@@ -153,7 +153,7 @@ jobs:
 
             const blockedLines = blocked.length
               ? blocked.map(({ issueNumber, issue, pending }) =>
-                  `- [ ] #${issueNumber} · ${shortTitle(issue.title)}\n  - necesita ${formatDeps(pending)}`
+                  `- [ ] #${issueNumber} · ${shortTitle(issue.title)}\n  - espera ${formatDeps(pending)}`
                 ).join('\n')
               : '_No hay tareas bloqueadas._';
 
@@ -163,13 +163,13 @@ jobs:
                 ).join('\n')
               : '_Todavía no hay tareas terminadas._';
 
-            const body = `# Empieza aquí
+            const body = `# ¿Qué tarea sigue?
 
-Esta issue responde una sola pregunta: **¿qué tarea puedo tomar ahora?**
+Este es el punto de entrada al backlog de QualityTrack.
 
-No necesitas revisar todo el backlog. Busca una tarea en la sección verde.
+**Si una tarea aparece en 🟢 Disponibles, puedes tomarla.** Las tareas bloqueadas se habilitan cuando terminan las issues que necesitan.
 
-## 🟢 Disponibles ahora
+## 🟢 Disponibles
 
 ${readyLines}
 
@@ -181,34 +181,14 @@ ${blockedLines}
 
 ${completedLines}
 
----
-
 ## Cómo trabajar
 
-1. Toma una issue que esté en **🟢 Disponibles ahora** y tenga el label \`ready\`.
-2. Asígnatela para que el equipo sepa que la estás trabajando.
-3. Sigue sus tareas y, si te atoras, abre **💡 ¿No sabes por dónde empezar?**.
-4. Cuando la issue se cierre, este tablero se actualizará automáticamente.
+1. Elige una tarea de **🟢 Disponibles** y asígnatela.
+2. Abre la issue y sigue su resumen.
+3. Si necesitas ayuda, abre **💡 ¿No sabes por dónde empezar?**.
+4. Cuando el trabajo termine y la issue se cierre, este tablero se recalcula.
 
-## Camino general
-
-\`\`\`text
-Acceso y clientes
-      ↓
-Solicitudes
-      ↓
-Cotizaciones
-      ↓
-Producción
-      ↓
-Calidad
-      ↓
-Entrega
-      ↓
-Trazabilidad 360
-\`\`\`
-
-> 🤖 Los labels \`ready\` / \`blocked\` y este tablero son administrados automáticamente por GitHub Actions.
+> \`ready\` = puedes comenzar · \`blocked\` = espera dependencias
 `;
 
             await github.rest.issues.update({
