@@ -30,13 +30,22 @@ public class UserSystemRole {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_by_user_id")
+    private User assignedByUser;
+
     @CreationTimestamp
     @Column(name = "assigned_at", nullable = false, updatable = false)
     private Instant assignedAt;
 
     public UserSystemRole(User user, SystemRole role) {
+        this(user, role, null);
+    }
+
+    public UserSystemRole(User user, SystemRole role, User assignedByUser) {
         this.user = user;
         this.id = new UserSystemRoleId(user.getId(), role);
+        this.assignedByUser = assignedByUser;
     }
 
     public SystemRole getRole() {
