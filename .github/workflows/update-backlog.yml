@@ -1,0 +1,223 @@
+name: Backlog automático
+
+on:
+  issues:
+    types: [opened, closed, reopened, edited]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  refresh-backlog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Actualizar estados y tablero
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            const configFile = await github.rest.repos.getContent({
+              owner,
+              repo,
+              path: '.github/backlog.json',
+              ref: context.payload.repository.default_branch
+            });
+
+            const config = JSON.parse(
+              Buffer.from(configFile.data.content, 'base64').toString('utf8')
+            );
+
+            const roadmapIssue = Number(config.roadmap_issue);
+            const dependencies = config.dependencies;
+
+            // Evita un ciclo cuando el propio workflow actualiza la issue de inicio.
+            if (
+              context.eventName === 'issues' &&
+              context.payload.action === 'edited' &&
+              context.payload.issue?.number === roadmapIssue
+            ) {
+              core.info('La edición pertenece al tablero automático. No se vuelve a ejecutar.');
+              return;
+            }
+
+            const managedLabels = [
+              {
+                name: 'ready',
+                color: '2DA44E',
+                description: 'Tarea disponible para comenzar'
+              },
+              {
+                name: 'blocked',
+                color: 'D1242F',
+                description: 'Tarea bloqueada por dependencias pendientes'
+              }
+            ];
+
+            for (const label of managedLabels) {
+              try {
+                await github.rest.issues.getLabel({ owner, repo, name: label.name });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ owner, repo, ...label });
+              }
+            }
+
+            const trackedNumbers = Object.keys(dependencies)
+              .map(Number)
+              .sort((a, b) => a - b);
+
+            const issues = new Map();
+
+            for (const issueNumber of trackedNumbers) {
+              const response = await github.rest.issues.get({
+                owner,
+                repo,
+                issue_number: issueNumber
+              });
+              issues.set(issueNumber, response.data);
+            }
+
+            const hasLabel = (issue, labelName) =>
+              issue.labels.some(label =>
+                typeof label === 'string' ? label === labelName : label.name === labelName
+              );
+
+            async function addLabel(issueNumber, labelName) {
+              await github.rest.issues.addLabels({
+                owner,
+                repo,
+                issue_number: issueNumber,
+                labels: [labelName]
+              });
+            }
+
+            async function removeLabel(issueNumber, labelName) {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner,
+                  repo,
+                  issue_number: issueNumber,
+                  name: labelName
+                });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+              }
+            }
+
+            const ready = [];
+            const blocked = [];
+            const completed = [];
+
+            for (const issueNumber of trackedNumbers) {
+              const issue = issues.get(issueNumber);
+              const deps = (dependencies[String(issueNumber)] ?? []).map(Number);
+
+              if (issue.state === 'closed') {
+                await removeLabel(issueNumber, 'ready');
+                await removeLabel(issueNumber, 'blocked');
+                completed.push({ issueNumber, issue });
+                continue;
+              }
+
+              const pending = deps.filter(dep => issues.get(dep)?.state !== 'closed');
+              const shouldBeReady = pending.length === 0;
+
+              if (shouldBeReady) {
+                if (!hasLabel(issue, 'ready')) await addLabel(issueNumber, 'ready');
+                if (hasLabel(issue, 'blocked')) await removeLabel(issueNumber, 'blocked');
+                ready.push({ issueNumber, issue });
+              } else {
+                if (!hasLabel(issue, 'blocked')) await addLabel(issueNumber, 'blocked');
+                if (hasLabel(issue, 'ready')) await removeLabel(issueNumber, 'ready');
+                blocked.push({ issueNumber, issue, pending });
+              }
+            }
+
+            const shortTitle = title => title.replace(/^\[[^\]]+\]\s*/, '');
+
+            const formatDeps = deps => {
+              if (deps.length === 1) return `#${deps[0]}`;
+              if (deps.length === 2) return `#${deps[0]} y #${deps[1]}`;
+              return `${deps.slice(0, -1).map(n => `#${n}`).join(', ')} y #${deps.at(-1)}`;
+            };
+
+            const readyLines = ready.length
+              ? ready.map(({ issueNumber, issue }) =>
+                  `- [ ] #${issueNumber} · ${shortTitle(issue.title)}`
+                ).join('\n')
+              : '_No hay tareas disponibles en este momento._';
+
+            const blockedLines = blocked.length
+              ? blocked.map(({ issueNumber, issue, pending }) =>
+                  `- [ ] #${issueNumber} · ${shortTitle(issue.title)}\n  - necesita ${formatDeps(pending)}`
+                ).join('\n')
+              : '_No hay tareas bloqueadas._';
+
+            const completedLines = completed.length
+              ? completed.map(({ issueNumber, issue }) =>
+                  `- [x] #${issueNumber} · ${shortTitle(issue.title)}`
+                ).join('\n')
+              : '_Todavía no hay tareas terminadas._';
+
+            const body = `# Empieza aquí
+
+Esta issue responde una sola pregunta: **¿qué tarea puedo tomar ahora?**
+
+No necesitas revisar todo el backlog. Busca una tarea en la sección verde.
+
+## 🟢 Disponibles ahora
+
+${readyLines}
+
+## 🔒 Bloqueadas
+
+${blockedLines}
+
+## ✅ Terminadas
+
+${completedLines}
+
+---
+
+## Cómo trabajar
+
+1. Toma una issue que esté en **🟢 Disponibles ahora** y tenga el label \`ready\`.
+2. Asígnatela para que el equipo sepa que la estás trabajando.
+3. Sigue sus tareas y, si te atoras, abre **💡 ¿No sabes por dónde empezar?**.
+4. Cuando la issue se cierre, este tablero se actualizará automáticamente.
+
+## Camino general
+
+\`\`\`text
+Acceso y clientes
+      ↓
+Solicitudes
+      ↓
+Cotizaciones
+      ↓
+Producción
+      ↓
+Calidad
+      ↓
+Entrega
+      ↓
+Trazabilidad 360
+\`\`\`
+
+> 🤖 Los labels \`ready\` / \`blocked\` y este tablero son administrados automáticamente por GitHub Actions.
+`;
+
+            await github.rest.issues.update({
+              owner,
+              repo,
+              issue_number: roadmapIssue,
+              body
+            });
+
+            core.info(`Ready: ${ready.map(i => i.issueNumber).join(', ') || 'ninguna'}`);
+            core.info(`Blocked: ${blocked.map(i => i.issueNumber).join(', ') || 'ninguna'}`);
+            core.info(`Completed: ${completed.map(i => i.issueNumber).join(', ') || 'ninguna'}`);
