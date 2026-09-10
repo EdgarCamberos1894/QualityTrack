@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar empresa cliente",
-        description = "Devuelve los datos de una empresa cuando el usuario autenticado mantiene una membresía ACTIVE en ella."
+        description = "Consulta los datos generales de una empresa a la que pertenece el usuario autenticado. Antes de devolver la información, se comprueba que el usuario conserve una membresía ACTIVE en esa empresa; tener un JWT válido por sí solo no concede acceso. Si el usuario fue retirado de la empresa, puede seguir teniendo una cuenta válida, pero este recurso dejará de estar disponible para él."
 )
 @ApiResponses({
         @ApiResponse(
