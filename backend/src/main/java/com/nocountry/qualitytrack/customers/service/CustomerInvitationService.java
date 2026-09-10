@@ -1,11 +1,12 @@
 package com.nocountry.qualitytrack.customers.service;
 
 import com.nocountry.qualitytrack.auth.token.OpaqueTokenService;
-import com.nocountry.qualitytrack.customers.dto.request.AcceptCustomerInvitationRequest;
 import com.nocountry.qualitytrack.customers.dto.request.CompleteCustomerInvitationRegistrationRequest;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerInvitationRequest;
+import com.nocountry.qualitytrack.customers.dto.request.CustomerInvitationTokenRequest;
+import com.nocountry.qualitytrack.customers.dto.response.CustomerInvitationAcceptResponse;
+import com.nocountry.qualitytrack.customers.dto.response.CustomerInvitationPreviewResponse;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerInvitationResponse;
-import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
 import com.nocountry.qualitytrack.customers.entity.Customer;
 import com.nocountry.qualitytrack.customers.entity.CustomerInvitation;
 import com.nocountry.qualitytrack.customers.entity.CustomerMembership;
@@ -20,6 +21,7 @@ import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.users.enums.AccountType;
+import com.nocountry.qualitytrack.users.enums.UserStatus;
 import com.nocountry.qualitytrack.users.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -109,41 +111,42 @@ public class CustomerInvitationService {
         return CustomerInvitationResponse.from(invitation);
     }
 
-    @Transactional
-    public CustomerMemberResponse acceptInvitation(
-            Long currentUserId,
-            AcceptCustomerInvitationRequest request
-    ) {
-        User user = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new BusinessException(
-                        ApiErrorCode.RESOURCE_NOT_FOUND,
-                        "No se encontró el usuario autenticado."
-                ));
-
-        if (user.getAccountType() != AccountType.CUSTOMER) {
-            throw new BusinessException(
-                    ApiErrorCode.ACCESS_DENIED,
-                    "Solo una cuenta de cliente puede aceptar invitaciones de empresa."
-            );
-        }
-
-        CustomerInvitation invitation = requirePendingInvitation(request.token());
-
-        if (!invitation.getEmail().equals(normalizeEmail(user.getEmail()))) {
-            throw new BusinessException(
-                    ApiErrorCode.ACCESS_DENIED,
-                    "La invitación pertenece a otra dirección de correo electrónico."
-            );
-        }
-
-        return acceptInvitationForUser(invitation, user, Instant.now());
+    @Transactional(readOnly = true)
+    public CustomerInvitationPreviewResponse resolveInvitation(CustomerInvitationTokenRequest request) {
+        CustomerInvitation invitation = requireAvailableInvitation(request.token());
+        return CustomerInvitationPreviewResponse.from(invitation);
     }
 
     @Transactional
-    public CustomerMemberResponse completeRegistration(
+    public CustomerInvitationAcceptResponse acceptInvitation(CustomerInvitationTokenRequest request) {
+        CustomerInvitation invitation = requireAvailableInvitationForUpdate(request.token());
+        Optional<User> existingUser = userRepository.findByEmail(invitation.getEmail());
+
+        if (existingUser.isEmpty()) {
+            return CustomerInvitationAcceptResponse.registrationRequired(invitation);
+        }
+
+        User user = existingUser.get();
+        validateExistingAccountForAcceptance(user);
+
+        Instant acceptedAt = Instant.now();
+        if (user.getStatus() == UserStatus.PENDING_VERIFICATION) {
+            // Possession of the invitation token proves control of the invited email address.
+            user.verifyEmail(acceptedAt);
+        }
+
+        activateMembership(invitation, user, acceptedAt);
+        invitation.accept(user, acceptedAt);
+        invitationRepository.save(invitation);
+
+        return CustomerInvitationAcceptResponse.accepted(invitation);
+    }
+
+    @Transactional
+    public CustomerInvitationAcceptResponse completeRegistration(
             CompleteCustomerInvitationRegistrationRequest request
     ) {
-        CustomerInvitation invitation = requirePendingInvitation(request.token());
+        CustomerInvitation invitation = requireAvailableInvitationForUpdate(request.token());
         String email = invitation.getEmail();
 
         if (userRepository.existsByEmail(email)) {
@@ -158,39 +161,50 @@ public class CustomerInvitationService {
                 passwordEncoder.encode(request.password())
         );
 
-        // Receiving the invitation at this address proves control of the email account.
+        // The invitation itself verifies control of the destination email address.
         user.verifyEmail(acceptedAt);
 
         try {
             user = userRepository.saveAndFlush(user);
         } catch (DataIntegrityViolationException exception) {
-            // Covers a concurrent registration using the same invited email.
+            // Covers a concurrent normal registration using the same invited email.
             throw existingAccountForInvitation();
         }
 
-        return acceptInvitationForUser(invitation, user, acceptedAt);
-    }
+        CustomerMembership membership = CustomerMembership.acceptedInvitation(
+                invitation.getCustomer(),
+                user,
+                invitation.getRole(),
+                invitation.getInvitedByUser(),
+                acceptedAt
+        );
+        membershipRepository.save(membership);
 
-    private CustomerMemberResponse acceptInvitationForUser(
-            CustomerInvitation invitation,
-            User user,
-            Instant acceptedAt
-    ) {
-        CustomerMembership membership = activateMembership(invitation, user, acceptedAt);
         invitation.accept(user, acceptedAt);
         invitationRepository.save(invitation);
 
-        return CustomerMemberResponse.from(membership);
+        return CustomerInvitationAcceptResponse.accepted(invitation);
     }
 
-    private CustomerInvitation requirePendingInvitation(String rawToken) {
+    private CustomerInvitation requireAvailableInvitation(String rawToken) {
         String tokenHash = opaqueTokenService.hash(rawToken.trim());
         CustomerInvitation invitation = invitationRepository.findByTokenHash(tokenHash)
-                .orElseThrow(() -> new BusinessException(
-                        ApiErrorCode.INVALID_CUSTOMER_INVITATION_TOKEN,
-                        "La invitación no es válida."
-                ));
+                .orElseThrow(this::invalidInvitation);
 
+        validateInvitationIsAvailable(invitation);
+        return invitation;
+    }
+
+    private CustomerInvitation requireAvailableInvitationForUpdate(String rawToken) {
+        String tokenHash = opaqueTokenService.hash(rawToken.trim());
+        CustomerInvitation invitation = invitationRepository.findByTokenHashForUpdate(tokenHash)
+                .orElseThrow(this::invalidInvitation);
+
+        validateInvitationIsAvailable(invitation);
+        return invitation;
+    }
+
+    private void validateInvitationIsAvailable(CustomerInvitation invitation) {
         if (invitation.getStatus() == CustomerInvitationStatus.EXPIRED) {
             throw expiredInvitation();
         }
@@ -205,8 +219,6 @@ public class CustomerInvitationService {
         if (invitation.isExpired(Instant.now())) {
             throw expiredInvitation();
         }
-
-        return invitation;
     }
 
     private void validateTargetCanBeInvited(Long customerId, String email) {
@@ -217,10 +229,11 @@ public class CustomerInvitationService {
 
         User user = targetUser.get();
         if (user.getAccountType() != AccountType.CUSTOMER) {
-            throw new BusinessException(
-                    ApiErrorCode.DATA_CONFLICT,
-                    "El correo pertenece a una cuenta interna y no puede añadirse como miembro cliente."
-            );
+            throw unavailableAccountForInvitation();
+        }
+
+        if (user.getStatus() == UserStatus.SUSPENDED || user.getStatus() == UserStatus.PENDING_ACTIVATION) {
+            throw unavailableAccountForInvitation();
         }
 
         membershipRepository.findByCustomer_IdAndUser_Id(customerId, user.getId())
@@ -231,6 +244,16 @@ public class CustomerInvitationService {
                             "El usuario ya es miembro activo de la empresa."
                     );
                 });
+    }
+
+    private void validateExistingAccountForAcceptance(User user) {
+        if (user.getAccountType() != AccountType.CUSTOMER) {
+            throw unavailableAccountForInvitation();
+        }
+
+        if (user.getStatus() != UserStatus.ACTIVE && user.getStatus() != UserStatus.PENDING_VERIFICATION) {
+            throw unavailableAccountForInvitation();
+        }
     }
 
     private void expirePreviousInvitationIfNecessary(Long customerId, String email, Instant now) {
@@ -314,6 +337,13 @@ public class CustomerInvitationService {
         return membership;
     }
 
+    private BusinessException invalidInvitation() {
+        return new BusinessException(
+                ApiErrorCode.INVALID_CUSTOMER_INVITATION_TOKEN,
+                "La invitación no es válida."
+        );
+    }
+
     private BusinessException expiredInvitation() {
         return new BusinessException(
                 ApiErrorCode.CUSTOMER_INVITATION_EXPIRED,
@@ -324,7 +354,14 @@ public class CustomerInvitationService {
     private BusinessException existingAccountForInvitation() {
         return new BusinessException(
                 ApiErrorCode.DATA_CONFLICT,
-                "Ya existe una cuenta asociada a este correo. Inicia sesión para aceptar la invitación."
+                "Ya existe una cuenta asociada a este correo. Vuelve a aceptar la invitación para continuar con esa cuenta."
+        );
+    }
+
+    private BusinessException unavailableAccountForInvitation() {
+        return new BusinessException(
+                ApiErrorCode.DATA_CONFLICT,
+                "La cuenta asociada a la invitación no está disponible para incorporarse a esta empresa."
         );
     }
 
