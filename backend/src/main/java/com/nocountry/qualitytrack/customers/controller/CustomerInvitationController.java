@@ -3,7 +3,9 @@ package com.nocountry.qualitytrack.customers.controller;
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
 import com.nocountry.qualitytrack.customers.documentation.AcceptCustomerInvitationApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.CompleteCustomerInvitationRegistrationApiDocs;
+import com.nocountry.qualitytrack.customers.documentation.CreateCustomerInvitationApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.CustomerInvitationApiDocs;
+import com.nocountry.qualitytrack.customers.documentation.ListCustomerInvitationsApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.ResolveCustomerInvitationApiDocs;
 import com.nocountry.qualitytrack.customers.dto.request.CompleteCustomerInvitationRegistrationRequest;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerInvitationRequest;
@@ -36,6 +38,7 @@ public class CustomerInvitationController {
 
     private final CustomerInvitationService invitationService;
 
+    @CreateCustomerInvitationApiDocs
     @PostMapping("/customers/{customerId}/invitations")
     public ResponseEntity<ApiResponse<CustomerInvitationResponse>> createInvitation(
             @CurrentUserId Long currentUserId,
@@ -56,6 +59,7 @@ public class CustomerInvitationController {
                 ));
     }
 
+    @ListCustomerInvitationsApiDocs
     @GetMapping("/customers/{customerId}/invitations")
     public ResponseEntity<ApiResponse<List<CustomerInvitationResponse>>> listPendingInvitations(
             @CurrentUserId Long currentUserId,
