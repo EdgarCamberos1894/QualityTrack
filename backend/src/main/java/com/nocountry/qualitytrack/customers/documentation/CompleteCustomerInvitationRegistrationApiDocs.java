@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @SecurityRequirements
 @Operation(
         summary = "Completar registro desde una invitación",
-        description = "Crea una cuenta CUSTOMER usando el correo de una invitación válida, verifica ese correo mediante el propio token de invitación y activa la membresía en la empresa."
+        description = "Finaliza una invitación que devolvió REGISTRATION_REQUIRED. Crea una cuenta CUSTOMER con el correo fijado por la invitación, usa el propio token como prueba de control del correo y activa la membresía en la misma transacción."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Cuenta creada e invitación aceptada correctamente"),
