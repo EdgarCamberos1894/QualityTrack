@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.documents.service;
 
 import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
+import com.nocountry.qualitytrack.documents.dto.response.DocumentSummaryResponse;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentVersionResponse;
 import com.nocountry.qualitytrack.documents.entity.Document;
 import com.nocountry.qualitytrack.documents.entity.DocumentVersion;
@@ -15,6 +16,7 @@ import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.users.entity.User;
+import com.nocountry.qualitytrack.users.enums.AccountType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -48,12 +50,7 @@ public class DocumentService {
     ) {
         validateFile(file);
 
-        JobCase jobCase = jobCaseRepository.findById(input.caseId())
-                .orElseThrow(() -> new BusinessException(
-                        ApiErrorCode.RESOURCE_NOT_FOUND,
-                        "No se encontró el expediente."
-                ));
-
+        JobCase jobCase = requireJobCase(input.caseId());
         User uploader = accessService.requireCanCreate(currentUserId, jobCase);
 
         Document document = Document.create(
@@ -83,6 +80,19 @@ public class DocumentService {
         version = documentVersionRepository.saveAndFlush(version);
 
         return DocumentResponse.from(document, version);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DocumentSummaryResponse> listByCase(Long currentUserId, Long caseId) {
+        JobCase jobCase = requireJobCase(caseId);
+        User viewer = accessService.requireCanReadCase(currentUserId, jobCase);
+
+        return documentRepository.findAllByJobCase_IdOrderByCreatedAtAsc(caseId)
+                .stream()
+                .filter(document -> viewer.getAccountType() == AccountType.INTERNAL
+                        || document.getCreatedBy().getAccountType() == AccountType.CUSTOMER)
+                .map(DocumentSummaryResponse::from)
+                .toList();
     }
 
     @Transactional
@@ -122,12 +132,7 @@ public class DocumentService {
 
     @Transactional(readOnly = true)
     public List<DocumentVersionResponse> listVersions(Long currentUserId, Long documentId) {
-        Document document = documentRepository.findById(documentId)
-                .orElseThrow(() -> new BusinessException(
-                        ApiErrorCode.RESOURCE_NOT_FOUND,
-                        "No se encontró el documento."
-                ));
-
+        Document document = requireDocument(documentId);
         accessService.requireCanRead(currentUserId, document);
 
         return documentVersionRepository.findAllByDocument_IdOrderByVersionAsc(documentId)
@@ -166,6 +171,22 @@ public class DocumentService {
         } catch (IOException | DocumentStorageException exception) {
             throw storageUnavailable();
         }
+    }
+
+    private JobCase requireJobCase(Long caseId) {
+        return jobCaseRepository.findById(caseId)
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.RESOURCE_NOT_FOUND,
+                        "No se encontró el expediente."
+                ));
+    }
+
+    private Document requireDocument(Long documentId) {
+        return documentRepository.findById(documentId)
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.RESOURCE_NOT_FOUND,
+                        "No se encontró el documento."
+                ));
     }
 
     private StoredDocumentFile storeFile(Long caseId, Integer version, MultipartFile file) {

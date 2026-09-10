@@ -41,6 +41,18 @@ public class DocumentAccessService {
         return user;
     }
 
+    public User requireCanReadCase(Long userId, JobCase jobCase) {
+        User user = requireUser(userId);
+
+        if (user.getAccountType() == AccountType.INTERNAL) {
+            requireInternalRole(userId, false);
+            return user;
+        }
+
+        requireActiveMembership(userId, jobCase);
+        return user;
+    }
+
     public User requireCanAddVersion(Long userId, Document document) {
         User user = requireUser(userId);
         JobCase jobCase = requireCase(document);

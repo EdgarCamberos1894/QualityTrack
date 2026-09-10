@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
@@ -20,6 +21,12 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "createdBy"
     })
     Optional<Document> findById(Long id);
+
+    @EntityGraph(attributePaths = {
+            "jobCase",
+            "createdBy"
+    })
+    List<Document> findAllByJobCase_IdOrderByCreatedAtAsc(Long caseId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""

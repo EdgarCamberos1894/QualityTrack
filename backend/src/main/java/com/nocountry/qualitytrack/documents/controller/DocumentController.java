@@ -1,8 +1,15 @@
 package com.nocountry.qualitytrack.documents.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.documents.documentation.AddDocumentVersionApiDocs;
+import com.nocountry.qualitytrack.documents.documentation.CreateDocumentApiDocs;
+import com.nocountry.qualitytrack.documents.documentation.DocumentApiDocs;
+import com.nocountry.qualitytrack.documents.documentation.DownloadDocumentVersionApiDocs;
+import com.nocountry.qualitytrack.documents.documentation.ListCaseDocumentsApiDocs;
+import com.nocountry.qualitytrack.documents.documentation.ListDocumentVersionsApiDocs;
 import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
+import com.nocountry.qualitytrack.documents.dto.response.DocumentSummaryResponse;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentVersionResponse;
 import com.nocountry.qualitytrack.documents.service.DocumentDownload;
 import com.nocountry.qualitytrack.documents.service.DocumentService;
@@ -20,6 +27,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,10 +38,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/documents")
 @RequiredArgsConstructor
+@DocumentApiDocs
 public class DocumentController {
 
     private final DocumentService documentService;
 
+    @CreateDocumentApiDocs
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<DocumentResponse>> create(
             @CurrentUserId Long currentUserId,
@@ -50,6 +60,25 @@ public class DocumentController {
                 ));
     }
 
+    @ListCaseDocumentsApiDocs
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<DocumentSummaryResponse>>> listByCase(
+            @CurrentUserId Long currentUserId,
+            @RequestParam Long caseId
+    ) {
+        List<DocumentSummaryResponse> response = documentService.listByCase(
+                currentUserId,
+                caseId
+        );
+
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.DOCUMENTS_RETRIEVED,
+                "Documentos del expediente consultados correctamente.",
+                response
+        ));
+    }
+
+    @AddDocumentVersionApiDocs
     @PostMapping(value = "/{documentId}/versions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<DocumentVersionResponse>> addVersion(
             @CurrentUserId Long currentUserId,
@@ -70,6 +99,7 @@ public class DocumentController {
                 ));
     }
 
+    @ListDocumentVersionsApiDocs
     @GetMapping("/{documentId}/versions")
     public ResponseEntity<ApiResponse<List<DocumentVersionResponse>>> listVersions(
             @CurrentUserId Long currentUserId,
@@ -87,6 +117,7 @@ public class DocumentController {
         ));
     }
 
+    @DownloadDocumentVersionApiDocs
     @GetMapping("/{documentId}/versions/{versionId}/content")
     public ResponseEntity<Resource> download(
             @CurrentUserId Long currentUserId,
