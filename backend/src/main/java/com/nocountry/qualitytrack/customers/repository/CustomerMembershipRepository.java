@@ -16,6 +16,8 @@ public interface CustomerMembershipRepository extends JpaRepository<CustomerMemb
             CustomerMembershipStatus status
     );
 
+    Optional<CustomerMembership> findByCustomer_IdAndUser_Id(Long customerId, Long userId);
+
     Optional<CustomerMembership> findByCustomer_IdAndUser_IdAndStatus(
             Long customerId,
             Long userId,
