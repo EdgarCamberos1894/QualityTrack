@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Listar miembros activos de una empresa",
-        description = "Devuelve únicamente las membresías ACTIVE de la empresa. El usuario autenticado debe pertenecer activamente a la misma empresa. Las invitaciones pendientes se consultan en el endpoint de invitaciones."
+        description = "Devuelve las personas que actualmente tienen acceso a la empresa mediante una membresía ACTIVE. Cualquier miembro ACTIVE de la misma empresa puede consultar esta lista, independientemente de su rol. Las invitaciones que todavía no han sido aceptadas no aparecen aquí porque aún no son membresías; se consultan mediante el endpoint de invitaciones pendientes. Los miembros retirados tampoco se muestran, aunque su historial de membresía se conserva."
 )
 @ApiResponses({
         @ApiResponse(
