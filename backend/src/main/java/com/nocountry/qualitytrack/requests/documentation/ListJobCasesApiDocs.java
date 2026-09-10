@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar expedientes",
-        description = "Devuelve los JobCase disponibles para el trabajo interno, ordenados desde el más reciente. Cada expediente incluye la solicitud de cliente que le dio origen. En esta primera etapa el endpoint es de consulta y está reservado a cuentas INTERNAL; las acciones de toma, revisión y transición de estado se incorporan junto con la trazabilidad del expediente."
+        description = "Devuelve los JobCase disponibles para el trabajo interno, ordenados desde el más reciente. Cada expediente incluye la solicitud de cliente que le dio origen. En esta primera etapa pueden consultarlos cuentas INTERNAL con rol ADMIN, COMMERCIAL, ENGINEERING o AUDITOR; las acciones de toma, revisión y transición de estado se incorporan junto con la trazabilidad del expediente."
 )
 @ApiResponses({
         @ApiResponse(
@@ -38,7 +38,7 @@ import java.lang.annotation.Target;
         ),
         @ApiResponse(
                 responseCode = "403",
-                description = "La cuenta autenticada no es INTERNAL",
+                description = "La cuenta o el rol interno no permiten consultar expedientes",
                 content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = RequestApiExamples.ACCESS_DENIED))
         )
 })
