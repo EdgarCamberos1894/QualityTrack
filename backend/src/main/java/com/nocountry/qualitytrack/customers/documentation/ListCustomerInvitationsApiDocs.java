@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Listar invitaciones pendientes",
-        description = "Devuelve las invitaciones PENDING que todavía no han expirado para una empresa. Solo un ADMIN activo de la empresa puede consultarlas. Nunca devuelve el token de invitación."
+        description = "Consulta las invitaciones que todavía están disponibles para incorporarse a una empresa. Solo un ADMIN activo de esa empresa puede verlas. La respuesta incluye datos como correo, rol, estado y expiración para construir la vista de 'Invitaciones pendientes', pero nunca devuelve el token utilizado por el invitado. Las invitaciones ya aceptadas, canceladas o cuyo tiempo de vigencia terminó no forman parte de esta lista."
 )
 @ApiResponses({
         @ApiResponse(
