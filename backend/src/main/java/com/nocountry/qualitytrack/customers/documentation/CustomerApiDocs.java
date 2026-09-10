@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Documented
 @Tag(
         name = "Empresas cliente",
-        description = "Operaciones para crear y administrar empresas cliente y consultar sus miembros activos. La autenticación identifica al usuario, pero el acceso a una empresa concreta depende de que conserve una membresía ACTIVE en ella. Algunas operaciones, como editar la empresa o retirar miembros, requieren además rol ADMIN dentro de esa empresa."
+        description = "Gestión de empresas cliente y sus membresías."
 )
 public @interface CustomerApiDocs {
 }
