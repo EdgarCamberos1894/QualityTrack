@@ -197,9 +197,9 @@ class CustomerInvitationServiceTest {
         List<CustomerInvitationResponse> response = service.listPendingInvitations(10L, 20L);
 
         assertEquals(1, response.size());
-        assertEquals(20L, response.getFirst().customerId());
-        assertEquals("member@example.com", response.getFirst().email());
-        assertEquals(CustomerInvitationStatus.PENDING, response.getFirst().status());
+        assertEquals(20L, response.get(0).customerId());
+        assertEquals("member@example.com", response.get(0).email());
+        assertEquals(CustomerInvitationStatus.PENDING, response.get(0).status());
     }
 
     @Test
