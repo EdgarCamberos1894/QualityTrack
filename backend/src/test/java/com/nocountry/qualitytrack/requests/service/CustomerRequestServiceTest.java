@@ -16,11 +16,6 @@ import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.users.entity.User;
-import com.nocountry.qualitytrack.users.entity.UserSystemRole;
-import com.nocountry.qualitytrack.users.enums.AccountType;
-import com.nocountry.qualitytrack.users.enums.SystemRole;
-import com.nocountry.qualitytrack.users.repository.UserRepository;
-import com.nocountry.qualitytrack.users.repository.UserSystemRoleRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,12 +46,6 @@ class CustomerRequestServiceTest {
     private CustomerMembershipRepository membershipRepository;
 
     @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private UserSystemRoleRepository userSystemRoleRepository;
-
-    @Mock
     private RequestReferenceGenerator referenceGenerator;
 
     @Mock
@@ -68,9 +57,6 @@ class CustomerRequestServiceTest {
     @Mock
     private User user;
 
-    @Mock
-    private UserSystemRole systemRole;
-
     private CustomerRequestService service;
 
     @BeforeEach
@@ -79,8 +65,6 @@ class CustomerRequestServiceTest {
                 customerRequestRepository,
                 jobCaseRepository,
                 membershipRepository,
-                userRepository,
-                userSystemRoleRepository,
                 referenceGenerator
         );
     }
@@ -185,48 +169,6 @@ class CustomerRequestServiceTest {
         List<CustomerRequestResponse> response = service.listForCustomer(10L, 20L);
 
         assertEquals(0, response.size());
-    }
-
-    @Test
-    void rejectsCustomerAccountFromInternalJobCaseList() {
-        when(userRepository.findById(10L)).thenReturn(Optional.of(user));
-        when(user.getAccountType()).thenReturn(AccountType.CUSTOMER);
-
-        BusinessException exception = assertThrows(
-                BusinessException.class,
-                () -> service.listJobCases(10L)
-        );
-
-        assertEquals(ApiErrorCode.ACCESS_DENIED, exception.getCode());
-        verify(userSystemRoleRepository, never()).findAllByIdUserId(10L);
-        verify(jobCaseRepository, never()).findAllByOrderByOpenedAtDesc();
-    }
-
-    @Test
-    void allowsCommercialToListJobCases() {
-        when(userRepository.findById(10L)).thenReturn(Optional.of(user));
-        when(user.getAccountType()).thenReturn(AccountType.INTERNAL);
-        when(userSystemRoleRepository.findAllByIdUserId(10L)).thenReturn(List.of(systemRole));
-        when(systemRole.getRole()).thenReturn(SystemRole.COMMERCIAL);
-        when(jobCaseRepository.findAllByOrderByOpenedAtDesc()).thenReturn(List.of());
-
-        assertEquals(0, service.listJobCases(10L).size());
-    }
-
-    @Test
-    void rejectsInternalRoleWithoutCaseVisibility() {
-        when(userRepository.findById(10L)).thenReturn(Optional.of(user));
-        when(user.getAccountType()).thenReturn(AccountType.INTERNAL);
-        when(userSystemRoleRepository.findAllByIdUserId(10L)).thenReturn(List.of(systemRole));
-        when(systemRole.getRole()).thenReturn(SystemRole.PRODUCTION);
-
-        BusinessException exception = assertThrows(
-                BusinessException.class,
-                () -> service.listJobCases(10L)
-        );
-
-        assertEquals(ApiErrorCode.ACCESS_DENIED, exception.getCode());
-        verify(jobCaseRepository, never()).findAllByOrderByOpenedAtDesc();
     }
 
     @Test
