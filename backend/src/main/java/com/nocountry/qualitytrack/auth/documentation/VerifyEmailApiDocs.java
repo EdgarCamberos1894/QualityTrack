@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @SecurityRequirements
 @Operation(
         summary = "Verificar correo electrónico",
-        description = "Consume un token de verificación de un solo uso y activa la cuenta CUSTOMER cuando cumple con los requisitos."
+        description = "Finaliza la activación de una cuenta CUSTOMER registrada de forma normal. El backend valida que el token exista, no haya expirado y corresponda a una cuenta que todavía esté PENDING_VERIFICATION. Si todo es correcto, la cuenta pasa a ACTIVE y el token se consume para que no pueda reutilizarse. A partir de ese momento el usuario ya puede iniciar sesión con sus credenciales."
 )
 @ApiResponses({
         @ApiResponse(
