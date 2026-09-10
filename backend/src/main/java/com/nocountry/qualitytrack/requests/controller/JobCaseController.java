@@ -5,7 +5,7 @@ import com.nocountry.qualitytrack.requests.documentation.GetJobCaseApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.JobCaseApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.ListJobCasesApiDocs;
 import com.nocountry.qualitytrack.requests.dto.response.JobCaseResponse;
-import com.nocountry.qualitytrack.requests.service.CustomerRequestService;
+import com.nocountry.qualitytrack.requests.service.JobCaseService;
 import com.nocountry.qualitytrack.shared.response.ApiResponse;
 import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +23,14 @@ import java.util.List;
 @JobCaseApiDocs
 public class JobCaseController {
 
-    private final CustomerRequestService customerRequestService;
+    private final JobCaseService jobCaseService;
 
     @ListJobCasesApiDocs
     @GetMapping
     public ResponseEntity<ApiResponse<List<JobCaseResponse>>> list(
             @CurrentUserId Long currentUserId
     ) {
-        List<JobCaseResponse> response = customerRequestService.listJobCases(currentUserId);
+        List<JobCaseResponse> response = jobCaseService.list(currentUserId);
 
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.JOB_CASES_RETRIEVED,
@@ -45,7 +45,7 @@ public class JobCaseController {
             @CurrentUserId Long currentUserId,
             @PathVariable Long caseId
     ) {
-        JobCaseResponse response = customerRequestService.getJobCase(currentUserId, caseId);
+        JobCaseResponse response = jobCaseService.get(currentUserId, caseId);
 
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.JOB_CASE_RETRIEVED,
