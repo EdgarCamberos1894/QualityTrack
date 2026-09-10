@@ -1,6 +1,9 @@
 package com.nocountry.qualitytrack.requests.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.requests.documentation.GetJobCaseApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.JobCaseApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.ListJobCasesApiDocs;
 import com.nocountry.qualitytrack.requests.dto.response.JobCaseResponse;
 import com.nocountry.qualitytrack.requests.service.CustomerRequestService;
 import com.nocountry.qualitytrack.shared.response.ApiResponse;
@@ -17,10 +20,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/job-cases")
 @RequiredArgsConstructor
+@JobCaseApiDocs
 public class JobCaseController {
 
     private final CustomerRequestService customerRequestService;
 
+    @ListJobCasesApiDocs
     @GetMapping
     public ResponseEntity<ApiResponse<List<JobCaseResponse>>> list(
             @CurrentUserId Long currentUserId
@@ -34,6 +39,7 @@ public class JobCaseController {
         ));
     }
 
+    @GetJobCaseApiDocs
     @GetMapping("/{caseId}")
     public ResponseEntity<ApiResponse<JobCaseResponse>> get(
             @CurrentUserId Long currentUserId,
