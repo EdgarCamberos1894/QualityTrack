@@ -1,0 +1,269 @@
+package com.nocountry.qualitytrack.customers.service;
+
+import com.nocountry.qualitytrack.auth.token.OpaqueTokenService;
+import com.nocountry.qualitytrack.customers.dto.request.AcceptCustomerInvitationRequest;
+import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerInvitationRequest;
+import com.nocountry.qualitytrack.customers.dto.response.CustomerInvitationResponse;
+import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
+import com.nocountry.qualitytrack.customers.entity.Customer;
+import com.nocountry.qualitytrack.customers.entity.CustomerInvitation;
+import com.nocountry.qualitytrack.customers.entity.CustomerMembership;
+import com.nocountry.qualitytrack.customers.enums.CustomerInvitationStatus;
+import com.nocountry.qualitytrack.customers.enums.CustomerMembershipRole;
+import com.nocountry.qualitytrack.customers.enums.CustomerMembershipStatus;
+import com.nocountry.qualitytrack.customers.repository.CustomerInvitationRepository;
+import com.nocountry.qualitytrack.customers.repository.CustomerMembershipRepository;
+import com.nocountry.qualitytrack.customers.repository.CustomerRepository;
+import com.nocountry.qualitytrack.notification.email.EmailService;
+import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
+import com.nocountry.qualitytrack.shared.exception.BusinessException;
+import com.nocountry.qualitytrack.users.entity.User;
+import com.nocountry.qualitytrack.users.enums.AccountType;
+import com.nocountry.qualitytrack.users.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Locale;
+import java.util.Optional;
+
+@Service
+public class CustomerInvitationService {
+
+    private final CustomerRepository customerRepository;
+    private final CustomerMembershipRepository membershipRepository;
+    private final CustomerInvitationRepository invitationRepository;
+    private final UserRepository userRepository;
+    private final OpaqueTokenService opaqueTokenService;
+    private final EmailService emailService;
+    private final Duration invitationExpiration;
+
+    public CustomerInvitationService(
+            CustomerRepository customerRepository,
+            CustomerMembershipRepository membershipRepository,
+            CustomerInvitationRepository invitationRepository,
+            UserRepository userRepository,
+            OpaqueTokenService opaqueTokenService,
+            EmailService emailService,
+            @Value("${app.customer-invitations.expiration:PT72H}") Duration invitationExpiration
+    ) {
+        if (invitationExpiration == null || invitationExpiration.isZero() || invitationExpiration.isNegative()) {
+            throw new IllegalStateException("La expiración de las invitaciones debe ser mayor a cero.");
+        }
+
+        this.customerRepository = customerRepository;
+        this.membershipRepository = membershipRepository;
+        this.invitationRepository = invitationRepository;
+        this.userRepository = userRepository;
+        this.opaqueTokenService = opaqueTokenService;
+        this.emailService = emailService;
+        this.invitationExpiration = invitationExpiration;
+    }
+
+    @Transactional
+    public CustomerInvitationResponse createInvitation(
+            Long currentUserId,
+            Long customerId,
+            CreateCustomerInvitationRequest request
+    ) {
+        Customer customer = customerRepository.findByIdForUpdate(customerId)
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.RESOURCE_NOT_FOUND,
+                        "No se encontró la empresa."
+                ));
+
+        CustomerMembership inviterMembership = requireActiveAdmin(currentUserId, customerId);
+        User inviter = inviterMembership.getUser();
+        String email = normalizeEmail(request.email());
+        Instant now = Instant.now();
+
+        validateTargetCanBeInvited(customerId, email);
+        expirePreviousInvitationIfNecessary(customerId, email, now);
+
+        OpaqueTokenService.GeneratedOpaqueToken token = opaqueTokenService.generate();
+        CustomerInvitation invitation = CustomerInvitation.create(
+                customer,
+                email,
+                request.role(),
+                token.hash(),
+                now.plus(invitationExpiration),
+                inviter
+        );
+
+        invitation = invitationRepository.saveAndFlush(invitation);
+        emailService.sendCustomerInvitationEmail(
+                email,
+                token.value(),
+                customer.getName(),
+                request.role().name()
+        );
+
+        return CustomerInvitationResponse.from(invitation);
+    }
+
+    @Transactional
+    public CustomerMemberResponse acceptInvitation(
+            Long currentUserId,
+            AcceptCustomerInvitationRequest request
+    ) {
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.RESOURCE_NOT_FOUND,
+                        "No se encontró el usuario autenticado."
+                ));
+
+        if (user.getAccountType() != AccountType.CUSTOMER) {
+            throw new BusinessException(
+                    ApiErrorCode.ACCESS_DENIED,
+                    "Solo una cuenta de cliente puede aceptar invitaciones de empresa."
+            );
+        }
+
+        String rawToken = request.token().trim();
+        CustomerInvitation invitation = invitationRepository.findByTokenHash(opaqueTokenService.hash(rawToken))
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.INVALID_CUSTOMER_INVITATION_TOKEN,
+                        "La invitación no es válida."
+                ));
+
+        if (invitation.getStatus() == CustomerInvitationStatus.EXPIRED
+                || invitation.isExpired(Instant.now())) {
+            throw new BusinessException(
+                    ApiErrorCode.CUSTOMER_INVITATION_EXPIRED,
+                    "La invitación ha expirado."
+            );
+        }
+
+        if (invitation.getStatus() != CustomerInvitationStatus.PENDING) {
+            throw new BusinessException(
+                    ApiErrorCode.INVALID_CUSTOMER_INVITATION_TOKEN,
+                    "La invitación ya no está disponible."
+            );
+        }
+
+        if (!invitation.getEmail().equals(normalizeEmail(user.getEmail()))) {
+            throw new BusinessException(
+                    ApiErrorCode.ACCESS_DENIED,
+                    "La invitación pertenece a otra dirección de correo electrónico."
+            );
+        }
+
+        Instant acceptedAt = Instant.now();
+        CustomerMembership membership = activateMembership(invitation, user, acceptedAt);
+        invitation.accept(user, acceptedAt);
+        invitationRepository.save(invitation);
+
+        return CustomerMemberResponse.from(membership);
+    }
+
+    private void validateTargetCanBeInvited(Long customerId, String email) {
+        Optional<User> targetUser = userRepository.findByEmail(email);
+        if (targetUser.isEmpty()) {
+            return;
+        }
+
+        User user = targetUser.get();
+        if (user.getAccountType() != AccountType.CUSTOMER) {
+            throw new BusinessException(
+                    ApiErrorCode.DATA_CONFLICT,
+                    "El correo pertenece a una cuenta interna y no puede añadirse como miembro cliente."
+            );
+        }
+
+        membershipRepository.findByCustomer_IdAndUser_Id(customerId, user.getId())
+                .filter(membership -> membership.getStatus() == CustomerMembershipStatus.ACTIVE)
+                .ifPresent(membership -> {
+                    throw new BusinessException(
+                            ApiErrorCode.DATA_CONFLICT,
+                            "El usuario ya es miembro activo de la empresa."
+                    );
+                });
+    }
+
+    private void expirePreviousInvitationIfNecessary(Long customerId, String email, Instant now) {
+        Optional<CustomerInvitation> pending = invitationRepository.findByCustomer_IdAndEmailAndStatus(
+                customerId,
+                email,
+                CustomerInvitationStatus.PENDING
+        );
+
+        if (pending.isEmpty()) {
+            return;
+        }
+
+        CustomerInvitation existing = pending.get();
+        if (!existing.isExpired(now)) {
+            throw new BusinessException(
+                    ApiErrorCode.DATA_CONFLICT,
+                    "Ya existe una invitación pendiente para ese correo en esta empresa."
+            );
+        }
+
+        existing.markExpired();
+        invitationRepository.saveAndFlush(existing);
+    }
+
+    private CustomerMembership activateMembership(
+            CustomerInvitation invitation,
+            User user,
+            Instant acceptedAt
+    ) {
+        Optional<CustomerMembership> existing = membershipRepository.findByCustomer_IdAndUser_Id(
+                invitation.getCustomer().getId(),
+                user.getId()
+        );
+
+        if (existing.isPresent()) {
+            CustomerMembership membership = existing.get();
+            if (membership.getStatus() == CustomerMembershipStatus.ACTIVE) {
+                throw new BusinessException(
+                        ApiErrorCode.DATA_CONFLICT,
+                        "El usuario ya es miembro activo de la empresa."
+                );
+            }
+
+            membership.activateFromInvitation(
+                    invitation.getRole(),
+                    invitation.getInvitedByUser(),
+                    acceptedAt
+            );
+            return membershipRepository.save(membership);
+        }
+
+        CustomerMembership membership = CustomerMembership.acceptedInvitation(
+                invitation.getCustomer(),
+                user,
+                invitation.getRole(),
+                invitation.getInvitedByUser(),
+                acceptedAt
+        );
+        return membershipRepository.save(membership);
+    }
+
+    private CustomerMembership requireActiveAdmin(Long userId, Long customerId) {
+        CustomerMembership membership = membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                        customerId,
+                        userId,
+                        CustomerMembershipStatus.ACTIVE
+                )
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.ACCESS_DENIED,
+                        "No tienes acceso a esta empresa."
+                ));
+
+        if (membership.getRole() != CustomerMembershipRole.ADMIN) {
+            throw new BusinessException(
+                    ApiErrorCode.ACCESS_DENIED,
+                    "Solo un administrador de la empresa puede invitar miembros."
+            );
+        }
+
+        return membership;
+    }
+
+    private String normalizeEmail(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
+    }
+}
