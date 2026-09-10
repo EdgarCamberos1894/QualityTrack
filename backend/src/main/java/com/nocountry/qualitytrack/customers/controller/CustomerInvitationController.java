@@ -19,11 +19,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -51,6 +54,23 @@ public class CustomerInvitationController {
                         "Invitación enviada correctamente.",
                         response
                 ));
+    }
+
+    @GetMapping("/customers/{customerId}/invitations")
+    public ResponseEntity<ApiResponse<List<CustomerInvitationResponse>>> listPendingInvitations(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long customerId
+    ) {
+        List<CustomerInvitationResponse> response = invitationService.listPendingInvitations(
+                currentUserId,
+                customerId
+        );
+
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.CUSTOMER_INVITATIONS_RETRIEVED,
+                "Invitaciones pendientes consultadas correctamente.",
+                response
+        ));
     }
 
     @ResolveCustomerInvitationApiDocs
