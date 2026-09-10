@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.springframework.http.ProblemDetail;
 
 import java.lang.annotation.Documented;
@@ -17,6 +18,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
+@SecurityRequirements
 @Operation(
         summary = "Autenticar usuario",
         description = "Autentica una cuenta ACTIVE y devuelve un token JWT de acceso firmado."
