@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Retirar miembro de una empresa",
-        description = "Revoca el acceso de una membresía ACTIVE mediante baja lógica: la membresía pasa a REMOVED y conserva su historial. Solo un ADMIN activo puede realizar la operación. No se permite retirar al último ADMIN activo de la empresa."
+        description = "Retira el acceso de un miembro sin eliminar su cuenta de usuario ni borrar el historial de la relación con la empresa. La membresía pasa de ACTIVE a REMOVED y se conserva quién realizó la baja y cuándo ocurrió. El usuario puede seguir iniciando sesión y conservar acceso a otras empresas donde todavía tenga una membresía ACTIVE, pero pierde inmediatamente el acceso a esta empresa. Solo un ADMIN activo puede realizar la operación y nunca se permite retirar al último ADMIN activo."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "204", description = "Miembro retirado correctamente"),
