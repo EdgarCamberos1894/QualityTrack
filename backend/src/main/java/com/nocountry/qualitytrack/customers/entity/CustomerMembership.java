@@ -61,6 +61,13 @@ public class CustomerMembership {
     @Column(name = "joined_at")
     private Instant joinedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "removed_by_user_id")
+    private User removedByUser;
+
+    @Column(name = "removed_at")
+    private Instant removedAt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -90,5 +97,15 @@ public class CustomerMembership {
                 null,
                 joinedAt
         );
+    }
+
+    public void remove(User removedByUser, Instant removedAt) {
+        if (status != CustomerMembershipStatus.ACTIVE) {
+            throw new IllegalStateException("Solo una membresía activa puede retirarse.");
+        }
+
+        this.status = CustomerMembershipStatus.REMOVED;
+        this.removedByUser = removedByUser;
+        this.removedAt = removedAt;
     }
 }
