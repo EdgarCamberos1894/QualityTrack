@@ -1,6 +1,8 @@
 package com.nocountry.qualitytrack.customers.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.customers.documentation.CustomerApiDocs;
+import com.nocountry.qualitytrack.customers.documentation.RemoveCustomerMemberApiDocs;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerRequest;
 import com.nocountry.qualitytrack.customers.dto.request.UpdateCustomerRequest;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
@@ -8,7 +10,6 @@ import com.nocountry.qualitytrack.customers.dto.response.CustomerResponse;
 import com.nocountry.qualitytrack.customers.service.CustomerService;
 import com.nocountry.qualitytrack.shared.response.ApiResponse;
 import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/customers")
 @RequiredArgsConstructor
-@Tag(name = "Empresas cliente", description = "Gestión de empresas cliente y sus membresías.")
+@CustomerApiDocs
 public class CustomerController {
 
     private final CustomerService customerService;
@@ -90,11 +91,8 @@ public class CustomerController {
         ));
     }
 
+    @RemoveCustomerMemberApiDocs
     @DeleteMapping("/{customerId}/members/{userId}")
-    @io.swagger.v3.oas.annotations.responses.ApiResponse(
-            responseCode = "204",
-            description = "Miembro retirado correctamente."
-    )
     public ResponseEntity<Void> removeMember(
             @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
