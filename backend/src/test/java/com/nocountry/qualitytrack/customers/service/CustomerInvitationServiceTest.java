@@ -1,5 +1,6 @@
 package com.nocountry.qualitytrack.customers.service;
 
+import com.nocountry.qualitytrack.auth.service.EmailVerificationService;
 import com.nocountry.qualitytrack.auth.token.OpaqueTokenService;
 import com.nocountry.qualitytrack.customers.dto.request.CompleteCustomerInvitationRegistrationRequest;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerInvitationRequest;
@@ -34,6 +35,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,6 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -59,6 +62,9 @@ class CustomerInvitationServiceTest {
 
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private EmailVerificationService emailVerificationService;
 
     @Mock
     private OpaqueTokenService opaqueTokenService;
@@ -90,6 +96,7 @@ class CustomerInvitationServiceTest {
                 membershipRepository,
                 invitationRepository,
                 userRepository,
+                emailVerificationService,
                 opaqueTokenService,
                 emailService,
                 passwordEncoder,
@@ -168,6 +175,52 @@ class CustomerInvitationServiceTest {
         assertEquals(ApiErrorCode.ACCESS_DENIED, exception.getCode());
         verify(opaqueTokenService, never()).generate();
         verify(emailService, never()).sendCustomerInvitationEmail(any(), any(), any(), any());
+    }
+
+    @Test
+    void listsOnlyCurrentPendingInvitationsForAdmin() {
+        Instant expiresAt = Instant.now().plus(Duration.ofHours(1));
+        CustomerInvitation invitation = invitation(expiresAt, CustomerMembershipRole.REQUESTER);
+        when(customer.getId()).thenReturn(20L);
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                20L,
+                10L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.of(adminMembership));
+        when(adminMembership.getRole()).thenReturn(CustomerMembershipRole.ADMIN);
+        when(invitationRepository.findAllByCustomer_IdAndStatusAndExpiresAtAfterOrderByCreatedAtDesc(
+                eq(20L),
+                eq(CustomerInvitationStatus.PENDING),
+                any(Instant.class)
+        )).thenReturn(List.of(invitation));
+
+        List<CustomerInvitationResponse> response = service.listPendingInvitations(10L, 20L);
+
+        assertEquals(1, response.size());
+        assertEquals(20L, response.getFirst().customerId());
+        assertEquals("member@example.com", response.getFirst().email());
+        assertEquals(CustomerInvitationStatus.PENDING, response.getFirst().status());
+    }
+
+    @Test
+    void rejectsPendingInvitationListForNonAdminMember() {
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                20L,
+                10L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.of(adminMembership));
+        when(adminMembership.getRole()).thenReturn(CustomerMembershipRole.VIEWER);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.listPendingInvitations(10L, 20L)
+        );
+
+        assertEquals(ApiErrorCode.ACCESS_DENIED, exception.getCode());
+        verify(invitationRepository, never())
+                .findAllByCustomer_IdAndStatusAndExpiresAtAfterOrderByCreatedAtDesc(
+                        any(), any(), any()
+                );
     }
 
     @Test
@@ -258,7 +311,7 @@ class CustomerInvitationServiceTest {
 
         service.acceptInvitation(new CustomerInvitationTokenRequest("raw-token"));
 
-        verify(invitedUser).verifyEmail(any(Instant.class));
+        verify(emailVerificationService).verifyWithTrustedEmailProof(eq(invitedUser), any(Instant.class));
         assertEquals(CustomerInvitationStatus.ACCEPTED, invitation.getStatus());
     }
 
