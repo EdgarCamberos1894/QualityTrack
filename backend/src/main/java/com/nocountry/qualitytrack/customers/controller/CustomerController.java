@@ -1,5 +1,6 @@
 package com.nocountry.qualitytrack.customers.controller;
 
+import com.nocountry.qualitytrack.auth.security.CurrentUserId;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerRequest;
 import com.nocountry.qualitytrack.customers.dto.request.UpdateCustomerRequest;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
@@ -12,8 +13,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,10 +34,10 @@ public class CustomerController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<CustomerResponse>> createCustomer(
-            @AuthenticationPrincipal Jwt jwt,
+            @CurrentUserId Long currentUserId,
             @Valid @RequestBody CreateCustomerRequest request
     ) {
-        CustomerResponse response = customerService.createCustomer(currentUserId(jwt), request);
+        CustomerResponse response = customerService.createCustomer(currentUserId, request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(
@@ -50,10 +49,10 @@ public class CustomerController {
 
     @GetMapping("/{customerId}")
     public ResponseEntity<ApiResponse<CustomerResponse>> getCustomer(
-            @AuthenticationPrincipal Jwt jwt,
+            @CurrentUserId Long currentUserId,
             @PathVariable Long customerId
     ) {
-        CustomerResponse response = customerService.getCustomer(currentUserId(jwt), customerId);
+        CustomerResponse response = customerService.getCustomer(currentUserId, customerId);
 
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.CUSTOMER_RETRIEVED,
@@ -64,11 +63,11 @@ public class CustomerController {
 
     @PatchMapping("/{customerId}")
     public ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(
-            @AuthenticationPrincipal Jwt jwt,
+            @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
             @Valid @RequestBody UpdateCustomerRequest request
     ) {
-        CustomerResponse response = customerService.updateCustomer(currentUserId(jwt), customerId, request);
+        CustomerResponse response = customerService.updateCustomer(currentUserId, customerId, request);
 
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.CUSTOMER_UPDATED,
@@ -79,10 +78,10 @@ public class CustomerController {
 
     @GetMapping("/{customerId}/members")
     public ResponseEntity<ApiResponse<List<CustomerMemberResponse>>> listMembers(
-            @AuthenticationPrincipal Jwt jwt,
+            @CurrentUserId Long currentUserId,
             @PathVariable Long customerId
     ) {
-        List<CustomerMemberResponse> response = customerService.listMembers(currentUserId(jwt), customerId);
+        List<CustomerMemberResponse> response = customerService.listMembers(currentUserId, customerId);
 
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.CUSTOMER_MEMBERS_RETRIEVED,
@@ -93,20 +92,16 @@ public class CustomerController {
 
     @DeleteMapping("/{customerId}/members/{userId}")
     public ResponseEntity<ApiResponse<Void>> removeMember(
-            @AuthenticationPrincipal Jwt jwt,
+            @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
             @PathVariable Long userId
     ) {
-        customerService.removeMember(currentUserId(jwt), customerId, userId);
+        customerService.removeMember(currentUserId, customerId, userId);
 
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.CUSTOMER_MEMBER_REMOVED,
                 "Miembro retirado de la empresa correctamente.",
                 null
         ));
-    }
-
-    private Long currentUserId(Jwt jwt) {
-        return Long.valueOf(jwt.getSubject());
     }
 }
