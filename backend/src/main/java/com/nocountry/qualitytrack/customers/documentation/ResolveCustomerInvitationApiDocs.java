@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @SecurityRequirements
 @Operation(
         summary = "Consultar una invitación",
-        description = "Valida un token de invitación y devuelve únicamente empresa, rol y expiración para mostrar la pantalla de confirmación. No consulta ni revela si el correo invitado ya tiene una cuenta y no consume la invitación."
+        description = "Es el primer endpoint que puede utilizar el frontend cuando una persona abre el enlace recibido por correo. Valida que el token corresponda a una invitación PENDING y que todavía no haya expirado; si es válida, devuelve únicamente el nombre de la empresa, el rol ofrecido y la fecha de expiración para mostrar la pantalla de confirmación. Esta consulta no acepta la invitación, no consume el token y tampoco consulta ni revela si el correo invitado ya tiene una cuenta registrada. No requiere JWT porque el propio token identifica la invitación que se está revisando."
 )
 @ApiResponses({
         @ApiResponse(
