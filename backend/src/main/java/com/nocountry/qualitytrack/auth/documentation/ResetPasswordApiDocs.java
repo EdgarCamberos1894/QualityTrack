@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @SecurityRequirements
 @Operation(
         summary = "Restablecer contraseña",
-        description = "Consume un token válido de un solo uso y almacena de forma segura la nueva contraseña."
+        description = "Finaliza la recuperación de contraseña utilizando el token recibido por correo. El backend valida que el token exista, no haya expirado y siga asociado a una cuenta ACTIVE; después valida la nueva contraseña, la almacena de forma segura y consume el token para impedir su reutilización. Si el token es inválido, expiró o la cuenta dejó de estar disponible, la contraseña no se modifica."
 )
 @ApiResponses({
         @ApiResponse(
