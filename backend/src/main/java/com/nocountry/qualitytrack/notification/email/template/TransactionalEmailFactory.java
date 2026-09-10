@@ -72,7 +72,7 @@ public class TransactionalEmailFactory {
                 "Únete a " + customerName,
                 "Te invitaron a formar parte de esta empresa con el rol de " + roleLabel + ".",
                 "Revisar invitación",
-                "Inicia sesión con este mismo correo para aceptar la invitación. Si aún no tienes cuenta, primero deberás registrarte y verificarla.",
+                "Si ya tienes cuenta, inicia sesión con este mismo correo. Si eres nuevo, podrás crear tu contraseña y activar tu cuenta desde la invitación.",
                 actionUrl,
                 "Si no esperabas esta invitación, puedes ignorar el mensaje. El enlace es personal y no debes compartirlo."
         );
