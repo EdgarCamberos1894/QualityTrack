@@ -6,8 +6,10 @@ import com.nocountry.qualitytrack.customers.enums.CustomerMembershipRole;
 import com.nocountry.qualitytrack.customers.enums.CustomerMembershipStatus;
 import com.nocountry.qualitytrack.customers.enums.CustomerStatus;
 import com.nocountry.qualitytrack.customers.repository.CustomerMembershipRepository;
+import com.nocountry.qualitytrack.requests.dto.request.CancelCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
+import com.nocountry.qualitytrack.requests.entity.CustomerRequest;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.requests.enums.JobCaseStatus;
 import com.nocountry.qualitytrack.requests.enums.MaterialRequirementType;
@@ -22,11 +24,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
@@ -96,7 +100,7 @@ class CustomerRequestServiceTest {
         when(user.getLastName()).thenReturn("López");
         when(referenceGenerator.nextCustomerRequestNumber()).thenReturn("REQ-00000001");
         when(referenceGenerator.nextJobCaseNumber()).thenReturn("CASE-00000001");
-        when(customerRequestRepository.saveAndFlush(any(com.nocountry.qualitytrack.requests.entity.CustomerRequest.class)))
+        when(customerRequestRepository.saveAndFlush(any(CustomerRequest.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
         when(jobCaseRepository.saveAndFlush(any(JobCase.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -109,7 +113,7 @@ class CustomerRequestServiceTest {
         assertEquals("AISI 4140", response.materialRequirement());
         assertEquals("CASE-00000001", response.jobCase().caseNumber());
         assertEquals(JobCaseStatus.SUBMITTED, response.jobCase().status());
-        verify(customerRequestRepository).saveAndFlush(any(com.nocountry.qualitytrack.requests.entity.CustomerRequest.class));
+        verify(customerRequestRepository).saveAndFlush(any(CustomerRequest.class));
         verify(jobCaseRepository).saveAndFlush(any(JobCase.class));
     }
 
@@ -187,6 +191,109 @@ class CustomerRequestServiceTest {
         );
 
         assertEquals(ApiErrorCode.RESOURCE_NOT_FOUND, exception.getCode());
+    }
+
+    @Test
+    void cancelsSubmittedRequestAndClosesJobCase() {
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                20L,
+                10L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.of(membership));
+        when(membership.getRole()).thenReturn(CustomerMembershipRole.REQUESTER);
+        when(membership.getUser()).thenReturn(user);
+        when(customer.getId()).thenReturn(20L);
+        when(user.getId()).thenReturn(10L);
+        when(user.getFirstName()).thenReturn("Ana");
+        when(user.getLastName()).thenReturn("López");
+
+        CustomerRequest customerRequest = CustomerRequest.submit(
+                customer,
+                "REQ-00000001",
+                "OC-4587",
+                "Eje de transmisión",
+                "Fabricar conforme al plano proporcionado.",
+                25,
+                MaterialRequirementType.SPECIFIED,
+                "AISI 4140",
+                LocalDate.now().plusDays(30),
+                user
+        );
+        JobCase jobCase = JobCase.open(customerRequest, "CASE-00000001", Instant.now().minusSeconds(60));
+
+        when(jobCaseRepository.findByRequestAndCustomerForUpdate(31L, 20L))
+                .thenReturn(Optional.of(jobCase));
+        when(jobCaseRepository.saveAndFlush(jobCase)).thenReturn(jobCase);
+
+        CustomerRequestResponse response = service.cancel(
+                10L,
+                20L,
+                31L,
+                new CancelCustomerRequest(" Ya no se requiere la pieza. ")
+        );
+
+        assertEquals(JobCaseStatus.CANCELLED, response.jobCase().status());
+        assertEquals(10L, response.jobCase().cancelledByUserId());
+        assertEquals("Ya no se requiere la pieza.", response.jobCase().cancellationReason());
+        assertNotNull(response.jobCase().cancelledAt());
+        assertNotNull(jobCase.getClosedAt());
+        assertEquals(jobCase.getCancelledAt(), jobCase.getClosedAt());
+        verify(jobCaseRepository).saveAndFlush(jobCase);
+    }
+
+    @Test
+    void rejectsViewerCancellingRequest() {
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                20L,
+                10L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.of(membership));
+        when(membership.getRole()).thenReturn(CustomerMembershipRole.VIEWER);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.cancel(10L, 20L, 31L, new CancelCustomerRequest(null))
+        );
+
+        assertEquals(ApiErrorCode.ACCESS_DENIED, exception.getCode());
+        verify(jobCaseRepository, never()).findByRequestAndCustomerForUpdate(any(), any());
+    }
+
+    @Test
+    void rejectsCancellingAlreadyCancelledRequest() {
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                20L,
+                10L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.of(membership));
+        when(membership.getRole()).thenReturn(CustomerMembershipRole.ADMIN);
+        when(membership.getUser()).thenReturn(user);
+
+        CustomerRequest customerRequest = CustomerRequest.submit(
+                customer,
+                "REQ-00000001",
+                null,
+                "Eje de transmisión",
+                "Fabricar conforme al plano proporcionado.",
+                25,
+                MaterialRequirementType.SPECIFIED,
+                "AISI 4140",
+                LocalDate.now().plusDays(30),
+                user
+        );
+        JobCase jobCase = JobCase.open(customerRequest, "CASE-00000001", Instant.now().minusSeconds(60));
+        jobCase.cancel(user, null, Instant.now());
+
+        when(jobCaseRepository.findByRequestAndCustomerForUpdate(31L, 20L))
+                .thenReturn(Optional.of(jobCase));
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.cancel(10L, 20L, 31L, new CancelCustomerRequest(null))
+        );
+
+        assertEquals(ApiErrorCode.CUSTOMER_REQUEST_CANNOT_BE_CANCELLED, exception.getCode());
+        verify(jobCaseRepository, never()).saveAndFlush(any());
     }
 
     private SubmitCustomerRequest validInput() {
