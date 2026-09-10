@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @SecurityRequirements
 @Operation(
         summary = "Reenviar correo de verificación",
-        description = "Genera un nuevo token de verificación de un solo uso cuando la cuenta cumple con los requisitos. La respuesta es genérica para evitar revelar si una cuenta existe."
+        description = "Solicita un nuevo enlace de verificación para una cuenta CUSTOMER que todavía esté PENDING_VERIFICATION. Si la cuenta cumple con esas condiciones, el token anterior se reemplaza por uno nuevo y se envía otro correo. La respuesta siempre es genérica, tanto si el correo existe como si no, para evitar que este endpoint pueda utilizarse para descubrir cuentas registradas."
 )
 @ApiResponses({
         @ApiResponse(
