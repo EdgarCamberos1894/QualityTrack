@@ -99,6 +99,40 @@ public class CustomerMembership {
         );
     }
 
+    public static CustomerMembership acceptedInvitation(
+            Customer customer,
+            User user,
+            CustomerMembershipRole role,
+            User invitedByUser,
+            Instant joinedAt
+    ) {
+        return new CustomerMembership(
+                customer,
+                user,
+                role,
+                CustomerMembershipStatus.ACTIVE,
+                invitedByUser,
+                joinedAt
+        );
+    }
+
+    public void activateFromInvitation(
+            CustomerMembershipRole role,
+            User invitedByUser,
+            Instant joinedAt
+    ) {
+        if (status == CustomerMembershipStatus.ACTIVE) {
+            throw new IllegalStateException("La membresía ya está activa.");
+        }
+
+        this.role = role;
+        this.status = CustomerMembershipStatus.ACTIVE;
+        this.invitedByUser = invitedByUser;
+        this.joinedAt = joinedAt;
+        this.removedByUser = null;
+        this.removedAt = null;
+    }
+
     public void remove(User removedByUser, Instant removedAt) {
         if (status != CustomerMembershipStatus.ACTIVE) {
             throw new IllegalStateException("Solo una membresía activa puede retirarse.");
