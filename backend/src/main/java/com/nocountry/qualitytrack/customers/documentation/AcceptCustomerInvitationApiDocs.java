@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @SecurityRequirements
 @Operation(
         summary = "Aceptar una invitación",
-        description = "Procesa una invitación mediante su token. Si el correo ya pertenece a una cuenta CUSTOMER disponible, crea o reactiva la membresía ACTIVE y consume la invitación. Si aún no existe una cuenta, devuelve REGISTRATION_REQUIRED y mantiene la invitación PENDING para completar el registro. No requiere JWT."
+        description = "Se utiliza cuando la persona confirma que desea unirse a la empresa. El backend vuelve a validar que la invitación siga PENDING y vigente y, a partir del correo fijado en esa invitación, determina si ya existe una cuenta CUSTOMER disponible. Si la cuenta existe, crea o reactiva su membresía como ACTIVE con el rol invitado y marca la invitación como ACCEPTED; desde ese momento el usuario puede iniciar sesión cuando lo desee. Si todavía no existe una cuenta, no crea la membresía ni consume la invitación: responde REGISTRATION_REQUIRED para que el frontend solicite los datos básicos y continúe con complete-registration. No requiere JWT y el cliente nunca indica qué usuario debe recibir la membresía."
 )
 @ApiResponses({
         @ApiResponse(
