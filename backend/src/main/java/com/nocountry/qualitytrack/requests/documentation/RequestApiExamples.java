@@ -34,6 +34,38 @@ final class RequestApiExamples {
             }
             """;
 
+    static final String CUSTOMER_REQUEST_RETRIEVED = """
+            {
+              "success": true,
+              "code": "CUSTOMER_REQUEST_RETRIEVED",
+              "message": "Solicitud consultada correctamente.",
+              "data": {
+                "id": 31,
+                "customerId": 20,
+                "requestNumber": "REQ-00000001",
+                "customerReference": "OC-4587",
+                "title": "Fabricación de eje de transmisión",
+                "description": "Se requiere fabricar un eje conforme al plano proporcionado.",
+                "quantity": 25,
+                "materialRequirementType": "SPECIFIED",
+                "materialRequirement": "AISI 4140",
+                "requestedDeliveryDate": "2026-10-15",
+                "requestedByUserId": 42,
+                "requestedByName": "Ana López",
+                "createdAt": "2026-09-10T10:00:00Z",
+                "updatedAt": "2026-09-10T10:00:00Z",
+                "jobCase": {
+                  "id": 12,
+                  "caseNumber": "CASE-00000001",
+                  "status": "SUBMITTED",
+                  "assignedToUserId": null,
+                  "assignedAt": null,
+                  "openedAt": "2026-09-10T10:00:00Z"
+                }
+              }
+            }
+            """;
+
     static final String CUSTOMER_REQUESTS_RETRIEVED = """
             {
               "success": true,
@@ -65,6 +97,40 @@ final class RequestApiExamples {
                   }
                 }
               ]
+            }
+            """;
+
+    static final String JOB_CASE_RETRIEVED = """
+            {
+              "success": true,
+              "code": "JOB_CASE_RETRIEVED",
+              "message": "Expediente consultado correctamente.",
+              "data": {
+                "id": 12,
+                "caseNumber": "CASE-00000001",
+                "status": "SUBMITTED",
+                "assignedToUserId": null,
+                "assignedToName": null,
+                "assignedAt": null,
+                "openedAt": "2026-09-10T10:00:00Z",
+                "closedAt": null,
+                "request": {
+                  "id": 31,
+                  "customerId": 20,
+                  "customerName": "Mecanizados del Pacífico",
+                  "requestNumber": "REQ-00000001",
+                  "customerReference": "OC-4587",
+                  "title": "Fabricación de eje de transmisión",
+                  "description": "Se requiere fabricar un eje conforme al plano proporcionado.",
+                  "quantity": 25,
+                  "materialRequirementType": "SPECIFIED",
+                  "materialRequirement": "AISI 4140",
+                  "requestedDeliveryDate": "2026-10-15",
+                  "requestedByUserId": 42,
+                  "requestedByName": "Ana López",
+                  "submittedAt": "2026-09-10T10:00:00Z"
+                }
+              }
             }
             """;
 
