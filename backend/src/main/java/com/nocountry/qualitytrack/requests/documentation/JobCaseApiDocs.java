@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Tag(
-        name = "Expedientes",
+        name = "05 · Expedientes",
         description = "Consulta interna de expedientes asociados a solicitudes de cliente."
 )
 public @interface JobCaseApiDocs {
