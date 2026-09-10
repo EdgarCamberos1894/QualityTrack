@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Invitar miembro a una empresa",
-        description = "Crea una invitación PENDING para el correo indicado y envía un enlace de aceptación. Solo un ADMIN activo de la empresa puede invitar. No se crea una membresía hasta que la invitación se acepta."
+        description = "Inicia el proceso para incorporar una persona a la empresa. Un ADMIN activo indica el correo y el rol que tendrá el futuro miembro; el backend valida que no sea ya un miembro ACTIVE y que no exista otra invitación vigente para ese mismo correo. Si todo es válido, se crea una CustomerInvitation en estado PENDING con expiración y se envía al correo un enlace con un token de un solo uso. En este punto todavía no se crea una membresía: el acceso a la empresa solo se activa cuando la persona acepta correctamente la invitación."
 )
 @ApiResponses({
         @ApiResponse(
