@@ -1,10 +1,12 @@
 package com.nocountry.qualitytrack.requests.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.requests.documentation.CancelCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.CustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.GetCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.ListCustomerRequestsApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.SubmitCustomerRequestApiDocs;
+import com.nocountry.qualitytrack.requests.dto.request.CancelCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.requests.service.CustomerRequestService;
@@ -81,6 +83,28 @@ public class CustomerRequestController {
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.CUSTOMER_REQUEST_RETRIEVED,
                 "Solicitud consultada correctamente.",
+                response
+        ));
+    }
+
+    @CancelCustomerRequestApiDocs
+    @PostMapping("/{requestId}/cancel")
+    public ResponseEntity<ApiResponse<CustomerRequestResponse>> cancel(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long customerId,
+            @PathVariable Long requestId,
+            @Valid @RequestBody(required = false) CancelCustomerRequest request
+    ) {
+        CustomerRequestResponse response = customerRequestService.cancel(
+                currentUserId,
+                customerId,
+                requestId,
+                request
+        );
+
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.CUSTOMER_REQUEST_CANCELLED,
+                "Solicitud cancelada correctamente.",
                 response
         ));
     }
