@@ -1,8 +1,12 @@
 package com.nocountry.qualitytrack.customers.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.customers.documentation.CreateCustomerApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.CustomerApiDocs;
+import com.nocountry.qualitytrack.customers.documentation.GetCustomerApiDocs;
+import com.nocountry.qualitytrack.customers.documentation.ListCustomerMembersApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.RemoveCustomerMemberApiDocs;
+import com.nocountry.qualitytrack.customers.documentation.UpdateCustomerApiDocs;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerRequest;
 import com.nocountry.qualitytrack.customers.dto.request.UpdateCustomerRequest;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
@@ -33,6 +37,7 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
+    @CreateCustomerApiDocs
     @PostMapping
     public ResponseEntity<ApiResponse<CustomerResponse>> createCustomer(
             @CurrentUserId Long currentUserId,
@@ -48,6 +53,7 @@ public class CustomerController {
                 ));
     }
 
+    @GetCustomerApiDocs
     @GetMapping("/{customerId}")
     public ResponseEntity<ApiResponse<CustomerResponse>> getCustomer(
             @CurrentUserId Long currentUserId,
@@ -62,6 +68,7 @@ public class CustomerController {
         ));
     }
 
+    @UpdateCustomerApiDocs
     @PatchMapping("/{customerId}")
     public ResponseEntity<ApiResponse<CustomerResponse>> updateCustomer(
             @CurrentUserId Long currentUserId,
@@ -77,6 +84,7 @@ public class CustomerController {
         ));
     }
 
+    @ListCustomerMembersApiDocs
     @GetMapping("/{customerId}/members")
     public ResponseEntity<ApiResponse<List<CustomerMemberResponse>>> listMembers(
             @CurrentUserId Long currentUserId,
