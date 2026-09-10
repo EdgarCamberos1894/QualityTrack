@@ -1,5 +1,6 @@
 package com.nocountry.qualitytrack.customers.service;
 
+import com.nocountry.qualitytrack.auth.service.EmailVerificationService;
 import com.nocountry.qualitytrack.auth.token.OpaqueTokenService;
 import com.nocountry.qualitytrack.customers.dto.request.CompleteCustomerInvitationRegistrationRequest;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerInvitationRequest;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -41,6 +43,7 @@ public class CustomerInvitationService {
     private final CustomerMembershipRepository membershipRepository;
     private final CustomerInvitationRepository invitationRepository;
     private final UserRepository userRepository;
+    private final EmailVerificationService emailVerificationService;
     private final OpaqueTokenService opaqueTokenService;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
@@ -51,6 +54,7 @@ public class CustomerInvitationService {
             CustomerMembershipRepository membershipRepository,
             CustomerInvitationRepository invitationRepository,
             UserRepository userRepository,
+            EmailVerificationService emailVerificationService,
             OpaqueTokenService opaqueTokenService,
             EmailService emailService,
             PasswordEncoder passwordEncoder,
@@ -64,6 +68,7 @@ public class CustomerInvitationService {
         this.membershipRepository = membershipRepository;
         this.invitationRepository = invitationRepository;
         this.userRepository = userRepository;
+        this.emailVerificationService = emailVerificationService;
         this.opaqueTokenService = opaqueTokenService;
         this.emailService = emailService;
         this.passwordEncoder = passwordEncoder;
@@ -112,6 +117,21 @@ public class CustomerInvitationService {
     }
 
     @Transactional(readOnly = true)
+    public List<CustomerInvitationResponse> listPendingInvitations(Long currentUserId, Long customerId) {
+        requireActiveAdmin(currentUserId, customerId);
+
+        return invitationRepository
+                .findAllByCustomer_IdAndStatusAndExpiresAtAfterOrderByCreatedAtDesc(
+                        customerId,
+                        CustomerInvitationStatus.PENDING,
+                        Instant.now()
+                )
+                .stream()
+                .map(CustomerInvitationResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public CustomerInvitationPreviewResponse resolveInvitation(CustomerInvitationTokenRequest request) {
         CustomerInvitation invitation = requireAvailableInvitation(request.token());
         return CustomerInvitationPreviewResponse.from(invitation);
@@ -131,8 +151,9 @@ public class CustomerInvitationService {
 
         Instant acceptedAt = Instant.now();
         if (user.getStatus() == UserStatus.PENDING_VERIFICATION) {
-            // Possession of the invitation token proves control of the invited email address.
-            user.verifyEmail(acceptedAt);
+            // The invitation token is a trusted proof of control of the invited email address.
+            // Consume any ordinary verification token in the same transaction as acceptance.
+            emailVerificationService.verifyWithTrustedEmailProof(user, acceptedAt);
         }
 
         activateMembership(invitation, user, acceptedAt);
@@ -330,7 +351,7 @@ public class CustomerInvitationService {
         if (membership.getRole() != CustomerMembershipRole.ADMIN) {
             throw new BusinessException(
                     ApiErrorCode.ACCESS_DENIED,
-                    "Solo un administrador de la empresa puede invitar miembros."
+                    "Solo un administrador de la empresa puede gestionar invitaciones."
             );
         }
 
