@@ -21,6 +21,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Table(name = "job_cases")
@@ -56,6 +57,16 @@ public class JobCase {
     @Column(name = "closed_at")
     private Instant closedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cancelled_by_user_id")
+    private User cancelledByUser;
+
+    @Column(name = "cancelled_at")
+    private Instant cancelledAt;
+
+    @Column(name = "cancellation_reason", columnDefinition = "TEXT")
+    private String cancellationReason;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -73,5 +84,23 @@ public class JobCase {
 
     public static JobCase open(CustomerRequest customerRequest, String caseNumber, Instant openedAt) {
         return new JobCase(customerRequest, caseNumber, openedAt);
+    }
+
+    public boolean canBeCancelled() {
+        return status == JobCaseStatus.SUBMITTED
+                || status == JobCaseStatus.UNDER_REVIEW
+                || status == JobCaseStatus.WAITING_CUSTOMER_INFO;
+    }
+
+    public void cancel(User cancelledByUser, String cancellationReason, Instant cancelledAt) {
+        if (!canBeCancelled()) {
+            throw new IllegalStateException("El expediente no se encuentra en un estado cancelable.");
+        }
+
+        this.cancelledByUser = Objects.requireNonNull(cancelledByUser);
+        this.cancelledAt = Objects.requireNonNull(cancelledAt);
+        this.cancellationReason = cancellationReason;
+        this.closedAt = cancelledAt;
+        this.status = JobCaseStatus.CANCELLED;
     }
 }
