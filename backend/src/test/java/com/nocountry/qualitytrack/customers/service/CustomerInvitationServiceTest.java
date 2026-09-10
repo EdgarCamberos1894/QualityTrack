@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.customers.service;
 
 import com.nocountry.qualitytrack.auth.token.OpaqueTokenService;
 import com.nocountry.qualitytrack.customers.dto.request.AcceptCustomerInvitationRequest;
+import com.nocountry.qualitytrack.customers.dto.request.CompleteCustomerInvitationRegistrationRequest;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerInvitationRequest;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerInvitationResponse;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
@@ -19,6 +20,7 @@ import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.users.enums.AccountType;
+import com.nocountry.qualitytrack.users.enums.UserStatus;
 import com.nocountry.qualitytrack.users.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +28,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -62,6 +65,9 @@ class CustomerInvitationServiceTest {
     private EmailService emailService;
 
     @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
     private Customer customer;
 
     @Mock
@@ -84,6 +90,7 @@ class CustomerInvitationServiceTest {
                 userRepository,
                 opaqueTokenService,
                 emailService,
+                passwordEncoder,
                 Duration.ofHours(72)
         );
     }
@@ -234,6 +241,86 @@ class CustomerInvitationServiceTest {
         assertEquals(invitedUser, invitation.getAcceptedByUser());
         assertNotNull(invitation.getAcceptedAt());
         verify(invitationRepository).save(invitation);
+    }
+
+    @Test
+    void completesRegistrationAndAcceptsInvitationForNewUser() {
+        when(opaqueTokenService.hash("raw-token")).thenReturn("token-hash");
+        when(customer.getId()).thenReturn(20L);
+
+        CustomerInvitation invitation = CustomerInvitation.create(
+                customer,
+                "member@example.com",
+                CustomerMembershipRole.REQUESTER,
+                "token-hash",
+                Instant.now().plus(Duration.ofHours(1)),
+                inviter
+        );
+        when(invitationRepository.findByTokenHash("token-hash")).thenReturn(Optional.of(invitation));
+        when(userRepository.existsByEmail("member@example.com")).thenReturn(false);
+        when(passwordEncoder.encode("StrongPass123")).thenReturn("encoded-password");
+        when(userRepository.saveAndFlush(any(User.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(membershipRepository.findByCustomer_IdAndUser_Id(20L, null)).thenReturn(Optional.empty());
+        when(membershipRepository.save(any(CustomerMembership.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        CustomerMemberResponse response = service.completeRegistration(
+                new CompleteCustomerInvitationRegistrationRequest(
+                        " raw-token ",
+                        " Juan ",
+                        " Pérez ",
+                        "StrongPass123"
+                )
+        );
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).saveAndFlush(userCaptor.capture());
+        User createdUser = userCaptor.getValue();
+
+        assertEquals("Juan", createdUser.getFirstName());
+        assertEquals("Pérez", createdUser.getLastName());
+        assertEquals("member@example.com", createdUser.getEmail());
+        assertEquals("encoded-password", createdUser.getPasswordHash());
+        assertEquals(AccountType.CUSTOMER, createdUser.getAccountType());
+        assertEquals(UserStatus.ACTIVE, createdUser.getStatus());
+        assertNotNull(createdUser.getEmailVerifiedAt());
+        assertEquals(CustomerMembershipRole.REQUESTER, response.role());
+        assertEquals(CustomerMembershipStatus.ACTIVE, response.status());
+        assertEquals(CustomerInvitationStatus.ACCEPTED, invitation.getStatus());
+        assertEquals(createdUser, invitation.getAcceptedByUser());
+    }
+
+    @Test
+    void rejectsInvitationRegistrationWhenAccountAlreadyExists() {
+        when(opaqueTokenService.hash("raw-token")).thenReturn("token-hash");
+
+        CustomerInvitation invitation = CustomerInvitation.create(
+                customer,
+                "member@example.com",
+                CustomerMembershipRole.VIEWER,
+                "token-hash",
+                Instant.now().plus(Duration.ofHours(1)),
+                inviter
+        );
+        when(invitationRepository.findByTokenHash("token-hash")).thenReturn(Optional.of(invitation));
+        when(userRepository.existsByEmail("member@example.com")).thenReturn(true);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.completeRegistration(
+                        new CompleteCustomerInvitationRegistrationRequest(
+                                "raw-token",
+                                "Juan",
+                                "Pérez",
+                                "StrongPass123"
+                        )
+                )
+        );
+
+        assertEquals(ApiErrorCode.DATA_CONFLICT, exception.getCode());
+        verify(passwordEncoder, never()).encode(any());
+        verify(userRepository, never()).saveAndFlush(any(User.class));
     }
 
     @Test
