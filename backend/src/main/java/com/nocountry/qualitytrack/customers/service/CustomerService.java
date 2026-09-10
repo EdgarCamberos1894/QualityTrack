@@ -101,9 +101,9 @@ public class CustomerService {
     public List<CustomerMemberResponse> listMembers(Long currentUserId, Long customerId) {
         requireActiveMembership(currentUserId, customerId);
 
-        return membershipRepository.findAllByCustomer_IdAndStatusNotOrderByCreatedAtAsc(
+        return membershipRepository.findAllByCustomer_IdAndStatusOrderByCreatedAtAsc(
                         customerId,
-                        CustomerMembershipStatus.REMOVED
+                        CustomerMembershipStatus.ACTIVE
                 )
                 .stream()
                 .map(CustomerMemberResponse::from)
