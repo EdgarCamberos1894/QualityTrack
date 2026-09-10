@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Actualizar empresa cliente",
-        description = "Actualiza parcialmente los datos de una empresa. Solo un miembro ACTIVE con rol ADMIN puede realizar la operación. Los campos omitidos se conservan; los campos opcionales enviados en blanco se limpian."
+        description = "Actualiza los datos generales de una empresa sin reemplazar el registro completo. La operación está reservada a miembros ACTIVE con rol ADMIN de esa empresa. Como es una actualización parcial, los campos que no se envían conservan su valor actual; los campos opcionales enviados en blanco se limpian, mientras que el nombre de la empresa no puede quedar vacío. Esta operación no modifica miembros, roles ni invitaciones."
 )
 @ApiResponses({
         @ApiResponse(
