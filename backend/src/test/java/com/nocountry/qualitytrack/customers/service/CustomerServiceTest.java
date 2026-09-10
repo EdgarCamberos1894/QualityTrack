@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -124,6 +125,26 @@ class CustomerServiceTest {
     }
 
     @Test
+    void listsOnlyActiveMembers() {
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                20L,
+                10L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.of(actorMembership));
+        when(membershipRepository.findAllByCustomer_IdAndStatusOrderByCreatedAtAsc(
+                20L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(List.of());
+
+        service.listMembers(10L, 20L);
+
+        verify(membershipRepository).findAllByCustomer_IdAndStatusOrderByCreatedAtAsc(
+                20L,
+                CustomerMembershipStatus.ACTIVE
+        );
+    }
+
+    @Test
     void rejectsMemberListForUserOutsideCustomer() {
         when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
                 20L,
@@ -138,9 +159,9 @@ class CustomerServiceTest {
 
         assertEquals(ApiErrorCode.ACCESS_DENIED, exception.getCode());
         verify(membershipRepository, never())
-                .findAllByCustomer_IdAndStatusNotOrderByCreatedAtAsc(
+                .findAllByCustomer_IdAndStatusOrderByCreatedAtAsc(
                         20L,
-                        CustomerMembershipStatus.REMOVED
+                        CustomerMembershipStatus.ACTIVE
                 );
     }
 
