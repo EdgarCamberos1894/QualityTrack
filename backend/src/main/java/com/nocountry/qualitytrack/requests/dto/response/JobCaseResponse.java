@@ -17,6 +17,10 @@ public record JobCaseResponse(
         Instant assignedAt,
         Instant openedAt,
         Instant closedAt,
+        Long cancelledByUserId,
+        String cancelledByName,
+        Instant cancelledAt,
+        String cancellationReason,
         RequestSummary request
 ) {
     public static JobCaseResponse from(JobCase jobCase) {
@@ -33,6 +37,12 @@ public record JobCaseResponse(
                 jobCase.getAssignedAt(),
                 jobCase.getOpenedAt(),
                 jobCase.getClosedAt(),
+                jobCase.getCancelledByUser() == null ? null : jobCase.getCancelledByUser().getId(),
+                jobCase.getCancelledByUser() == null
+                        ? null
+                        : jobCase.getCancelledByUser().getFirstName() + " " + jobCase.getCancelledByUser().getLastName(),
+                jobCase.getCancelledAt(),
+                jobCase.getCancellationReason(),
                 RequestSummary.from(request)
         );
     }
