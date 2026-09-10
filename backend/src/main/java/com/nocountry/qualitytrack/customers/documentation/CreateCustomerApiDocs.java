@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Crear empresa cliente",
-        description = "Crea una empresa cliente y registra al usuario autenticado como su primer miembro ADMIN activo. Solo una cuenta CUSTOMER puede crear empresas."
+        description = "Crea una nueva empresa para la cuenta CUSTOMER autenticada. Cuando la operación termina correctamente, la empresa queda ACTIVE y el usuario que la creó se registra automáticamente como su primer miembro con rol ADMIN y membresía ACTIVE, por lo que puede comenzar a administrarla sin una operación adicional. Una cuenta INTERNAL no puede crear empresas mediante este endpoint."
 )
 @ApiResponses({
         @ApiResponse(
