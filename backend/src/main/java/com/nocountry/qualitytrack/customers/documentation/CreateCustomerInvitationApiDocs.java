@@ -51,6 +51,11 @@ import java.lang.annotation.Target;
                 responseCode = "409",
                 description = "El usuario ya es miembro activo, existe otra invitación vigente o la cuenta destino no puede incorporarse",
                 content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = CustomerApiExamples.DATA_CONFLICT))
+        ),
+        @ApiResponse(
+                responseCode = "503",
+                description = "El servicio de correo no está disponible temporalmente",
+                content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = CustomerApiExamples.EMAIL_DELIVERY_FAILED))
         )
 })
 public @interface CreateCustomerInvitationApiDocs {
