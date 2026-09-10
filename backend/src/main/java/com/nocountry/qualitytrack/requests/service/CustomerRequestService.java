@@ -5,6 +5,7 @@ import com.nocountry.qualitytrack.customers.enums.CustomerMembershipRole;
 import com.nocountry.qualitytrack.customers.enums.CustomerMembershipStatus;
 import com.nocountry.qualitytrack.customers.enums.CustomerStatus;
 import com.nocountry.qualitytrack.customers.repository.CustomerMembershipRepository;
+import com.nocountry.qualitytrack.requests.dto.request.CancelCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.requests.entity.CustomerRequest;
@@ -99,6 +100,40 @@ public class CustomerRequestService {
         return CustomerRequestResponse.from(jobCase.getCustomerRequest(), jobCase);
     }
 
+    @Transactional
+    public CustomerRequestResponse cancel(
+            Long currentUserId,
+            Long customerId,
+            Long requestId,
+            CancelCustomerRequest input
+    ) {
+        CustomerMembership membership = requireActiveMembership(currentUserId, customerId);
+        requireCanCancel(membership);
+
+        JobCase jobCase = jobCaseRepository
+                .findByRequestAndCustomerForUpdate(requestId, customerId)
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.RESOURCE_NOT_FOUND,
+                        "No se encontró la solicitud."
+                ));
+
+        if (!jobCase.canBeCancelled()) {
+            throw new BusinessException(
+                    ApiErrorCode.CUSTOMER_REQUEST_CANNOT_BE_CANCELLED,
+                    "La solicitud no puede cancelarse en su estado actual."
+            );
+        }
+
+        jobCase.cancel(
+                membership.getUser(),
+                normalizeNullable(input == null ? null : input.reason()),
+                Instant.now()
+        );
+        jobCase = jobCaseRepository.saveAndFlush(jobCase);
+
+        return CustomerRequestResponse.from(jobCase.getCustomerRequest(), jobCase);
+    }
+
     private CustomerMembership requireActiveMembership(Long userId, Long customerId) {
         return membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
                         customerId,
@@ -117,6 +152,16 @@ public class CustomerRequestService {
             throw new BusinessException(
                     ApiErrorCode.ACCESS_DENIED,
                     "Tu rol dentro de la empresa no permite crear solicitudes."
+            );
+        }
+    }
+
+    private void requireCanCancel(CustomerMembership membership) {
+        if (membership.getRole() != CustomerMembershipRole.ADMIN
+                && membership.getRole() != CustomerMembershipRole.REQUESTER) {
+            throw new BusinessException(
+                    ApiErrorCode.ACCESS_DENIED,
+                    "Tu rol dentro de la empresa no permite cancelar solicitudes."
             );
         }
     }
