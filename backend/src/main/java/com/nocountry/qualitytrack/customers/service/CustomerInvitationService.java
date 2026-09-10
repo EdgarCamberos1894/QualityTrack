@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.customers.service;
 
 import com.nocountry.qualitytrack.auth.token.OpaqueTokenService;
 import com.nocountry.qualitytrack.customers.dto.request.AcceptCustomerInvitationRequest;
+import com.nocountry.qualitytrack.customers.dto.request.CompleteCustomerInvitationRegistrationRequest;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerInvitationRequest;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerInvitationResponse;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
@@ -21,6 +22,8 @@ import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.users.enums.AccountType;
 import com.nocountry.qualitytrack.users.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +41,7 @@ public class CustomerInvitationService {
     private final UserRepository userRepository;
     private final OpaqueTokenService opaqueTokenService;
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
     private final Duration invitationExpiration;
 
     public CustomerInvitationService(
@@ -47,6 +51,7 @@ public class CustomerInvitationService {
             UserRepository userRepository,
             OpaqueTokenService opaqueTokenService,
             EmailService emailService,
+            PasswordEncoder passwordEncoder,
             @Value("${app.customer-invitations.expiration:PT72H}") Duration invitationExpiration
     ) {
         if (invitationExpiration == null || invitationExpiration.isZero() || invitationExpiration.isNegative()) {
@@ -59,6 +64,7 @@ public class CustomerInvitationService {
         this.userRepository = userRepository;
         this.opaqueTokenService = opaqueTokenService;
         this.emailService = emailService;
+        this.passwordEncoder = passwordEncoder;
         this.invitationExpiration = invitationExpiration;
     }
 
@@ -121,8 +127,65 @@ public class CustomerInvitationService {
             );
         }
 
-        String rawToken = request.token().trim();
-        CustomerInvitation invitation = invitationRepository.findByTokenHash(opaqueTokenService.hash(rawToken))
+        CustomerInvitation invitation = requirePendingInvitation(request.token());
+
+        if (!invitation.getEmail().equals(normalizeEmail(user.getEmail()))) {
+            throw new BusinessException(
+                    ApiErrorCode.ACCESS_DENIED,
+                    "La invitación pertenece a otra dirección de correo electrónico."
+            );
+        }
+
+        return acceptInvitationForUser(invitation, user, Instant.now());
+    }
+
+    @Transactional
+    public CustomerMemberResponse completeRegistration(
+            CompleteCustomerInvitationRegistrationRequest request
+    ) {
+        CustomerInvitation invitation = requirePendingInvitation(request.token());
+        String email = invitation.getEmail();
+
+        if (userRepository.existsByEmail(email)) {
+            throw existingAccountForInvitation();
+        }
+
+        Instant acceptedAt = Instant.now();
+        User user = User.registerCustomer(
+                request.firstName().trim(),
+                request.lastName().trim(),
+                email,
+                passwordEncoder.encode(request.password())
+        );
+
+        // Receiving the invitation at this address proves control of the email account.
+        user.verifyEmail(acceptedAt);
+
+        try {
+            user = userRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException exception) {
+            // Covers a concurrent registration using the same invited email.
+            throw existingAccountForInvitation();
+        }
+
+        return acceptInvitationForUser(invitation, user, acceptedAt);
+    }
+
+    private CustomerMemberResponse acceptInvitationForUser(
+            CustomerInvitation invitation,
+            User user,
+            Instant acceptedAt
+    ) {
+        CustomerMembership membership = activateMembership(invitation, user, acceptedAt);
+        invitation.accept(user, acceptedAt);
+        invitationRepository.save(invitation);
+
+        return CustomerMemberResponse.from(membership);
+    }
+
+    private CustomerInvitation requirePendingInvitation(String rawToken) {
+        String tokenHash = opaqueTokenService.hash(rawToken.trim());
+        CustomerInvitation invitation = invitationRepository.findByTokenHash(tokenHash)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.INVALID_CUSTOMER_INVITATION_TOKEN,
                         "La invitación no es válida."
@@ -143,19 +206,7 @@ public class CustomerInvitationService {
             throw expiredInvitation();
         }
 
-        if (!invitation.getEmail().equals(normalizeEmail(user.getEmail()))) {
-            throw new BusinessException(
-                    ApiErrorCode.ACCESS_DENIED,
-                    "La invitación pertenece a otra dirección de correo electrónico."
-            );
-        }
-
-        Instant acceptedAt = Instant.now();
-        CustomerMembership membership = activateMembership(invitation, user, acceptedAt);
-        invitation.accept(user, acceptedAt);
-        invitationRepository.save(invitation);
-
-        return CustomerMemberResponse.from(membership);
+        return invitation;
     }
 
     private void validateTargetCanBeInvited(Long customerId, String email) {
@@ -267,6 +318,13 @@ public class CustomerInvitationService {
         return new BusinessException(
                 ApiErrorCode.CUSTOMER_INVITATION_EXPIRED,
                 "La invitación ha expirado."
+        );
+    }
+
+    private BusinessException existingAccountForInvitation() {
+        return new BusinessException(
+                ApiErrorCode.DATA_CONFLICT,
+                "Ya existe una cuenta asociada a este correo. Inicia sesión para aceptar la invitación."
         );
     }
 
