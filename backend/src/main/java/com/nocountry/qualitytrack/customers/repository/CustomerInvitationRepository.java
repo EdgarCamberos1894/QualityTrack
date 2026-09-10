@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 public interface CustomerInvitationRepository extends JpaRepository<CustomerInvitation, Long> {
@@ -16,6 +18,12 @@ public interface CustomerInvitationRepository extends JpaRepository<CustomerInvi
             Long customerId,
             String email,
             CustomerInvitationStatus status
+    );
+
+    List<CustomerInvitation> findAllByCustomer_IdAndStatusAndExpiresAtAfterOrderByCreatedAtDesc(
+            Long customerId,
+            CustomerInvitationStatus status,
+            Instant expiresAt
     );
 
     Optional<CustomerInvitation> findByTokenHash(String tokenHash);
