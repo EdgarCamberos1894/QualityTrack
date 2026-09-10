@@ -128,12 +128,8 @@ public class CustomerInvitationService {
                         "La invitación no es válida."
                 ));
 
-        if (invitation.getStatus() == CustomerInvitationStatus.EXPIRED
-                || invitation.isExpired(Instant.now())) {
-            throw new BusinessException(
-                    ApiErrorCode.CUSTOMER_INVITATION_EXPIRED,
-                    "La invitación ha expirado."
-            );
+        if (invitation.getStatus() == CustomerInvitationStatus.EXPIRED) {
+            throw expiredInvitation();
         }
 
         if (invitation.getStatus() != CustomerInvitationStatus.PENDING) {
@@ -141,6 +137,10 @@ public class CustomerInvitationService {
                     ApiErrorCode.INVALID_CUSTOMER_INVITATION_TOKEN,
                     "La invitación ya no está disponible."
             );
+        }
+
+        if (invitation.isExpired(Instant.now())) {
+            throw expiredInvitation();
         }
 
         if (!invitation.getEmail().equals(normalizeEmail(user.getEmail()))) {
@@ -261,6 +261,13 @@ public class CustomerInvitationService {
         }
 
         return membership;
+    }
+
+    private BusinessException expiredInvitation() {
+        return new BusinessException(
+                ApiErrorCode.CUSTOMER_INVITATION_EXPIRED,
+                "La invitación ha expirado."
+        );
     }
 
     private String normalizeEmail(String email) {
