@@ -282,7 +282,7 @@ class CustomerRequestServiceTest {
                 user
         );
         JobCase jobCase = JobCase.open(customerRequest, "CASE-00000001", Instant.now().minusSeconds(60));
-        jobCase.cancel(user, null, Instant.now());
+        jobCase.cancel(membership.getUser(), null, Instant.now());
 
         when(jobCaseRepository.findByRequestAndCustomerForUpdate(31L, 20L))
                 .thenReturn(Optional.of(jobCase));
