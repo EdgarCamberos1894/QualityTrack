@@ -96,4 +96,22 @@ public class Customer {
     ) {
         return new Customer(name, rfc, phone, administrativeEmail, city, state, website, createdByUser);
     }
+
+    public void updateDetails(
+            String name,
+            String rfc,
+            String phone,
+            String administrativeEmail,
+            String city,
+            String state,
+            String website
+    ) {
+        this.name = name;
+        this.rfc = rfc;
+        this.phone = phone;
+        this.administrativeEmail = administrativeEmail;
+        this.city = city;
+        this.state = state;
+        this.website = website;
+    }
 }
