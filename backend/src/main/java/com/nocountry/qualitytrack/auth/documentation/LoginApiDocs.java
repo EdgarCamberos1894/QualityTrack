@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @SecurityRequirements
 @Operation(
         summary = "Autenticar usuario",
-        description = "Autentica una cuenta ACTIVE y devuelve un token JWT de acceso firmado."
+        description = "Valida el correo y la contraseña de una cuenta que esté habilitada para iniciar sesión. Si las credenciales son correctas y la cuenta está ACTIVE, devuelve un token JWT que el frontend debe enviar como Bearer en los endpoints protegidos. El token confirma la identidad del usuario, pero no concede por sí solo acceso a una empresa concreta: las operaciones de empresa siguen comprobando que exista una membresía ACTIVE para ese usuario. Las cuentas pendientes de verificación o suspendidas no pueden autenticarse."
 )
 @ApiResponses({
         @ApiResponse(
