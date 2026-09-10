@@ -15,8 +15,11 @@ import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.users.entity.User;
+import com.nocountry.qualitytrack.users.entity.UserSystemRole;
 import com.nocountry.qualitytrack.users.enums.AccountType;
+import com.nocountry.qualitytrack.users.enums.SystemRole;
 import com.nocountry.qualitytrack.users.repository.UserRepository;
+import com.nocountry.qualitytrack.users.repository.UserSystemRoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +35,7 @@ public class CustomerRequestService {
     private final JobCaseRepository jobCaseRepository;
     private final CustomerMembershipRepository membershipRepository;
     private final UserRepository userRepository;
+    private final UserSystemRoleRepository userSystemRoleRepository;
     private final RequestReferenceGenerator referenceGenerator;
 
     @Transactional
@@ -106,7 +110,7 @@ public class CustomerRequestService {
 
     @Transactional(readOnly = true)
     public List<JobCaseResponse> listJobCases(Long currentUserId) {
-        requireInternalUser(currentUserId);
+        requireCanReadJobCases(currentUserId);
 
         return jobCaseRepository.findAllByOrderByOpenedAtDesc()
                 .stream()
@@ -116,7 +120,7 @@ public class CustomerRequestService {
 
     @Transactional(readOnly = true)
     public JobCaseResponse getJobCase(Long currentUserId, Long caseId) {
-        requireInternalUser(currentUserId);
+        requireCanReadJobCases(currentUserId);
 
         JobCase jobCase = jobCaseRepository.findById(caseId)
                 .orElseThrow(() -> new BusinessException(
@@ -149,7 +153,7 @@ public class CustomerRequestService {
         }
     }
 
-    private User requireInternalUser(Long userId) {
+    private void requireCanReadJobCases(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.RESOURCE_NOT_FOUND,
@@ -159,11 +163,28 @@ public class CustomerRequestService {
         if (user.getAccountType() != AccountType.INTERNAL) {
             throw new BusinessException(
                     ApiErrorCode.ACCESS_DENIED,
-                    "Esta operación está disponible únicamente para usuarios internos."
+                    "Esta operación está disponible únicamente para usuarios internos autorizados."
             );
         }
 
-        return user;
+        boolean allowed = userSystemRoleRepository.findAllByIdUserId(userId)
+                .stream()
+                .map(UserSystemRole::getRole)
+                .anyMatch(this::canReadJobCases);
+
+        if (!allowed) {
+            throw new BusinessException(
+                    ApiErrorCode.ACCESS_DENIED,
+                    "Tu rol interno no permite consultar expedientes."
+            );
+        }
+    }
+
+    private boolean canReadJobCases(SystemRole role) {
+        return role == SystemRole.ADMIN
+                || role == SystemRole.COMMERCIAL
+                || role == SystemRole.ENGINEERING
+                || role == SystemRole.AUDITOR;
     }
 
     private String normalizeNullable(String value) {
