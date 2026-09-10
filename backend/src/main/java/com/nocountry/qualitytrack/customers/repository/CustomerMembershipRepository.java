@@ -30,7 +30,7 @@ public interface CustomerMembershipRepository extends JpaRepository<CustomerMemb
             CustomerMembershipStatus status
     );
 
-    List<CustomerMembership> findAllByCustomer_IdAndStatusNotOrderByCreatedAtAsc(
+    List<CustomerMembership> findAllByCustomer_IdAndStatusOrderByCreatedAtAsc(
             Long customerId,
             CustomerMembershipStatus status
     );
