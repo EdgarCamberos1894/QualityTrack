@@ -28,7 +28,10 @@ final class RequestApiExamples {
                   "status": "SUBMITTED",
                   "assignedToUserId": null,
                   "assignedAt": null,
-                  "openedAt": "2026-09-10T10:00:00Z"
+                  "openedAt": "2026-09-10T10:00:00Z",
+                  "cancelledByUserId": null,
+                  "cancelledAt": null,
+                  "cancellationReason": null
                 }
               }
             }
@@ -60,7 +63,10 @@ final class RequestApiExamples {
                   "status": "SUBMITTED",
                   "assignedToUserId": null,
                   "assignedAt": null,
-                  "openedAt": "2026-09-10T10:00:00Z"
+                  "openedAt": "2026-09-10T10:00:00Z",
+                  "cancelledByUserId": null,
+                  "cancelledAt": null,
+                  "cancellationReason": null
                 }
               }
             }
@@ -93,10 +99,48 @@ final class RequestApiExamples {
                     "status": "SUBMITTED",
                     "assignedToUserId": null,
                     "assignedAt": null,
-                    "openedAt": "2026-09-10T10:00:00Z"
+                    "openedAt": "2026-09-10T10:00:00Z",
+                    "cancelledByUserId": null,
+                    "cancelledAt": null,
+                    "cancellationReason": null
                   }
                 }
               ]
+            }
+            """;
+
+    static final String CUSTOMER_REQUEST_CANCELLED = """
+            {
+              "success": true,
+              "code": "CUSTOMER_REQUEST_CANCELLED",
+              "message": "Solicitud cancelada correctamente.",
+              "data": {
+                "id": 31,
+                "customerId": 20,
+                "requestNumber": "REQ-00000001",
+                "customerReference": "OC-4587",
+                "title": "Fabricación de eje de transmisión",
+                "description": "Se requiere fabricar un eje conforme al plano proporcionado.",
+                "quantity": 25,
+                "materialRequirementType": "SPECIFIED",
+                "materialRequirement": "AISI 4140",
+                "requestedDeliveryDate": "2026-10-15",
+                "requestedByUserId": 42,
+                "requestedByName": "Ana López",
+                "createdAt": "2026-09-10T10:00:00Z",
+                "updatedAt": "2026-09-10T10:00:00Z",
+                "jobCase": {
+                  "id": 12,
+                  "caseNumber": "CASE-00000001",
+                  "status": "CANCELLED",
+                  "assignedToUserId": null,
+                  "assignedAt": null,
+                  "openedAt": "2026-09-10T10:00:00Z",
+                  "cancelledByUserId": 42,
+                  "cancelledAt": "2026-09-10T14:45:00Z",
+                  "cancellationReason": "El cliente ya no requiere la fabricación."
+                }
+              }
             }
             """;
 
@@ -114,6 +158,10 @@ final class RequestApiExamples {
                 "assignedAt": null,
                 "openedAt": "2026-09-10T10:00:00Z",
                 "closedAt": null,
+                "cancelledByUserId": null,
+                "cancelledByName": null,
+                "cancelledAt": null,
+                "cancellationReason": null,
                 "request": {
                   "id": 31,
                   "customerId": 20,
@@ -149,6 +197,10 @@ final class RequestApiExamples {
                   "assignedAt": null,
                   "openedAt": "2026-09-10T10:00:00Z",
                   "closedAt": null,
+                  "cancelledByUserId": null,
+                  "cancelledByName": null,
+                  "cancelledAt": null,
+                  "cancellationReason": null,
                   "request": {
                     "id": 31,
                     "customerId": 20,
@@ -207,6 +259,16 @@ final class RequestApiExamples {
               "status": 404,
               "detail": "No se encontró el recurso solicitado.",
               "code": "RESOURCE_NOT_FOUND"
+            }
+            """;
+
+    static final String CUSTOMER_REQUEST_CANNOT_BE_CANCELLED = """
+            {
+              "type": "urn:qualitytrack:problem:customer-request-cannot-be-cancelled",
+              "title": "Solicitud no cancelable",
+              "status": 409,
+              "detail": "La solicitud no puede cancelarse en su estado actual.",
+              "code": "CUSTOMER_REQUEST_CANNOT_BE_CANCELLED"
             }
             """;
 
