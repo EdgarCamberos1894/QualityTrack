@@ -1,8 +1,10 @@
 package com.nocountry.qualitytrack.customers.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.customers.documentation.CompleteCustomerInvitationRegistrationApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.CustomerInvitationApiDocs;
 import com.nocountry.qualitytrack.customers.dto.request.AcceptCustomerInvitationRequest;
+import com.nocountry.qualitytrack.customers.dto.request.CompleteCustomerInvitationRegistrationRequest;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerInvitationRequest;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerInvitationResponse;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
@@ -59,5 +61,20 @@ public class CustomerInvitationController {
                 "Invitación aceptada correctamente.",
                 response
         ));
+    }
+
+    @CompleteCustomerInvitationRegistrationApiDocs
+    @PostMapping("/customer-invitations/complete-registration")
+    public ResponseEntity<ApiResponse<CustomerMemberResponse>> completeRegistration(
+            @Valid @RequestBody CompleteCustomerInvitationRegistrationRequest request
+    ) {
+        CustomerMemberResponse response = invitationService.completeRegistration(request);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(
+                        ApiSuccessCode.CUSTOMER_INVITATION_REGISTRATION_COMPLETED,
+                        "Cuenta creada e invitación aceptada correctamente.",
+                        response
+                ));
     }
 }
