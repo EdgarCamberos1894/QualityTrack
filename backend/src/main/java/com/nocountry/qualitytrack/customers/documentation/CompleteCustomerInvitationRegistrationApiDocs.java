@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @SecurityRequirements
 @Operation(
         summary = "Completar registro desde una invitación",
-        description = "Finaliza una invitación que requiere crear cuenta. El correo, empresa y rol provienen exclusivamente de la invitación. Crea una cuenta CUSTOMER ACTIVE, registra la membresía ACTIVE y consume la invitación en la misma transacción. No requiere JWT."
+        description = "Completa el flujo cuando accept respondió REGISTRATION_REQUIRED porque el correo invitado todavía no tenía una cuenta. El frontend solo solicita nombre, apellido y contraseña; el correo, la empresa y el rol no se reciben del cliente, sino que se recuperan de la invitación para evitar que puedan modificarse. Si el token sigue válido y el correo continúa disponible, se crea una cuenta CUSTOMER ya ACTIVE, se registra la membresía ACTIVE con el rol de la invitación y la invitación pasa a ACCEPTED en la misma operación. El propio token sirve como prueba de acceso al correo invitado, por lo que esta cuenta no necesita una verificación de correo adicional. Si la operación no puede completarse, la invitación no debe quedar aceptada a medias."
 )
 @ApiResponses({
         @ApiResponse(
