@@ -1,6 +1,7 @@
 package com.nocountry.qualitytrack.customers.service;
 
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerRequest;
+import com.nocountry.qualitytrack.customers.dto.request.UpdateCustomerRequest;
 import com.nocountry.qualitytrack.customers.entity.Customer;
 import com.nocountry.qualitytrack.customers.entity.CustomerMembership;
 import com.nocountry.qualitytrack.customers.enums.CustomerMembershipRole;
@@ -19,6 +20,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -44,6 +47,15 @@ class CustomerServiceTest {
 
     @Mock
     private User user;
+
+    @Mock
+    private Customer customer;
+
+    @Mock
+    private CustomerMembership actorMembership;
+
+    @Mock
+    private CustomerMembership targetMembership;
 
     private CustomerService service;
 
@@ -113,11 +125,11 @@ class CustomerServiceTest {
 
     @Test
     void rejectsMemberListForUserOutsideCustomer() {
-        when(membershipRepository.existsByCustomer_IdAndUser_IdAndStatus(
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
                 20L,
                 10L,
                 CustomerMembershipStatus.ACTIVE
-        )).thenReturn(false);
+        )).thenReturn(Optional.empty());
 
         BusinessException exception = assertThrows(
                 BusinessException.class,
@@ -125,6 +137,79 @@ class CustomerServiceTest {
         );
 
         assertEquals(ApiErrorCode.ACCESS_DENIED, exception.getCode());
-        verify(membershipRepository, never()).findAllByCustomer_IdOrderByCreatedAtAsc(20L);
+        verify(membershipRepository, never())
+                .findAllByCustomer_IdAndStatusNotOrderByCreatedAtAsc(
+                        20L,
+                        CustomerMembershipStatus.REMOVED
+                );
+    }
+
+    @Test
+    void rejectsCompanyUpdateForNonAdminMember() {
+        UpdateCustomerRequest request = new UpdateCustomerRequest(
+                "Nuevo nombre", null, null, null, null, null, null
+        );
+
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                20L,
+                10L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.of(actorMembership));
+        when(actorMembership.getRole()).thenReturn(CustomerMembershipRole.VIEWER);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.updateCustomer(10L, 20L, request)
+        );
+
+        assertEquals(ApiErrorCode.ACCESS_DENIED, exception.getCode());
+        verify(customerRepository, never()).findById(20L);
+    }
+
+    @Test
+    void removesActiveMemberWhenActorIsAdmin() {
+        when(customerRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(customer));
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                20L,
+                10L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.of(actorMembership));
+        when(actorMembership.getRole()).thenReturn(CustomerMembershipRole.ADMIN);
+        when(actorMembership.getUser()).thenReturn(user);
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                20L,
+                11L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.of(targetMembership));
+        when(targetMembership.getRole()).thenReturn(CustomerMembershipRole.REQUESTER);
+
+        service.removeMember(10L, 20L, 11L);
+
+        verify(targetMembership).remove(eq(user), any(Instant.class));
+        verify(membershipRepository).save(targetMembership);
+    }
+
+    @Test
+    void rejectsRemovingLastActiveAdmin() {
+        when(customerRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(customer));
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                20L,
+                10L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.of(actorMembership));
+        when(actorMembership.getRole()).thenReturn(CustomerMembershipRole.ADMIN);
+        when(membershipRepository.countByCustomer_IdAndRoleAndStatus(
+                20L,
+                CustomerMembershipRole.ADMIN,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(1L);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.removeMember(10L, 20L, 10L)
+        );
+
+        assertEquals(ApiErrorCode.DATA_CONFLICT, exception.getCode());
+        verify(actorMembership, never()).remove(any(User.class), any(Instant.class));
     }
 }
