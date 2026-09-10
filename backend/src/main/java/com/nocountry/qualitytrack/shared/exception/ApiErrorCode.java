@@ -6,6 +6,7 @@ public enum ApiErrorCode {
     VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "Error de validación"),
     MALFORMED_REQUEST(HttpStatus.BAD_REQUEST, "Solicitud inválida"),
     DOCUMENT_FILE_REQUIRED(HttpStatus.BAD_REQUEST, "Archivo requerido"),
+    DOCUMENT_FILE_TOO_LARGE(HttpStatus.PAYLOAD_TOO_LARGE, "Archivo demasiado grande"),
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "Conflicto"),
     DATA_CONFLICT(HttpStatus.CONFLICT, "Conflicto"),
     CUSTOMER_REQUEST_CANNOT_BE_CANCELLED(HttpStatus.CONFLICT, "Solicitud no cancelable"),

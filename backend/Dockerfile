@@ -16,7 +16,7 @@ WORKDIR /app
 
 RUN useradd --system --uid 10001 qualitytrack \
     && mkdir -p /app/storage/documents \
-    && chown -R qualitytrack:qualitytrack /app/storage
+    && chown -R 10001:10001 /app/storage
 
 COPY --from=builder /app/target/*.jar app.jar
 
