@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Tag(
-        name = "Solicitudes de cliente",
+        name = "04 · Solicitudes de cliente",
         description = "Gestión de solicitudes enviadas por empresas cliente."
 )
 public @interface CustomerRequestApiDocs {
