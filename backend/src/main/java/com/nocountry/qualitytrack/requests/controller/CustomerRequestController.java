@@ -1,0 +1,79 @@
+package com.nocountry.qualitytrack.requests.controller;
+
+import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
+import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
+import com.nocountry.qualitytrack.requests.service.CustomerRequestService;
+import com.nocountry.qualitytrack.shared.response.ApiResponse;
+import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/customers/{customerId}/requests")
+@RequiredArgsConstructor
+public class CustomerRequestController {
+
+    private final CustomerRequestService customerRequestService;
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<CustomerRequestResponse>> submit(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long customerId,
+            @Valid @RequestBody SubmitCustomerRequest request
+    ) {
+        CustomerRequestResponse response = customerRequestService.submit(
+                currentUserId,
+                customerId,
+                request
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(
+                        ApiSuccessCode.CUSTOMER_REQUEST_SUBMITTED,
+                        "Solicitud enviada correctamente.",
+                        response
+                ));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<CustomerRequestResponse>>> list(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long customerId
+    ) {
+        List<CustomerRequestResponse> response = customerRequestService
+                .listForCustomer(currentUserId, customerId);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.CUSTOMER_REQUESTS_RETRIEVED,
+                "Solicitudes consultadas correctamente.",
+                response
+        ));
+    }
+
+    @GetMapping("/{requestId}")
+    public ResponseEntity<ApiResponse<CustomerRequestResponse>> get(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long customerId,
+            @PathVariable Long requestId
+    ) {
+        CustomerRequestResponse response = customerRequestService
+                .getForCustomer(currentUserId, customerId, requestId);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.CUSTOMER_REQUEST_RETRIEVED,
+                "Solicitud consultada correctamente.",
+                response
+        ));
+    }
+}
