@@ -1,6 +1,10 @@
 package com.nocountry.qualitytrack.requests.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.requests.documentation.CustomerRequestApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.GetCustomerRequestApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.ListCustomerRequestsApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.SubmitCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.requests.service.CustomerRequestService;
@@ -22,10 +26,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/customers/{customerId}/requests")
 @RequiredArgsConstructor
+@CustomerRequestApiDocs
 public class CustomerRequestController {
 
     private final CustomerRequestService customerRequestService;
 
+    @SubmitCustomerRequestApiDocs
     @PostMapping
     public ResponseEntity<ApiResponse<CustomerRequestResponse>> submit(
             @CurrentUserId Long currentUserId,
@@ -46,6 +52,7 @@ public class CustomerRequestController {
                 ));
     }
 
+    @ListCustomerRequestsApiDocs
     @GetMapping
     public ResponseEntity<ApiResponse<List<CustomerRequestResponse>>> list(
             @CurrentUserId Long currentUserId,
@@ -61,6 +68,7 @@ public class CustomerRequestController {
         ));
     }
 
+    @GetCustomerRequestApiDocs
     @GetMapping("/{requestId}")
     public ResponseEntity<ApiResponse<CustomerRequestResponse>> get(
             @CurrentUserId Long currentUserId,
