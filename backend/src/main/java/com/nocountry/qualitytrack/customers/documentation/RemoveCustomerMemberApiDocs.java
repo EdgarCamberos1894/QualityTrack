@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.customers.documentation;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,36 +19,29 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Retirar miembro de una empresa",
-        description = "Retira el acceso de un miembro activo sin eliminar su historial de membresía. Solo un administrador activo de la empresa puede realizar esta operación."
+        description = "Revoca el acceso de una membresía ACTIVE mediante baja lógica: la membresía pasa a REMOVED y conserva su historial. Solo un ADMIN activo puede realizar la operación. No se permite retirar al último ADMIN activo de la empresa."
 )
 @ApiResponses({
-        @ApiResponse(
-                responseCode = "204",
-                description = "Miembro retirado correctamente"
-        ),
+        @ApiResponse(responseCode = "204", description = "Miembro retirado correctamente"),
         @ApiResponse(
                 responseCode = "401",
                 description = "Autenticación requerida",
-                content = @Content(
-                        mediaType = "application/problem+json",
-                        schema = @Schema(implementation = ProblemDetail.class)
-                )
+                content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = CustomerApiExamples.AUTHENTICATION_REQUIRED))
         ),
         @ApiResponse(
                 responseCode = "403",
-                description = "El usuario no tiene permisos para retirar miembros",
-                content = @Content(
-                        mediaType = "application/problem+json",
-                        schema = @Schema(implementation = ProblemDetail.class)
-                )
+                description = "El usuario no es ADMIN activo de la empresa",
+                content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = CustomerApiExamples.ACCESS_DENIED))
         ),
         @ApiResponse(
                 responseCode = "404",
-                description = "Empresa o membresía no encontrada",
-                content = @Content(
-                        mediaType = "application/problem+json",
-                        schema = @Schema(implementation = ProblemDetail.class)
-                )
+                description = "Empresa o membresía activa no encontrada",
+                content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = CustomerApiExamples.RESOURCE_NOT_FOUND))
+        ),
+        @ApiResponse(
+                responseCode = "409",
+                description = "La operación dejaría a la empresa sin administradores activos",
+                content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = CustomerApiExamples.DATA_CONFLICT))
         )
 })
 public @interface RemoveCustomerMemberApiDocs {
