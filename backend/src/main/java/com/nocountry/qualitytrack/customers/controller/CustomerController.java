@@ -8,7 +8,6 @@ import com.nocountry.qualitytrack.customers.dto.response.CustomerResponse;
 import com.nocountry.qualitytrack.customers.service.CustomerService;
 import com.nocountry.qualitytrack.shared.response.ApiResponse;
 import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
-import io.swagger.v3.oas.annotations.responses.ApiResponse as OpenApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -92,7 +91,10 @@ public class CustomerController {
     }
 
     @DeleteMapping("/{customerId}/members/{userId}")
-    @OpenApiResponse(responseCode = "204", description = "Miembro retirado correctamente.")
+    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+            responseCode = "204",
+            description = "Miembro retirado correctamente."
+    )
     public ResponseEntity<Void> removeMember(
             @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
