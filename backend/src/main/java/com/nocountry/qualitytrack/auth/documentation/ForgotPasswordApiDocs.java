@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @SecurityRequirements
 @Operation(
         summary = "Solicitar restablecimiento de contraseña",
-        description = "Genera un token de un solo uso para restablecer la contraseña de una cuenta ACTIVE. La respuesta es genérica para evitar revelar si una cuenta existe."
+        description = "Inicia el proceso de recuperación de contraseña a partir de un correo electrónico. Si existe una cuenta ACTIVE asociada, se genera un token temporal de un solo uso y se envía un enlace para establecer una nueva contraseña; si ya había un token de recuperación, se reemplaza por el nuevo. La respuesta es siempre genérica, incluso cuando el correo no existe o la cuenta no está ACTIVE, para evitar revelar qué cuentas están registradas."
 )
 @ApiResponses({
         @ApiResponse(
