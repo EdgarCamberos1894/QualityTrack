@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
                 content = @Content(
                         mediaType = "application/json",
                         schema = @Schema(implementation = com.nocountry.qualitytrack.shared.response.ApiResponse.class),
-                        examples = @ExampleObject(value = RequestApiExamples.CUSTOMER_REQUEST_SUBMITTED)
+                        examples = @ExampleObject(value = RequestApiExamples.CUSTOMER_REQUEST_RETRIEVED)
                 )
         ),
         @ApiResponse(
