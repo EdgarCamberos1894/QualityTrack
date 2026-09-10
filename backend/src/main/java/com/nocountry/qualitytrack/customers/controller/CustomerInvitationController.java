@@ -1,13 +1,17 @@
 package com.nocountry.qualitytrack.customers.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.customers.documentation.AcceptCustomerInvitationApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.CompleteCustomerInvitationRegistrationApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.CustomerInvitationApiDocs;
-import com.nocountry.qualitytrack.customers.dto.request.AcceptCustomerInvitationRequest;
+import com.nocountry.qualitytrack.customers.documentation.ResolveCustomerInvitationApiDocs;
 import com.nocountry.qualitytrack.customers.dto.request.CompleteCustomerInvitationRegistrationRequest;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerInvitationRequest;
+import com.nocountry.qualitytrack.customers.dto.request.CustomerInvitationTokenRequest;
+import com.nocountry.qualitytrack.customers.dto.response.CustomerInvitationAcceptResponse;
+import com.nocountry.qualitytrack.customers.dto.response.CustomerInvitationPreviewResponse;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerInvitationResponse;
-import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
+import com.nocountry.qualitytrack.customers.enums.CustomerInvitationAcceptOutcome;
 import com.nocountry.qualitytrack.customers.service.CustomerInvitationService;
 import com.nocountry.qualitytrack.shared.response.ApiResponse;
 import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
@@ -49,31 +53,53 @@ public class CustomerInvitationController {
                 ));
     }
 
-    @PostMapping("/customer-invitations/accept")
-    public ResponseEntity<ApiResponse<CustomerMemberResponse>> acceptInvitation(
-            @CurrentUserId Long currentUserId,
-            @Valid @RequestBody AcceptCustomerInvitationRequest request
+    @ResolveCustomerInvitationApiDocs
+    @PostMapping("/customer-invitations/resolve")
+    public ResponseEntity<ApiResponse<CustomerInvitationPreviewResponse>> resolveInvitation(
+            @Valid @RequestBody CustomerInvitationTokenRequest request
     ) {
-        CustomerMemberResponse response = invitationService.acceptInvitation(currentUserId, request);
+        CustomerInvitationPreviewResponse response = invitationService.resolveInvitation(request);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.CUSTOMER_INVITATION_RESOLVED,
+                "Invitación disponible.",
+                response
+        ));
+    }
+
+    @AcceptCustomerInvitationApiDocs
+    @PostMapping("/customer-invitations/accept")
+    public ResponseEntity<ApiResponse<CustomerInvitationAcceptResponse>> acceptInvitation(
+            @Valid @RequestBody CustomerInvitationTokenRequest request
+    ) {
+        CustomerInvitationAcceptResponse response = invitationService.acceptInvitation(request);
+
+        if (response.outcome() == CustomerInvitationAcceptOutcome.REGISTRATION_REQUIRED) {
+            return ResponseEntity.ok(ApiResponse.success(
+                    ApiSuccessCode.CUSTOMER_INVITATION_REGISTRATION_REQUIRED,
+                    "Completa tus datos para crear la cuenta y finalizar la invitación.",
+                    response
+            ));
+        }
 
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.CUSTOMER_INVITATION_ACCEPTED,
-                "Invitación aceptada correctamente.",
+                "Invitación aceptada correctamente. Ya puedes iniciar sesión.",
                 response
         ));
     }
 
     @CompleteCustomerInvitationRegistrationApiDocs
     @PostMapping("/customer-invitations/complete-registration")
-    public ResponseEntity<ApiResponse<CustomerMemberResponse>> completeRegistration(
+    public ResponseEntity<ApiResponse<CustomerInvitationAcceptResponse>> completeRegistration(
             @Valid @RequestBody CompleteCustomerInvitationRegistrationRequest request
     ) {
-        CustomerMemberResponse response = invitationService.completeRegistration(request);
+        CustomerInvitationAcceptResponse response = invitationService.completeRegistration(request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(
                         ApiSuccessCode.CUSTOMER_INVITATION_REGISTRATION_COMPLETED,
-                        "Cuenta creada e invitación aceptada correctamente.",
+                        "Cuenta creada e invitación aceptada correctamente. Ya puedes iniciar sesión.",
                         response
                 ));
     }
