@@ -11,7 +11,10 @@ public record JobCaseSummaryResponse(
         JobCaseStatus status,
         Long assignedToUserId,
         Instant assignedAt,
-        Instant openedAt
+        Instant openedAt,
+        Long cancelledByUserId,
+        Instant cancelledAt,
+        String cancellationReason
 ) {
     public static JobCaseSummaryResponse from(JobCase jobCase) {
         return new JobCaseSummaryResponse(
@@ -20,7 +23,10 @@ public record JobCaseSummaryResponse(
                 jobCase.getStatus(),
                 jobCase.getAssignedToUser() == null ? null : jobCase.getAssignedToUser().getId(),
                 jobCase.getAssignedAt(),
-                jobCase.getOpenedAt()
+                jobCase.getOpenedAt(),
+                jobCase.getCancelledByUser() == null ? null : jobCase.getCancelledByUser().getId(),
+                jobCase.getCancelledAt(),
+                jobCase.getCancellationReason()
         );
     }
 }
