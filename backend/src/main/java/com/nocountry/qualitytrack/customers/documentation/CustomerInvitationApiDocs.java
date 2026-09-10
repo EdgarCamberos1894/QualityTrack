@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Documented
 @Tag(
         name = "Invitaciones de empresa",
-        description = "Flujo para incorporar personas a una empresa cliente mediante invitaciones por correo. La empresa crea una invitación independiente de la membresía; el acceso solo se activa cuando la persona acepta correctamente. Los endpoints de administración requieren una membresía ADMIN activa, mientras que la revisión y aceptación se realizan con el token de invitación enviado por correo."
+        description = "Gestión de invitaciones para incorporar usuarios a empresas cliente."
 )
 public @interface CustomerInvitationApiDocs {
 }
