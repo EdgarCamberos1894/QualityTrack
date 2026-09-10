@@ -1,0 +1,50 @@
+package com.nocountry.qualitytrack.requests.controller;
+
+import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.requests.dto.response.JobCaseResponse;
+import com.nocountry.qualitytrack.requests.service.CustomerRequestService;
+import com.nocountry.qualitytrack.shared.response.ApiResponse;
+import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/job-cases")
+@RequiredArgsConstructor
+public class JobCaseController {
+
+    private final CustomerRequestService customerRequestService;
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<JobCaseResponse>>> list(
+            @CurrentUserId Long currentUserId
+    ) {
+        List<JobCaseResponse> response = customerRequestService.listJobCases(currentUserId);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.JOB_CASES_RETRIEVED,
+                "Expedientes consultados correctamente.",
+                response
+        ));
+    }
+
+    @GetMapping("/{caseId}")
+    public ResponseEntity<ApiResponse<JobCaseResponse>> get(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long caseId
+    ) {
+        JobCaseResponse response = customerRequestService.getJobCase(currentUserId, caseId);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.JOB_CASE_RETRIEVED,
+                "Expediente consultado correctamente.",
+                response
+        ));
+    }
+}
