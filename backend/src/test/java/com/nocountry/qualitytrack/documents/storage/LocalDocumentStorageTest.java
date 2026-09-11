@@ -23,13 +23,16 @@ class LocalDocumentStorageTest {
         byte[] content = "quality-track".getBytes(StandardCharsets.UTF_8);
 
         StoredDocumentFile stored = storage.store(
+                20L,
                 12L,
                 1,
+                "plano.pdf",
                 new ByteArrayInputStream(content)
         );
 
         assertEquals(content.length, stored.fileSize());
         assertEquals(64, stored.checksum().length());
+        assertTrue(stored.storageKey().startsWith("customer-20/case-12/"));
 
         Resource resource = storage.load(stored.storageKey());
         assertTrue(resource.exists());
