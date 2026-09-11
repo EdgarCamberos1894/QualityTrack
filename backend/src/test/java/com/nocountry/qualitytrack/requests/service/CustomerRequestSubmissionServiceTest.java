@@ -30,6 +30,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,7 +48,8 @@ class CustomerRequestSubmissionServiceTest {
     void setUp() {
         service = new CustomerRequestSubmissionService(
                 customerRequestService,
-                documentService
+                documentService,
+                5
         );
     }
 
@@ -113,6 +115,25 @@ class CustomerRequestSubmissionServiceTest {
                 ),
                 specification
         );
+    }
+
+    @Test
+    void rejectsTooManyDocumentsBeforeCreatingRequest() {
+        SubmitCustomerRequest input = validInput();
+        MultipartFile file = new MockMultipartFile(
+                "documents",
+                "plano.pdf",
+                "application/pdf",
+                "drawing".getBytes()
+        );
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.submit(10L, 20L, input, List.of(file, file, file, file, file, file))
+        );
+
+        assertEquals(ApiErrorCode.VALIDATION_ERROR, exception.getCode());
+        verifyNoInteractions(customerRequestService, documentService);
     }
 
     @Test
