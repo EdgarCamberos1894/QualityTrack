@@ -131,7 +131,8 @@ public class DocumentService {
     ) {
         validateFile(file);
 
-        Document document = documentRepository.findActiveByIdAndCaseIdForUpdate(documentId, caseId)
+        Document document = documentRepository
+                .findByIdAndCaseIdAndStatusForUpdate(documentId, caseId, DocumentStatus.ACTIVE)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.RESOURCE_NOT_FOUND,
                         "No se encontró el documento activo dentro del expediente."
@@ -223,7 +224,8 @@ public class DocumentService {
             Long caseId,
             Long documentId
     ) {
-        Document document = documentRepository.findActiveByIdAndCaseIdForUpdate(documentId, caseId)
+        Document document = documentRepository
+                .findByIdAndCaseIdAndStatusForUpdate(documentId, caseId, DocumentStatus.ACTIVE)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.RESOURCE_NOT_FOUND,
                         "No se encontró el documento activo dentro del expediente."
