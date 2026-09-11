@@ -32,8 +32,8 @@ public class Document {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "case_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "case_id", nullable = false)
     private JobCase jobCase;
 
     @Column(name = "document_type", nullable = false, length = 50)
@@ -71,7 +71,7 @@ public class Document {
             String description,
             User createdBy
     ) {
-        this.jobCase = jobCase;
+        this.jobCase = Objects.requireNonNull(jobCase);
         this.documentType = Objects.requireNonNull(documentType);
         this.name = Objects.requireNonNull(name);
         this.description = description;
