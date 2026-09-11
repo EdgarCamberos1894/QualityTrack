@@ -64,7 +64,7 @@ public class DocumentService {
 
         String fileName = sanitizeFileName(file.getOriginalFilename());
         String mimeType = normalizeMimeType(file.getContentType());
-        StoredDocumentFile storedFile = storeFile(jobCase.getId(), 1, file);
+        StoredDocumentFile storedFile = storeFile(jobCase, 1, fileName, file);
         registerRollbackCleanup(storedFile.storageKey());
 
         DocumentVersion version = DocumentVersion.upload(
@@ -111,14 +111,20 @@ public class DocumentService {
 
         User uploader = accessService.requireCanAddVersion(currentUserId, document);
         int nextVersion = documentVersionRepository.findMaxVersionByDocumentId(documentId) + 1;
+        String fileName = sanitizeFileName(file.getOriginalFilename());
 
-        StoredDocumentFile storedFile = storeFile(document.getJobCase().getId(), nextVersion, file);
+        StoredDocumentFile storedFile = storeFile(
+                document.getJobCase(),
+                nextVersion,
+                fileName,
+                file
+        );
         registerRollbackCleanup(storedFile.storageKey());
 
         DocumentVersion version = DocumentVersion.upload(
                 document,
                 nextVersion,
-                sanitizeFileName(file.getOriginalFilename()),
+                fileName,
                 storedFile.storageKey(),
                 normalizeMimeType(file.getContentType()),
                 storedFile.fileSize(),
@@ -189,9 +195,22 @@ public class DocumentService {
                 ));
     }
 
-    private StoredDocumentFile storeFile(Long caseId, Integer version, MultipartFile file) {
+    private StoredDocumentFile storeFile(
+            JobCase jobCase,
+            Integer version,
+            String fileName,
+            MultipartFile file
+    ) {
+        Long customerId = jobCase.getCustomerRequest().getCustomer().getId();
+
         try (InputStream inputStream = file.getInputStream()) {
-            return storage.store(caseId, version, inputStream);
+            return storage.store(
+                    customerId,
+                    jobCase.getId(),
+                    version,
+                    fileName,
+                    inputStream
+            );
         } catch (IOException | DocumentStorageException exception) {
             throw storageUnavailable();
         }
