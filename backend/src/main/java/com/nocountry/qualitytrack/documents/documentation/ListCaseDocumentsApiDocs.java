@@ -18,8 +18,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Operation(
-        summary = "Listar documentos de un expediente",
-        description = "Lista los documentos asociados al JobCase indicado. Las cuentas de cliente solo reciben documentos creados desde el lado cliente; los usuarios internos autorizados pueden consultar todos los documentos del expediente."
+        summary = "Listar documentos de una solicitud",
+        description = "Lista los documentos asociados a la solicitud indicada. El backend resuelve internamente su expediente. Las cuentas de cliente solo reciben documentos creados desde el lado cliente; los usuarios internos autorizados pueden consultar todos los documentos del expediente."
 )
 @ApiResponses({
         @ApiResponse(
@@ -32,8 +32,8 @@ import java.lang.annotation.Target;
                 )
         ),
         @ApiResponse(responseCode = "401", description = "Autenticación requerida", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-        @ApiResponse(responseCode = "403", description = "El usuario no puede consultar el expediente", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-        @ApiResponse(responseCode = "404", description = "No se encontró el expediente", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+        @ApiResponse(responseCode = "403", description = "El usuario no puede consultar los documentos de la solicitud", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+        @ApiResponse(responseCode = "404", description = "No se encontró la solicitud", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
 })
 public @interface ListCaseDocumentsApiDocs {
 }
