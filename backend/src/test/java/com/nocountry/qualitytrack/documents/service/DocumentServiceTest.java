@@ -136,8 +136,11 @@ class DocumentServiceTest {
         Document document = Document.create(jobCase, "DRAWING", "Plano", null, user);
 
         stubCaseCustomer();
-        when(documentRepository.findActiveByIdAndCaseIdForUpdate(7L, 12L))
-                .thenReturn(Optional.of(document));
+        when(documentRepository.findByIdAndCaseIdAndStatusForUpdate(
+                7L,
+                12L,
+                DocumentStatus.ACTIVE
+        )).thenReturn(Optional.of(document));
         when(accessService.requireCanAddVersion(10L, document)).thenReturn(user);
         when(documentVersionRepository.findMaxVersionByDocumentId(7L)).thenReturn(1);
         when(storage.store(
@@ -169,8 +172,11 @@ class DocumentServiceTest {
                 "revision".getBytes()
         );
 
-        when(documentRepository.findActiveByIdAndCaseIdForUpdate(7L, 12L))
-                .thenReturn(Optional.empty());
+        when(documentRepository.findByIdAndCaseIdAndStatusForUpdate(
+                7L,
+                12L,
+                DocumentStatus.ACTIVE
+        )).thenReturn(Optional.empty());
 
         assertThrows(
                 RuntimeException.class,
@@ -232,8 +238,11 @@ class DocumentServiceTest {
     void removesDocumentLogicallyWithoutDeletingStoredFile() {
         Document document = Document.create(jobCase, "DRAWING", "Plano", null, user);
 
-        when(documentRepository.findActiveByIdAndCaseIdForUpdate(7L, 12L))
-                .thenReturn(Optional.of(document));
+        when(documentRepository.findByIdAndCaseIdAndStatusForUpdate(
+                7L,
+                12L,
+                DocumentStatus.ACTIVE
+        )).thenReturn(Optional.of(document));
         when(accessService.requireCanRemove(10L, document)).thenReturn(user);
         when(documentRepository.saveAndFlush(document)).thenReturn(document);
 
