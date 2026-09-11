@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -129,7 +130,8 @@ class DocumentServiceTest {
         Document document = Document.create(jobCase, "DRAWING", "Plano", null, user);
 
         stubCaseCustomer();
-        when(documentRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(document));
+        when(documentRepository.findByIdAndCaseIdForUpdate(7L, 12L))
+                .thenReturn(Optional.of(document));
         when(accessService.requireCanAddVersion(10L, document)).thenReturn(user);
         when(documentVersionRepository.findMaxVersionByDocumentId(7L)).thenReturn(1);
         when(storage.store(
@@ -146,10 +148,28 @@ class DocumentServiceTest {
         when(documentVersionRepository.saveAndFlush(any(DocumentVersion.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        DocumentVersionResponse response = service.addVersion(10L, 7L, file);
+        DocumentVersionResponse response = service.addVersion(10L, 12L, 7L, file);
 
         assertEquals(2, response.version());
         assertEquals("plano-rev-b.pdf", response.fileName());
+    }
+
+    @Test
+    void rejectsDocumentFromDifferentCaseWhenAddingVersion() {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "plano-rev-b.pdf",
+                "application/pdf",
+                "revision".getBytes()
+        );
+
+        when(documentRepository.findByIdAndCaseIdForUpdate(7L, 12L))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                RuntimeException.class,
+                () -> service.addVersion(10L, 12L, 7L, file)
+        );
     }
 
     @Test
