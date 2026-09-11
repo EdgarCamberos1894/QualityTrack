@@ -49,9 +49,9 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     @Query("""
             select d
             from Document d
-            left join fetch d.jobCase jc
-            left join fetch jc.customerRequest cr
-            left join fetch cr.customer c
+            join fetch d.jobCase jc
+            join fetch jc.customerRequest cr
+            join fetch cr.customer c
             join fetch d.createdBy
             where d.id = :documentId
               and jc.id = :caseId
