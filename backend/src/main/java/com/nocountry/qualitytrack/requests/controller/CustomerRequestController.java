@@ -1,19 +1,19 @@
 package com.nocountry.qualitytrack.requests.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
-import com.nocountry.qualitytrack.documents.documentation.AddDocumentVersionApiDocs;
-import com.nocountry.qualitytrack.documents.documentation.CreateDocumentApiDocs;
-import com.nocountry.qualitytrack.documents.documentation.DownloadDocumentVersionApiDocs;
-import com.nocountry.qualitytrack.documents.documentation.ListCaseDocumentsApiDocs;
-import com.nocountry.qualitytrack.documents.documentation.ListDocumentVersionsApiDocs;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentSummaryResponse;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentVersionResponse;
 import com.nocountry.qualitytrack.documents.service.DocumentDownload;
+import com.nocountry.qualitytrack.requests.documentation.AddRequestDocumentVersionApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.CancelCustomerRequestApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.CreateRequestDocumentApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.CustomerRequestApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.DownloadRequestDocumentVersionApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.GetCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.ListCustomerRequestsApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.ListRequestDocumentsApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.ListRequestDocumentVersionsApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.SubmitCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.dto.request.CancelCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
@@ -110,7 +110,7 @@ public class CustomerRequestController {
         ));
     }
 
-    @CreateDocumentApiDocs
+    @CreateRequestDocumentApiDocs
     @PostMapping(value = "/{requestId}/documents", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<DocumentResponse>> createDocument(
             @CurrentUserId Long currentUserId,
@@ -135,7 +135,7 @@ public class CustomerRequestController {
                 ));
     }
 
-    @ListCaseDocumentsApiDocs
+    @ListRequestDocumentsApiDocs
     @GetMapping("/{requestId}/documents")
     public ResponseEntity<ApiResponse<List<DocumentSummaryResponse>>> listDocuments(
             @CurrentUserId Long currentUserId,
@@ -155,7 +155,7 @@ public class CustomerRequestController {
         ));
     }
 
-    @AddDocumentVersionApiDocs
+    @AddRequestDocumentVersionApiDocs
     @PostMapping(
             value = "/{requestId}/documents/{documentId}/versions",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -183,7 +183,7 @@ public class CustomerRequestController {
                 ));
     }
 
-    @ListDocumentVersionsApiDocs
+    @ListRequestDocumentVersionsApiDocs
     @GetMapping("/{requestId}/documents/{documentId}/versions")
     public ResponseEntity<ApiResponse<List<DocumentVersionResponse>>> listDocumentVersions(
             @CurrentUserId Long currentUserId,
@@ -205,7 +205,7 @@ public class CustomerRequestController {
         ));
     }
 
-    @DownloadDocumentVersionApiDocs
+    @DownloadRequestDocumentVersionApiDocs
     @GetMapping("/{requestId}/documents/{documentId}/versions/{versionId}/content")
     public ResponseEntity<Resource> downloadDocumentVersion(
             @CurrentUserId Long currentUserId,
