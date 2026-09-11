@@ -30,7 +30,7 @@ public class CustomerRequestDocumentService {
     private final DocumentService documentService;
 
     @Transactional
-    public DocumentResponse create(
+    public RequestDocumentResponse create(
             Long currentUserId,
             Long customerId,
             Long requestId,
@@ -38,8 +38,7 @@ public class CustomerRequestDocumentService {
             MultipartFile file
     ) {
         JobCase jobCase = requireJobCase(customerId, requestId);
-
-        return documentService.create(
+        DocumentResponse document = documentService.create(
                 currentUserId,
                 new CreateDocumentRequest(
                         jobCase.getId(),
@@ -49,6 +48,8 @@ public class CustomerRequestDocumentService {
                 ),
                 file
         );
+
+        return RequestDocumentResponse.from(document, customerId, requestId);
     }
 
     @Transactional(readOnly = true)
