@@ -12,6 +12,11 @@ on:
     branches:
       - develop
       - main
+      - 'feature/**'
+      - 'fix/**'
+      - 'chore/**'
+      - 'qa/**'
+      - 'docs/**'
     paths:
       - 'backend/**'
       - '.github/workflows/backend-ci.yml'
