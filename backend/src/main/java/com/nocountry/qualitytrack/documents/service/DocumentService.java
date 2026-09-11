@@ -98,15 +98,16 @@ public class DocumentService {
     @Transactional
     public DocumentVersionResponse addVersion(
             Long currentUserId,
+            Long caseId,
             Long documentId,
             MultipartFile file
     ) {
         validateFile(file);
 
-        Document document = documentRepository.findByIdForUpdate(documentId)
+        Document document = documentRepository.findByIdAndCaseIdForUpdate(documentId, caseId)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.RESOURCE_NOT_FOUND,
-                        "No se encontró el documento."
+                        "No se encontró el documento dentro del expediente."
                 ));
 
         User uploader = accessService.requireCanAddVersion(currentUserId, document);
@@ -137,8 +138,12 @@ public class DocumentService {
     }
 
     @Transactional(readOnly = true)
-    public List<DocumentVersionResponse> listVersions(Long currentUserId, Long documentId) {
-        Document document = requireDocument(documentId);
+    public List<DocumentVersionResponse> listVersions(
+            Long currentUserId,
+            Long caseId,
+            Long documentId
+    ) {
+        Document document = requireDocument(caseId, documentId);
         accessService.requireCanRead(currentUserId, document);
 
         return documentVersionRepository.findAllByDocument_IdOrderByVersionAsc(documentId)
@@ -150,14 +155,15 @@ public class DocumentService {
     @Transactional(readOnly = true)
     public DocumentDownload download(
             Long currentUserId,
+            Long caseId,
             Long documentId,
             Long versionId
     ) {
         DocumentVersion version = documentVersionRepository
-                .findByIdAndDocument_Id(versionId, documentId)
+                .findByIdAndDocument_IdAndDocument_JobCase_Id(versionId, documentId, caseId)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.RESOURCE_NOT_FOUND,
-                        "No se encontró la versión del documento."
+                        "No se encontró la versión del documento dentro del expediente."
                 ));
 
         accessService.requireCanRead(currentUserId, version.getDocument());
@@ -187,11 +193,11 @@ public class DocumentService {
                 ));
     }
 
-    private Document requireDocument(Long documentId) {
-        return documentRepository.findById(documentId)
+    private Document requireDocument(Long caseId, Long documentId) {
+        return documentRepository.findByIdAndJobCase_Id(documentId, caseId)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.RESOURCE_NOT_FOUND,
-                        "No se encontró el documento."
+                        "No se encontró el documento dentro del expediente."
                 ));
     }
 
