@@ -37,6 +37,9 @@ class JobCaseServiceTest {
     private UserSystemRoleRepository userSystemRoleRepository;
 
     @Mock
+    private CustomerRequestDocumentService customerRequestDocumentService;
+
+    @Mock
     private User user;
 
     @Mock
@@ -49,7 +52,8 @@ class JobCaseServiceTest {
         service = new JobCaseService(
                 jobCaseRepository,
                 userRepository,
-                userSystemRoleRepository
+                userSystemRoleRepository,
+                customerRequestDocumentService
         );
     }
 
