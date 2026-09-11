@@ -19,12 +19,12 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Enviar solicitud de cliente",
-        description = "Envía una nueva solicitud para una empresa en la que el usuario tenga una membresía ACTIVE con rol ADMIN o REQUESTER. La solicitud representa lo que el cliente necesita y no persiste como borrador. Al enviarse, el backend crea en la misma transacción la CustomerRequest y su JobCase 1:1 en estado SUBMITTED y todavía sin responsable. La fecha solicitada es una preferencia del cliente y no un compromiso de entrega."
+        description = "Envía una nueva solicitud como multipart/form-data. La parte 'request' contiene los datos JSON de la solicitud y la parte opcional 'documents' permite adjuntar uno o varios archivos iniciales. El backend crea CustomerRequest y su JobCase 1:1 y, una vez disponible el identificador del expediente, crea los documentos asociados al mismo JobCase dentro de la misma transacción de aplicación. Si falla la creación de cualquiera de los documentos, la transacción de base de datos se revierte y el adaptador de almacenamiento intenta compensar eliminando los archivos ya almacenados. Requiere membresía ACTIVE con rol ADMIN o REQUESTER."
 )
 @ApiResponses({
         @ApiResponse(
                 responseCode = "201",
-                description = "Solicitud y expediente creados correctamente",
+                description = "Solicitud, expediente y documentos iniciales creados correctamente",
                 content = @Content(
                         mediaType = "application/json",
                         schema = @Schema(implementation = com.nocountry.qualitytrack.shared.response.ApiResponse.class),
@@ -33,7 +33,7 @@ import java.lang.annotation.Target;
         ),
         @ApiResponse(
                 responseCode = "400",
-                description = "Los datos de la solicitud no son válidos",
+                description = "Los datos de la solicitud o alguno de los archivos no son válidos",
                 content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = RequestApiExamples.VALIDATION_ERROR))
         ),
         @ApiResponse(
@@ -45,6 +45,16 @@ import java.lang.annotation.Target;
                 responseCode = "403",
                 description = "Sin membresía activa, rol suficiente o empresa disponible para recibir solicitudes",
                 content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = RequestApiExamples.ACCESS_DENIED))
+        ),
+        @ApiResponse(
+                responseCode = "413",
+                description = "Uno de los archivos o la petición multipart supera el límite configurado",
+                content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))
+        ),
+        @ApiResponse(
+                responseCode = "503",
+                description = "El almacenamiento de documentos no está disponible",
+                content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))
         )
 })
 public @interface SubmitCustomerRequestApiDocs {
