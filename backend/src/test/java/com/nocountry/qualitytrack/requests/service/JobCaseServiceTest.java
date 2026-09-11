@@ -173,7 +173,7 @@ class JobCaseServiceTest {
         when(customerRequest.getMaterialRequirementType()).thenReturn(MaterialRequirementType.SPECIFIED);
         when(customerRequest.getMaterialRequirement()).thenReturn("AISI 4140");
         when(customerRequest.getRequestedDeliveryDate()).thenReturn(LocalDate.of(2026, 10, 15));
-        when(customerRequest.getRequestedBy()).thenReturn(requestedBy);
+        when(customerRequest.getRequestedByUser()).thenReturn(requestedBy);
         when(customerRequest.getCreatedAt()).thenReturn(openedAt);
 
         when(customer.getId()).thenReturn(20L);
