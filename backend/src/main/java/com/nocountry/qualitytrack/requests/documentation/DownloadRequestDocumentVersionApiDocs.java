@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Ver o descargar una versión de un documento",
-        description = "Entrega exactamente la versión indicada dentro de la solicitud. Por defecto usa Content-Disposition inline para permitir vista previa cuando el navegador soporte el tipo de archivo. Con download=true fuerza Content-Disposition attachment. El backend valida la cadena solicitud, expediente, documento y versión antes de resolver el archivo en almacenamiento."
+        description = "Entrega exactamente la versión indicada dentro de la solicitud. Por defecto permite vista previa inline únicamente para tipos seguros soportados (PDF, JPEG, PNG, WEBP, GIF y texto plano); otros tipos se fuerzan como descarga. Con download=true siempre usa Content-Disposition attachment. El backend valida la cadena solicitud, expediente, documento y versión antes de resolver el archivo en almacenamiento."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Archivo entregado correctamente"),
