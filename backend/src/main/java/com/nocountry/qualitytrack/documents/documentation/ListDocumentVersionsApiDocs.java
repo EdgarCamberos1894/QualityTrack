@@ -18,8 +18,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Operation(
-        summary = "Consultar historial de versiones",
-        description = "Devuelve todas las versiones de un documento ordenadas desde la primera hasta la más reciente. Cada versión conserva archivo, checksum, usuario y fecha de carga."
+        summary = "Consultar historial de versiones de un documento",
+        description = "Devuelve todas las versiones del documento indicado dentro de la solicitud, ordenadas desde la primera hasta la más reciente. El backend valida que el documento pertenezca al expediente de la solicitud antes de consultar su historial."
 )
 @ApiResponses({
         @ApiResponse(
@@ -31,8 +31,9 @@ import java.lang.annotation.Target;
                         examples = @ExampleObject(value = DocumentApiExamples.DOCUMENT_VERSIONS_RETRIEVED)
                 )
         ),
+        @ApiResponse(responseCode = "401", description = "Autenticación requerida", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "403", description = "El usuario no puede consultar el documento", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-        @ApiResponse(responseCode = "404", description = "No se encontró el documento", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+        @ApiResponse(responseCode = "404", description = "No se encontró la solicitud o el documento dentro de ella", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
 })
 public @interface ListDocumentVersionsApiDocs {
 }
