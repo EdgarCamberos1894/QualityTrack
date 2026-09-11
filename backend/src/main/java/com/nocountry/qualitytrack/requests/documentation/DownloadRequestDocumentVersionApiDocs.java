@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Ver o descargar una versión de un documento",
-        description = "Entrega exactamente la versión indicada dentro de la solicitud. Por defecto permite vista previa inline únicamente para tipos seguros soportados (PDF, JPEG, PNG, WEBP, GIF y texto plano); otros tipos se fuerzan como descarga. Con download=true siempre usa Content-Disposition attachment. El backend valida la cadena solicitud, expediente, documento y versión antes de resolver el archivo en almacenamiento."
+        description = "Entrega exactamente la versión indicada dentro de la solicitud. Por defecto permite vista previa inline únicamente para tipos seguros soportados (PDF, JPEG, PNG, WEBP, GIF y texto plano); otros tipos se fuerzan como descarga. Con download=true siempre usa Content-Disposition attachment. El backend valida la cadena solicitud, expediente, documento y versión antes de resolver el archivo en almacenamiento. Esta ruta está protegida por JWT: contentUrl y downloadUrl son rutas de API autenticadas, no enlaces públicos. Un frontend con Bearer token debe solicitar el contenido como binario/blob mediante su cliente HTTP autenticado y, si necesita abrirlo en el navegador, crear una URL local temporal con URL.createObjectURL."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Archivo entregado correctamente"),
