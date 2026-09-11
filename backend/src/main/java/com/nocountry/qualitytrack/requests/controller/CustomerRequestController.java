@@ -248,6 +248,7 @@ public class CustomerRequestController {
                 .contentType(mediaType)
                 .contentLength(document.fileSize())
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
+                .header(HttpHeaders.CACHE_CONTROL, "private, no-store")
                 .header("X-Content-Type-Options", "nosniff")
                 .body(document.resource());
     }
