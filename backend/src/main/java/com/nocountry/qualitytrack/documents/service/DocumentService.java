@@ -2,10 +2,10 @@ package com.nocountry.qualitytrack.documents.service;
 
 import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
-import com.nocountry.qualitytrack.documents.dto.response.DocumentSummaryResponse;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentVersionResponse;
 import com.nocountry.qualitytrack.documents.entity.Document;
 import com.nocountry.qualitytrack.documents.entity.DocumentVersion;
+import com.nocountry.qualitytrack.documents.enums.DocumentStatus;
 import com.nocountry.qualitytrack.documents.repository.DocumentRepository;
 import com.nocountry.qualitytrack.documents.repository.DocumentVersionRepository;
 import com.nocountry.qualitytrack.documents.storage.DocumentStorage;
@@ -27,8 +27,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,15 +87,38 @@ public class DocumentService {
     }
 
     @Transactional(readOnly = true)
-    public List<DocumentSummaryResponse> listByCase(Long currentUserId, Long caseId) {
+    public List<DocumentResponse> listCurrentByCase(Long currentUserId, Long caseId) {
         JobCase jobCase = requireJobCase(caseId);
         User viewer = accessService.requireCanReadCase(currentUserId, jobCase);
 
-        return documentRepository.findAllByJobCase_IdOrderByCreatedAtAsc(caseId)
+        List<Document> documents = documentRepository
+                .findAllByJobCase_IdAndStatusOrderByCreatedAtAsc(caseId, DocumentStatus.ACTIVE)
                 .stream()
                 .filter(document -> viewer.getAccountType() == AccountType.INTERNAL
                         || document.getCreatedBy().getAccountType() == AccountType.CUSTOMER)
-                .map(DocumentSummaryResponse::from)
+                .toList();
+
+        if (documents.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> documentIds = documents.stream()
+                .map(Document::getId)
+                .toList();
+
+        Map<Long, DocumentVersion> latestVersions = documentVersionRepository
+                .findLatestByDocumentIds(documentIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        version -> version.getDocument().getId(),
+                        Function.identity()
+                ));
+
+        return documents.stream()
+                .map(document -> DocumentResponse.from(
+                        document,
+                        requireLatestVersion(document, latestVersions)
+                ))
                 .toList();
     }
 
@@ -104,10 +131,10 @@ public class DocumentService {
     ) {
         validateFile(file);
 
-        Document document = documentRepository.findByIdAndCaseIdForUpdate(documentId, caseId)
+        Document document = documentRepository.findActiveByIdAndCaseIdForUpdate(documentId, caseId)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.RESOURCE_NOT_FOUND,
-                        "No se encontró el documento dentro del expediente."
+                        "No se encontró el documento activo dentro del expediente."
                 ));
 
         User uploader = accessService.requireCanAddVersion(currentUserId, document);
@@ -143,7 +170,7 @@ public class DocumentService {
             Long caseId,
             Long documentId
     ) {
-        Document document = requireDocument(caseId, documentId);
+        Document document = requireActiveDocument(caseId, documentId);
         accessService.requireCanRead(currentUserId, document);
 
         return documentVersionRepository.findAllByDocument_IdOrderByVersionAsc(documentId)
@@ -160,10 +187,15 @@ public class DocumentService {
             Long versionId
     ) {
         DocumentVersion version = documentVersionRepository
-                .findByIdAndDocument_IdAndDocument_JobCase_Id(versionId, documentId, caseId)
+                .findByIdAndDocument_IdAndDocument_JobCase_IdAndDocument_Status(
+                        versionId,
+                        documentId,
+                        caseId,
+                        DocumentStatus.ACTIVE
+                )
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.RESOURCE_NOT_FOUND,
-                        "No se encontró la versión del documento dentro del expediente."
+                        "No se encontró la versión del documento activo dentro del expediente."
                 ));
 
         accessService.requireCanRead(currentUserId, version.getDocument());
@@ -185,6 +217,23 @@ public class DocumentService {
         }
     }
 
+    @Transactional
+    public void remove(
+            Long currentUserId,
+            Long caseId,
+            Long documentId
+    ) {
+        Document document = documentRepository.findActiveByIdAndCaseIdForUpdate(documentId, caseId)
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.RESOURCE_NOT_FOUND,
+                        "No se encontró el documento activo dentro del expediente."
+                ));
+
+        User remover = accessService.requireCanRemove(currentUserId, document);
+        document.remove(remover, Instant.now());
+        documentRepository.saveAndFlush(document);
+    }
+
     private JobCase requireJobCase(Long caseId) {
         return jobCaseRepository.findById(caseId)
                 .orElseThrow(() -> new BusinessException(
@@ -193,12 +242,27 @@ public class DocumentService {
                 ));
     }
 
-    private Document requireDocument(Long caseId, Long documentId) {
-        return documentRepository.findByIdAndJobCase_Id(documentId, caseId)
+    private Document requireActiveDocument(Long caseId, Long documentId) {
+        return documentRepository
+                .findByIdAndJobCase_IdAndStatus(documentId, caseId, DocumentStatus.ACTIVE)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.RESOURCE_NOT_FOUND,
-                        "No se encontró el documento dentro del expediente."
+                        "No se encontró el documento activo dentro del expediente."
                 ));
+    }
+
+    private DocumentVersion requireLatestVersion(
+            Document document,
+            Map<Long, DocumentVersion> latestVersions
+    ) {
+        DocumentVersion version = latestVersions.get(document.getId());
+        if (version == null) {
+            throw new BusinessException(
+                    ApiErrorCode.DATA_CONFLICT,
+                    "El documento no tiene una versión disponible."
+            );
+        }
+        return version;
     }
 
     private StoredDocumentFile storeFile(
