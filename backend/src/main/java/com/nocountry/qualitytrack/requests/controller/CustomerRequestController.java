@@ -45,12 +45,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/customers/{customerId}/requests")
 @RequiredArgsConstructor
 @CustomerRequestApiDocs
 public class CustomerRequestController {
+
+    private static final Set<String> INLINE_PREVIEW_TYPES = Set.of(
+            MediaType.APPLICATION_PDF_VALUE,
+            MediaType.IMAGE_JPEG_VALUE,
+            MediaType.IMAGE_PNG_VALUE,
+            "image/webp",
+            MediaType.IMAGE_GIF_VALUE,
+            MediaType.TEXT_PLAIN_VALUE
+    );
 
     private final CustomerRequestService customerRequestService;
     private final CustomerRequestSubmissionService customerRequestSubmissionService;
@@ -223,7 +233,10 @@ public class CustomerRequestController {
                 versionId
         );
 
-        ContentDisposition contentDisposition = download
+        MediaType mediaType = safeMediaType(document.mimeType());
+        boolean forceDownload = download || !supportsInlinePreview(mediaType);
+
+        ContentDisposition contentDisposition = forceDownload
                 ? ContentDisposition.attachment()
                     .filename(document.fileName(), StandardCharsets.UTF_8)
                     .build()
@@ -232,9 +245,10 @@ public class CustomerRequestController {
                     .build();
 
         return ResponseEntity.ok()
-                .contentType(safeMediaType(document.mimeType()))
+                .contentType(mediaType)
                 .contentLength(document.fileSize())
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
+                .header("X-Content-Type-Options", "nosniff")
                 .body(document.resource());
     }
 
@@ -266,5 +280,9 @@ public class CustomerRequestController {
         } catch (IllegalArgumentException exception) {
             return MediaType.APPLICATION_OCTET_STREAM;
         }
+    }
+
+    private boolean supportsInlinePreview(MediaType mediaType) {
+        return INLINE_PREVIEW_TYPES.contains(mediaType.toString().toLowerCase());
     }
 }
