@@ -2,11 +2,12 @@ package com.nocountry.qualitytrack.requests.service;
 
 import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
-import com.nocountry.qualitytrack.documents.dto.response.DocumentSummaryResponse;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentVersionResponse;
 import com.nocountry.qualitytrack.documents.service.DocumentDownload;
 import com.nocountry.qualitytrack.documents.service.DocumentService;
 import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
+import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentResponse;
+import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentVersionResponse;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
@@ -51,17 +52,21 @@ public class CustomerRequestDocumentService {
     }
 
     @Transactional(readOnly = true)
-    public List<DocumentSummaryResponse> list(
+    public List<RequestDocumentResponse> listCurrent(
             Long currentUserId,
-            Long customerId,
-            Long requestId
+            JobCase jobCase
     ) {
-        JobCase jobCase = requireJobCase(customerId, requestId);
-        return documentService.listByCase(currentUserId, jobCase.getId());
+        Long customerId = jobCase.getCustomerRequest().getCustomer().getId();
+        Long requestId = jobCase.getCustomerRequest().getId();
+
+        return documentService.listCurrentByCase(currentUserId, jobCase.getId())
+                .stream()
+                .map(document -> RequestDocumentResponse.from(document, customerId, requestId))
+                .toList();
     }
 
     @Transactional
-    public DocumentVersionResponse addVersion(
+    public RequestDocumentVersionResponse addVersion(
             Long currentUserId,
             Long customerId,
             Long requestId,
@@ -69,16 +74,23 @@ public class CustomerRequestDocumentService {
             MultipartFile file
     ) {
         JobCase jobCase = requireJobCase(customerId, requestId);
-        return documentService.addVersion(
+        DocumentVersionResponse version = documentService.addVersion(
                 currentUserId,
                 jobCase.getId(),
                 documentId,
                 file
         );
+
+        return RequestDocumentVersionResponse.from(
+                version,
+                customerId,
+                requestId,
+                documentId
+        );
     }
 
     @Transactional(readOnly = true)
-    public List<DocumentVersionResponse> listVersions(
+    public List<RequestDocumentVersionResponse> listVersions(
             Long currentUserId,
             Long customerId,
             Long requestId,
@@ -86,10 +98,18 @@ public class CustomerRequestDocumentService {
     ) {
         JobCase jobCase = requireJobCase(customerId, requestId);
         return documentService.listVersions(
-                currentUserId,
-                jobCase.getId(),
-                documentId
-        );
+                        currentUserId,
+                        jobCase.getId(),
+                        documentId
+                )
+                .stream()
+                .map(version -> RequestDocumentVersionResponse.from(
+                        version,
+                        customerId,
+                        requestId,
+                        documentId
+                ))
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -107,6 +127,17 @@ public class CustomerRequestDocumentService {
                 documentId,
                 versionId
         );
+    }
+
+    @Transactional
+    public void remove(
+            Long currentUserId,
+            Long customerId,
+            Long requestId,
+            Long documentId
+    ) {
+        JobCase jobCase = requireJobCase(customerId, requestId);
+        documentService.remove(currentUserId, jobCase.getId(), documentId);
     }
 
     private JobCase requireJobCase(Long customerId, Long requestId) {
