@@ -1,6 +1,7 @@
 package com.nocountry.qualitytrack.documents.storage;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,11 @@ import java.util.HexFormat;
 import java.util.UUID;
 
 @Component
+@ConditionalOnProperty(
+        name = "app.documents.storage-provider",
+        havingValue = "local",
+        matchIfMissing = true
+)
 public class LocalDocumentStorage implements DocumentStorage {
 
     private final Path root;
@@ -28,8 +34,17 @@ public class LocalDocumentStorage implements DocumentStorage {
     }
 
     @Override
-    public StoredDocumentFile store(Long caseId, Integer version, InputStream inputStream) {
-        Path directory = root.resolve("case-" + caseId).normalize();
+    public StoredDocumentFile store(
+            Long customerId,
+            Long caseId,
+            Integer version,
+            String fileName,
+            InputStream inputStream
+    ) {
+        Path directory = root
+                .resolve("customer-" + customerId)
+                .resolve("case-" + caseId)
+                .normalize();
         Path target = directory.resolve(
                 "v" + version + "-" + UUID.randomUUID()
         ).normalize();
