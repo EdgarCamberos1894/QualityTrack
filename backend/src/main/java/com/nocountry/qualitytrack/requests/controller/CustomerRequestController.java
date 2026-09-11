@@ -10,18 +10,22 @@ import com.nocountry.qualitytrack.requests.dto.request.CancelCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.requests.service.CustomerRequestService;
+import com.nocountry.qualitytrack.requests.service.CustomerRequestSubmissionService;
 import com.nocountry.qualitytrack.shared.response.ApiResponse;
 import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -32,18 +36,21 @@ import java.util.List;
 public class CustomerRequestController {
 
     private final CustomerRequestService customerRequestService;
+    private final CustomerRequestSubmissionService customerRequestSubmissionService;
 
     @SubmitCustomerRequestApiDocs
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<CustomerRequestResponse>> submit(
             @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
-            @Valid @RequestBody SubmitCustomerRequest request
+            @Valid @RequestPart("request") SubmitCustomerRequest request,
+            @RequestPart(value = "documents", required = false) List<MultipartFile> documents
     ) {
-        CustomerRequestResponse response = customerRequestService.submit(
+        CustomerRequestResponse response = customerRequestSubmissionService.submit(
                 currentUserId,
                 customerId,
-                request
+                request,
+                documents
         );
 
         return ResponseEntity.status(HttpStatus.CREATED)
