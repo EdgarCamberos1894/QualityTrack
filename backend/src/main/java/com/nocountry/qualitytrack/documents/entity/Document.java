@@ -1,9 +1,12 @@
 package com.nocountry.qualitytrack.documents.entity;
 
+import com.nocountry.qualitytrack.documents.enums.DocumentStatus;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.users.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -46,6 +49,17 @@ public class Document {
     @JoinColumn(name = "created_by_user_id", nullable = false)
     private User createdBy;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private DocumentStatus status = DocumentStatus.ACTIVE;
+
+    @Column(name = "removed_at")
+    private Instant removedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "removed_by_user_id")
+    private User removedBy;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -62,6 +76,7 @@ public class Document {
         this.name = Objects.requireNonNull(name);
         this.description = description;
         this.createdBy = Objects.requireNonNull(createdBy);
+        this.status = DocumentStatus.ACTIVE;
     }
 
     public static Document create(
@@ -72,5 +87,19 @@ public class Document {
             User createdBy
     ) {
         return new Document(jobCase, documentType, name, description, createdBy);
+    }
+
+    public void remove(User removedBy, Instant removedAt) {
+        if (status == DocumentStatus.REMOVED) {
+            return;
+        }
+
+        this.status = DocumentStatus.REMOVED;
+        this.removedBy = Objects.requireNonNull(removedBy);
+        this.removedAt = Objects.requireNonNull(removedAt);
+    }
+
+    public boolean isActive() {
+        return status == DocumentStatus.ACTIVE;
     }
 }
