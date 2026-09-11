@@ -29,5 +29,9 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
             "document.jobCase.customerRequest.customer",
             "document.createdBy"
     })
-    Optional<DocumentVersion> findByIdAndDocument_Id(Long versionId, Long documentId);
+    Optional<DocumentVersion> findByIdAndDocument_IdAndDocument_JobCase_Id(
+            Long versionId,
+            Long documentId,
+            Long caseId
+    );
 }
