@@ -9,7 +9,6 @@ final class RequestDocumentApiExamples {
               "message": "Documento agregado a la solicitud correctamente.",
               "data": {
                 "id": 7,
-                "caseId": 12,
                 "documentType": "DRAWING",
                 "name": "Plano de eje",
                 "description": "Plano recibido del cliente.",
@@ -25,29 +24,11 @@ final class RequestDocumentApiExamples {
                   "checksum": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                   "uploadedByUserId": 42,
                   "uploadedByName": "Ana López",
-                  "uploadedAt": "2026-09-10T23:40:00Z"
+                  "uploadedAt": "2026-09-10T23:40:00Z",
+                  "contentUrl": "/api/v1/customers/20/requests/31/documents/7/versions/21/content",
+                  "downloadUrl": "/api/v1/customers/20/requests/31/documents/7/versions/21/content?download=true"
                 }
               }
-            }
-            """;
-
-    static final String DOCUMENTS_RETRIEVED = """
-            {
-              "success": true,
-              "code": "DOCUMENTS_RETRIEVED",
-              "message": "Documentos de la solicitud consultados correctamente.",
-              "data": [
-                {
-                  "id": 7,
-                  "caseId": 12,
-                  "documentType": "DRAWING",
-                  "name": "Plano de eje",
-                  "description": "Plano recibido del cliente.",
-                  "createdByUserId": 42,
-                  "createdByName": "Ana López",
-                  "createdAt": "2026-09-10T23:40:00Z"
-                }
-              ]
             }
             """;
 
@@ -65,7 +46,9 @@ final class RequestDocumentApiExamples {
                 "checksum": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
                 "uploadedByUserId": 42,
                 "uploadedByName": "Ana López",
-                "uploadedAt": "2026-09-10T23:55:00Z"
+                "uploadedAt": "2026-09-10T23:55:00Z",
+                "contentUrl": "/api/v1/customers/20/requests/31/documents/7/versions/22/content",
+                "downloadUrl": "/api/v1/customers/20/requests/31/documents/7/versions/22/content?download=true"
               }
             }
             """;
@@ -85,7 +68,9 @@ final class RequestDocumentApiExamples {
                   "checksum": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
                   "uploadedByUserId": 42,
                   "uploadedByName": "Ana López",
-                  "uploadedAt": "2026-09-10T23:40:00Z"
+                  "uploadedAt": "2026-09-10T23:40:00Z",
+                  "contentUrl": "/api/v1/customers/20/requests/31/documents/7/versions/21/content",
+                  "downloadUrl": "/api/v1/customers/20/requests/31/documents/7/versions/21/content?download=true"
                 },
                 {
                   "id": 22,
@@ -96,7 +81,9 @@ final class RequestDocumentApiExamples {
                   "checksum": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
                   "uploadedByUserId": 42,
                   "uploadedByName": "Ana López",
-                  "uploadedAt": "2026-09-10T23:55:00Z"
+                  "uploadedAt": "2026-09-10T23:55:00Z",
+                  "contentUrl": "/api/v1/customers/20/requests/31/documents/7/versions/22/content",
+                  "downloadUrl": "/api/v1/customers/20/requests/31/documents/7/versions/22/content?download=true"
                 }
               ]
             }
