@@ -1,6 +1,7 @@
 package com.nocountry.qualitytrack.documents.repository;
 
 import com.nocountry.qualitytrack.documents.entity.Document;
+import com.nocountry.qualitytrack.documents.enums.DocumentStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,7 +19,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "jobCase",
             "jobCase.customerRequest",
             "jobCase.customerRequest.customer",
-            "createdBy"
+            "createdBy",
+            "removedBy"
     })
     Optional<Document> findById(Long id);
 
@@ -28,13 +30,20 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "jobCase.customerRequest.customer",
             "createdBy"
     })
-    Optional<Document> findByIdAndJobCase_Id(Long documentId, Long caseId);
+    Optional<Document> findByIdAndJobCase_IdAndStatus(
+            Long documentId,
+            Long caseId,
+            DocumentStatus status
+    );
 
     @EntityGraph(attributePaths = {
             "jobCase",
             "createdBy"
     })
-    List<Document> findAllByJobCase_IdOrderByCreatedAtAsc(Long caseId);
+    List<Document> findAllByJobCase_IdAndStatusOrderByCreatedAtAsc(
+            Long caseId,
+            DocumentStatus status
+    );
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
@@ -46,8 +55,9 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             join fetch d.createdBy
             where d.id = :documentId
               and jc.id = :caseId
+              and d.status = com.nocountry.qualitytrack.documents.enums.DocumentStatus.ACTIVE
             """)
-    Optional<Document> findByIdAndCaseIdForUpdate(
+    Optional<Document> findActiveByIdAndCaseIdForUpdate(
             @Param("documentId") Long documentId,
             @Param("caseId") Long caseId
     );
