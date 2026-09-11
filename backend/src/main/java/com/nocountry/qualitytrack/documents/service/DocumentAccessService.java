@@ -70,6 +70,23 @@ public class DocumentAccessService {
         return user;
     }
 
+    public User requireCanRemove(Long userId, Document document) {
+        User user = requireUser(userId);
+        JobCase jobCase = requireCase(document);
+
+        if (user.getAccountType() == AccountType.INTERNAL) {
+            requireInternalRole(userId, true);
+            requireOpenForInternalWrite(jobCase);
+            return user;
+        }
+
+        CustomerMembership membership = requireActiveMembership(userId, jobCase);
+        requireCustomerWriteRole(membership);
+        requireCustomerOwnedDocument(document);
+        requireOpenForCustomerWrite(jobCase);
+        return user;
+    }
+
     public User requireCanRead(Long userId, Document document) {
         User user = requireUser(userId);
         JobCase jobCase = requireCase(document);
@@ -120,7 +137,7 @@ public class DocumentAccessService {
                 && membership.getRole() != CustomerMembershipRole.REQUESTER) {
             throw new BusinessException(
                     ApiErrorCode.ACCESS_DENIED,
-                    "Tu rol dentro de la empresa no permite subir documentos."
+                    "Tu rol dentro de la empresa no permite modificar documentos."
             );
         }
     }
@@ -155,7 +172,7 @@ public class DocumentAccessService {
                 || jobCase.getStatus() == JobCaseStatus.CANCELLED) {
             throw new BusinessException(
                     ApiErrorCode.DATA_CONFLICT,
-                    "El expediente ya no admite documentos nuevos por parte del cliente."
+                    "El expediente ya no admite modificaciones de documentos por parte del cliente."
             );
         }
     }
@@ -164,7 +181,7 @@ public class DocumentAccessService {
         if (jobCase.getStatus() == JobCaseStatus.CANCELLED) {
             throw new BusinessException(
                     ApiErrorCode.DATA_CONFLICT,
-                    "No se pueden agregar documentos a un expediente cancelado."
+                    "No se pueden modificar documentos de un expediente cancelado."
             );
         }
     }
