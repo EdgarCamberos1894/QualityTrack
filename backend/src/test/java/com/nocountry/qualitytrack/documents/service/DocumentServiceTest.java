@@ -3,10 +3,10 @@ package com.nocountry.qualitytrack.documents.service;
 import com.nocountry.qualitytrack.customers.entity.Customer;
 import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
-import com.nocountry.qualitytrack.documents.dto.response.DocumentSummaryResponse;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentVersionResponse;
 import com.nocountry.qualitytrack.documents.entity.Document;
 import com.nocountry.qualitytrack.documents.entity.DocumentVersion;
+import com.nocountry.qualitytrack.documents.enums.DocumentStatus;
 import com.nocountry.qualitytrack.documents.repository.DocumentRepository;
 import com.nocountry.qualitytrack.documents.repository.DocumentVersionRepository;
 import com.nocountry.qualitytrack.documents.storage.DocumentStorage;
@@ -24,13 +24,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.InputStream;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -130,7 +136,7 @@ class DocumentServiceTest {
         Document document = Document.create(jobCase, "DRAWING", "Plano", null, user);
 
         stubCaseCustomer();
-        when(documentRepository.findByIdAndCaseIdForUpdate(7L, 12L))
+        when(documentRepository.findActiveByIdAndCaseIdForUpdate(7L, 12L))
                 .thenReturn(Optional.of(document));
         when(accessService.requireCanAddVersion(10L, document)).thenReturn(user);
         when(documentVersionRepository.findMaxVersionByDocumentId(7L)).thenReturn(1);
@@ -163,7 +169,7 @@ class DocumentServiceTest {
                 "revision".getBytes()
         );
 
-        when(documentRepository.findByIdAndCaseIdForUpdate(7L, 12L))
+        when(documentRepository.findActiveByIdAndCaseIdForUpdate(7L, 12L))
                 .thenReturn(Optional.empty());
 
         assertThrows(
@@ -173,22 +179,71 @@ class DocumentServiceTest {
     }
 
     @Test
-    void customerListOnlyIncludesCustomerCreatedDocuments() {
-        User internalCreator = org.mockito.Mockito.mock(User.class);
-        Document customerDocument = Document.create(jobCase, "DRAWING", "Plano cliente", null, user);
-        Document internalDocument = Document.create(jobCase, "SPECIFICATION", "Nota interna", null, internalCreator);
+    void customerDetailOnlyIncludesActiveCustomerDocumentsWithCurrentVersion() {
+        Document customerDocument = mock(Document.class);
+        Document internalDocument = mock(Document.class);
+        DocumentVersion latestVersion = mock(DocumentVersion.class);
+        User internalCreator = mock(User.class);
 
         when(jobCaseRepository.findById(12L)).thenReturn(Optional.of(jobCase));
         when(accessService.requireCanReadCase(10L, jobCase)).thenReturn(user);
         when(user.getAccountType()).thenReturn(AccountType.CUSTOMER);
+        when(customerDocument.getCreatedBy()).thenReturn(user);
+        when(internalDocument.getCreatedBy()).thenReturn(internalCreator);
         when(internalCreator.getAccountType()).thenReturn(AccountType.INTERNAL);
-        when(documentRepository.findAllByJobCase_IdOrderByCreatedAtAsc(12L))
-                .thenReturn(List.of(customerDocument, internalDocument));
+        when(documentRepository.findAllByJobCase_IdAndStatusOrderByCreatedAtAsc(
+                12L,
+                DocumentStatus.ACTIVE
+        )).thenReturn(List.of(customerDocument, internalDocument));
 
-        List<DocumentSummaryResponse> response = service.listByCase(10L, 12L);
+        when(customerDocument.getId()).thenReturn(7L);
+        when(customerDocument.getJobCase()).thenReturn(jobCase);
+        when(customerDocument.getDocumentType()).thenReturn("DRAWING");
+        when(customerDocument.getName()).thenReturn("Plano cliente");
+        when(customerDocument.getDescription()).thenReturn(null);
+        when(customerDocument.getCreatedAt()).thenReturn(Instant.parse("2026-09-10T23:40:00Z"));
+        when(user.getId()).thenReturn(10L);
+        when(user.getFirstName()).thenReturn("Ana");
+        when(user.getLastName()).thenReturn("López");
+
+        when(documentVersionRepository.findLatestByDocumentIds(List.of(7L)))
+                .thenReturn(List.of(latestVersion));
+        when(latestVersion.getDocument()).thenReturn(customerDocument);
+        when(latestVersion.getId()).thenReturn(21L);
+        when(latestVersion.getVersion()).thenReturn(2);
+        when(latestVersion.getFileName()).thenReturn("plano-v2.pdf");
+        when(latestVersion.getMimeType()).thenReturn("application/pdf");
+        when(latestVersion.getFileSize()).thenReturn(100L);
+        when(latestVersion.getChecksum()).thenReturn(
+                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+        );
+        when(latestVersion.getUploadedBy()).thenReturn(user);
+        when(latestVersion.getUploadedAt()).thenReturn(Instant.parse("2026-09-10T23:50:00Z"));
+        when(jobCase.getId()).thenReturn(12L);
+
+        List<DocumentResponse> response = service.listCurrentByCase(10L, 12L);
 
         assertEquals(1, response.size());
         assertEquals("Plano cliente", response.get(0).name());
+        assertEquals(2, response.get(0).currentVersion().version());
+    }
+
+    @Test
+    void removesDocumentLogicallyWithoutDeletingStoredFile() {
+        Document document = Document.create(jobCase, "DRAWING", "Plano", null, user);
+
+        when(documentRepository.findActiveByIdAndCaseIdForUpdate(7L, 12L))
+                .thenReturn(Optional.of(document));
+        when(accessService.requireCanRemove(10L, document)).thenReturn(user);
+        when(documentRepository.saveAndFlush(document)).thenReturn(document);
+
+        service.remove(10L, 12L, 7L);
+
+        assertEquals(DocumentStatus.REMOVED, document.getStatus());
+        assertSame(user, document.getRemovedBy());
+        assertNotNull(document.getRemovedAt());
+        verify(documentRepository).saveAndFlush(document);
+        verifyNoInteractions(storage);
     }
 
     private void stubCaseCustomer() {
