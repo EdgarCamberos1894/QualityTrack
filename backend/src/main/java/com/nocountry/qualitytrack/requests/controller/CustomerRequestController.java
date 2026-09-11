@@ -2,23 +2,23 @@ package com.nocountry.qualitytrack.requests.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
-import com.nocountry.qualitytrack.documents.dto.response.DocumentSummaryResponse;
-import com.nocountry.qualitytrack.documents.dto.response.DocumentVersionResponse;
 import com.nocountry.qualitytrack.documents.service.DocumentDownload;
 import com.nocountry.qualitytrack.requests.documentation.AddRequestDocumentVersionApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.CancelCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.CreateRequestDocumentApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.CustomerRequestApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.DeleteRequestDocumentApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.DownloadRequestDocumentVersionApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.GetCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.ListCustomerRequestsApiDocs;
-import com.nocountry.qualitytrack.requests.documentation.ListRequestDocumentsApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.ListRequestDocumentVersionsApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.SubmitCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.dto.request.CancelCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
+import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestDetailResponse;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
+import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentVersionResponse;
 import com.nocountry.qualitytrack.requests.service.CustomerRequestDocumentService;
 import com.nocountry.qualitytrack.requests.service.CustomerRequestService;
 import com.nocountry.qualitytrack.requests.service.CustomerRequestSubmissionService;
@@ -32,11 +32,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -95,12 +97,12 @@ public class CustomerRequestController {
 
     @GetCustomerRequestApiDocs
     @GetMapping("/{requestId}")
-    public ResponseEntity<ApiResponse<CustomerRequestResponse>> get(
+    public ResponseEntity<ApiResponse<CustomerRequestDetailResponse>> get(
             @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
             @PathVariable Long requestId
     ) {
-        CustomerRequestResponse response = customerRequestService
+        CustomerRequestDetailResponse response = customerRequestService
                 .getForCustomer(currentUserId, customerId, requestId);
 
         return ResponseEntity.ok(ApiResponse.success(
@@ -135,24 +137,22 @@ public class CustomerRequestController {
                 ));
     }
 
-    @ListRequestDocumentsApiDocs
-    @GetMapping("/{requestId}/documents")
-    public ResponseEntity<ApiResponse<List<DocumentSummaryResponse>>> listDocuments(
+    @DeleteRequestDocumentApiDocs
+    @DeleteMapping("/{requestId}/documents/{documentId}")
+    public ResponseEntity<Void> removeDocument(
             @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
-            @PathVariable Long requestId
+            @PathVariable Long requestId,
+            @PathVariable Long documentId
     ) {
-        List<DocumentSummaryResponse> response = customerRequestDocumentService.list(
+        customerRequestDocumentService.remove(
                 currentUserId,
                 customerId,
-                requestId
+                requestId,
+                documentId
         );
 
-        return ResponseEntity.ok(ApiResponse.success(
-                ApiSuccessCode.DOCUMENTS_RETRIEVED,
-                "Documentos de la solicitud consultados correctamente.",
-                response
-        ));
+        return ResponseEntity.noContent().build();
     }
 
     @AddRequestDocumentVersionApiDocs
@@ -160,14 +160,14 @@ public class CustomerRequestController {
             value = "/{requestId}/documents/{documentId}/versions",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<ApiResponse<DocumentVersionResponse>> addDocumentVersion(
+    public ResponseEntity<ApiResponse<RequestDocumentVersionResponse>> addDocumentVersion(
             @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
             @PathVariable Long requestId,
             @PathVariable Long documentId,
             @RequestPart("file") MultipartFile file
     ) {
-        DocumentVersionResponse response = customerRequestDocumentService.addVersion(
+        RequestDocumentVersionResponse response = customerRequestDocumentService.addVersion(
                 currentUserId,
                 customerId,
                 requestId,
@@ -185,13 +185,13 @@ public class CustomerRequestController {
 
     @ListRequestDocumentVersionsApiDocs
     @GetMapping("/{requestId}/documents/{documentId}/versions")
-    public ResponseEntity<ApiResponse<List<DocumentVersionResponse>>> listDocumentVersions(
+    public ResponseEntity<ApiResponse<List<RequestDocumentVersionResponse>>> listDocumentVersions(
             @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
             @PathVariable Long requestId,
             @PathVariable Long documentId
     ) {
-        List<DocumentVersionResponse> response = customerRequestDocumentService.listVersions(
+        List<RequestDocumentVersionResponse> response = customerRequestDocumentService.listVersions(
                 currentUserId,
                 customerId,
                 requestId,
@@ -212,9 +212,10 @@ public class CustomerRequestController {
             @PathVariable Long customerId,
             @PathVariable Long requestId,
             @PathVariable Long documentId,
-            @PathVariable Long versionId
+            @PathVariable Long versionId,
+            @RequestParam(defaultValue = "false") boolean download
     ) {
-        DocumentDownload download = customerRequestDocumentService.download(
+        DocumentDownload document = customerRequestDocumentService.download(
                 currentUserId,
                 customerId,
                 requestId,
@@ -222,15 +223,19 @@ public class CustomerRequestController {
                 versionId
         );
 
-        ContentDisposition contentDisposition = ContentDisposition.attachment()
-                .filename(download.fileName(), StandardCharsets.UTF_8)
-                .build();
+        ContentDisposition contentDisposition = download
+                ? ContentDisposition.attachment()
+                    .filename(document.fileName(), StandardCharsets.UTF_8)
+                    .build()
+                : ContentDisposition.inline()
+                    .filename(document.fileName(), StandardCharsets.UTF_8)
+                    .build();
 
         return ResponseEntity.ok()
-                .contentType(safeMediaType(download.mimeType()))
-                .contentLength(download.fileSize())
+                .contentType(safeMediaType(document.mimeType()))
+                .contentLength(document.fileSize())
                 .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString())
-                .body(download.resource());
+                .body(document.resource());
     }
 
     @CancelCustomerRequestApiDocs
