@@ -18,8 +18,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Operation(
-        summary = "Crear documento con versión inicial",
-        description = "Crea un documento asociado a un JobCase y almacena el archivo recibido como versión 1. El documento y su primera versión se registran sin sobrescribir archivos existentes. Clientes ADMIN/REQUESTER pueden subir documentos mientras el expediente admita cambios; usuarios internos autorizados también pueden hacerlo."
+        summary = "Agregar documento a una solicitud",
+        description = "Agrega un documento a la solicitud indicada. El backend resuelve internamente su JobCase y crea la versión 1 del archivo, por lo que el cliente no necesita conocer ni enviar el caseId. Si no se envía metadata, se usa REQUEST_ATTACHMENT y el nombre del archivo como valores predeterminados."
 )
 @ApiResponses({
         @ApiResponse(
@@ -33,8 +33,8 @@ import java.lang.annotation.Target;
         ),
         @ApiResponse(responseCode = "400", description = "Metadata o archivo inválidos", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "401", description = "Autenticación requerida", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-        @ApiResponse(responseCode = "403", description = "El usuario no puede subir documentos al expediente", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-        @ApiResponse(responseCode = "404", description = "No se encontró el expediente", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+        @ApiResponse(responseCode = "403", description = "El usuario no puede subir documentos a la solicitud", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+        @ApiResponse(responseCode = "404", description = "No se encontró la solicitud", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "409", description = "El estado del expediente no admite la operación", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "413", description = "El archivo supera el tamaño máximo permitido", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "503", description = "El almacenamiento de documentos no está disponible", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
