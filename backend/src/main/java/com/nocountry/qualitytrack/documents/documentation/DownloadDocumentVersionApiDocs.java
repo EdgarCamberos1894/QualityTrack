@@ -17,13 +17,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Operation(
-        summary = "Descargar una versión",
-        description = "Descarga exactamente la versión indicada. La existencia de versiones posteriores no altera el archivo almacenado para versiones anteriores."
+        summary = "Descargar una versión de un documento",
+        description = "Descarga exactamente la versión indicada dentro de la solicitud. El backend valida la cadena solicitud, expediente, documento y versión antes de resolver el archivo en almacenamiento."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Archivo descargado correctamente"),
+        @ApiResponse(responseCode = "401", description = "Autenticación requerida", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "403", description = "El usuario no puede consultar el documento", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-        @ApiResponse(responseCode = "404", description = "No se encontró la versión solicitada", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
+        @ApiResponse(responseCode = "404", description = "No se encontró la solicitud, el documento o la versión dentro de ese contexto", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "503", description = "El archivo no está disponible en almacenamiento", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
 })
 public @interface DownloadDocumentVersionApiDocs {
