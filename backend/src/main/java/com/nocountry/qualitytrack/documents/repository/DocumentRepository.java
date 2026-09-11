@@ -55,10 +55,11 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             join fetch d.createdBy
             where d.id = :documentId
               and jc.id = :caseId
-              and d.status = com.nocountry.qualitytrack.documents.enums.DocumentStatus.ACTIVE
+              and d.status = :status
             """)
-    Optional<Document> findActiveByIdAndCaseIdForUpdate(
+    Optional<Document> findByIdAndCaseIdAndStatusForUpdate(
             @Param("documentId") Long documentId,
-            @Param("caseId") Long caseId
+            @Param("caseId") Long caseId,
+            @Param("status") DocumentStatus status
     );
 }
