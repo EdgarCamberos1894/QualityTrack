@@ -1,7 +1,6 @@
 package com.nocountry.qualitytrack.requests.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
-import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
 import com.nocountry.qualitytrack.documents.service.DocumentDownload;
 import com.nocountry.qualitytrack.requests.documentation.AddRequestDocumentVersionApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.CancelCustomerRequestApiDocs;
@@ -18,6 +17,7 @@ import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestDetailResponse;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
+import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentResponse;
 import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentVersionResponse;
 import com.nocountry.qualitytrack.requests.service.CustomerRequestDocumentService;
 import com.nocountry.qualitytrack.requests.service.CustomerRequestService;
@@ -114,14 +114,14 @@ public class CustomerRequestController {
 
     @CreateRequestDocumentApiDocs
     @PostMapping(value = "/{requestId}/documents", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ApiResponse<DocumentResponse>> createDocument(
+    public ResponseEntity<ApiResponse<RequestDocumentResponse>> createDocument(
             @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
             @PathVariable Long requestId,
             @Valid @RequestPart(value = "metadata", required = false) CreateRequestDocument metadata,
             @RequestPart("file") MultipartFile file
     ) {
-        DocumentResponse response = customerRequestDocumentService.create(
+        RequestDocumentResponse response = customerRequestDocumentService.create(
                 currentUserId,
                 customerId,
                 requestId,
