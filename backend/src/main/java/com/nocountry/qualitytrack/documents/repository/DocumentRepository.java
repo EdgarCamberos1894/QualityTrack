@@ -24,6 +24,14 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
 
     @EntityGraph(attributePaths = {
             "jobCase",
+            "jobCase.customerRequest",
+            "jobCase.customerRequest.customer",
+            "createdBy"
+    })
+    Optional<Document> findByIdAndJobCase_Id(Long documentId, Long caseId);
+
+    @EntityGraph(attributePaths = {
+            "jobCase",
             "createdBy"
     })
     List<Document> findAllByJobCase_IdOrderByCreatedAtAsc(Long caseId);
@@ -37,6 +45,10 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             left join fetch cr.customer c
             join fetch d.createdBy
             where d.id = :documentId
+              and jc.id = :caseId
             """)
-    Optional<Document> findByIdForUpdate(@Param("documentId") Long documentId);
+    Optional<Document> findByIdAndCaseIdForUpdate(
+            @Param("documentId") Long documentId,
+            @Param("caseId") Long caseId
+    );
 }
