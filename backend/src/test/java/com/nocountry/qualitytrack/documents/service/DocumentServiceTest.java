@@ -1,5 +1,6 @@
 package com.nocountry.qualitytrack.documents.service;
 
+import com.nocountry.qualitytrack.customers.entity.Customer;
 import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentSummaryResponse;
@@ -10,6 +11,7 @@ import com.nocountry.qualitytrack.documents.repository.DocumentRepository;
 import com.nocountry.qualitytrack.documents.repository.DocumentVersionRepository;
 import com.nocountry.qualitytrack.documents.storage.DocumentStorage;
 import com.nocountry.qualitytrack.documents.storage.StoredDocumentFile;
+import com.nocountry.qualitytrack.requests.entity.CustomerRequest;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.users.entity.User;
@@ -52,6 +54,12 @@ class DocumentServiceTest {
     private JobCase jobCase;
 
     @Mock
+    private CustomerRequest customerRequest;
+
+    @Mock
+    private Customer customer;
+
+    @Mock
     private User user;
 
     private DocumentService service;
@@ -76,20 +84,25 @@ class DocumentServiceTest {
                 "contenido".getBytes()
         );
 
+        stubCaseCustomer();
         when(jobCaseRepository.findById(12L)).thenReturn(Optional.of(jobCase));
-        when(jobCase.getId()).thenReturn(12L);
         when(accessService.requireCanCreate(10L, jobCase)).thenReturn(user);
         when(user.getId()).thenReturn(10L);
         when(user.getFirstName()).thenReturn("Ana");
         when(user.getLastName()).thenReturn("López");
         when(documentRepository.saveAndFlush(any(Document.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
-        when(storage.store(eq(12L), eq(1), any(InputStream.class)))
-                .thenReturn(new StoredDocumentFile(
-                        "case-12/v1-test",
-                        9L,
-                        "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
-                ));
+        when(storage.store(
+                eq(20L),
+                eq(12L),
+                eq(1),
+                eq("plano.pdf"),
+                any(InputStream.class)
+        )).thenReturn(new StoredDocumentFile(
+                "qualitytrack/20/case-12/v1-test.pdf",
+                9L,
+                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+        ));
         when(documentVersionRepository.saveAndFlush(any(DocumentVersion.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -115,16 +128,21 @@ class DocumentServiceTest {
         );
         Document document = Document.create(jobCase, "DRAWING", "Plano", null, user);
 
-        when(jobCase.getId()).thenReturn(12L);
+        stubCaseCustomer();
         when(documentRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(document));
         when(accessService.requireCanAddVersion(10L, document)).thenReturn(user);
         when(documentVersionRepository.findMaxVersionByDocumentId(7L)).thenReturn(1);
-        when(storage.store(eq(12L), eq(2), any(InputStream.class)))
-                .thenReturn(new StoredDocumentFile(
-                        "case-12/v2-test",
-                        8L,
-                        "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
-                ));
+        when(storage.store(
+                eq(20L),
+                eq(12L),
+                eq(2),
+                eq("plano-rev-b.pdf"),
+                any(InputStream.class)
+        )).thenReturn(new StoredDocumentFile(
+                "qualitytrack/20/case-12/v2-test.pdf",
+                8L,
+                "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+        ));
         when(documentVersionRepository.saveAndFlush(any(DocumentVersion.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -151,5 +169,12 @@ class DocumentServiceTest {
 
         assertEquals(1, response.size());
         assertEquals("Plano cliente", response.get(0).name());
+    }
+
+    private void stubCaseCustomer() {
+        when(jobCase.getId()).thenReturn(12L);
+        when(jobCase.getCustomerRequest()).thenReturn(customerRequest);
+        when(customerRequest.getCustomer()).thenReturn(customer);
+        when(customer.getId()).thenReturn(20L);
     }
 }
