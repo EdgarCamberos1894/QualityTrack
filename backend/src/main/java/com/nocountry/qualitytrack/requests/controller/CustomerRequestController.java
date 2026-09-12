@@ -13,7 +13,7 @@ import com.nocountry.qualitytrack.requests.documentation.ListCustomerRequestsApi
 import com.nocountry.qualitytrack.requests.documentation.ListRequestDocumentVersionsApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.SubmitCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.dto.request.CancelCustomerRequest;
-import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
+import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocumentForm;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequestForm;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestDetailResponse;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
@@ -128,15 +128,14 @@ public class CustomerRequestController {
             @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
             @PathVariable Long requestId,
-            @Valid @RequestPart(value = "metadata", required = false) CreateRequestDocument metadata,
-            @RequestPart("file") MultipartFile file
+            @Valid @ModelAttribute CreateRequestDocumentForm form
     ) {
         RequestDocumentResponse response = customerRequestDocumentService.create(
                 currentUserId,
                 customerId,
                 requestId,
-                metadata,
-                file
+                form.toMetadata(),
+                form.file()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED)
