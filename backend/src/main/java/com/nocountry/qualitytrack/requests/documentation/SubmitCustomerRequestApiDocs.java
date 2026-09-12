@@ -1,11 +1,14 @@
 package com.nocountry.qualitytrack.requests.documentation;
 
+import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequestForm;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 
 import java.lang.annotation.Documented;
@@ -19,7 +22,14 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Enviar solicitud de cliente",
-        description = "Envía una nueva solicitud como multipart/form-data. La parte 'request' contiene los datos JSON de la solicitud y la parte opcional 'documents' permite adjuntar uno o varios archivos iniciales. El backend crea CustomerRequest y su JobCase 1:1 y, una vez disponible el identificador del expediente, crea los documentos asociados al mismo JobCase dentro de la misma transacción de aplicación. Si falla la creación de cualquiera de los documentos, la transacción de base de datos se revierte y el adaptador de almacenamiento intenta compensar eliminando los archivos ya almacenados. Requiere membresía ACTIVE con rol ADMIN o REQUESTER."
+        description = "Envía una nueva solicitud como multipart/form-data. Los campos de la solicitud y los documentos iniciales viajan en un único formulario multipart; no es necesario enviar una parte JSON independiente. El backend crea CustomerRequest y su JobCase 1:1 y, una vez disponible el identificador del expediente, crea los documentos asociados al mismo JobCase dentro de la misma transacción de aplicación. Si falla la creación de cualquiera de los documentos, la transacción de base de datos se revierte y el adaptador de almacenamiento intenta compensar eliminando los archivos ya almacenados. Requiere membresía ACTIVE con rol ADMIN o REQUESTER.",
+        requestBody = @RequestBody(
+                required = true,
+                content = @Content(
+                        mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                        schema = @Schema(implementation = SubmitCustomerRequestForm.class)
+                )
+        )
 )
 @ApiResponses({
         @ApiResponse(
