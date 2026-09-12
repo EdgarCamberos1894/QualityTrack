@@ -14,7 +14,7 @@ import com.nocountry.qualitytrack.requests.documentation.ListRequestDocumentVers
 import com.nocountry.qualitytrack.requests.documentation.SubmitCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.dto.request.CancelCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
-import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
+import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequestForm;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestDetailResponse;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentResponse;
@@ -34,6 +34,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,14 +72,13 @@ public class CustomerRequestController {
     public ResponseEntity<ApiResponse<CustomerRequestResponse>> submit(
             @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
-            @Valid @RequestPart("request") SubmitCustomerRequest request,
-            @RequestPart(value = "documents", required = false) List<MultipartFile> documents
+            @Valid @ModelAttribute SubmitCustomerRequestForm form
     ) {
         CustomerRequestResponse response = customerRequestSubmissionService.submit(
                 currentUserId,
                 customerId,
-                request,
-                documents
+                form.toRequest(),
+                form.documents()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED)
