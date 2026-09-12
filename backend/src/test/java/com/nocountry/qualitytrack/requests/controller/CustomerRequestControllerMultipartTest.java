@@ -1,8 +1,10 @@
 package com.nocountry.qualitytrack.requests.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
+import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentResponse;
 import com.nocountry.qualitytrack.requests.enums.MaterialRequirementType;
 import com.nocountry.qualitytrack.requests.service.CustomerRequestDocumentService;
 import com.nocountry.qualitytrack.requests.service.CustomerRequestService;
@@ -28,6 +30,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -114,6 +117,84 @@ class CustomerRequestControllerMultipartTest {
         assertEquals(1, documents.size());
         assertEquals("plano.png", documents.get(0).getOriginalFilename());
         assertEquals("image/png", documents.get(0).getContentType());
+    }
+
+    @Test
+    void acceptsFlatMultipartFormWhenAddingDocumentWithOptionalMetadata() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "plano-v2.png",
+                "image/png",
+                new byte[]{4, 5, 6}
+        );
+        RequestDocumentResponse response = mock(RequestDocumentResponse.class);
+
+        when(customerRequestDocumentService.create(eq(10L), eq(1L), eq(31L), any(), eq(file)))
+                .thenReturn(response);
+
+        mockMvc.perform(multipart(
+                        "/api/v1/customers/{customerId}/requests/{requestId}/documents",
+                        1L,
+                        31L
+                )
+                        .file(file)
+                        .param("documentType", "TECHNICAL_DRAWING")
+                        .param("name", "Plano técnico actualizado")
+                        .param("description", "Incluye nuevas tolerancias dimensionales."))
+                .andExpect(status().isCreated());
+
+        ArgumentCaptor<CreateRequestDocument> metadataCaptor =
+                ArgumentCaptor.forClass(CreateRequestDocument.class);
+
+        verify(customerRequestDocumentService).create(
+                eq(10L),
+                eq(1L),
+                eq(31L),
+                metadataCaptor.capture(),
+                eq(file)
+        );
+
+        CreateRequestDocument metadata = metadataCaptor.getValue();
+        assertEquals("TECHNICAL_DRAWING", metadata.documentType());
+        assertEquals("Plano técnico actualizado", metadata.name());
+        assertEquals("Incluye nuevas tolerancias dimensionales.", metadata.description());
+    }
+
+    @Test
+    void acceptsOnlyFileWhenAddingDocument() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "referencia.png",
+                "image/png",
+                new byte[]{7, 8, 9}
+        );
+        RequestDocumentResponse response = mock(RequestDocumentResponse.class);
+
+        when(customerRequestDocumentService.create(eq(10L), eq(1L), eq(31L), any(), eq(file)))
+                .thenReturn(response);
+
+        mockMvc.perform(multipart(
+                        "/api/v1/customers/{customerId}/requests/{requestId}/documents",
+                        1L,
+                        31L
+                ).file(file))
+                .andExpect(status().isCreated());
+
+        ArgumentCaptor<CreateRequestDocument> metadataCaptor =
+                ArgumentCaptor.forClass(CreateRequestDocument.class);
+
+        verify(customerRequestDocumentService).create(
+                eq(10L),
+                eq(1L),
+                eq(31L),
+                metadataCaptor.capture(),
+                eq(file)
+        );
+
+        CreateRequestDocument metadata = metadataCaptor.getValue();
+        assertNull(metadata.documentType());
+        assertNull(metadata.name());
+        assertNull(metadata.description());
     }
 
     private static final class CurrentUserIdResolver implements HandlerMethodArgumentResolver {
