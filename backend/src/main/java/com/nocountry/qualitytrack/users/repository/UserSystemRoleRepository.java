@@ -12,5 +12,9 @@ public interface UserSystemRoleRepository extends JpaRepository<UserSystemRole, 
 
     List<UserSystemRole> findAllByIdUserId(Long userId);
 
+    boolean existsByIdUserIdAndIdRole(Long userId, SystemRole role);
+
     boolean existsById_RoleAndUser_AccountType(SystemRole role, AccountType accountType);
+
+    void deleteAllByIdUserId(Long userId);
 }
