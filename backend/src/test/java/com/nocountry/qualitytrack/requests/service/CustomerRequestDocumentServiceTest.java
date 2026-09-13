@@ -11,6 +11,7 @@ import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
+import com.nocountry.qualitytrack.traceability.service.TraceabilityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,9 @@ class CustomerRequestDocumentServiceTest {
     private DocumentService documentService;
 
     @Mock
+    private TraceabilityService traceabilityService;
+
+    @Mock
     private JobCase jobCase;
 
     @Mock
@@ -51,7 +55,8 @@ class CustomerRequestDocumentServiceTest {
     void setUp() {
         service = new CustomerRequestDocumentService(
                 jobCaseRepository,
-                documentService
+                documentService,
+                traceabilityService
         );
     }
 
