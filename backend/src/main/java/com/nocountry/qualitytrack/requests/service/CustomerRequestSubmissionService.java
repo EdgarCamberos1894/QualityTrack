@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.requests.service;
 
 import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
 import com.nocountry.qualitytrack.documents.service.DocumentService;
+import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocumentForm;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
@@ -16,7 +17,8 @@ import java.util.List;
 @Service
 public class CustomerRequestSubmissionService {
 
-    private static final String INITIAL_DOCUMENT_TYPE = "REQUEST_ATTACHMENT";
+    private static final String DEFAULT_DOCUMENT_TYPE = "REQUEST_ATTACHMENT";
+    private static final String DEFAULT_DOCUMENT_NAME = "Documento adjunto";
 
     private final CustomerRequestService customerRequestService;
     private final DocumentService documentService;
@@ -41,9 +43,9 @@ public class CustomerRequestSubmissionService {
             Long currentUserId,
             Long customerId,
             SubmitCustomerRequest input,
-            List<MultipartFile> documents
+            List<CreateRequestDocumentForm> documents
     ) {
-        validateDocumentCount(documents);
+        validateDocuments(documents);
 
         CustomerRequestResponse response = customerRequestService.submit(
                 currentUserId,
@@ -57,34 +59,57 @@ public class CustomerRequestSubmissionService {
 
         Long caseId = response.jobCase().id();
 
-        for (MultipartFile document : documents) {
+        for (CreateRequestDocumentForm document : documents) {
+            MultipartFile file = document.getFile();
             documentService.create(
                     currentUserId,
                     new CreateDocumentRequest(
                             caseId,
-                            INITIAL_DOCUMENT_TYPE,
-                            initialDocumentName(document),
-                            null
+                            documentType(document),
+                            documentName(document, file),
+                            document.getDescription()
                     ),
-                    document
+                    file
             );
         }
 
         return response;
     }
 
-    private void validateDocumentCount(List<MultipartFile> documents) {
-        if (documents != null && documents.size() > maxFilesPerRequest) {
+    private void validateDocuments(List<CreateRequestDocumentForm> documents) {
+        if (documents == null) {
+            return;
+        }
+
+        if (documents.size() > maxFilesPerRequest) {
             throw new BusinessException(
                     ApiErrorCode.VALIDATION_ERROR,
                     "Puedes adjuntar como máximo " + maxFilesPerRequest + " documentos por solicitud."
             );
         }
+
+        if (documents.stream().anyMatch(document -> document == null || document.getFile() == null)) {
+            throw new BusinessException(
+                    ApiErrorCode.VALIDATION_ERROR,
+                    "Cada documento debe incluir un archivo."
+            );
+        }
     }
 
-    private String initialDocumentName(MultipartFile file) {
-        if (file == null || file.getOriginalFilename() == null) {
-            return "Documento adjunto";
+    private String documentType(CreateRequestDocumentForm document) {
+        if (document.getDocumentType() == null || document.getDocumentType().isBlank()) {
+            return DEFAULT_DOCUMENT_TYPE;
+        }
+        return document.getDocumentType().trim();
+    }
+
+    private String documentName(CreateRequestDocumentForm document, MultipartFile file) {
+        if (document.getName() != null && !document.getName().isBlank()) {
+            return document.getName().trim();
+        }
+
+        if (file.getOriginalFilename() == null) {
+            return DEFAULT_DOCUMENT_NAME;
         }
 
         String normalized = file.getOriginalFilename()
@@ -98,6 +123,6 @@ public class CustomerRequestSubmissionService {
                 ? normalized.substring(separator + 1).trim()
                 : normalized;
 
-        return fileName.isBlank() ? "Documento adjunto" : fileName;
+        return fileName.isBlank() ? DEFAULT_DOCUMENT_NAME : fileName;
     }
 }
