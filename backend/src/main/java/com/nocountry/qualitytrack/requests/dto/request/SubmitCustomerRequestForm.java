@@ -3,6 +3,7 @@ package com.nocountry.qualitytrack.requests.dto.request;
 import com.nocountry.qualitytrack.requests.enums.MaterialRequirementType;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,14 +11,13 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
 @Setter
-@Schema(description = "Formulario multipart para enviar una solicitud de cliente junto con sus documentos iniciales.")
+@Schema(description = "Formulario multipart para enviar una solicitud de cliente junto con sus documentos iniciales y metadata opcional por documento.")
 public class SubmitCustomerRequestForm {
 
     @Size(max = 120)
@@ -52,11 +52,12 @@ public class SubmitCustomerRequestForm {
     @Schema(description = "Fecha solicitada de entrega.", example = "2026-09-25", type = "string", format = "date")
     private LocalDate requestedDeliveryDate;
 
+    @Valid
     @ArraySchema(
-            arraySchema = @Schema(description = "Archivos iniciales opcionales. La metadata correspondiente se envía en documentsMetadata usando el mismo orden. El máximo se controla mediante DOCUMENT_MAX_FILES_PER_REQUEST (5 por defecto)."),
-            schema = @Schema(type = "string", format = "binary")
+            arraySchema = @Schema(description = "Documentos iniciales opcionales. Cada elemento agrupa documentType, name, description y file. El máximo se controla mediante DOCUMENT_MAX_FILES_PER_REQUEST (5 por defecto)."),
+            schema = @Schema(implementation = CreateRequestDocumentForm.class)
     )
-    private List<MultipartFile> documents;
+    private List<@NotNull CreateRequestDocumentForm> documents;
 
     public SubmitCustomerRequest toRequest() {
         return new SubmitCustomerRequest(
