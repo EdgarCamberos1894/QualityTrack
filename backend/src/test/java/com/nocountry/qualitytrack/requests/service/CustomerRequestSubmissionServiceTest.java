@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.requests.service;
 
 import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
 import com.nocountry.qualitytrack.documents.service.DocumentService;
+import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocumentForm;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.requests.dto.response.JobCaseSummaryResponse;
@@ -66,20 +67,33 @@ class CustomerRequestSubmissionServiceTest {
     }
 
     @Test
-    void createsInitialDocumentsAfterJobCaseExists() {
+    void createsInitialDocumentsWithIndependentMetadataAfterJobCaseExists() {
         SubmitCustomerRequest input = validInput();
         CustomerRequestResponse response = submittedResponse();
         MultipartFile drawing = new MockMultipartFile(
-                "documents",
+                "documents[0].file",
                 "plano.pdf",
                 "application/pdf",
                 "drawing".getBytes()
         );
         MultipartFile specification = new MockMultipartFile(
-                "documents",
+                "documents[1].file",
                 "ficha-tecnica.pdf",
                 "application/pdf",
                 "specification".getBytes()
+        );
+
+        CreateRequestDocumentForm drawingForm = document(
+                " TECHNICAL_DRAWING ",
+                " Plano técnico del eje ",
+                "Plano dimensional para cotización",
+                drawing
+        );
+        CreateRequestDocumentForm specificationForm = document(
+                null,
+                null,
+                null,
+                specification
         );
 
         when(customerRequestService.submit(10L, 20L, input)).thenReturn(response);
@@ -88,7 +102,7 @@ class CustomerRequestSubmissionServiceTest {
                 10L,
                 20L,
                 input,
-                List.of(drawing, specification)
+                List.of(drawingForm, specificationForm)
         );
 
         assertSame(response, result);
@@ -99,9 +113,9 @@ class CustomerRequestSubmissionServiceTest {
                 10L,
                 new CreateDocumentRequest(
                         73L,
-                        "REQUEST_ATTACHMENT",
-                        "plano.pdf",
-                        null
+                        "TECHNICAL_DRAWING",
+                        "Plano técnico del eje",
+                        "Plano dimensional para cotización"
                 ),
                 drawing
         );
@@ -121,15 +135,21 @@ class CustomerRequestSubmissionServiceTest {
     void rejectsTooManyDocumentsBeforeCreatingRequest() {
         SubmitCustomerRequest input = validInput();
         MultipartFile file = new MockMultipartFile(
-                "documents",
+                "documents[0].file",
                 "plano.pdf",
                 "application/pdf",
                 "drawing".getBytes()
         );
+        CreateRequestDocumentForm document = document(null, null, null, file);
 
         BusinessException exception = assertThrows(
                 BusinessException.class,
-                () -> service.submit(10L, 20L, input, List.of(file, file, file, file, file, file))
+                () -> service.submit(
+                        10L,
+                        20L,
+                        input,
+                        List.of(document, document, document, document, document, document)
+                )
         );
 
         assertEquals(ApiErrorCode.VALIDATION_ERROR, exception.getCode());
@@ -137,19 +157,39 @@ class CustomerRequestSubmissionServiceTest {
     }
 
     @Test
-    void sanitizesBrowserPathForInitialDocumentName() {
+    void rejectsDocumentWithoutFileBeforeCreatingRequest() {
+        SubmitCustomerRequest input = validInput();
+        CreateRequestDocumentForm document = document(
+                "TECHNICAL_DRAWING",
+                "Plano",
+                null,
+                null
+        );
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.submit(10L, 20L, input, List.of(document))
+        );
+
+        assertEquals(ApiErrorCode.VALIDATION_ERROR, exception.getCode());
+        verifyNoInteractions(customerRequestService, documentService);
+    }
+
+    @Test
+    void sanitizesBrowserPathWhenMetadataNameIsOmitted() {
         SubmitCustomerRequest input = validInput();
         CustomerRequestResponse response = submittedResponse();
         MultipartFile drawing = new MockMultipartFile(
-                "documents",
+                "documents[0].file",
                 "C:\\fakepath\\plano.pdf",
                 "application/pdf",
                 "drawing".getBytes()
         );
+        CreateRequestDocumentForm document = document(null, null, null, drawing);
 
         when(customerRequestService.submit(10L, 20L, input)).thenReturn(response);
 
-        service.submit(10L, 20L, input, List.of(drawing));
+        service.submit(10L, 20L, input, List.of(document));
 
         verify(documentService).create(
                 10L,
@@ -168,11 +208,12 @@ class CustomerRequestSubmissionServiceTest {
         SubmitCustomerRequest input = validInput();
         CustomerRequestResponse response = submittedResponse();
         MultipartFile drawing = new MockMultipartFile(
-                "documents",
+                "documents[0].file",
                 "plano.pdf",
                 "application/pdf",
                 "drawing".getBytes()
         );
+        CreateRequestDocumentForm document = document(null, null, null, drawing);
 
         when(customerRequestService.submit(10L, 20L, input)).thenReturn(response);
         doThrow(new BusinessException(
@@ -191,10 +232,24 @@ class CustomerRequestSubmissionServiceTest {
 
         BusinessException exception = assertThrows(
                 BusinessException.class,
-                () -> service.submit(10L, 20L, input, List.of(drawing))
+                () -> service.submit(10L, 20L, input, List.of(document))
         );
 
         assertEquals(ApiErrorCode.DOCUMENT_STORAGE_ERROR, exception.getCode());
+    }
+
+    private CreateRequestDocumentForm document(
+            String type,
+            String name,
+            String description,
+            MultipartFile file
+    ) {
+        CreateRequestDocumentForm form = new CreateRequestDocumentForm();
+        form.setDocumentType(type);
+        form.setName(name);
+        form.setDescription(description);
+        form.setFile(file);
+        return form;
     }
 
     private SubmitCustomerRequest validInput() {
