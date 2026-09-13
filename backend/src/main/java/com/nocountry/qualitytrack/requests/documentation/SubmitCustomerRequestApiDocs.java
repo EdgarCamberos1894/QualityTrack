@@ -1,8 +1,9 @@
 package com.nocountry.qualitytrack.requests.documentation;
 
-import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequestForm;
+import com.nocountry.qualitytrack.requests.documentation.schema.SubmitCustomerRequestMultipartSchema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -22,12 +23,18 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Enviar solicitud de cliente",
-        description = "Envía una nueva solicitud como multipart/form-data. Los campos de la solicitud y los documentos iniciales viajan en un único formulario. Cada elemento de documents agrupa su documentType, name, description y file, usando los mismos campos disponibles al agregar un documento posteriormente. La metadata es opcional: si documentType se omite se usa REQUEST_ATTACHMENT y si name se omite se usa el nombre original del archivo. El backend crea CustomerRequest y su JobCase 1:1 y, una vez disponible el expediente, crea los documentos asociados dentro de la misma transacción de aplicación. Si falla la creación de cualquiera de los documentos, la transacción de base de datos se revierte y el adaptador de almacenamiento intenta compensar eliminando los archivos ya almacenados. Requiere membresía ACTIVE con rol ADMIN o REQUESTER.",
+        description = "Envía una nueva solicitud como multipart/form-data. Los archivos iniciales se envían en documents como partes binarias reales para que clientes como Swagger UI puedan seleccionarlos correctamente. La metadata opcional se envía en documentsMetadata como un arreglo JSON de objetos con documentType, name y description, conservando el mismo orden que documents. Si se envía documentsMetadata debe contener exactamente un elemento por archivo; un objeto vacío aplica los valores por defecto. Si se omite toda la metadata, cada archivo usa REQUEST_ATTACHMENT y su nombre original. El backend crea CustomerRequest y su JobCase 1:1 y posteriormente crea los documentos asociados dentro de la misma transacción de aplicación. Si falla la creación de cualquiera de los documentos, la transacción de base de datos se revierte y el adaptador de almacenamiento intenta compensar eliminando los archivos ya almacenados. Requiere membresía ACTIVE con rol ADMIN o REQUESTER.",
         requestBody = @RequestBody(
                 required = true,
                 content = @Content(
                         mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
-                        schema = @Schema(implementation = SubmitCustomerRequestForm.class)
+                        schema = @Schema(implementation = SubmitCustomerRequestMultipartSchema.class),
+                        encoding = {
+                                @Encoding(
+                                        name = "documentsMetadata",
+                                        contentType = MediaType.APPLICATION_JSON_VALUE
+                                )
+                        }
                 )
         )
 )
