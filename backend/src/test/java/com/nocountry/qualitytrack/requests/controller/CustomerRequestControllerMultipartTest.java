@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.requests.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
 import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
+import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocumentForm;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentResponse;
@@ -23,7 +24,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.bind.support.WebDataBinderFactory;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -67,13 +67,19 @@ class CustomerRequestControllerMultipartTest {
     }
 
     @Test
-    void acceptsFlatMultipartFormWithPngDocument() throws Exception {
+    void bindsInitialDocumentsAsNestedMultipartObjectsWithIndependentMetadata() throws Exception {
         LocalDate deliveryDate = LocalDate.now().plusDays(10);
         MockMultipartFile drawing = new MockMultipartFile(
-                "documents",
+                "documents[0].file",
                 "plano.png",
                 "image/png",
                 new byte[]{1, 2, 3}
+        );
+        MockMultipartFile referenceImage = new MockMultipartFile(
+                "documents[1].file",
+                "referencia.png",
+                "image/png",
+                new byte[]{4, 5, 6}
         );
         CustomerRequestResponse response = mock(CustomerRequestResponse.class);
 
@@ -82,19 +88,25 @@ class CustomerRequestControllerMultipartTest {
 
         mockMvc.perform(multipart("/api/v1/customers/{customerId}/requests", 1L)
                         .file(drawing)
+                        .file(referenceImage)
                         .param("customerReference", "OC-2026-0912-EJE-01")
                         .param("title", "Fabricación de eje de transmisión")
                         .param("description", "Fabricar conforme al plano proporcionado.")
                         .param("quantity", "20")
                         .param("materialRequirementType", "SPECIFIED")
                         .param("materialRequirement", "Acero inoxidable AISI 304")
-                        .param("requestedDeliveryDate", deliveryDate.toString()))
+                        .param("requestedDeliveryDate", deliveryDate.toString())
+                        .param("documents[0].documentType", "TECHNICAL_DRAWING")
+                        .param("documents[0].name", "Plano técnico del eje")
+                        .param("documents[0].description", "Plano dimensional para cotización")
+                        .param("documents[1].documentType", "REFERENCE_IMAGE")
+                        .param("documents[1].name", "Pieza de referencia"))
                 .andExpect(status().isCreated());
 
         ArgumentCaptor<SubmitCustomerRequest> requestCaptor =
                 ArgumentCaptor.forClass(SubmitCustomerRequest.class);
         @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<MultipartFile>> documentsCaptor =
+        ArgumentCaptor<List<CreateRequestDocumentForm>> documentsCaptor =
                 ArgumentCaptor.forClass(List.class);
 
         verify(customerRequestSubmissionService).submit(
@@ -112,11 +124,22 @@ class CustomerRequestControllerMultipartTest {
         assertEquals("Acero inoxidable AISI 304", request.materialRequirement());
         assertEquals(deliveryDate, request.requestedDeliveryDate());
 
-        List<MultipartFile> documents = documentsCaptor.getValue();
+        List<CreateRequestDocumentForm> documents = documentsCaptor.getValue();
         assertNotNull(documents);
-        assertEquals(1, documents.size());
-        assertEquals("plano.png", documents.get(0).getOriginalFilename());
-        assertEquals("image/png", documents.get(0).getContentType());
+        assertEquals(2, documents.size());
+
+        CreateRequestDocumentForm first = documents.get(0);
+        assertEquals("TECHNICAL_DRAWING", first.getDocumentType());
+        assertEquals("Plano técnico del eje", first.getName());
+        assertEquals("Plano dimensional para cotización", first.getDescription());
+        assertEquals("plano.png", first.getFile().getOriginalFilename());
+        assertEquals("image/png", first.getFile().getContentType());
+
+        CreateRequestDocumentForm second = documents.get(1);
+        assertEquals("REFERENCE_IMAGE", second.getDocumentType());
+        assertEquals("Pieza de referencia", second.getName());
+        assertNull(second.getDescription());
+        assertEquals("referencia.png", second.getFile().getOriginalFilename());
     }
 
     @Test
@@ -174,10 +197,10 @@ class CustomerRequestControllerMultipartTest {
                 .thenReturn(response);
 
         mockMvc.perform(multipart(
-                        "/api/v1/customers/{customerId}/requests/{requestId}/documents",
-                        1L,
-                        31L
-                ).file(file))
+                "/api/v1/customers/{customerId}/requests/{requestId}/documents",
+                1L,
+                31L
+        ).file(file))
                 .andExpect(status().isCreated());
 
         ArgumentCaptor<CreateRequestDocument> metadataCaptor =
