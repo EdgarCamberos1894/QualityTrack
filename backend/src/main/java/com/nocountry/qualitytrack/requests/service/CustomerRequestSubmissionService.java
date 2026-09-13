@@ -2,7 +2,7 @@ package com.nocountry.qualitytrack.requests.service;
 
 import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
 import com.nocountry.qualitytrack.documents.service.DocumentService;
-import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocumentForm;
+import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -43,9 +44,10 @@ public class CustomerRequestSubmissionService {
             Long currentUserId,
             Long customerId,
             SubmitCustomerRequest input,
-            List<CreateRequestDocumentForm> documents
+            List<MultipartFile> files,
+            List<CreateRequestDocument> metadata
     ) {
-        validateDocuments(documents);
+        List<InitialDocumentUpload> documents = pairDocuments(files, metadata);
 
         CustomerRequestResponse response = customerRequestService.submit(
                 currentUserId,
@@ -53,21 +55,23 @@ public class CustomerRequestSubmissionService {
                 input
         );
 
-        if (documents == null || documents.isEmpty()) {
+        if (documents.isEmpty()) {
             return response;
         }
 
         Long caseId = response.jobCase().id();
 
-        for (CreateRequestDocumentForm document : documents) {
-            MultipartFile file = document.getFile();
+        for (InitialDocumentUpload document : documents) {
+            MultipartFile file = document.file();
+            CreateRequestDocument documentMetadata = document.metadata();
+
             documentService.create(
                     currentUserId,
                     new CreateDocumentRequest(
                             caseId,
-                            documentType(document),
-                            documentName(document, file),
-                            document.getDescription()
+                            documentType(documentMetadata),
+                            documentName(documentMetadata, file),
+                            documentMetadata == null ? null : documentMetadata.description()
                     ),
                     file
             );
@@ -76,36 +80,67 @@ public class CustomerRequestSubmissionService {
         return response;
     }
 
-    private void validateDocuments(List<CreateRequestDocumentForm> documents) {
-        if (documents == null) {
-            return;
+    private List<InitialDocumentUpload> pairDocuments(
+            List<MultipartFile> files,
+            List<CreateRequestDocument> metadata
+    ) {
+        boolean hasFiles = files != null && !files.isEmpty();
+        boolean hasMetadata = metadata != null && !metadata.isEmpty();
+
+        if (!hasFiles) {
+            if (hasMetadata) {
+                throw new BusinessException(
+                        ApiErrorCode.VALIDATION_ERROR,
+                        "No puedes enviar metadata de documentos sin adjuntar archivos."
+                );
+            }
+            return List.of();
         }
 
-        if (documents.size() > maxFilesPerRequest) {
+        if (files.size() > maxFilesPerRequest) {
             throw new BusinessException(
                     ApiErrorCode.VALIDATION_ERROR,
                     "Puedes adjuntar como máximo " + maxFilesPerRequest + " documentos por solicitud."
             );
         }
 
-        if (documents.stream().anyMatch(document -> document == null || document.getFile() == null)) {
+        if (files.stream().anyMatch(file -> file == null)) {
             throw new BusinessException(
                     ApiErrorCode.VALIDATION_ERROR,
                     "Cada documento debe incluir un archivo."
             );
         }
+
+        if (hasMetadata && metadata.size() != files.size()) {
+            throw new BusinessException(
+                    ApiErrorCode.VALIDATION_ERROR,
+                    "documentsMetadata debe contener exactamente un elemento por cada archivo enviado en documents."
+            );
+        }
+
+        List<InitialDocumentUpload> documents = new ArrayList<>(files.size());
+        for (int index = 0; index < files.size(); index++) {
+            CreateRequestDocument documentMetadata = hasMetadata
+                    ? metadata.get(index)
+                    : null;
+            documents.add(new InitialDocumentUpload(documentMetadata, files.get(index)));
+        }
+
+        return List.copyOf(documents);
     }
 
-    private String documentType(CreateRequestDocumentForm document) {
-        if (document.getDocumentType() == null || document.getDocumentType().isBlank()) {
+    private String documentType(CreateRequestDocument metadata) {
+        if (metadata == null
+                || metadata.documentType() == null
+                || metadata.documentType().isBlank()) {
             return DEFAULT_DOCUMENT_TYPE;
         }
-        return document.getDocumentType().trim();
+        return metadata.documentType().trim();
     }
 
-    private String documentName(CreateRequestDocumentForm document, MultipartFile file) {
-        if (document.getName() != null && !document.getName().isBlank()) {
-            return document.getName().trim();
+    private String documentName(CreateRequestDocument metadata, MultipartFile file) {
+        if (metadata != null && metadata.name() != null && !metadata.name().isBlank()) {
+            return metadata.name().trim();
         }
 
         if (file.getOriginalFilename() == null) {
@@ -124,5 +159,11 @@ public class CustomerRequestSubmissionService {
                 : normalized;
 
         return fileName.isBlank() ? DEFAULT_DOCUMENT_NAME : fileName;
+    }
+
+    private record InitialDocumentUpload(
+            CreateRequestDocument metadata,
+            MultipartFile file
+    ) {
     }
 }
