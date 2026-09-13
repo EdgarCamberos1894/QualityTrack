@@ -2,7 +2,7 @@ package com.nocountry.qualitytrack.requests.service;
 
 import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
 import com.nocountry.qualitytrack.documents.service.DocumentService;
-import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
+import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocumentForm;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
@@ -10,9 +10,9 @@ import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -33,7 +33,6 @@ public class CustomerRequestSubmissionService {
         if (maxFilesPerRequest < 1) {
             throw new IllegalStateException("DOCUMENT_MAX_FILES_PER_REQUEST must be greater than zero.");
         }
-
         this.customerRequestService = customerRequestService;
         this.documentService = documentService;
         this.maxFilesPerRequest = maxFilesPerRequest;
@@ -44,34 +43,25 @@ public class CustomerRequestSubmissionService {
             Long currentUserId,
             Long customerId,
             SubmitCustomerRequest input,
-            List<MultipartFile> files,
-            List<CreateRequestDocument> metadata
+            List<CreateRequestDocumentForm> documents
     ) {
-        List<InitialDocumentUpload> documents = pairDocuments(files, metadata);
+        validateDocuments(documents);
 
-        CustomerRequestResponse response = customerRequestService.submit(
-                currentUserId,
-                customerId,
-                input
-        );
-
-        if (documents.isEmpty()) {
+        CustomerRequestResponse response = customerRequestService.submit(currentUserId, customerId, input);
+        if (documents == null || documents.isEmpty()) {
             return response;
         }
 
         Long caseId = response.jobCase().id();
-
-        for (InitialDocumentUpload document : documents) {
-            MultipartFile file = document.file();
-            CreateRequestDocument documentMetadata = document.metadata();
-
+        for (CreateRequestDocumentForm document : documents) {
+            MultipartFile file = document.getFile();
             documentService.create(
                     currentUserId,
                     new CreateDocumentRequest(
                             caseId,
-                            documentType(documentMetadata),
-                            documentName(documentMetadata, file),
-                            documentMetadata == null ? null : documentMetadata.description()
+                            resolveDocumentType(document),
+                            resolveDocumentName(document, file),
+                            document.getDescription()
                     ),
                     file
             );
@@ -80,90 +70,41 @@ public class CustomerRequestSubmissionService {
         return response;
     }
 
-    private List<InitialDocumentUpload> pairDocuments(
-            List<MultipartFile> files,
-            List<CreateRequestDocument> metadata
-    ) {
-        boolean hasFiles = files != null && !files.isEmpty();
-        boolean hasMetadata = metadata != null && !metadata.isEmpty();
-
-        if (!hasFiles) {
-            if (hasMetadata) {
-                throw new BusinessException(
-                        ApiErrorCode.VALIDATION_ERROR,
-                        "No puedes enviar metadata de documentos sin adjuntar archivos."
-                );
-            }
-            return List.of();
+    private void validateDocuments(List<CreateRequestDocumentForm> documents) {
+        if (documents == null) {
+            return;
         }
-
-        if (files.size() > maxFilesPerRequest) {
+        if (documents.size() > maxFilesPerRequest) {
             throw new BusinessException(
                     ApiErrorCode.VALIDATION_ERROR,
                     "Puedes adjuntar como máximo " + maxFilesPerRequest + " documentos por solicitud."
             );
         }
-
-        if (files.stream().anyMatch(file -> file == null)) {
+        if (documents.stream().anyMatch(document -> document == null || document.getFile() == null)) {
             throw new BusinessException(
                     ApiErrorCode.VALIDATION_ERROR,
                     "Cada documento debe incluir un archivo."
             );
         }
-
-        if (hasMetadata && metadata.size() != files.size()) {
-            throw new BusinessException(
-                    ApiErrorCode.VALIDATION_ERROR,
-                    "documentsMetadata debe contener exactamente un elemento por cada archivo enviado en documents."
-            );
-        }
-
-        List<InitialDocumentUpload> documents = new ArrayList<>(files.size());
-        for (int index = 0; index < files.size(); index++) {
-            CreateRequestDocument documentMetadata = hasMetadata
-                    ? metadata.get(index)
-                    : null;
-            documents.add(new InitialDocumentUpload(documentMetadata, files.get(index)));
-        }
-
-        return List.copyOf(documents);
     }
 
-    private String documentType(CreateRequestDocument metadata) {
-        if (metadata == null
-                || metadata.documentType() == null
-                || metadata.documentType().isBlank()) {
-            return DEFAULT_DOCUMENT_TYPE;
-        }
-        return metadata.documentType().trim();
+    private String resolveDocumentType(CreateRequestDocumentForm document) {
+        return StringUtils.hasText(document.getDocumentType())
+                ? document.getDocumentType().trim()
+                : DEFAULT_DOCUMENT_TYPE;
     }
 
-    private String documentName(CreateRequestDocument metadata, MultipartFile file) {
-        if (metadata != null && metadata.name() != null && !metadata.name().isBlank()) {
-            return metadata.name().trim();
+    private String resolveDocumentName(CreateRequestDocumentForm document, MultipartFile file) {
+        if (StringUtils.hasText(document.getName())) {
+            return document.getName().trim();
         }
 
-        if (file.getOriginalFilename() == null) {
+        String originalFilename = file.getOriginalFilename();
+        if (!StringUtils.hasText(originalFilename)) {
             return DEFAULT_DOCUMENT_NAME;
         }
 
-        String normalized = file.getOriginalFilename()
-                .replace('\\', '/')
-                .replace("\r", "")
-                .replace("\n", "")
-                .trim();
-
-        int separator = normalized.lastIndexOf('/');
-        String fileName = separator >= 0
-                ? normalized.substring(separator + 1).trim()
-                : normalized;
-
-        return fileName.isBlank() ? DEFAULT_DOCUMENT_NAME : fileName;
-    }
-
-    private record InitialDocumentUpload(
-            CreateRequestDocument metadata,
-            MultipartFile file
-    ) {
+        String fileName = StringUtils.getFilename(StringUtils.cleanPath(originalFilename));
+        return StringUtils.hasText(fileName) ? fileName : DEFAULT_DOCUMENT_NAME;
     }
 }
