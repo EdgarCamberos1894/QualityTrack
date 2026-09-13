@@ -78,7 +78,7 @@ public class CustomerRequestController {
                 currentUserId,
                 customerId,
                 form.toRequest(),
-                form.documents()
+                form.getDocuments()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -135,7 +135,7 @@ public class CustomerRequestController {
                 customerId,
                 requestId,
                 form.toMetadata(),
-                form.file()
+                form.getFile()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED)
