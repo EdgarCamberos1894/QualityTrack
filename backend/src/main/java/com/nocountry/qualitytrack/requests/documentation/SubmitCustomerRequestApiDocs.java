@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Enviar solicitud de cliente",
-        description = "Envía una nueva solicitud como multipart/form-data. Los campos de la solicitud y los documentos iniciales viajan en un único formulario multipart; no es necesario enviar una parte JSON independiente. El backend crea CustomerRequest y su JobCase 1:1 y, una vez disponible el identificador del expediente, crea los documentos asociados al mismo JobCase dentro de la misma transacción de aplicación. Si falla la creación de cualquiera de los documentos, la transacción de base de datos se revierte y el adaptador de almacenamiento intenta compensar eliminando los archivos ya almacenados. Requiere membresía ACTIVE con rol ADMIN o REQUESTER.",
+        description = "Envía una nueva solicitud como multipart/form-data. Los campos de la solicitud y los documentos iniciales viajan en un único formulario. Cada elemento de documents agrupa su documentType, name, description y file, usando los mismos campos disponibles al agregar un documento posteriormente. La metadata es opcional: si documentType se omite se usa REQUEST_ATTACHMENT y si name se omite se usa el nombre original del archivo. El backend crea CustomerRequest y su JobCase 1:1 y, una vez disponible el expediente, crea los documentos asociados dentro de la misma transacción de aplicación. Si falla la creación de cualquiera de los documentos, la transacción de base de datos se revierte y el adaptador de almacenamiento intenta compensar eliminando los archivos ya almacenados. Requiere membresía ACTIVE con rol ADMIN o REQUESTER.",
         requestBody = @RequestBody(
                 required = true,
                 content = @Content(
@@ -43,7 +43,7 @@ import java.lang.annotation.Target;
         ),
         @ApiResponse(
                 responseCode = "400",
-                description = "Los datos de la solicitud o alguno de los archivos no son válidos",
+                description = "Los datos de la solicitud, la metadata de documentos o alguno de los archivos no son válidos",
                 content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = RequestApiExamples.VALIDATION_ERROR))
         ),
         @ApiResponse(
