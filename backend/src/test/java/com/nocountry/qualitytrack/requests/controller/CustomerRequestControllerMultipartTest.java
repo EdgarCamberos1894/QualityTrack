@@ -2,7 +2,6 @@ package com.nocountry.qualitytrack.requests.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
 import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
-import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocumentForm;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentResponse;
@@ -24,7 +23,9 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.bind.support.WebDataBinderFactory;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -67,53 +68,72 @@ class CustomerRequestControllerMultipartTest {
     }
 
     @Test
-    void bindsInitialDocumentsAsNestedMultipartObjectsWithIndependentMetadata() throws Exception {
+    void acceptsBinaryInitialDocumentsWithIndependentJsonMetadata() throws Exception {
         LocalDate deliveryDate = LocalDate.now().plusDays(10);
         MockMultipartFile drawing = new MockMultipartFile(
-                "documents[0].file",
+                "documents",
                 "plano.png",
                 "image/png",
                 new byte[]{1, 2, 3}
         );
         MockMultipartFile referenceImage = new MockMultipartFile(
-                "documents[1].file",
+                "documents",
                 "referencia.png",
                 "image/png",
                 new byte[]{4, 5, 6}
         );
+        MockMultipartFile metadata = new MockMultipartFile(
+                "documentsMetadata",
+                "",
+                "application/json",
+                """
+                [
+                  {
+                    "documentType": "TECHNICAL_DRAWING",
+                    "name": "Plano técnico del eje",
+                    "description": "Plano dimensional para cotización"
+                  },
+                  {
+                    "documentType": "REFERENCE_IMAGE",
+                    "name": "Pieza de referencia",
+                    "description": null
+                  }
+                ]
+                """.getBytes(StandardCharsets.UTF_8)
+        );
         CustomerRequestResponse response = mock(CustomerRequestResponse.class);
 
-        when(customerRequestSubmissionService.submit(eq(10L), eq(1L), any(), any()))
+        when(customerRequestSubmissionService.submit(eq(10L), eq(1L), any(), any(), any()))
                 .thenReturn(response);
 
         mockMvc.perform(multipart("/api/v1/customers/{customerId}/requests", 1L)
                         .file(drawing)
                         .file(referenceImage)
+                        .file(metadata)
                         .param("customerReference", "OC-2026-0912-EJE-01")
                         .param("title", "Fabricación de eje de transmisión")
                         .param("description", "Fabricar conforme al plano proporcionado.")
                         .param("quantity", "20")
                         .param("materialRequirementType", "SPECIFIED")
                         .param("materialRequirement", "Acero inoxidable AISI 304")
-                        .param("requestedDeliveryDate", deliveryDate.toString())
-                        .param("documents[0].documentType", "TECHNICAL_DRAWING")
-                        .param("documents[0].name", "Plano técnico del eje")
-                        .param("documents[0].description", "Plano dimensional para cotización")
-                        .param("documents[1].documentType", "REFERENCE_IMAGE")
-                        .param("documents[1].name", "Pieza de referencia"))
+                        .param("requestedDeliveryDate", deliveryDate.toString()))
                 .andExpect(status().isCreated());
 
         ArgumentCaptor<SubmitCustomerRequest> requestCaptor =
                 ArgumentCaptor.forClass(SubmitCustomerRequest.class);
         @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<CreateRequestDocumentForm>> documentsCaptor =
+        ArgumentCaptor<List<MultipartFile>> filesCaptor =
+                ArgumentCaptor.forClass(List.class);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<List<CreateRequestDocument>> metadataCaptor =
                 ArgumentCaptor.forClass(List.class);
 
         verify(customerRequestSubmissionService).submit(
                 eq(10L),
                 eq(1L),
                 requestCaptor.capture(),
-                documentsCaptor.capture()
+                filesCaptor.capture(),
+                metadataCaptor.capture()
         );
 
         SubmitCustomerRequest request = requestCaptor.getValue();
@@ -124,22 +144,22 @@ class CustomerRequestControllerMultipartTest {
         assertEquals("Acero inoxidable AISI 304", request.materialRequirement());
         assertEquals(deliveryDate, request.requestedDeliveryDate());
 
-        List<CreateRequestDocumentForm> documents = documentsCaptor.getValue();
-        assertNotNull(documents);
-        assertEquals(2, documents.size());
+        List<MultipartFile> files = filesCaptor.getValue();
+        assertNotNull(files);
+        assertEquals(2, files.size());
+        assertEquals("plano.png", files.get(0).getOriginalFilename());
+        assertEquals("image/png", files.get(0).getContentType());
+        assertEquals("referencia.png", files.get(1).getOriginalFilename());
 
-        CreateRequestDocumentForm first = documents.get(0);
-        assertEquals("TECHNICAL_DRAWING", first.getDocumentType());
-        assertEquals("Plano técnico del eje", first.getName());
-        assertEquals("Plano dimensional para cotización", first.getDescription());
-        assertEquals("plano.png", first.getFile().getOriginalFilename());
-        assertEquals("image/png", first.getFile().getContentType());
-
-        CreateRequestDocumentForm second = documents.get(1);
-        assertEquals("REFERENCE_IMAGE", second.getDocumentType());
-        assertEquals("Pieza de referencia", second.getName());
-        assertNull(second.getDescription());
-        assertEquals("referencia.png", second.getFile().getOriginalFilename());
+        List<CreateRequestDocument> documentsMetadata = metadataCaptor.getValue();
+        assertNotNull(documentsMetadata);
+        assertEquals(2, documentsMetadata.size());
+        assertEquals("TECHNICAL_DRAWING", documentsMetadata.get(0).documentType());
+        assertEquals("Plano técnico del eje", documentsMetadata.get(0).name());
+        assertEquals("Plano dimensional para cotización", documentsMetadata.get(0).description());
+        assertEquals("REFERENCE_IMAGE", documentsMetadata.get(1).documentType());
+        assertEquals("Pieza de referencia", documentsMetadata.get(1).name());
+        assertNull(documentsMetadata.get(1).description());
     }
 
     @Test
@@ -177,10 +197,10 @@ class CustomerRequestControllerMultipartTest {
                 eq(file)
         );
 
-        CreateRequestDocument metadata = metadataCaptor.getValue();
-        assertEquals("TECHNICAL_DRAWING", metadata.documentType());
-        assertEquals("Plano técnico actualizado", metadata.name());
-        assertEquals("Incluye nuevas tolerancias dimensionales.", metadata.description());
+        CreateRequestDocument documentMetadata = metadataCaptor.getValue();
+        assertEquals("TECHNICAL_DRAWING", documentMetadata.documentType());
+        assertEquals("Plano técnico actualizado", documentMetadata.name());
+        assertEquals("Incluye nuevas tolerancias dimensionales.", documentMetadata.description());
     }
 
     @Test
@@ -214,10 +234,10 @@ class CustomerRequestControllerMultipartTest {
                 eq(file)
         );
 
-        CreateRequestDocument metadata = metadataCaptor.getValue();
-        assertNull(metadata.documentType());
-        assertNull(metadata.name());
-        assertNull(metadata.description());
+        CreateRequestDocument documentMetadata = metadataCaptor.getValue();
+        assertNull(documentMetadata.documentType());
+        assertNull(documentMetadata.name());
+        assertNull(documentMetadata.description());
     }
 
     private static final class CurrentUserIdResolver implements HandlerMethodArgumentResolver {
