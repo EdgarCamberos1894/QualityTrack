@@ -80,6 +80,17 @@ public class User {
         );
     }
 
+    public static User createActiveInternal(String firstName, String lastName, String email, String passwordHash) {
+        return new User(
+                firstName,
+                lastName,
+                email,
+                passwordHash,
+                AccountType.INTERNAL,
+                UserStatus.ACTIVE
+        );
+    }
+
     public void verifyEmail(Instant verifiedAt) {
         this.status = UserStatus.ACTIVE;
         this.emailVerifiedAt = verifiedAt;
