@@ -260,8 +260,6 @@ class JobCaseWorkflowServiceTest {
         when(userRepository.findById(10L)).thenReturn(Optional.of(internalUser));
         when(internalUser.getAccountType()).thenReturn(AccountType.INTERNAL);
         when(internalUser.getId()).thenReturn(10L);
-        when(internalUser.getFirstName()).thenReturn("Carlos");
-        when(internalUser.getLastName()).thenReturn("Ruiz");
         when(userSystemRoleRepository.findAllByIdUserId(10L)).thenReturn(List.of(systemRole));
         when(systemRole.getRole()).thenReturn(role);
     }
