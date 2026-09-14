@@ -1,5 +1,6 @@
 package com.nocountry.qualitytrack.requests.entity;
 
+import com.nocountry.qualitytrack.requests.enums.JobCaseStatus;
 import com.nocountry.qualitytrack.users.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -72,12 +73,14 @@ public class CaseInformationRequest {
     }
 
     public boolean isOpen() {
-        return respondedAt == null;
+        return respondedAt == null
+                && jobCase != null
+                && jobCase.getStatus() == JobCaseStatus.WAITING_CUSTOMER_INFO;
     }
 
     public void respond(String response, User respondedByUser, Instant respondedAt) {
         if (!isOpen()) {
-            throw new IllegalStateException("La solicitud de información ya fue respondida.");
+            throw new IllegalStateException("La solicitud de información ya no está abierta.");
         }
 
         this.response = requireText(response, "La respuesta es obligatoria.");
