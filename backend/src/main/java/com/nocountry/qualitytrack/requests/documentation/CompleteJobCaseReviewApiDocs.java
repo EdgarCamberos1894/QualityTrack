@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Completar la revisión y dejar el expediente listo para cotizar",
-        description = "Finaliza un expediente en UNDER_REVIEW y lo cambia a READY_FOR_QUOTATION. Requiere no tener aclaraciones pendientes y, si el cliente pidió asistencia de material, contar con una especificación técnica; no crea la cotización."
+        description = "Marca como terminada la revisión de un expediente en UNDER_REVIEW y lo cambia a READY_FOR_QUOTATION. Solo puede ejecutarlo el COMMERCIAL responsable o un ADMIN, no debe haber aclaraciones pendientes y, si materialRequirementType es ASSISTANCE_REQUIRED, debe existir una especificación técnica del material. El responsable permanece asociado al expediente como referencia de quién llevó la revisión. Esta operación no crea una cotización; únicamente deja el expediente preparado para iniciar ese siguiente proceso."
 )
 @ApiResponses({
         @ApiResponse(
