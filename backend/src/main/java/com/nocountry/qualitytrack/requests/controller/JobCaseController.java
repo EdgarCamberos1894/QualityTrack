@@ -23,6 +23,7 @@ import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
 import com.nocountry.qualitytrack.traceability.dto.response.TraceabilityEventResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -115,11 +116,12 @@ public class JobCaseController {
                 request
         );
 
-        return ResponseEntity.ok(ApiResponse.success(
-                ApiSuccessCode.JOB_CASE_INFORMATION_REQUESTED,
-                "Información solicitada al cliente correctamente.",
-                response
-        ));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(
+                        ApiSuccessCode.JOB_CASE_INFORMATION_REQUESTED,
+                        "Información solicitada al cliente correctamente.",
+                        response
+                ));
     }
 
     @DefineCaseMaterialSpecificationApiDocs
