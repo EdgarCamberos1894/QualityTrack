@@ -103,7 +103,8 @@ public class CustomerRequestService {
                 currentUserId,
                 metadata(
                         "caseNumber", jobCase.getCaseNumber(),
-                        "requestId", request.getId()
+                        "requestId", request.getId(),
+                        "requestNumber", request.getRequestNumber()
                 )
         );
 
@@ -190,6 +191,7 @@ public class CustomerRequestService {
                 currentUserId,
                 metadata(
                         "requestId", requestId,
+                        "requestNumber", jobCase.getCustomerRequest().getRequestNumber(),
                         "reason", reason
                 )
         );
