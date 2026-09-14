@@ -23,12 +23,12 @@ public record CustomerRequestDetailResponse(
         Instant updatedAt,
         JobCaseSummaryResponse jobCase,
         List<RequestDocumentResponse> documents,
-        List<CaseInformationRequestResponse> informationRequests
+        List<CustomerInformationRequestResponse> informationRequests
 ) {
     public static CustomerRequestDetailResponse from(
             CustomerRequestResponse request,
             List<RequestDocumentResponse> documents,
-            List<CaseInformationRequestResponse> informationRequests
+            List<CustomerInformationRequestResponse> informationRequests
     ) {
         return new CustomerRequestDetailResponse(
                 request.id(),
