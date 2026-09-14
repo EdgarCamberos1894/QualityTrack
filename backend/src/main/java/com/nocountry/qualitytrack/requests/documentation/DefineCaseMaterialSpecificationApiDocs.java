@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Definir o actualizar la especificación técnica del material",
-        description = "Crea o actualiza la especificación técnica del material mientras el expediente está en UNDER_REVIEW. Solo ENGINEERING o ADMIN pueden hacerlo; si la solicitud requiere asistencia de material, debe existir antes de completar la revisión.",
+        description = "Permite a ENGINEERING o ADMIN dejar definida la especificación técnica del material mientras el expediente está en UNDER_REVIEW. Existe una sola especificación por expediente: si todavía no existe se crea y, si ya existe, se actualiza con los valores enviados. Es obligatoria antes de completar la revisión cuando la solicitud usa ASSISTANCE_REQUIRED; con SPECIFIED es opcional y puede utilizarse para precisar técnicamente lo indicado por el cliente. Guardarla no cambia el estado del expediente.",
         requestBody = @RequestBody(
                 required = true,
                 description = "Definición técnica vigente del material para el expediente. materialName es obligatorio; norma/grado y notas técnicas son opcionales.",
