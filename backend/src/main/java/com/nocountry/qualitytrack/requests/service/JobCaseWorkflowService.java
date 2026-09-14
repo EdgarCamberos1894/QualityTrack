@@ -60,42 +60,8 @@ public class JobCaseWorkflowService {
             conflict("El expediente ya tiene un responsable asignado.");
         }
 
-        jobCase.assignTo(actor, Instant.now());
-        jobCaseRepository.saveAndFlush(jobCase);
-
-        traceabilityService.record(
-                jobCase,
-                TraceabilityAggregateType.JOB_CASE,
-                jobCase.getId(),
-                TraceabilityEventType.JOB_CASE_ASSIGNED,
-                null,
-                null,
-                currentUserId,
-                metadata(
-                        "caseNumber", jobCase.getCaseNumber(),
-                        "assignedToUserId", actor.getId(),
-                        "assignedToName", fullName(actor)
-                )
-        );
-
-        return JobCaseResponse.from(jobCase);
-    }
-
-    @Transactional
-    public JobCaseResponse startReview(Long currentUserId, Long caseId) {
-        requireInternalRole(currentUserId, SystemRole.COMMERCIAL, SystemRole.ADMIN);
-        JobCase jobCase = requireCaseForUpdate(caseId);
-        requireAssignedCommercialOrAdmin(currentUserId, jobCase);
-
-        if (jobCase.getStatus() != JobCaseStatus.SUBMITTED) {
-            conflict("Solo se puede iniciar revisión desde SUBMITTED.");
-        }
-        if (jobCase.getAssignedToUser() == null) {
-            conflict("El expediente debe tener un responsable antes de iniciar revisión.");
-        }
-
         JobCaseStatus previousStatus = jobCase.getStatus();
-        jobCase.startReview();
+        jobCase.takeForReview(actor, Instant.now());
         jobCaseRepository.saveAndFlush(jobCase);
 
         recordStatusEvent(
@@ -103,7 +69,11 @@ public class JobCaseWorkflowService {
                 TraceabilityEventType.JOB_CASE_REVIEW_STARTED,
                 previousStatus,
                 currentUserId,
-                metadata("caseNumber", jobCase.getCaseNumber())
+                metadata(
+                        "caseNumber", jobCase.getCaseNumber(),
+                        "assignedToUserId", actor.getId(),
+                        "assignedToName", fullName(actor)
+                )
         );
 
         return JobCaseResponse.from(jobCase);
