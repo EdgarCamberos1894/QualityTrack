@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Solicitar una aclaración al cliente",
-        description = "Se utiliza cuando el responsable del expediente ya está revisando la solicitud pero necesita un dato adicional del cliente antes de continuar. El JobCase debe estar en UNDER_REVIEW. La operación crea una CaseInformationRequest con la pregunta enviada y cambia el expediente a WAITING_CUSTOMER_INFO para reflejar que la revisión queda pausada esperando al cliente. Solo puede existir una solicitud de información abierta por expediente. Puede ejecutarla el COMMERCIAL responsable del caso o un ADMIN. La respuesta del cliente se registra mediante el endpoint contextual de la CustomerRequest; el usuario interno no debe cambiar manualmente el estado para reanudar la revisión.",
+        description = "Permite al COMMERCIAL responsable o a un ADMIN pedir información adicional durante UNDER_REVIEW. Crea la aclaración y mueve el expediente a WAITING_CUSTOMER_INFO; solo puede existir una abierta por expediente.",
         requestBody = @RequestBody(
                 required = true,
                 description = "Pregunta concreta que el equipo interno necesita que responda el cliente.",
