@@ -5,6 +5,7 @@ import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentVersionResponse;
 import com.nocountry.qualitytrack.documents.service.DocumentDownload;
 import com.nocountry.qualitytrack.documents.service.DocumentService;
+import com.nocountry.qualitytrack.documents.service.DocumentVersionMutationResult;
 import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
 import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentResponse;
 import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentVersionResponse;
@@ -97,12 +98,13 @@ public class CustomerRequestDocumentService {
             MultipartFile file
     ) {
         JobCase jobCase = requireJobCase(customerId, requestId);
-        DocumentVersionResponse version = documentService.addVersion(
+        DocumentVersionMutationResult result = documentService.addVersion(
                 currentUserId,
                 jobCase.getId(),
                 documentId,
                 file
         );
+        DocumentVersionResponse version = result.version();
 
         traceabilityService.record(
                 jobCase,
@@ -115,7 +117,7 @@ public class CustomerRequestDocumentService {
                 metadata(
                         "requestId", requestId,
                         "documentId", documentId,
-                        "documentName", version.documentName(),
+                        "documentName", result.documentName(),
                         "version", version.version(),
                         "fileName", version.fileName()
                 )
