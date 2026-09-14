@@ -11,6 +11,8 @@ import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
+import com.nocountry.qualitytrack.traceability.enums.TraceabilityAggregateType;
+import com.nocountry.qualitytrack.traceability.enums.TraceabilityEventType;
 import com.nocountry.qualitytrack.traceability.service.TraceabilityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -101,6 +105,16 @@ class CustomerRequestDocumentServiceTest {
                 "/api/v1/customers/20/requests/31/documents/7/versions/21/content?download=true",
                 result.currentVersion().downloadUrl()
         );
+        verify(traceabilityService).record(
+                eq(jobCase),
+                eq(TraceabilityAggregateType.DOCUMENT),
+                eq(7L),
+                eq(TraceabilityEventType.DOCUMENT_ADDED),
+                any(),
+                any(),
+                eq(10L),
+                any()
+        );
     }
 
     @Test
@@ -171,6 +185,16 @@ class CustomerRequestDocumentServiceTest {
                 "/api/v1/customers/20/requests/31/documents/7/versions/21/content",
                 result.contentUrl()
         );
+        verify(traceabilityService).record(
+                eq(jobCase),
+                eq(TraceabilityAggregateType.DOCUMENT_VERSION),
+                eq(21L),
+                eq(TraceabilityEventType.DOCUMENT_VERSION_ADDED),
+                any(),
+                any(),
+                eq(10L),
+                any()
+        );
     }
 
     @Test
@@ -182,6 +206,16 @@ class CustomerRequestDocumentServiceTest {
         service.remove(10L, 20L, 31L, 7L);
 
         verify(documentService).remove(10L, 73L, 7L);
+        verify(traceabilityService).record(
+                eq(jobCase),
+                eq(TraceabilityAggregateType.DOCUMENT),
+                eq(7L),
+                eq(TraceabilityEventType.DOCUMENT_REMOVED),
+                any(),
+                any(),
+                eq(10L),
+                any()
+        );
     }
 
     @Test
