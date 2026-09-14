@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Tomar expediente e iniciar su revisión",
-        description = "Toma un JobCase SUBMITTED sin responsable. Asigna al COMMERCIAL autenticado y cambia el estado a UNDER_REVIEW en la misma operación; ADMIN también puede ejecutarla."
+        description = "Permite que un COMMERCIAL tome un expediente SUBMITTED que todavía no tiene responsable. La operación lo asigna al usuario autenticado, registra el momento de asignación e inicia la revisión cambiando el estado a UNDER_REVIEW; ADMIN también puede ejecutarla. No existe un paso separado para iniciar la revisión: tomar el expediente significa comenzar a trabajarlo y evita que otro comercial pueda tomarlo después.",
 )
 @ApiResponses({
         @ApiResponse(
