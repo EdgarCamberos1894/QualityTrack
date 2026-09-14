@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar detalle de una solicitud de cliente",
-        description = "Devuelve una CustomerRequest junto con su JobCase, documentos activos y aclaraciones asociadas. De cada documento se incluye su versión actual; la consulta no modifica estados."
+        description = "Devuelve una CustomerRequest visible para la empresa junto con el resumen de su JobCase, los documentos activos y las aclaraciones asociadas. Esta vista permite al cliente seguir el estado de su solicitud, conocer quién está atendiendo la revisión cuando exista un responsable y detectar preguntas pendientes del equipo interno. De cada documento se incluye su versión actual y las aclaraciones contienen la información necesaria para responderlas. La consulta es de solo lectura y no modifica estados ni asignaciones."
 )
 @ApiResponses({
         @ApiResponse(
