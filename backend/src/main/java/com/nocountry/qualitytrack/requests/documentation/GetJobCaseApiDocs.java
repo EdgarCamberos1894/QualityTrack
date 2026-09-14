@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar detalle de un expediente",
-        description = "Devuelve la vista de trabajo completa de un JobCase. Incluye su estado y responsable actual, la CustomerRequest que lo originó, los documentos activos con su versión vigente, el historial de solicitudes de información al cliente y la especificación técnica del material cuando exista. Este endpoint es solo de consulta: abrir el detalle no toma el expediente ni cambia su estado. Un expediente SUBMITTED y sin responsable continúa disponible para que un COMMERCIAL lo tome mediante POST /api/v1/job-cases/{caseId}/take. Pueden consultarlo cuentas INTERNAL con rol ADMIN, COMMERCIAL, ENGINEERING o AUDITOR."
+        description = "Devuelve el JobCase con su solicitud de origen, documentos, aclaraciones y especificación técnica cuando exista. Es solo de consulta: abrir el detalle no asigna el expediente ni cambia su estado."
 )
 @ApiResponses({
         @ApiResponse(
