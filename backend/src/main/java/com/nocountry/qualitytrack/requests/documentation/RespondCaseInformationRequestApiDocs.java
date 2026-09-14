@@ -64,7 +64,7 @@ import java.lang.annotation.Target;
         ),
         @ApiResponse(
                 responseCode = "409",
-                description = "El expediente ya no está esperando información o la aclaración indicada ya fue respondida",
+                description = "El expediente ya no espera información del cliente o la aclaración indicada ya no está abierta",
                 content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = JobCaseApiExamples.DATA_CONFLICT))
         )
 })
