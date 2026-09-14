@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Solicitar una aclaración al cliente",
-        description = "Permite al COMMERCIAL responsable o a un ADMIN pedir información adicional durante UNDER_REVIEW. Crea la aclaración y mueve el expediente a WAITING_CUSTOMER_INFO; solo puede existir una abierta por expediente.",
+        description = "Se utiliza cuando, durante UNDER_REVIEW, el responsable necesita una aclaración del cliente antes de continuar. El COMMERCIAL asignado o un ADMIN registra una pregunta y el expediente pasa a WAITING_CUSTOMER_INFO. Mientras exista una aclaración abierta no puede crearse otra ni completarse la revisión. Cuando el cliente responde desde su solicitud, la aclaración se cierra y el expediente vuelve automáticamente a UNDER_REVIEW.",
         requestBody = @RequestBody(
                 required = true,
                 description = "Pregunta concreta que el equipo interno necesita que responda el cliente.",
