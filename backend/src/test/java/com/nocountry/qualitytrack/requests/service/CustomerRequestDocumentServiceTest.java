@@ -4,6 +4,7 @@ import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentVersionResponse;
 import com.nocountry.qualitytrack.documents.service.DocumentService;
+import com.nocountry.qualitytrack.documents.service.DocumentVersionMutationResult;
 import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocument;
 import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentResponse;
 import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentVersionResponse;
@@ -175,9 +176,9 @@ class CustomerRequestDocumentServiceTest {
         when(jobCaseRepository.findByCustomerRequest_IdAndCustomerRequest_Customer_Id(31L, 20L))
                 .thenReturn(Optional.of(jobCase));
         when(jobCase.getId()).thenReturn(73L);
-        when(documentService.addVersion(10L, 73L, 7L, file))
-                .thenReturn(versionResponse);
         stubVersionResponse();
+        when(documentService.addVersion(10L, 73L, 7L, file))
+                .thenReturn(new DocumentVersionMutationResult(versionResponse, "Plano de eje"));
 
         RequestDocumentVersionResponse result = service.addVersion(
                 10L,
@@ -263,7 +264,6 @@ class CustomerRequestDocumentServiceTest {
     private void stubVersionResponse() {
         when(versionResponse.id()).thenReturn(21L);
         when(versionResponse.version()).thenReturn(1);
-        when(versionResponse.documentName()).thenReturn("Plano de eje");
         when(versionResponse.fileName()).thenReturn("plano.pdf");
         when(versionResponse.mimeType()).thenReturn("application/pdf");
         when(versionResponse.fileSize()).thenReturn(245812L);
