@@ -7,7 +7,7 @@ import com.nocountry.qualitytrack.customers.enums.CustomerStatus;
 import com.nocountry.qualitytrack.customers.repository.CustomerMembershipRepository;
 import com.nocountry.qualitytrack.requests.dto.request.CancelCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequest;
-import com.nocountry.qualitytrack.requests.dto.response.CaseInformationRequestResponse;
+import com.nocountry.qualitytrack.requests.dto.response.CustomerInformationRequestResponse;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestDetailResponse;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentResponse;
@@ -146,10 +146,10 @@ public class CustomerRequestService {
         );
         List<RequestDocumentResponse> documents = customerRequestDocumentService
                 .listCurrent(currentUserId, jobCase);
-        List<CaseInformationRequestResponse> informationRequests = informationRequestRepository
+        List<CustomerInformationRequestResponse> informationRequests = informationRequestRepository
                 .findAllByJobCase_IdOrderByRequestedAtAsc(jobCase.getId())
                 .stream()
-                .map(CaseInformationRequestResponse::from)
+                .map(CustomerInformationRequestResponse::from)
                 .toList();
 
         return CustomerRequestDetailResponse.from(request, documents, informationRequests);
