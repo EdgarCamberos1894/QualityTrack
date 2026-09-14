@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -113,7 +114,12 @@ class CustomerRequestDocumentServiceTest {
                 any(),
                 any(),
                 eq(10L),
-                any()
+                eq(Map.of(
+                        "requestId", 31L,
+                        "documentType", "DRAWING",
+                        "documentName", "Plano de eje",
+                        "fileName", "plano.pdf"
+                ))
         );
     }
 
@@ -193,7 +199,13 @@ class CustomerRequestDocumentServiceTest {
                 any(),
                 any(),
                 eq(10L),
-                any()
+                eq(Map.of(
+                        "requestId", 31L,
+                        "documentId", 7L,
+                        "documentName", "Plano de eje",
+                        "version", 1,
+                        "fileName", "plano.pdf"
+                ))
         );
     }
 
@@ -202,6 +214,7 @@ class CustomerRequestDocumentServiceTest {
         when(jobCaseRepository.findByCustomerRequest_IdAndCustomerRequest_Customer_Id(31L, 20L))
                 .thenReturn(Optional.of(jobCase));
         when(jobCase.getId()).thenReturn(73L);
+        when(documentService.remove(10L, 73L, 7L)).thenReturn("Plano de eje");
 
         service.remove(10L, 20L, 31L, 7L);
 
@@ -214,7 +227,10 @@ class CustomerRequestDocumentServiceTest {
                 any(),
                 any(),
                 eq(10L),
-                any()
+                eq(Map.of(
+                        "requestId", 31L,
+                        "documentName", "Plano de eje"
+                ))
         );
     }
 
@@ -247,6 +263,7 @@ class CustomerRequestDocumentServiceTest {
     private void stubVersionResponse() {
         when(versionResponse.id()).thenReturn(21L);
         when(versionResponse.version()).thenReturn(1);
+        when(versionResponse.documentName()).thenReturn("Plano de eje");
         when(versionResponse.fileName()).thenReturn("plano.pdf");
         when(versionResponse.mimeType()).thenReturn("application/pdf");
         when(versionResponse.fileSize()).thenReturn(245812L);
