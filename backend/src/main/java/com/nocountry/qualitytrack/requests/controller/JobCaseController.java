@@ -1,10 +1,15 @@
 package com.nocountry.qualitytrack.requests.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.requests.documentation.CompleteJobCaseReviewApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.DefineCaseMaterialSpecificationApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.GetJobCaseApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.GetJobCaseTimelineApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.JobCaseApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.ListJobCasesApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.RequestJobCaseInformationApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.StartJobCaseReviewApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.TakeJobCaseApiDocs;
 import com.nocountry.qualitytrack.requests.dto.request.CreateCaseInformationRequest;
 import com.nocountry.qualitytrack.requests.dto.request.DefineCaseMaterialSpecificationRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CaseInformationRequestResponse;
@@ -67,6 +72,7 @@ public class JobCaseController {
         ));
     }
 
+    @TakeJobCaseApiDocs
     @PostMapping("/{caseId}/take")
     public ResponseEntity<ApiResponse<JobCaseResponse>> take(
             @CurrentUserId Long currentUserId,
@@ -81,6 +87,7 @@ public class JobCaseController {
         ));
     }
 
+    @StartJobCaseReviewApiDocs
     @PostMapping("/{caseId}/review/start")
     public ResponseEntity<ApiResponse<JobCaseResponse>> startReview(
             @CurrentUserId Long currentUserId,
@@ -95,6 +102,7 @@ public class JobCaseController {
         ));
     }
 
+    @RequestJobCaseInformationApiDocs
     @PostMapping("/{caseId}/information-requests")
     public ResponseEntity<ApiResponse<CaseInformationRequestResponse>> requestInformation(
             @CurrentUserId Long currentUserId,
@@ -114,6 +122,7 @@ public class JobCaseController {
         ));
     }
 
+    @DefineCaseMaterialSpecificationApiDocs
     @PutMapping("/{caseId}/material-specification")
     public ResponseEntity<ApiResponse<CaseMaterialSpecificationResponse>> defineMaterialSpecification(
             @CurrentUserId Long currentUserId,
@@ -133,6 +142,7 @@ public class JobCaseController {
         ));
     }
 
+    @CompleteJobCaseReviewApiDocs
     @PostMapping("/{caseId}/review/complete")
     public ResponseEntity<ApiResponse<JobCaseResponse>> completeReview(
             @CurrentUserId Long currentUserId,
