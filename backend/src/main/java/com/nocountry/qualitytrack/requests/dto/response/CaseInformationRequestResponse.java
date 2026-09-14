@@ -35,7 +35,7 @@ public record CaseInformationRequestResponse(
                                 request.getRespondedByUser().getLastName()
                         ),
                 request.getRespondedAt(),
-                request.getRespondedAt() == null
+                request.isOpen()
         );
     }
 
