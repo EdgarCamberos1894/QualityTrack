@@ -80,12 +80,13 @@ public class InternalUserInvitationService {
         Set<SystemRole> roles = normalizeRoles(request.roles());
         Instant now = Instant.now();
 
-        User invitedUser = userRepository.findByEmailIgnoreCase(email)
+        User pendingUser = userRepository.findByEmailIgnoreCase(email)
                 .map(existing -> prepareExistingPendingUser(existing, firstName, lastName))
                 .orElseGet(() -> createPendingInternalUser(firstName, lastName, email));
 
+        final User invitedUser;
         try {
-            invitedUser = userRepository.saveAndFlush(invitedUser);
+            invitedUser = userRepository.saveAndFlush(pendingUser);
         } catch (DataIntegrityViolationException exception) {
             throw unavailableEmail();
         }
