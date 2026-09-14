@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Responder una aclaración solicitada por el equipo interno",
-        description = "Permite a un miembro ACTIVE con rol ADMIN o REQUESTER responder una aclaración abierta de su empresa. Guarda la respuesta y devuelve el expediente de WAITING_CUSTOMER_INFO a UNDER_REVIEW.",
+        description = "Permite a un miembro ACTIVE de la empresa con rol ADMIN o REQUESTER responder una aclaración abierta solicitada por el equipo interno. La respuesta queda asociada a esa pregunta y, si el expediente continúa en WAITING_CUSTOMER_INFO, el backend lo devuelve automáticamente a UNDER_REVIEW para que pueda continuar la revisión. El cliente no envía ni decide el estado interno del expediente. Cada aclaración solo puede responderse una vez.",
         requestBody = @RequestBody(
                 required = true,
                 description = "Respuesta del cliente a la pregunta concreta realizada por el equipo interno.",
