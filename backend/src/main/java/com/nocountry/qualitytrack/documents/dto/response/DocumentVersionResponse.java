@@ -7,7 +7,6 @@ import java.time.Instant;
 public record DocumentVersionResponse(
         Long id,
         Integer version,
-        String documentName,
         String fileName,
         String mimeType,
         Long fileSize,
@@ -20,7 +19,6 @@ public record DocumentVersionResponse(
         return new DocumentVersionResponse(
                 version.getId(),
                 version.getVersion(),
-                version.getDocument().getName(),
                 version.getFileName(),
                 version.getMimeType(),
                 version.getFileSize(),
