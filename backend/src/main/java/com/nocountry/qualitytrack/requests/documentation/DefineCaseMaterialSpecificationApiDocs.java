@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Definir o actualizar la especificación técnica del material",
-        description = "Registra la definición técnica de material asociada al expediente mientras éste se encuentra en UNDER_REVIEW. Está pensada para los casos en los que el cliente solicitó asesoría de material o cuando Ingeniería necesita dejar una definición técnica interna más precisa. Cada JobCase puede tener una sola CaseMaterialSpecification: si todavía no existe se crea; si ya existe, este PUT reemplaza sus valores actuales con la nueva definición. Solo pueden ejecutar la operación usuarios INTERNAL con rol ENGINEERING o ADMIN. Cuando la CustomerRequest tiene materialRequirementType = ASSISTANCE_REQUIRED, esta especificación debe existir antes de completar la revisión y pasar el expediente a READY_FOR_QUOTATION. Guardar la especificación no cambia por sí solo el estado del expediente.",
+        description = "Crea o actualiza la especificación técnica del material mientras el expediente está en UNDER_REVIEW. Solo ENGINEERING o ADMIN pueden hacerlo; si la solicitud requiere asistencia de material, debe existir antes de completar la revisión.",
         requestBody = @RequestBody(
                 required = true,
                 description = "Definición técnica vigente del material para el expediente. materialName es obligatorio; norma/grado y notas técnicas son opcionales.",
