@@ -40,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -91,7 +90,7 @@ class JobCaseWorkflowServiceTest {
     }
 
     @Test
-    void commercialCanTakeSubmittedCaseWithoutChangingStatus() {
+    void commercialTakingSubmittedCaseAssignsItAndStartsReview() {
         allowInternal(SystemRole.COMMERCIAL);
         JobCase jobCase = newJobCase(MaterialRequirementType.SPECIFIED);
         when(jobCaseRepository.findByIdForUpdate(12L)).thenReturn(Optional.of(jobCase));
@@ -99,32 +98,8 @@ class JobCaseWorkflowServiceTest {
 
         var response = service.take(10L, 12L);
 
-        assertEquals(JobCaseStatus.SUBMITTED, response.status());
-        assertEquals(10L, response.assignedToUserId());
-        verify(traceabilityService).record(
-                eq(jobCase),
-                any(),
-                any(),
-                eq(TraceabilityEventType.JOB_CASE_ASSIGNED),
-                isNull(),
-                isNull(),
-                eq(10L),
-                any()
-        );
-    }
-
-    @Test
-    void assignedCommercialCanStartReview() {
-        allowInternal(SystemRole.COMMERCIAL);
-        JobCase jobCase = newJobCase(MaterialRequirementType.SPECIFIED);
-        jobCase.assignTo(internalUser, Instant.now());
-        when(jobCaseRepository.findByIdForUpdate(12L)).thenReturn(Optional.of(jobCase));
-        when(userSystemRoleRepository.existsByIdUserIdAndIdRole(10L, SystemRole.ADMIN)).thenReturn(false);
-        when(jobCaseRepository.saveAndFlush(jobCase)).thenReturn(jobCase);
-
-        var response = service.startReview(10L, 12L);
-
         assertEquals(JobCaseStatus.UNDER_REVIEW, response.status());
+        assertEquals(10L, response.assignedToUserId());
         verify(traceabilityService).record(
                 eq(jobCase),
                 any(),
@@ -266,8 +241,7 @@ class JobCaseWorkflowServiceTest {
 
     private JobCase reviewedJobCase(MaterialRequirementType materialRequirementType) {
         JobCase jobCase = newJobCase(materialRequirementType);
-        jobCase.assignTo(internalUser, Instant.now());
-        jobCase.startReview();
+        jobCase.takeForReview(internalUser, Instant.now());
         return jobCase;
     }
 
