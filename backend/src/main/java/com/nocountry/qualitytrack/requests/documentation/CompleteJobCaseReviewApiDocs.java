@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Completar la revisión y dejar el expediente listo para cotizar",
-        description = "Finaliza la etapa de revisión interna del JobCase. Solo puede ejecutarse cuando el expediente está en UNDER_REVIEW y por el COMMERCIAL responsable del caso o un ADMIN. Antes de permitir la transición, el backend valida que no exista ninguna CaseInformationRequest abierta esperando respuesta del cliente. Además, si la CustomerRequest fue creada con materialRequirementType = ASSISTANCE_REQUIRED, debe existir una CaseMaterialSpecification definida por Ingeniería. Si todas las condiciones se cumplen, el estado cambia de UNDER_REVIEW a READY_FOR_QUOTATION. Esta operación únicamente declara que la información necesaria para cotizar está completa: no crea una Quotation automáticamente. La cotización será un recurso posterior y separado."
+        description = "Finaliza un expediente en UNDER_REVIEW y lo cambia a READY_FOR_QUOTATION. Requiere no tener aclaraciones pendientes y, si el cliente pidió asistencia de material, contar con una especificación técnica; no crea la cotización."
 )
 @ApiResponses({
         @ApiResponse(
