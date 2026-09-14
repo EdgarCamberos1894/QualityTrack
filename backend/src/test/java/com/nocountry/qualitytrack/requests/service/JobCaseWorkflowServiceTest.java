@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -105,8 +106,8 @@ class JobCaseWorkflowServiceTest {
                 any(),
                 any(),
                 eq(TraceabilityEventType.JOB_CASE_ASSIGNED),
-                eq(null),
-                eq(null),
+                isNull(),
+                isNull(),
                 eq(10L),
                 any()
         );
@@ -273,12 +274,6 @@ class JobCaseWorkflowServiceTest {
     }
 
     private JobCase newJobCase(MaterialRequirementType materialRequirementType) {
-        when(customer.getId()).thenReturn(20L);
-        when(customer.getName()).thenReturn("Mecanizados del Pacífico");
-        when(requester.getId()).thenReturn(42L);
-        when(requester.getFirstName()).thenReturn("Ana");
-        when(requester.getLastName()).thenReturn("López");
-
         CustomerRequest request = CustomerRequest.submit(
                 customer,
                 "REQ-00000001",
