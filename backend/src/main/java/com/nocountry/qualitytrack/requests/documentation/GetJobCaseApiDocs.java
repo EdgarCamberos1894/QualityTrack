@@ -18,13 +18,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Operation(
-        summary = "Consultar expediente",
-        description = "Consulta un JobCase específico junto con la solicitud de cliente que lo originó y sus documentos activos con la versión actual de cada uno. El historial completo de versiones se consulta mediante el endpoint contextual del documento. En esta primera etapa pueden consultarlo cuentas INTERNAL con rol ADMIN, COMMERCIAL, ENGINEERING o AUDITOR y la operación no modifica su estado."
+        summary = "Consultar detalle de un expediente",
+        description = "Devuelve la vista de trabajo completa de un JobCase. Incluye su estado y responsable actual, la CustomerRequest que lo originó, los documentos activos con su versión vigente, el historial de solicitudes de información al cliente y la especificación técnica del material cuando exista. Este endpoint es solo de consulta: abrir el detalle no toma el expediente ni cambia su estado. Un expediente SUBMITTED y sin responsable continúa disponible para que un COMMERCIAL lo tome mediante POST /api/v1/job-cases/{caseId}/take. Pueden consultarlo cuentas INTERNAL con rol ADMIN, COMMERCIAL, ENGINEERING o AUDITOR."
 )
 @ApiResponses({
         @ApiResponse(
                 responseCode = "200",
-                description = "Expediente consultado correctamente",
+                description = "Detalle del expediente consultado correctamente",
                 content = @Content(
                         mediaType = "application/json",
                         schema = @Schema(implementation = com.nocountry.qualitytrack.shared.response.ApiResponse.class),
@@ -33,17 +33,17 @@ import java.lang.annotation.Target;
         ),
         @ApiResponse(
                 responseCode = "401",
-                description = "Autenticación requerida",
+                description = "La petición no contiene una autenticación válida",
                 content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = RequestApiExamples.AUTHENTICATION_REQUIRED))
         ),
         @ApiResponse(
                 responseCode = "403",
-                description = "La cuenta o el rol interno no permiten consultar expedientes",
+                description = "La cuenta no es INTERNAL o no posee un rol con acceso al expediente",
                 content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = RequestApiExamples.ACCESS_DENIED))
         ),
         @ApiResponse(
                 responseCode = "404",
-                description = "No se encontró el expediente",
+                description = "No existe un expediente con el identificador indicado",
                 content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class), examples = @ExampleObject(value = RequestApiExamples.RESOURCE_NOT_FOUND))
         )
 })
