@@ -30,6 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -135,7 +136,11 @@ class CustomerRequestServiceTest {
                 any(),
                 any(),
                 eq(10L),
-                any()
+                eq(Map.of(
+                        "requestNumber", "REQ-00000001",
+                        "customerId", 20L,
+                        "title", "Eje de transmisión"
+                ))
         );
         verify(traceabilityService).record(
                 any(JobCase.class),
@@ -143,9 +148,12 @@ class CustomerRequestServiceTest {
                 any(),
                 eq(TraceabilityEventType.JOB_CASE_CREATED),
                 any(),
-                any(),
+                eq(JobCaseStatus.SUBMITTED.name()),
                 eq(10L),
-                any()
+                eq(Map.of(
+                        "caseNumber", "CASE-00000001",
+                        "requestNumber", "REQ-00000001"
+                ))
         );
     }
 
@@ -280,7 +288,11 @@ class CustomerRequestServiceTest {
                 eq(JobCaseStatus.SUBMITTED.name()),
                 eq(JobCaseStatus.CANCELLED.name()),
                 eq(10L),
-                any()
+                eq(Map.of(
+                        "requestId", 31L,
+                        "requestNumber", "REQ-00000001",
+                        "reason", "Ya no se requiere la pieza."
+                ))
         );
     }
 
