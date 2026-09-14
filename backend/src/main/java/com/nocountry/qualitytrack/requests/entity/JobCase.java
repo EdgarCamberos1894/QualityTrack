@@ -86,7 +86,7 @@ public class JobCase {
         return new JobCase(customerRequest, caseNumber, openedAt);
     }
 
-    public void assignTo(User user, Instant assignedAt) {
+    public void takeForReview(User user, Instant assignedAt) {
         if (status != JobCaseStatus.SUBMITTED) {
             throw new IllegalStateException("Solo se puede tomar un expediente en estado SUBMITTED.");
         }
@@ -96,16 +96,6 @@ public class JobCase {
 
         this.assignedToUser = Objects.requireNonNull(user);
         this.assignedAt = Objects.requireNonNull(assignedAt);
-    }
-
-    public void startReview() {
-        if (status != JobCaseStatus.SUBMITTED) {
-            throw new IllegalStateException("Solo se puede iniciar revisión desde SUBMITTED.");
-        }
-        if (assignedToUser == null) {
-            throw new IllegalStateException("El expediente debe tener un responsable antes de iniciar revisión.");
-        }
-
         this.status = JobCaseStatus.UNDER_REVIEW;
     }
 
