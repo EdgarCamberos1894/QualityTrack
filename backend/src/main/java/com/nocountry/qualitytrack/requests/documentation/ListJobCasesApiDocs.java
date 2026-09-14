@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar bandeja de expedientes",
-        description = "Lista los JobCase disponibles para el trabajo interno, ordenados desde el más reciente. Cada elemento incluye su estado, responsable y un resumen de la solicitud de origen."
+        description = "Devuelve la bandeja interna de JobCase ordenada desde el expediente más reciente. Cada elemento incluye su estado actual, el responsable cuando exista y un resumen de la solicitud que originó el caso, suficiente para construir la vista principal de trabajo sin abrir cada expediente. Solo los usuarios internos con un rol autorizado pueden consultarla. Esta operación es de solo lectura y no modifica asignaciones ni estados."
 )
 @ApiResponses({
         @ApiResponse(
