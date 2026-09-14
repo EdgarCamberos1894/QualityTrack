@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Tomar expediente e iniciar su revisión",
-        description = "Permite que un usuario INTERNAL con rol COMMERCIAL tome un expediente que todavía no está siendo atendido. El JobCase debe estar en SUBMITTED y no tener responsable asignado. La operación asigna al usuario autenticado como responsable, registra assignedAt y cambia el estado directamente de SUBMITTED a UNDER_REVIEW; no existe un paso adicional para iniciar la revisión. ADMIN también puede ejecutar la operación. Si otro usuario ya tomó el expediente o el caso ya avanzó a otro estado, se responde con 409 Conflict. Tomar el expediente no crea una cotización ni modifica la solicitud original del cliente."
+        description = "Toma un JobCase SUBMITTED sin responsable. Asigna al COMMERCIAL autenticado y cambia el estado a UNDER_REVIEW en la misma operación; ADMIN también puede ejecutarla."
 )
 @ApiResponses({
         @ApiResponse(
