@@ -21,8 +21,8 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Responder una aclaración solicitada por el equipo interno",
-        description = "Permite que el cliente responda una CaseInformationRequest abierta perteneciente a su propia CustomerRequest. Puede hacerlo un miembro ACTIVE de la empresa con rol ADMIN o REQUESTER. El expediente debe encontrarse en WAITING_CUSTOMER_INFO y la aclaración indicada debe seguir abierta. La operación guarda la respuesta, registra quién respondió y cuándo, cierra esa solicitud de información y devuelve automáticamente el JobCase a UNDER_REVIEW para que el responsable interno pueda continuar. El cliente no elige ni envía el nuevo estado del expediente; esa transición la controla el backend."
-        ,requestBody = @RequestBody(
+        description = "Permite que el cliente responda una CaseInformationRequest abierta perteneciente a su propia CustomerRequest. Puede hacerlo un miembro ACTIVE de la empresa con rol ADMIN o REQUESTER. El expediente debe encontrarse en WAITING_CUSTOMER_INFO y la aclaración indicada debe seguir abierta. La operación guarda la respuesta, registra quién respondió y cuándo, cierra esa solicitud de información y devuelve automáticamente el JobCase a UNDER_REVIEW para que el responsable interno pueda continuar. El cliente no elige ni envía el nuevo estado del expediente; esa transición la controla el backend.",
+        requestBody = @RequestBody(
                 required = true,
                 description = "Respuesta del cliente a la pregunta concreta realizada por el equipo interno.",
                 content = @Content(
