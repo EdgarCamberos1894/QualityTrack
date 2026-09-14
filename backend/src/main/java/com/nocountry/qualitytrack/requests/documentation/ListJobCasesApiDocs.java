@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar bandeja de expedientes",
-        description = "Devuelve todos los JobCase visibles para el trabajo interno, ordenados desde el más reciente. Cada elemento incluye el estado actual, el responsable cuando exista y un resumen de la CustomerRequest que originó el expediente. SUBMITTED sin responsable representa un expediente todavía sin asignar; UNDER_REVIEW indica que un responsable ya lo tomó y lo está revisando; WAITING_CUSTOMER_INFO indica que la revisión está pausada esperando una respuesta del cliente; READY_FOR_QUOTATION indica que la revisión terminó y el siguiente paso de negocio es crear una cotización. Esta consulta no asigna expedientes ni modifica estados. Pueden utilizarla cuentas INTERNAL con rol ADMIN, COMMERCIAL, ENGINEERING o AUDITOR."
+        description = "Lista los JobCase disponibles para el trabajo interno, ordenados desde el más reciente. Cada elemento incluye su estado, responsable y un resumen de la solicitud de origen."
 )
 @ApiResponses({
         @ApiResponse(
