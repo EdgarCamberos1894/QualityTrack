@@ -219,7 +219,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public void remove(
+    public String remove(
             Long currentUserId,
             Long caseId,
             Long documentId
@@ -232,8 +232,10 @@ public class DocumentService {
                 ));
 
         User remover = accessService.requireCanRemove(currentUserId, document);
+        String documentName = document.getName();
         document.remove(remover, Instant.now());
         documentRepository.saveAndFlush(document);
+        return documentName;
     }
 
     private JobCase requireJobCase(Long caseId) {
