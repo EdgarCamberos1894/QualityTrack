@@ -80,11 +80,9 @@ final class JobCaseApiExamples {
               "data": {
                 "id": 7,
                 "question": "¿Puede confirmar si la tolerancia de ±0.02 mm aplica a todos los asientos?",
-                "requestedByUserId": 10,
                 "requestedByName": "Carlos Ruiz",
                 "requestedAt": "2026-09-14T12:45:00Z",
                 "response": "La tolerancia de ±0.02 mm aplica únicamente a los asientos indicados en el plano.",
-                "respondedByUserId": 42,
                 "respondedByName": "Ana López",
                 "respondedAt": "2026-09-14T13:20:00Z",
                 "open": false
