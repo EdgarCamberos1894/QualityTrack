@@ -9,6 +9,7 @@ import com.nocountry.qualitytrack.requests.dto.request.DefineCaseMaterialSpecifi
 import com.nocountry.qualitytrack.requests.dto.request.RespondCaseInformationRequest;
 import com.nocountry.qualitytrack.requests.dto.response.CaseInformationRequestResponse;
 import com.nocountry.qualitytrack.requests.dto.response.CaseMaterialSpecificationResponse;
+import com.nocountry.qualitytrack.requests.dto.response.CustomerInformationRequestResponse;
 import com.nocountry.qualitytrack.requests.dto.response.JobCaseResponse;
 import com.nocountry.qualitytrack.requests.entity.CaseInformationRequest;
 import com.nocountry.qualitytrack.requests.entity.CaseMaterialSpecification;
@@ -85,7 +86,7 @@ public class JobCaseWorkflowService {
             Long caseId,
             CreateCaseInformationRequest input
     ) {
-        requireInternalRole(currentUserId, SystemRole.COMMERCIAL, SystemRole.ADMIN);
+        User actor = requireInternalRole(currentUserId, SystemRole.COMMERCIAL, SystemRole.ADMIN);
         JobCase jobCase = requireCaseForUpdate(caseId);
         requireAssignedCommercialOrAdmin(currentUserId, jobCase);
 
@@ -96,7 +97,6 @@ public class JobCaseWorkflowService {
             conflict("El expediente ya tiene una solicitud de información pendiente.");
         }
 
-        User actor = requireUser(currentUserId);
         CaseInformationRequest informationRequest = CaseInformationRequest.open(
                 jobCase,
                 input.question(),
@@ -126,7 +126,7 @@ public class JobCaseWorkflowService {
     }
 
     @Transactional
-    public CaseInformationRequestResponse respondInformation(
+    public CustomerInformationRequestResponse respondInformation(
             Long currentUserId,
             Long customerId,
             Long requestId,
@@ -147,7 +147,7 @@ public class JobCaseWorkflowService {
                 .orElseThrow(() -> notFound("No se encontró la solicitud de información."));
 
         if (!informationRequest.isOpen()) {
-            conflict("La solicitud de información ya fue respondida.");
+            conflict("La solicitud de información ya no está abierta.");
         }
 
         informationRequest.respond(input.response(), membership.getUser(), Instant.now());
@@ -170,7 +170,7 @@ public class JobCaseWorkflowService {
                 )
         );
 
-        return CaseInformationRequestResponse.from(informationRequest);
+        return CustomerInformationRequestResponse.from(informationRequest);
     }
 
     @Transactional
