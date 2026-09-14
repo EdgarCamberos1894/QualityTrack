@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar detalle de un expediente",
-        description = "Devuelve el JobCase con su solicitud de origen, documentos, aclaraciones y especificación técnica cuando exista. Es solo de consulta: abrir el detalle no asigna el expediente ni cambia su estado."
+        description = "Devuelve la información completa de un JobCase: la solicitud que lo originó, los documentos accesibles, las aclaraciones realizadas y la especificación técnica del material cuando exista. Está pensado para abrir la vista de trabajo y revisar el contexto antes de ejecutar acciones sobre el expediente. Consultarlo no asigna responsable, no inicia la revisión y no modifica ningún estado. Las acciones del workflow se realizan mediante sus endpoints específicos."
 )
 @ApiResponses({
         @ApiResponse(
