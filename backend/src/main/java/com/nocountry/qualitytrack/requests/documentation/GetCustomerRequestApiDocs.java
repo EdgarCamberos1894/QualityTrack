@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar detalle de una solicitud de cliente",
-        description = "Devuelve una CustomerRequest específica perteneciente a la empresa indicada. La respuesta incluye el resumen de su JobCase asociado, los documentos ACTIVE con la versión vigente de cada uno y el historial de solicitudes de información realizadas por el equipo interno. Este último dato permite al frontend saber si existe una aclaración abierta que el cliente deba responder. La consulta no cambia ningún estado ni responde automáticamente las aclaraciones. De cada documento se devuelve únicamente su versión actual; el historial completo de versiones se consulta en el endpoint contextual del documento. Requiere una membresía ACTIVE en la empresa."
+        description = "Devuelve una CustomerRequest junto con su JobCase, documentos activos y aclaraciones asociadas. De cada documento se incluye su versión actual; la consulta no modifica estados."
 )
 @ApiResponses({
         @ApiResponse(
