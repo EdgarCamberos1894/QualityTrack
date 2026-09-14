@@ -17,7 +17,7 @@ import com.nocountry.qualitytrack.requests.dto.request.CancelCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocumentForm;
 import com.nocountry.qualitytrack.requests.dto.request.RespondCaseInformationRequest;
 import com.nocountry.qualitytrack.requests.dto.request.SubmitCustomerRequestForm;
-import com.nocountry.qualitytrack.requests.dto.response.CaseInformationRequestResponse;
+import com.nocountry.qualitytrack.requests.dto.response.CustomerInformationRequestResponse;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestDetailResponse;
 import com.nocountry.qualitytrack.requests.dto.response.CustomerRequestResponse;
 import com.nocountry.qualitytrack.requests.dto.response.RequestDocumentResponse;
@@ -259,14 +259,14 @@ public class CustomerRequestController {
 
     @RespondCaseInformationRequestApiDocs
     @PostMapping("/{requestId}/information-requests/{informationRequestId}/response")
-    public ResponseEntity<ApiResponse<CaseInformationRequestResponse>> respondInformationRequest(
+    public ResponseEntity<ApiResponse<CustomerInformationRequestResponse>> respondInformationRequest(
             @CurrentUserId Long currentUserId,
             @PathVariable Long customerId,
             @PathVariable Long requestId,
             @PathVariable Long informationRequestId,
             @Valid @RequestBody RespondCaseInformationRequest request
     ) {
-        CaseInformationRequestResponse response = jobCaseWorkflowService.respondInformation(
+        CustomerInformationRequestResponse response = jobCaseWorkflowService.respondInformation(
                 currentUserId,
                 customerId,
                 requestId,
