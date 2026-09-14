@@ -115,6 +115,7 @@ public class CustomerRequestDocumentService {
                 metadata(
                         "requestId", requestId,
                         "documentId", documentId,
+                        "documentName", version.documentName(),
                         "version", version.version(),
                         "fileName", version.fileName()
                 )
@@ -176,7 +177,7 @@ public class CustomerRequestDocumentService {
             Long documentId
     ) {
         JobCase jobCase = requireJobCase(customerId, requestId);
-        documentService.remove(currentUserId, jobCase.getId(), documentId);
+        String documentName = documentService.remove(currentUserId, jobCase.getId(), documentId);
 
         traceabilityService.record(
                 jobCase,
@@ -186,7 +187,10 @@ public class CustomerRequestDocumentService {
                 null,
                 null,
                 currentUserId,
-                metadata("requestId", requestId)
+                metadata(
+                        "requestId", requestId,
+                        "documentName", documentName
+                )
         );
     }
 
