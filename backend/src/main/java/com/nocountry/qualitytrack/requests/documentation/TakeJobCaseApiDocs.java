@@ -17,15 +17,15 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Operation(
-        summary = "Tomar expediente",
-        description = "Asigna al usuario COMMERCIAL autenticado como responsable de un JobCase SUBMITTED. Tomar el expediente no inicia la revisión ni cambia su estado. ADMIN también puede ejecutar la operación."
+        summary = "Tomar expediente e iniciar revisión",
+        description = "Asigna al usuario COMMERCIAL autenticado como responsable de un JobCase SUBMITTED y cambia el estado a UNDER_REVIEW en la misma operación. ADMIN también puede ejecutar la acción."
 )
 @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Expediente tomado correctamente"),
+        @ApiResponse(responseCode = "200", description = "Expediente tomado y revisión iniciada correctamente"),
         @ApiResponse(responseCode = "401", description = "Autenticación requerida", content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "403", description = "Rol no autorizado", content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "404", description = "Expediente no encontrado", content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
-        @ApiResponse(responseCode = "409", description = "El expediente no puede tomarse en su estado actual", content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
+        @ApiResponse(responseCode = "409", description = "El expediente ya está asignado o no puede tomarse en su estado actual", content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
 })
 public @interface TakeJobCaseApiDocs {
 }
