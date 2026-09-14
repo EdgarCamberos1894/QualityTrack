@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
         description = "Crea una aclaración pendiente y cambia el JobCase de UNDER_REVIEW a WAITING_CUSTOMER_INFO. Solo puede existir una aclaración abierta por expediente."
 )
 @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Información solicitada correctamente"),
+        @ApiResponse(responseCode = "201", description = "Información solicitada correctamente"),
         @ApiResponse(responseCode = "400", description = "Solicitud inválida", content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "401", description = "Autenticación requerida", content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "403", description = "Usuario no autorizado", content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
