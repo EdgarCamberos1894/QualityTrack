@@ -123,7 +123,7 @@ public class DocumentService {
     }
 
     @Transactional
-    public DocumentVersionResponse addVersion(
+    public DocumentVersionMutationResult addVersion(
             Long currentUserId,
             Long caseId,
             Long documentId,
@@ -162,7 +162,10 @@ public class DocumentService {
         );
         version = documentVersionRepository.saveAndFlush(version);
 
-        return DocumentVersionResponse.from(version);
+        return new DocumentVersionMutationResult(
+                DocumentVersionResponse.from(version),
+                document.getName()
+        );
     }
 
     @Transactional(readOnly = true)
