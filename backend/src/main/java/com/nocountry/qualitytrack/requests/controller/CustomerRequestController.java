@@ -11,6 +11,7 @@ import com.nocountry.qualitytrack.requests.documentation.DownloadRequestDocument
 import com.nocountry.qualitytrack.requests.documentation.GetCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.ListCustomerRequestsApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.ListRequestDocumentVersionsApiDocs;
+import com.nocountry.qualitytrack.requests.documentation.RespondCaseInformationRequestApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.SubmitCustomerRequestApiDocs;
 import com.nocountry.qualitytrack.requests.dto.request.CancelCustomerRequest;
 import com.nocountry.qualitytrack.requests.dto.request.CreateRequestDocumentForm;
@@ -256,6 +257,7 @@ public class CustomerRequestController {
                 .body(document.resource());
     }
 
+    @RespondCaseInformationRequestApiDocs
     @PostMapping("/{requestId}/information-requests/{informationRequestId}/response")
     public ResponseEntity<ApiResponse<CaseInformationRequestResponse>> respondInformationRequest(
             @CurrentUserId Long currentUserId,
