@@ -8,7 +8,6 @@ import com.nocountry.qualitytrack.requests.documentation.GetJobCaseTimelineApiDo
 import com.nocountry.qualitytrack.requests.documentation.JobCaseApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.ListJobCasesApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.RequestJobCaseInformationApiDocs;
-import com.nocountry.qualitytrack.requests.documentation.StartJobCaseReviewApiDocs;
 import com.nocountry.qualitytrack.requests.documentation.TakeJobCaseApiDocs;
 import com.nocountry.qualitytrack.requests.dto.request.CreateCaseInformationRequest;
 import com.nocountry.qualitytrack.requests.dto.request.DefineCaseMaterialSpecificationRequest;
@@ -82,23 +81,8 @@ public class JobCaseController {
         JobCaseResponse response = workflowService.take(currentUserId, caseId);
 
         return ResponseEntity.ok(ApiResponse.success(
-                ApiSuccessCode.JOB_CASE_TAKEN,
-                "Expediente tomado correctamente.",
-                response
-        ));
-    }
-
-    @StartJobCaseReviewApiDocs
-    @PostMapping("/{caseId}/review/start")
-    public ResponseEntity<ApiResponse<JobCaseResponse>> startReview(
-            @CurrentUserId Long currentUserId,
-            @PathVariable Long caseId
-    ) {
-        JobCaseResponse response = workflowService.startReview(currentUserId, caseId);
-
-        return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.JOB_CASE_REVIEW_STARTED,
-                "Revisión del expediente iniciada correctamente.",
+                "Expediente tomado. La revisión ha iniciado correctamente.",
                 response
         ));
     }
