@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar historial del expediente",
-        description = "Devuelve en orden cronológico los eventos de negocio registrados para un JobCase. Es una consulta de solo lectura para reconstruir los cambios relevantes del expediente."
+        description = "Devuelve en orden cronológico los eventos de negocio registrados para el expediente, como cambios de estado, inicio de revisión, aclaraciones y movimientos de documentos. Cada evento puede incluir el usuario que realizó la acción, la transición de estado y metadata de contexto para que el frontend construya una línea de tiempo legible. Es una consulta de solo lectura y no modifica el JobCase. Solo los usuarios internos con acceso a expedientes pueden consultarla."
 )
 @ApiResponses({
         @ApiResponse(
