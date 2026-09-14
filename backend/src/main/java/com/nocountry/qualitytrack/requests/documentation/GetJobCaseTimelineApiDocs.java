@@ -18,13 +18,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Operation(
-        summary = "Consultar trazabilidad del expediente",
-        description = "Devuelve en orden cronológico los eventos de negocio registrados para un JobCase. La trazabilidad es de solo lectura desde la API: los eventos se generan internamente cuando ocurren operaciones como crear la solicitud, adjuntar documentos, agregar versiones o cancelar el expediente. En esta etapa pueden consultarla cuentas INTERNAL con rol ADMIN, COMMERCIAL, ENGINEERING o AUDITOR."
+        summary = "Consultar historial del expediente",
+        description = "Devuelve, en orden cronológico, los eventos de negocio registrados para un JobCase. Esta consulta sirve para reconstruir qué ocurrió durante el ciclo del expediente sin depender únicamente de su estado actual. Entre otros hechos pueden aparecer la creación de la solicitud y del expediente, el inicio de la revisión al ser tomado por un responsable, solicitudes y respuestas de información, definición técnica de material, cambios relacionados con documentos, cancelación y preparación para cotización. La trazabilidad es append-only y de solo lectura desde este endpoint; los eventos se generan automáticamente como consecuencia de otras operaciones del sistema. Pueden consultarla cuentas INTERNAL con rol ADMIN, COMMERCIAL, ENGINEERING o AUDITOR."
 )
 @ApiResponses({
         @ApiResponse(
                 responseCode = "200",
-                description = "Trazabilidad del expediente consultada correctamente",
+                description = "Historial cronológico del expediente consultado correctamente",
                 content = @Content(
                         mediaType = "application/json",
                         schema = @Schema(implementation = com.nocountry.qualitytrack.shared.response.ApiResponse.class)
@@ -32,7 +32,7 @@ import java.lang.annotation.Target;
         ),
         @ApiResponse(
                 responseCode = "401",
-                description = "Autenticación requerida",
+                description = "La petición no contiene una autenticación válida",
                 content = @Content(
                         mediaType = "application/problem+json",
                         schema = @Schema(implementation = ProblemDetail.class),
@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
         ),
         @ApiResponse(
                 responseCode = "403",
-                description = "La cuenta o el rol interno no permiten consultar la trazabilidad",
+                description = "La cuenta no es INTERNAL o no posee un rol con acceso al historial del expediente",
                 content = @Content(
                         mediaType = "application/problem+json",
                         schema = @Schema(implementation = ProblemDetail.class),
@@ -50,7 +50,7 @@ import java.lang.annotation.Target;
         ),
         @ApiResponse(
                 responseCode = "404",
-                description = "No se encontró el expediente",
+                description = "No existe un expediente con el identificador indicado",
                 content = @Content(
                         mediaType = "application/problem+json",
                         schema = @Schema(implementation = ProblemDetail.class),
