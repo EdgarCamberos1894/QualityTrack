@@ -167,6 +167,57 @@ class QuotationWorkflowServiceTest {
     }
 
     @Test
+    void updateSupportsZeroAndCustomTaxRates() {
+        JobCase jobCase = readyJobCase();
+        Quotation quotation = Quotation.draft(jobCase, "QUO-00000001", commercialUser);
+        LocalDate today = LocalDate.now(ZoneId.of("America/Mexico_City"));
+
+        when(accessPolicy.requireCommercialActor(10L)).thenReturn(commercialUser);
+        when(quotationRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(quotation));
+        when(quotationRepository.saveAndFlush(quotation)).thenReturn(quotation);
+
+        List<QuotationItemRequest> items = List.of(
+                new QuotationItemRequest(
+                        "Mecanizado de eje",
+                        new BigDecimal("1.00"),
+                        new BigDecimal("100.00")
+                )
+        );
+
+        var withoutTax = service.update(
+                10L,
+                1L,
+                new UpdateQuotationRequest(
+                        "MXN",
+                        new BigDecimal("0.0000"),
+                        today.plusDays(15),
+                        today.plusDays(30),
+                        items
+                )
+        );
+
+        assertEquals(new BigDecimal("0.0000"), withoutTax.taxRate());
+        assertEquals(new BigDecimal("0.00"), withoutTax.tax());
+        assertEquals(new BigDecimal("100.00"), withoutTax.total());
+
+        var customTax = service.update(
+                10L,
+                1L,
+                new UpdateQuotationRequest(
+                        "MXN",
+                        new BigDecimal("8.0000"),
+                        today.plusDays(15),
+                        today.plusDays(30),
+                        items
+                )
+        );
+
+        assertEquals(new BigDecimal("8.0000"), customTax.taxRate());
+        assertEquals(new BigDecimal("8.00"), customTax.tax());
+        assertEquals(new BigDecimal("108.00"), customTax.total());
+    }
+
+    @Test
     void customerAdjustmentSupersedesSentRevisionAndCreatesNextDraft() {
         JobCase jobCase = readyJobCase();
         Quotation quotation = sentQuotation(jobCase);
