@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Crear cotización para un expediente",
-        description = "Crea la revisión 1 en DRAFT para un JobCase READY_FOR_QUOTATION. Solo el COMMERCIAL responsable o un ADMIN pueden iniciar el flujo; crearla no modifica el estado del expediente y un mismo expediente no puede iniciar dos flujos de cotización."
+        description = "Crea la revisión 1 en DRAFT para un JobCase READY_FOR_QUOTATION. Solo el COMMERCIAL responsable o un ADMIN pueden iniciar el flujo; crearla no modifica el estado del expediente y un mismo expediente no puede iniciar dos flujos de cotización. El borrador nace en MXN con una tasa de impuesto predeterminada de 16%, que puede cambiarse a 0% o a una tasa personalizada mientras la revisión continúe en DRAFT."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Cotización DRAFT creada correctamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.nocountry.qualitytrack.shared.response.ApiResponse.class), examples = @ExampleObject(value = QuotationApiExamples.QUOTATION_CREATED))),
