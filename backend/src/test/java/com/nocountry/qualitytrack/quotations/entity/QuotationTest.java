@@ -31,7 +31,7 @@ class QuotationTest {
         assertEquals(1, quotation.getRevision());
         assertEquals("MXN", quotation.getCurrency());
         assertEquals(new BigDecimal("0.00"), quotation.getSubtotal());
-        assertEquals(new BigDecimal("0.0000"), quotation.getTaxRate());
+        assertEquals(new BigDecimal("16.0000"), quotation.getTaxRate());
         assertEquals(new BigDecimal("0.00"), quotation.getTax());
         assertEquals(new BigDecimal("0.00"), quotation.getTotal());
         assertTrue(quotation.getItems().isEmpty());
