@@ -18,7 +18,7 @@ final class QuotationApiExamples {
                 "status": "DRAFT",
                 "currency": "MXN",
                 "subtotal": 0.00,
-                "taxRate": 0.0000,
+                "taxRate": 16.0000,
                 "tax": 0.00,
                 "total": 0.00,
                 "items": []
