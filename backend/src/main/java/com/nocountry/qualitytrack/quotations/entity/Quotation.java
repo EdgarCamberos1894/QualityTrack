@@ -37,6 +37,8 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Quotation {
 
+    private static final BigDecimal DEFAULT_TAX_RATE = new BigDecimal("16.0000");
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -126,7 +128,7 @@ public class Quotation {
         this.status = QuotationStatus.DRAFT;
         this.currency = "MXN";
         this.subtotal = BigDecimal.ZERO.setScale(2);
-        this.taxRate = BigDecimal.ZERO.setScale(4);
+        this.taxRate = DEFAULT_TAX_RATE;
         this.tax = BigDecimal.ZERO.setScale(2);
         this.total = BigDecimal.ZERO.setScale(2);
     }
