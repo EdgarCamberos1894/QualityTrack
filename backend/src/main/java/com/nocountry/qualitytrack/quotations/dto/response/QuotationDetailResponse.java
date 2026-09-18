@@ -42,6 +42,13 @@ public record QuotationDetailResponse(
         List<QuotationItemResponse> items
 ) {
     public static QuotationDetailResponse from(Quotation quotation) {
+        return from(quotation, quotation.getStatus());
+    }
+
+    public static QuotationDetailResponse from(
+            Quotation quotation,
+            QuotationStatus effectiveStatus
+    ) {
         return new QuotationDetailResponse(
                 quotation.getId(),
                 quotation.getJobCase().getId(),
@@ -52,7 +59,7 @@ public record QuotationDetailResponse(
                 quotation.getJobCase().getCustomerRequest().getCustomer().getName(),
                 quotation.getQuotationNumber(),
                 quotation.getRevision(),
-                quotation.getStatus(),
+                effectiveStatus,
                 quotation.getCurrency(),
                 quotation.getSubtotal(),
                 quotation.getTaxRate(),

@@ -3,6 +3,7 @@ package com.nocountry.qualitytrack.quotations.controller;
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
 import com.nocountry.qualitytrack.quotations.documentation.ApproveQuotationApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.GetCustomerQuotationApiDocs;
+import com.nocountry.qualitytrack.quotations.documentation.ListCustomerQuotationRevisionsApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.ListCustomerQuotationsApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.QuotationApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.RejectQuotationApiDocs;
@@ -46,6 +47,20 @@ public class CustomerQuotationController {
                 ApiSuccessCode.QUOTATIONS_RETRIEVED,
                 "Cotizaciones consultadas correctamente.",
                 quotationService.listForCustomer(currentUserId, customerId)
+        ));
+    }
+
+    @ListCustomerQuotationRevisionsApiDocs
+    @GetMapping("/{quotationId}/revisions")
+    public ResponseEntity<ApiResponse<List<CustomerQuotationResponse>>> revisions(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long customerId,
+            @PathVariable Long quotationId
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.QUOTATIONS_RETRIEVED,
+                "Historial de revisiones de la cotización consultado correctamente.",
+                quotationService.listRevisionsForCustomer(currentUserId, customerId, quotationId)
         ));
     }
 

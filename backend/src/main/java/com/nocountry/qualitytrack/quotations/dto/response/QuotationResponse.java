@@ -35,6 +35,13 @@ public record QuotationResponse(
         Instant updatedAt
 ) {
     public static QuotationResponse from(Quotation quotation) {
+        return from(quotation, quotation.getStatus());
+    }
+
+    public static QuotationResponse from(
+            Quotation quotation,
+            QuotationStatus effectiveStatus
+    ) {
         return new QuotationResponse(
                 quotation.getId(),
                 quotation.getJobCase().getId(),
@@ -45,7 +52,7 @@ public record QuotationResponse(
                 quotation.getJobCase().getCustomerRequest().getCustomer().getName(),
                 quotation.getQuotationNumber(),
                 quotation.getRevision(),
-                quotation.getStatus(),
+                effectiveStatus,
                 quotation.getCurrency(),
                 quotation.getSubtotal(),
                 quotation.getTaxRate(),

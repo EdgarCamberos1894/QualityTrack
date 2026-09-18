@@ -16,12 +16,12 @@ public class QuotationExpirationScheduler {
     private final QuotationRepository quotationRepository;
     private final QuotationExpirationService expirationService;
 
-    @Value("${app.quotations.expiration-zone:America/Mexico_City}")
+    @Value("${app.quotations.expiration-zone:America/Mazatlan}")
     private String expirationZone;
 
     @Scheduled(
-            cron = "${app.quotations.expiration-cron:0 5 0 * * *}",
-            zone = "${app.quotations.expiration-zone:America/Mexico_City}"
+            cron = "${app.quotations.expiration-cron:0 */5 * * * *}",
+            zone = "${app.quotations.expiration-zone:America/Mazatlan}"
     )
     public void expireSentQuotations() {
         LocalDate today = LocalDate.now(ZoneId.of(expirationZone));

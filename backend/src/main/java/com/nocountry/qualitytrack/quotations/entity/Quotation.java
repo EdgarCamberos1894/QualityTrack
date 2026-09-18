@@ -177,7 +177,11 @@ public class Quotation {
             );
         }
 
-        return copyRevision(previous, createdByUser, null);
+        Quotation next = copyRevision(previous, createdByUser, null);
+        if (previous.status == QuotationStatus.EXPIRED) {
+            next.validUntil = null;
+        }
+        return next;
     }
 
     private static Quotation copyRevision(

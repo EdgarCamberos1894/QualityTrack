@@ -53,7 +53,7 @@ public class QuotationWorkflowService {
     private final QuotationAccessPolicy accessPolicy;
     private final TraceabilityService traceabilityService;
 
-    @Value("${app.quotations.expiration-zone:America/Mexico_City}")
+    @Value("${app.quotations.expiration-zone:America/Mazatlan}")
     private String expirationZone;
 
     @Transactional
@@ -366,6 +366,25 @@ public class QuotationWorkflowService {
         Quotation previous = requireQuotationForUpdate(quotationId);
         requireAssignedActor(currentUserId, previous);
 
+        if (previous.getStatus() == QuotationStatus.SENT
+                && previous.isExpiredOn(today())) {
+            QuotationStatus previousStatus = previous.getStatus();
+            previous.expire();
+            quotationRepository.saveAndFlush(previous);
+
+            recordStatusEvent(
+                    previous,
+                    TraceabilityEventType.QUOTATION_EXPIRED,
+                    previousStatus,
+                    null,
+                    metadata(
+                            "quotationNumber", previous.getQuotationNumber(),
+                            "revision", previous.getRevision(),
+                            "validUntil", previous.getValidUntil()
+                    )
+            );
+        }
+
         if (previous.getStatus() != QuotationStatus.EXPIRED
                 && previous.getStatus() != QuotationStatus.CANCELLED
                 && previous.getStatus() != QuotationStatus.REJECTED) {
@@ -410,6 +429,11 @@ public class QuotationWorkflowService {
         User actor = accessPolicy.requireCommercialActor(currentUserId);
         Quotation quotation = requireQuotationForUpdate(quotationId);
         requireAssignedActor(currentUserId, quotation);
+
+        if (quotation.getStatus() == QuotationStatus.SENT
+                && quotation.isExpiredOn(today())) {
+            conflict("La cotización ya venció y no puede cancelarse. Crea una nueva revisión desde el estado EXPIRED.");
+        }
 
         if (!quotation.canBeCancelled()) {
             conflict("Solo una cotización DRAFT o SENT puede cancelarse.");

@@ -4,6 +4,7 @@ import com.nocountry.qualitytrack.auth.security.CurrentUserId;
 import com.nocountry.qualitytrack.quotations.documentation.CancelQuotationApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.CreateQuotationRevisionApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.GetQuotationApiDocs;
+import com.nocountry.qualitytrack.quotations.documentation.ListQuotationRevisionsApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.ListQuotationsApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.QuotationApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.SendQuotationApiDocs;
@@ -48,6 +49,19 @@ public class QuotationController {
                 ApiSuccessCode.QUOTATIONS_RETRIEVED,
                 "Cotizaciones consultadas correctamente.",
                 quotationService.listInternal(currentUserId)
+        ));
+    }
+
+    @ListQuotationRevisionsApiDocs
+    @GetMapping("/{quotationId}/revisions")
+    public ResponseEntity<ApiResponse<List<QuotationResponse>>> revisions(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long quotationId
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.QUOTATIONS_RETRIEVED,
+                "Historial de revisiones consultado correctamente.",
+                quotationService.listRevisionsInternal(currentUserId, quotationId)
         ));
     }
 

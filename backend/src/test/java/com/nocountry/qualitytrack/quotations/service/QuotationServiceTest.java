@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
@@ -38,6 +39,7 @@ class QuotationServiceTest {
     @BeforeEach
     void setUp() {
         service = new QuotationService(quotationRepository, accessPolicy);
+        ReflectionTestUtils.setField(service, "expirationZone", "America/Mazatlan");
     }
 
     @Test
@@ -117,6 +119,41 @@ class QuotationServiceTest {
         assertEquals(CustomerQuotationStatus.ADJUSTMENT_REQUESTED, response.customerStatus());
         assertEquals("Segundo ajuste.", response.adjustment().notes());
         assertNull(response.adjustment().response());
+    }
+
+    @Test
+    void customerHistoryMarksOlderSupersededRevisionAsReplacedAfterNextRevisionWasSent() {
+        Quotation first = mock(Quotation.class);
+        Quotation second = mock(Quotation.class);
+        JobCase jobCase = mock(JobCase.class);
+        CustomerRequest request = mock(CustomerRequest.class);
+        Customer customer = mock(Customer.class);
+
+        when(quotationRepository.findDetailById(2L)).thenReturn(Optional.of(second));
+        when(second.getJobCase()).thenReturn(jobCase);
+        when(jobCase.getCustomerRequest()).thenReturn(request);
+        when(request.getCustomer()).thenReturn(customer);
+        when(customer.getId()).thenReturn(20L);
+        when(second.getSentAt()).thenReturn(Instant.now());
+        when(second.getQuotationNumber()).thenReturn("QT-00000001");
+
+        when(quotationRepository.findAllByQuotationNumberOrderByRevisionDesc("QT-00000001"))
+                .thenReturn(List.of(second, first));
+
+        when(second.getRevision()).thenReturn(2);
+        when(second.getStatus()).thenReturn(QuotationStatus.SENT);
+        when(second.getItems()).thenReturn(List.of());
+
+        when(first.getRevision()).thenReturn(1);
+        when(first.getStatus()).thenReturn(QuotationStatus.SUPERSEDED);
+        when(first.getSentAt()).thenReturn(Instant.now());
+        when(first.getItems()).thenReturn(List.of());
+
+        var response = service.listRevisionsForCustomer(42L, 20L, 2L);
+
+        assertEquals(2, response.size());
+        assertEquals(CustomerQuotationStatus.SENT, response.get(0).customerStatus());
+        assertEquals(CustomerQuotationStatus.REPLACED, response.get(1).customerStatus());
     }
 
     @Test

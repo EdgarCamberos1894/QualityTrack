@@ -37,6 +37,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -83,7 +84,7 @@ class QuotationWorkflowServiceTest {
                 accessPolicy,
                 traceabilityService
         );
-        ReflectionTestUtils.setField(service, "expirationZone", "America/Mexico_City");
+        ReflectionTestUtils.setField(service, "expirationZone", "America/Mazatlan");
 
         lenient().when(commercialUser.getId()).thenReturn(10L);
         lenient().when(commercialUser.getFirstName()).thenReturn("Carlos");
@@ -254,7 +255,7 @@ class QuotationWorkflowServiceTest {
         quotation.replaceDraftContent(
                 "MXN",
                 new BigDecimal("16.0000"),
-                today.plusDays(10),
+                validUntil,
                 today.plusDays(20),
                 List.of(retained, removed),
                 new BigDecimal("125.00"),
@@ -477,8 +478,35 @@ class QuotationWorkflowServiceTest {
     @Test
     void internalCanCreateNewRevisionFromExpiredQuotation() {
         JobCase jobCase = readyJobCase();
+        Quotation quotation = sentQuotation(
+                jobCase,
+                LocalDate.now(ZoneId.of("America/Mazatlan")).minusDays(1)
+        );
+
+        when(accessPolicy.requireCommercialActor(10L)).thenReturn(commercialUser);
+        when(quotationRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(quotation));
+        when(quotationRepository.existsByQuotationNumberAndRevisionGreaterThan(
+                quotation.getQuotationNumber(),
+                quotation.getRevision()
+        )).thenReturn(false);
+        when(quotationRepository.saveAndFlush(any(Quotation.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = service.createRevision(10L, 1L);
+
+        assertEquals(QuotationStatus.EXPIRED, quotation.getStatus());
+        assertEquals(QuotationStatus.DRAFT, response.status());
+        assertEquals(2, response.revision());
+        assertEquals(quotation.getQuotationNumber(), response.quotationNumber());
+        assertEquals(commercialUser.getId(), response.createdByUserId());
+        assertNull(response.validUntil());
+    }
+
+    @Test
+    void internalCanCreateNewRevisionFromRejectedQuotationWithoutAdjustmentContext() {
+        JobCase jobCase = readyJobCase();
         Quotation quotation = sentQuotation(jobCase);
-        quotation.expire();
+        quotation.reject("El cliente no acepta la propuesta.", Instant.now());
 
         when(accessPolicy.requireCommercialActor(10L)).thenReturn(commercialUser);
         when(quotationRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(quotation));
@@ -493,8 +521,31 @@ class QuotationWorkflowServiceTest {
 
         assertEquals(QuotationStatus.DRAFT, response.status());
         assertEquals(2, response.revision());
-        assertEquals(quotation.getQuotationNumber(), response.quotationNumber());
-        assertEquals(commercialUser.getId(), response.createdByUserId());
+        assertNull(response.adjustmentNotes());
+        assertNull(response.adjustmentResponse());
+    }
+
+    @Test
+    void overdueSentQuotationCannotBeCancelledBeforeSchedulerRuns() {
+        JobCase jobCase = readyJobCase();
+        Quotation quotation = sentQuotation(
+                jobCase,
+                LocalDate.now(ZoneId.of("America/Mazatlan")).minusDays(1)
+        );
+
+        when(accessPolicy.requireCommercialActor(10L)).thenReturn(commercialUser);
+        when(quotationRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(quotation));
+
+        assertThrows(
+                com.nocountry.qualitytrack.shared.exception.BusinessException.class,
+                () -> service.cancel(
+                        10L,
+                        1L,
+                        new CancelQuotationRequest("Cerrar propuesta.")
+                )
+        );
+
+        assertEquals(QuotationStatus.SENT, quotation.getStatus());
     }
 
     @Test
@@ -521,7 +572,15 @@ class QuotationWorkflowServiceTest {
     }
 
     private Quotation sentQuotation(JobCase jobCase) {
-        LocalDate today = LocalDate.now(ZoneId.of("America/Mexico_City"));
+        LocalDate today = LocalDate.now(ZoneId.of("America/Mazatlan"));
+        return sentQuotation(jobCase, today.plusDays(10));
+    }
+
+    private Quotation sentQuotation(
+            JobCase jobCase,
+            LocalDate validUntil
+    ) {
+        LocalDate today = LocalDate.now(ZoneId.of("America/Mazatlan"));
         Quotation quotation = Quotation.draft(jobCase, "QUO-00000001", commercialUser);
         QuotationItem item = QuotationItem.create(
                 quotation,
