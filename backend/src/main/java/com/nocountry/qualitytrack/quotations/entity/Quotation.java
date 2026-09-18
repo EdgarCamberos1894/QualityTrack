@@ -82,6 +82,9 @@ public class Quotation {
     @Column(name = "adjustment_notes", columnDefinition = "TEXT")
     private String adjustmentNotes;
 
+    @Column(name = "adjustment_response", columnDefinition = "TEXT")
+    private String adjustmentResponse;
+
     @Column(name = "sent_at")
     private Instant sentAt;
 
@@ -211,6 +214,11 @@ public class Quotation {
             }
         }
         this.items.sort(Comparator.comparing(QuotationItem::getLineNumber));
+    }
+
+    public void recordAdjustmentResponse(String response) {
+        requireDraft();
+        this.adjustmentResponse = normalizeOptional(response);
     }
 
     public void send(Instant sentAt) {
