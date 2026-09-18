@@ -9,6 +9,7 @@ import com.nocountry.qualitytrack.quotations.dto.response.CustomerQuotationDetai
 import com.nocountry.qualitytrack.quotations.dto.response.QuotationDetailResponse;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.quotations.entity.QuotationItem;
+import com.nocountry.qualitytrack.quotations.enums.CustomerQuotationStatus;
 import com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
 import com.nocountry.qualitytrack.quotations.repository.QuotationRepository;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
@@ -297,7 +298,11 @@ public class QuotationWorkflowService {
                 )
         );
 
-        return CustomerQuotationDetailResponse.from(current);
+        return CustomerQuotationDetailResponse.from(
+                current,
+                CustomerQuotationStatus.ADJUSTMENT_REQUESTED,
+                input.notes()
+        );
     }
 
     @Transactional
