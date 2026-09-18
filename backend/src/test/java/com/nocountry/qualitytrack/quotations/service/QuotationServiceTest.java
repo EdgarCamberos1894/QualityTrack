@@ -131,6 +131,7 @@ class QuotationServiceTest {
 
         when(quotationRepository.findDetailById(2L)).thenReturn(Optional.of(second));
         when(second.getJobCase()).thenReturn(jobCase);
+        when(first.getJobCase()).thenReturn(jobCase);
         when(jobCase.getCustomerRequest()).thenReturn(request);
         when(request.getCustomer()).thenReturn(customer);
         when(customer.getId()).thenReturn(20L);

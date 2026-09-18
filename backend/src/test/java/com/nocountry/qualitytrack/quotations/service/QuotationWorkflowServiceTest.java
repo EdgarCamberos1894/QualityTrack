@@ -255,7 +255,7 @@ class QuotationWorkflowServiceTest {
         quotation.replaceDraftContent(
                 "MXN",
                 new BigDecimal("16.0000"),
-                validUntil,
+                today.plusDays(10),
                 today.plusDays(20),
                 List.of(retained, removed),
                 new BigDecimal("125.00"),
@@ -593,7 +593,7 @@ class QuotationWorkflowServiceTest {
         quotation.replaceDraftContent(
                 "MXN",
                 new BigDecimal("16.0000"),
-                today.plusDays(10),
+                validUntil,
                 today.plusDays(20),
                 List.of(item),
                 new BigDecimal("100.00"),
