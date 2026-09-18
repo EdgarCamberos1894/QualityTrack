@@ -4,6 +4,7 @@ import com.nocountry.qualitytrack.customers.entity.CustomerMembership;
 import com.nocountry.qualitytrack.quotations.dto.request.CancelQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.QuotationItemRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.RequestQuotationAdjustmentRequest;
+import com.nocountry.qualitytrack.quotations.dto.request.SendQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.UpdateQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.response.CustomerQuotationDetailResponse;
 import com.nocountry.qualitytrack.quotations.dto.response.QuotationDetailResponse;
@@ -182,12 +183,20 @@ public class QuotationWorkflowService {
     }
 
     @Transactional
-    public QuotationDetailResponse send(Long currentUserId, Long quotationId) {
+    public QuotationDetailResponse send(
+            Long currentUserId,
+            Long quotationId,
+            SendQuotationRequest input
+    ) {
         accessPolicy.requireCommercialActor(currentUserId);
         Quotation quotation = requireQuotationForUpdate(quotationId);
         requireAssignedActor(currentUserId, quotation);
         requireStatus(quotation, QuotationStatus.DRAFT, "Solo una revisión DRAFT puede enviarse.");
         validateReadyToSend(quotation);
+
+        String adjustmentResponse = input == null ? null : input.adjustmentResponse();
+        validateAdjustmentResponse(quotation, adjustmentResponse);
+        quotation.recordAdjustmentResponse(adjustmentResponse);
 
         QuotationStatus previousStatus = quotation.getStatus();
         quotation.send(Instant.now());
@@ -204,7 +213,8 @@ public class QuotationWorkflowService {
                         "currency", quotation.getCurrency(),
                         "total", quotation.getTotal(),
                         "validUntil", quotation.getValidUntil(),
-                        "estimatedDeliveryDate", quotation.getEstimatedDeliveryDate()
+                        "estimatedDeliveryDate", quotation.getEstimatedDeliveryDate(),
+                        "adjustmentResponse", quotation.getAdjustmentResponse()
                 )
         );
 
@@ -355,6 +365,23 @@ public class QuotationWorkflowService {
         }
         if (quotation.getEstimatedDeliveryDate().isBefore(today)) {
             conflict("La fecha estimada de entrega no puede estar en el pasado.");
+        }
+    }
+
+    private void validateAdjustmentResponse(
+            Quotation quotation,
+            String adjustmentResponse
+    ) {
+        boolean hasAdjustmentRequest = quotation.getAdjustmentNotes() != null
+                && !quotation.getAdjustmentNotes().isBlank();
+        boolean hasResponse = adjustmentResponse != null
+                && !adjustmentResponse.isBlank();
+
+        if (hasAdjustmentRequest && !hasResponse) {
+            conflict("Debes responder la solicitud de ajuste antes de enviar la nueva revisión.");
+        }
+        if (!hasAdjustmentRequest && hasResponse) {
+            conflict("La respuesta de ajuste solo aplica a revisiones creadas por una solicitud del cliente.");
         }
     }
 
