@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar cotizaciones de la empresa",
-        description = "Lista únicamente la revisión más reciente de cada flujo que ya es visible para el cliente. Las revisiones DRAFT permanecen internas; si existe una nueva DRAFT por una solicitud de ajuste, el cliente continúa viendo la última revisión no DRAFT con customerStatus=ADJUSTMENT_REQUESTED. Cuando la nueva revisión se envía, pasa a ser la visible. Cualquier miembro ACTIVE de la empresa puede consultar la bandeja."
+        description = "Lista únicamente la revisión enviada más reciente de cada flujo. Las revisiones que nunca fueron enviadas permanecen internas, incluso si después fueron canceladas. Si existe una nueva DRAFT por una solicitud de ajuste, el cliente continúa viendo la última revisión enviada con customerStatus=ADJUSTMENT_REQUESTED. Cuando la nueva revisión se envía, pasa a ser la visible. Cualquier miembro ACTIVE de la empresa puede consultar la bandeja."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Cotizaciones de la empresa consultadas correctamente"),
