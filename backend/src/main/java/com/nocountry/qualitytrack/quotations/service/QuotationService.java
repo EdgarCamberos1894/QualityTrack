@@ -47,10 +47,7 @@ public class QuotationService {
         accessPolicy.requireCustomerReader(currentUserId, customerId);
 
         return quotationRepository
-                .findLatestVisibleRevisionsForCustomer(
-                        customerId,
-                        QuotationStatus.DRAFT
-                )
+                .findLatestVisibleRevisionsForCustomer(customerId)
                 .stream()
                 .map(quotation -> CustomerQuotationResponse.from(
                         quotation,
@@ -72,7 +69,7 @@ public class QuotationService {
         Quotation quotation = requireDetail(quotationId);
 
         if (!customerId.equals(quotation.getJobCase().getCustomerRequest().getCustomer().getId())
-                || quotation.getStatus() == QuotationStatus.DRAFT) {
+                || quotation.getSentAt() == null) {
             throw notFound();
         }
 
@@ -86,9 +83,12 @@ public class QuotationService {
         boolean adjustmentPending = nextRevision != null
                 && nextRevision.getStatus() == QuotationStatus.DRAFT;
 
-        String adjustmentNotes = nextRevision != null
+        String adjustmentNotes = adjustmentPending
                 ? nextRevision.getAdjustmentNotes()
                 : quotation.getAdjustmentNotes();
+        String adjustmentResponse = adjustmentPending
+                ? null
+                : quotation.getAdjustmentResponse();
 
         return CustomerQuotationDetailResponse.from(
                 quotation,
@@ -96,7 +96,8 @@ public class QuotationService {
                         quotation.getStatus(),
                         adjustmentPending
                 ),
-                adjustmentNotes
+                adjustmentNotes,
+                adjustmentResponse
         );
     }
 
