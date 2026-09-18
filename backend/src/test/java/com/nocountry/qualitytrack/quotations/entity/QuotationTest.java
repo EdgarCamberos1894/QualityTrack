@@ -13,6 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -128,8 +129,8 @@ class QuotationTest {
         assertEquals(2, revised.getRevision());
         assertEquals(quotation.getQuotationNumber(), revised.getQuotationNumber());
         assertEquals(quotation.getTotal(), revised.getTotal());
-        assertEquals(null, revised.getAdjustmentNotes());
-        assertEquals(null, revised.getAdjustmentResponse());
+        assertNull(revised.getAdjustmentNotes());
+        assertNull(revised.getAdjustmentResponse());
     }
 
     @Test
