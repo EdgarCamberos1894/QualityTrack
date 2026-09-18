@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar cotizaciones de la empresa",
-        description = "Lista las revisiones que ya forman parte del intercambio comercial con el cliente. Las revisiones DRAFT permanecen internas hasta ser enviadas; cualquier miembro ACTIVE de la empresa puede consultar las demás."
+        description = "Lista únicamente la revisión más reciente de cada flujo que ya es visible para el cliente. Las revisiones DRAFT permanecen internas; si existe una nueva DRAFT por una solicitud de ajuste, el cliente continúa viendo la última revisión no DRAFT hasta que la nueva revisión sea enviada. Cualquier miembro ACTIVE de la empresa puede consultar la bandeja."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Cotizaciones de la empresa consultadas correctamente"),
