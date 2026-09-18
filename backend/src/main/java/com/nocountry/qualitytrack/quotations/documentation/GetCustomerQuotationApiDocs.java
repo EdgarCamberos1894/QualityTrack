@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar detalle de una cotización como cliente",
-        description = "Devuelve una revisión enviada o histórica con sus conceptos, importes, vigencia y entrega estimada. Una revisión DRAFT no es visible para el cliente. customerStatus traduce el estado técnico al contexto del cliente; una revisión SUPERSEDED con una nueva DRAFT pendiente se presenta como ADJUSTMENT_REQUESTED y expone las notas del ajuste."
+        description = "Devuelve una revisión enviada o histórica con sus conceptos, importes, vigencia y entrega estimada. Una revisión DRAFT no es visible para el cliente. customerStatus traduce el estado técnico al contexto del cliente. Si hubo una solicitud de ajuste, adjustmentNotes conserva lo pedido por el cliente y adjustmentResponse contiene la respuesta comercial cuando la nueva revisión ya fue enviada."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Cotización consultada correctamente"),
