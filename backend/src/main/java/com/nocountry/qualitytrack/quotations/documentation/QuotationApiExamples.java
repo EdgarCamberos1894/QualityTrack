@@ -101,7 +101,9 @@ final class QuotationApiExamples {
                 "id": 21,
                 "quotationNumber": "QT-00000001",
                 "revision": 1,
-                "status": "SUPERSEDED"
+                "status": "SUPERSEDED",
+                "customerStatus": "ADJUSTMENT_REQUESTED",
+                "adjustmentNotes": "Reducir el plazo de entrega."
               }
             }
             """;
