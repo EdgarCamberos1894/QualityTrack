@@ -1,7 +1,7 @@
 package com.nocountry.qualitytrack.quotations.dto.response;
 
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
-import com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
+import com.nocountry.qualitytrack.quotations.enums.CustomerQuotationStatus;\nimport com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -30,6 +30,18 @@ public record CustomerQuotationDetailResponse(
         List<QuotationItemResponse> items
 ) {
     public static CustomerQuotationDetailResponse from(Quotation quotation) {
+        return from(
+                quotation,
+                CustomerQuotationStatus.fromDomain(quotation.getStatus(), false),
+                quotation.getAdjustmentNotes()
+        );
+    }
+
+    public static CustomerQuotationDetailResponse from(
+            Quotation quotation,
+            CustomerQuotationStatus customerStatus,
+            String adjustmentNotes
+    ) {
         return new CustomerQuotationDetailResponse(
                 quotation.getId(),
                 quotation.getJobCase().getCaseNumber(),
