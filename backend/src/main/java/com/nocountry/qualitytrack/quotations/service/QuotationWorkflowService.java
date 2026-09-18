@@ -3,6 +3,7 @@ package com.nocountry.qualitytrack.quotations.service;
 import com.nocountry.qualitytrack.customers.entity.CustomerMembership;
 import com.nocountry.qualitytrack.quotations.dto.request.CancelQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.QuotationItemRequest;
+import com.nocountry.qualitytrack.quotations.dto.request.RejectQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.RequestQuotationAdjustmentRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.SendQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.UpdateQuotationRequest;
@@ -273,7 +274,11 @@ public class QuotationWorkflowService {
         }
 
         QuotationStatus previousStatus = current.getStatus();
-        Quotation next = Quotation.revisedFrom(current, membership.getUser(), input.notes());
+        Quotation next = Quotation.revisedFrom(
+                current,
+                current.getCreatedByUser(),
+                input.notes()
+        );
         current.supersede();
         quotationRepository.saveAndFlush(current);
         next = quotationRepository.saveAndFlush(next);
@@ -296,7 +301,7 @@ public class QuotationWorkflowService {
                 next.getJobCase(),
                 TraceabilityAggregateType.QUOTATION,
                 next.getId(),
-                TraceabilityEventType.QUOTATION_CREATED,
+                TraceabilityEventType.QUOTATION_REVISION_CREATED,
                 null,
                 QuotationStatus.DRAFT.name(),
                 membership.getUser().getId(),
@@ -311,8 +316,89 @@ public class QuotationWorkflowService {
         return CustomerQuotationDetailResponse.from(
                 current,
                 CustomerQuotationStatus.ADJUSTMENT_REQUESTED,
-                input.notes()
+                input.notes(),
+                null
         );
+    }
+
+    @Transactional
+    public CustomerQuotationDetailResponse reject(
+            Long currentUserId,
+            Long customerId,
+            Long quotationId,
+            RejectQuotationRequest input
+    ) {
+        CustomerMembership membership = accessPolicy.requireCustomerDecisionActor(currentUserId, customerId);
+        Quotation quotation = requireQuotationForUpdate(quotationId);
+        requireCustomerQuotation(customerId, quotation);
+        requireStatus(quotation, QuotationStatus.SENT, "Solo una revisión SENT puede rechazarse.");
+
+        if (quotation.isExpiredOn(today())) {
+            conflict("La cotización ya venció y no puede rechazarse.");
+        }
+
+        QuotationStatus previousStatus = quotation.getStatus();
+        quotation.reject(input == null ? null : input.reason(), Instant.now());
+        quotation = quotationRepository.saveAndFlush(quotation);
+
+        recordStatusEvent(
+                quotation,
+                TraceabilityEventType.QUOTATION_REJECTED,
+                previousStatus,
+                membership.getUser().getId(),
+                metadata(
+                        "quotationNumber", quotation.getQuotationNumber(),
+                        "revision", quotation.getRevision(),
+                        "reason", quotation.getRejectionReason(),
+                        "customerId", customerId
+                )
+        );
+
+        return CustomerQuotationDetailResponse.from(quotation);
+    }
+
+    @Transactional
+    public QuotationDetailResponse createRevision(
+            Long currentUserId,
+            Long quotationId
+    ) {
+        User actor = accessPolicy.requireCommercialActor(currentUserId);
+        Quotation previous = requireQuotationForUpdate(quotationId);
+        requireAssignedActor(currentUserId, previous);
+
+        if (previous.getStatus() != QuotationStatus.EXPIRED
+                && previous.getStatus() != QuotationStatus.CANCELLED
+                && previous.getStatus() != QuotationStatus.REJECTED) {
+            conflict("Solo una cotización EXPIRED, CANCELLED o REJECTED puede generar una nueva revisión manual.");
+        }
+        if (quotationRepository.existsByQuotationNumberAndRevisionGreaterThan(
+                previous.getQuotationNumber(),
+                previous.getRevision()
+        )) {
+            conflict("La cotización ya tiene una revisión posterior.");
+        }
+
+        Quotation next = Quotation.reissuedFrom(previous, actor);
+        next = quotationRepository.saveAndFlush(next);
+
+        traceabilityService.record(
+                next.getJobCase(),
+                TraceabilityAggregateType.QUOTATION,
+                next.getId(),
+                TraceabilityEventType.QUOTATION_REVISION_CREATED,
+                null,
+                QuotationStatus.DRAFT.name(),
+                currentUserId,
+                metadata(
+                        "quotationNumber", next.getQuotationNumber(),
+                        "revision", next.getRevision(),
+                        "sourceQuotationId", previous.getId(),
+                        "sourceRevision", previous.getRevision(),
+                        "sourceStatus", previous.getStatus().name()
+                )
+        );
+
+        return QuotationDetailResponse.from(next);
     }
 
     @Transactional
@@ -327,6 +413,10 @@ public class QuotationWorkflowService {
 
         if (!quotation.canBeCancelled()) {
             conflict("Solo una cotización DRAFT o SENT puede cancelarse.");
+        }
+        if (quotation.getStatus() == QuotationStatus.DRAFT
+                && quotation.getAdjustmentNotes() != null) {
+            conflict("Una revisión DRAFT creada por una solicitud de ajuste debe responderse y enviarse; no puede cancelarse directamente.");
         }
 
         QuotationStatus previousStatus = quotation.getStatus();
