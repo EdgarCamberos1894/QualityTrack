@@ -4,6 +4,7 @@ public enum CustomerQuotationStatus {
     SENT,
     ADJUSTMENT_REQUESTED,
     APPROVED,
+    REJECTED,
     EXPIRED,
     CANCELLED,
     REPLACED;
@@ -15,6 +16,7 @@ public enum CustomerQuotationStatus {
         return switch (status) {
             case SENT -> SENT;
             case APPROVED -> APPROVED;
+            case REJECTED -> REJECTED;
             case EXPIRED -> EXPIRED;
             case CANCELLED -> CANCELLED;
             case SUPERSEDED -> adjustmentPending ? ADJUSTMENT_REQUESTED : REPLACED;
