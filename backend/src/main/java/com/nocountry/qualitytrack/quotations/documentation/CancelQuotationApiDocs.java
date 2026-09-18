@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Cancelar cotización",
-        description = "Cancela una revisión DRAFT o SENT cuando el proceso comercial ya no debe continuar. Conserva la cotización como historial, registra actor y motivo opcional, y no elimina ninguna revisión previa."
+        description = "Cancela la revisión actual DRAFT o SENT y conserva su historial. Una revisión CANCELLED puede originar posteriormente una nueva revisión mediante el endpoint de revisiones. Las revisiones DRAFT creadas por una solicitud de ajuste no pueden cancelarse directamente: deben responderse y enviarse para cerrar correctamente la solicitud del cliente."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Cotización cancelada correctamente"),
