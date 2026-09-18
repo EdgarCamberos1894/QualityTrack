@@ -1,7 +1,7 @@
 package com.nocountry.qualitytrack.quotations.dto.response;
 
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
-import com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
+import com.nocountry.qualitytrack.quotations.enums.CustomerQuotationStatus;\nimport com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
