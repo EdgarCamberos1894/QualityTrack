@@ -89,7 +89,7 @@ final class QuotationApiExamples {
                 "id": 21,
                 "quotationNumber": "QT-00000001",
                 "revision": 1,
-                "status": "APPROVED",
+                "customerStatus": "APPROVED",
                 "total": 2900.00
               }
             }
@@ -103,9 +103,11 @@ final class QuotationApiExamples {
                 "id": 21,
                 "quotationNumber": "QT-00000001",
                 "revision": 1,
-                "status": "SUPERSEDED",
                 "customerStatus": "ADJUSTMENT_REQUESTED",
-                "adjustmentNotes": "Reducir el plazo de entrega."
+                "adjustment": {
+                  "notes": "Reducir el plazo de entrega.",
+                  "response": null
+                }
               }
             }
             """;
