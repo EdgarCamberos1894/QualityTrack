@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Solicitar ajuste de cotización",
-        description = "Permite a un ADMIN o REQUESTER de la empresa solicitar cambios sobre una revisión SENT vigente. La revisión recibida queda SUPERSEDED y el sistema crea la siguiente revisión como DRAFT copiando sus datos y conceptos para que el equipo comercial la ajuste."
+        description = "Permite a un ADMIN o REQUESTER de la empresa solicitar cambios sobre una revisión SENT vigente. La revisión recibida queda SUPERSEDED y el sistema crea la siguiente revisión como DRAFT copiando sus datos y conceptos para que el equipo comercial la ajuste. La respuesta conserva el status técnico SUPERSEDED y expone customerStatus=ADJUSTMENT_REQUESTED junto con las notas solicitadas."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Solicitud registrada y revisión anterior marcada SUPERSEDED", content = @Content(mediaType = "application/json", schema = @Schema(implementation = com.nocountry.qualitytrack.shared.response.ApiResponse.class), examples = @ExampleObject(value = QuotationApiExamples.ADJUSTMENT_REQUESTED))),
