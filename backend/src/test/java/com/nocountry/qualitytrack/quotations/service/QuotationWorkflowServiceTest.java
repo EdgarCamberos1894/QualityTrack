@@ -4,6 +4,7 @@ import com.nocountry.qualitytrack.customers.entity.Customer;
 import com.nocountry.qualitytrack.customers.entity.CustomerMembership;
 import com.nocountry.qualitytrack.quotations.dto.request.QuotationItemRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.RequestQuotationAdjustmentRequest;
+import com.nocountry.qualitytrack.quotations.dto.request.SendQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.UpdateQuotationRequest;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.quotations.entity.QuotationItem;
@@ -155,7 +156,7 @@ class QuotationWorkflowServiceTest {
         assertEquals(new BigDecimal("290.00"), updated.total());
         assertEquals(2, updated.items().size());
 
-        var sent = service.send(10L, 1L);
+        var sent = service.send(10L, 1L, null);
 
         assertEquals(QuotationStatus.SENT, sent.status());
         assertNotNull(sent.sentAt());
@@ -358,6 +359,58 @@ class QuotationWorkflowServiceTest {
         assertEquals("Reducir el plazo de entrega.", nextRevision.getAdjustmentNotes());
         assertEquals(CustomerQuotationStatus.ADJUSTMENT_REQUESTED, response.customerStatus());
         assertEquals("Reducir el plazo de entrega.", response.adjustmentNotes());
+    }
+
+    @Test
+    void revisedQuotationRequiresCommercialResponseBeforeSend() {
+        JobCase jobCase = readyJobCase();
+        Quotation previous = sentQuotation(jobCase);
+        Quotation revised = Quotation.revisedFrom(
+                previous,
+                commercialUser,
+                "Reducir el plazo de entrega."
+        );
+
+        when(accessPolicy.requireCommercialActor(10L)).thenReturn(commercialUser);
+        when(quotationRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(revised));
+
+        assertThrows(
+                com.nocountry.qualitytrack.shared.exception.BusinessException.class,
+                () -> service.send(10L, 2L, new SendQuotationRequest(null))
+        );
+    }
+
+    @Test
+    void revisedQuotationSendsCommercialResponseTogetherWithQuote() {
+        JobCase jobCase = readyJobCase();
+        Quotation previous = sentQuotation(jobCase);
+        Quotation revised = Quotation.revisedFrom(
+                previous,
+                commercialUser,
+                "Reducir el plazo de entrega."
+        );
+
+        when(accessPolicy.requireCommercialActor(10L)).thenReturn(commercialUser);
+        when(quotationRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(revised));
+        when(quotationRepository.saveAndFlush(revised)).thenReturn(revised);
+
+        var response = service.send(
+                10L,
+                2L,
+                new SendQuotationRequest(
+                        "Podemos reducir el plazo a 20 días manteniendo el precio propuesto."
+                )
+        );
+
+        assertEquals(QuotationStatus.SENT, response.status());
+        assertEquals(
+                "Podemos reducir el plazo a 20 días manteniendo el precio propuesto.",
+                response.adjustmentResponse()
+        );
+        assertEquals(
+                "Podemos reducir el plazo a 20 días manteniendo el precio propuesto.",
+                revised.getAdjustmentResponse()
+        );
     }
 
     @Test
