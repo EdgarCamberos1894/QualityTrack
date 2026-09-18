@@ -26,7 +26,7 @@ public class QuotationService {
     public List<QuotationResponse> listInternal(Long currentUserId) {
         accessPolicy.requireInternalReader(currentUserId);
 
-        return quotationRepository.findAllByOrderByUpdatedAtDesc()
+        return quotationRepository.findCurrentRevisions()
                 .stream()
                 .map(QuotationResponse::from)
                 .toList();
@@ -46,7 +46,7 @@ public class QuotationService {
         accessPolicy.requireCustomerReader(currentUserId, customerId);
 
         return quotationRepository
-                .findAllByJobCase_CustomerRequest_Customer_IdAndStatusNotOrderByCreatedAtDesc(
+                .findLatestVisibleRevisionsForCustomer(
                         customerId,
                         QuotationStatus.DRAFT
                 )
