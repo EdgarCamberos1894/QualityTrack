@@ -2,7 +2,9 @@ package com.nocountry.qualitytrack.quotations.service;
 
 import com.nocountry.qualitytrack.customers.entity.Customer;
 import com.nocountry.qualitytrack.customers.entity.CustomerMembership;
+import com.nocountry.qualitytrack.quotations.dto.request.CancelQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.QuotationItemRequest;
+import com.nocountry.qualitytrack.quotations.dto.request.RejectQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.RequestQuotationAdjustmentRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.SendQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.UpdateQuotationRequest;
@@ -358,7 +360,8 @@ class QuotationWorkflowServiceTest {
         assertEquals(quotation.getQuotationNumber(), nextRevision.getQuotationNumber());
         assertEquals("Reducir el plazo de entrega.", nextRevision.getAdjustmentNotes());
         assertEquals(CustomerQuotationStatus.ADJUSTMENT_REQUESTED, response.customerStatus());
-        assertEquals("Reducir el plazo de entrega.", response.adjustmentNotes());
+        assertEquals("Reducir el plazo de entrega.", response.adjustment().notes());
+        assertSame(commercialUser, nextRevision.getCreatedByUser());
     }
 
     @Test
@@ -425,7 +428,7 @@ class QuotationWorkflowServiceTest {
 
         var response = service.approve(42L, 20L, 1L);
 
-        assertEquals(QuotationStatus.APPROVED, response.status());
+        assertEquals(CustomerQuotationStatus.APPROVED, response.customerStatus());
         assertNotNull(response.approvedAt());
         verify(traceabilityService).record(
                 eq(jobCase),
@@ -436,6 +439,84 @@ class QuotationWorkflowServiceTest {
                 eq(QuotationStatus.APPROVED.name()),
                 eq(42L),
                 any()
+        );
+    }
+
+    @Test
+    void customerCanRejectCurrentSentRevision() {
+        JobCase jobCase = readyJobCase();
+        Quotation quotation = sentQuotation(jobCase);
+
+        when(accessPolicy.requireCustomerDecisionActor(42L, 20L)).thenReturn(membership);
+        when(membership.getUser()).thenReturn(customerUser);
+        when(quotationRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(quotation));
+        when(quotationRepository.saveAndFlush(quotation)).thenReturn(quotation);
+
+        var response = service.reject(
+                42L,
+                20L,
+                1L,
+                new RejectQuotationRequest("El plazo ya no satisface la necesidad.")
+        );
+
+        assertEquals(CustomerQuotationStatus.REJECTED, response.customerStatus());
+        assertNotNull(response.rejectedAt());
+        assertEquals("El plazo ya no satisface la necesidad.", response.rejectionReason());
+        verify(traceabilityService).record(
+                eq(jobCase),
+                any(),
+                nullable(Long.class),
+                eq(TraceabilityEventType.QUOTATION_REJECTED),
+                eq(QuotationStatus.SENT.name()),
+                eq(QuotationStatus.REJECTED.name()),
+                eq(42L),
+                any()
+        );
+    }
+
+    @Test
+    void internalCanCreateNewRevisionFromExpiredQuotation() {
+        JobCase jobCase = readyJobCase();
+        Quotation quotation = sentQuotation(jobCase);
+        quotation.expire();
+
+        when(accessPolicy.requireCommercialActor(10L)).thenReturn(commercialUser);
+        when(quotationRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(quotation));
+        when(quotationRepository.existsByQuotationNumberAndRevisionGreaterThan(
+                quotation.getQuotationNumber(),
+                quotation.getRevision()
+        )).thenReturn(false);
+        when(quotationRepository.saveAndFlush(any(Quotation.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = service.createRevision(10L, 1L);
+
+        assertEquals(QuotationStatus.DRAFT, response.status());
+        assertEquals(2, response.revision());
+        assertEquals(quotation.getQuotationNumber(), response.quotationNumber());
+        assertEquals(commercialUser.getId(), response.createdByUserId());
+    }
+
+    @Test
+    void adjustmentDraftCannotBeCancelledBeforeCommercialResponse() {
+        JobCase jobCase = readyJobCase();
+        Quotation previous = sentQuotation(jobCase);
+        Quotation revised = Quotation.revisedFrom(
+                previous,
+                commercialUser,
+                "Reducir el plazo de entrega."
+        );
+
+        when(accessPolicy.requireCommercialActor(10L)).thenReturn(commercialUser);
+        when(quotationRepository.findByIdForUpdate(2L)).thenReturn(Optional.of(revised));
+
+        assertThrows(
+                com.nocountry.qualitytrack.shared.exception.BusinessException.class,
+                () -> service.cancel(
+                        10L,
+                        2L,
+                        new CancelQuotationRequest("Cerrar revisión.")
+                )
         );
     }
 
