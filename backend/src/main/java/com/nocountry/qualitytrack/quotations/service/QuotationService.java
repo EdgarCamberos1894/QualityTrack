@@ -5,6 +5,7 @@ import com.nocountry.qualitytrack.quotations.dto.response.CustomerQuotationRespo
 import com.nocountry.qualitytrack.quotations.dto.response.QuotationDetailResponse;
 import com.nocountry.qualitytrack.quotations.dto.response.QuotationResponse;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
+import com.nocountry.qualitytrack.quotations.enums.CustomerQuotationStatus;
 import com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
 import com.nocountry.qualitytrack.quotations.repository.QuotationRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
@@ -51,7 +52,13 @@ public class QuotationService {
                         QuotationStatus.DRAFT
                 )
                 .stream()
-                .map(CustomerQuotationResponse::from)
+                .map(quotation -> CustomerQuotationResponse.from(
+                        quotation,
+                        CustomerQuotationStatus.fromDomain(
+                                quotation.getStatus(),
+                                quotation.getStatus() == QuotationStatus.SUPERSEDED
+                        )
+                ))
                 .toList();
     }
 
