@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.quotations.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
 import com.nocountry.qualitytrack.quotations.documentation.CancelQuotationApiDocs;
+import com.nocountry.qualitytrack.quotations.documentation.CreateQuotationRevisionApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.GetQuotationApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.ListQuotationsApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.QuotationApiDocs;
@@ -89,6 +90,20 @@ public class QuotationController {
                 "Cotización enviada al cliente correctamente.",
                 workflowService.send(currentUserId, quotationId, request)
         ));
+    }
+
+    @CreateQuotationRevisionApiDocs
+    @PostMapping("/{quotationId}/revisions")
+    public ResponseEntity<ApiResponse<QuotationDetailResponse>> createRevision(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long quotationId
+    ) {
+        return ResponseEntity.status(org.springframework.http.HttpStatus.CREATED)
+                .body(ApiResponse.success(
+                        ApiSuccessCode.QUOTATION_REVISION_CREATED,
+                        "Nueva revisión de cotización creada correctamente.",
+                        workflowService.createRevision(currentUserId, quotationId)
+                ));
     }
 
     @CancelQuotationApiDocs
