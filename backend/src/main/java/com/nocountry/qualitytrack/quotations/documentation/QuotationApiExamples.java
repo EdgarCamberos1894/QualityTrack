@@ -71,10 +71,12 @@ final class QuotationApiExamples {
               "data": {
                 "id": 21,
                 "quotationNumber": "QT-00000001",
-                "revision": 1,
+                "revision": 2,
                 "status": "SENT",
                 "total": 2900.00,
-                "validUntil": "2026-10-15"
+                "validUntil": "2026-10-15",
+                "adjustmentNotes": "Reducir el plazo de entrega.",
+                "adjustmentResponse": "Podemos reducir el plazo a 20 días manteniendo el precio propuesto."
               }
             }
             """;
