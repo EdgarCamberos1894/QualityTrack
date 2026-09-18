@@ -41,7 +41,25 @@ final class QuotationApiExamples {
                 "tax": 400.00,
                 "total": 2900.00,
                 "validUntil": "2026-10-15",
-                "estimatedDeliveryDate": "2026-10-30"
+                "estimatedDeliveryDate": "2026-10-30",
+                "items": [
+                  {
+                    "id": 81,
+                    "lineNumber": 1,
+                    "description": "Mecanizado de eje",
+                    "quantity": 2.00,
+                    "unitPrice": 1000.00,
+                    "subtotal": 2000.00
+                  },
+                  {
+                    "id": 82,
+                    "lineNumber": 2,
+                    "description": "Inspección dimensional",
+                    "quantity": 1.00,
+                    "unitPrice": 500.00,
+                    "subtotal": 500.00
+                  }
+                ]
               }
             }
             """;
