@@ -17,6 +17,11 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
 
     boolean existsByJobCase_Id(Long caseId);
 
+    boolean existsByQuotationNumberAndRevisionGreaterThan(
+            String quotationNumber,
+            Integer revision
+    );
+
     @EntityGraph(attributePaths = {
             "jobCase",
             "jobCase.customerRequest",
@@ -48,19 +53,18 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
             select quotation
             from Quotation quotation
             where quotation.jobCase.customerRequest.customer.id = :customerId
-              and quotation.status <> :hiddenStatus
+              and quotation.sentAt is not null
               and not exists (
                   select newer.id
                   from Quotation newer
                   where newer.quotationNumber = quotation.quotationNumber
-                    and newer.status <> :hiddenStatus
+                    and newer.sentAt is not null
                     and newer.revision > quotation.revision
               )
             order by quotation.createdAt desc
             """)
     List<Quotation> findLatestVisibleRevisionsForCustomer(
-            @Param("customerId") Long customerId,
-            @Param("hiddenStatus") QuotationStatus hiddenStatus
+            @Param("customerId") Long customerId
     );
 
     Optional<Quotation> findByQuotationNumberAndRevision(
