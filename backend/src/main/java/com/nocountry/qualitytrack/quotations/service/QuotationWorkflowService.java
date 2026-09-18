@@ -31,9 +31,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -103,6 +105,14 @@ public class QuotationWorkflowService {
         BigDecimal taxRate = input.taxRate().setScale(4, RoundingMode.HALF_UP);
         BigDecimal subtotal = BigDecimal.ZERO.setScale(2);
         List<QuotationItem> items = new ArrayList<>();
+        Map<Long, QuotationItem> existingItemsById = new LinkedHashMap<>();
+        Set<Long> referencedItemIds = new HashSet<>();
+
+        for (QuotationItem existingItem : quotation.getItems()) {
+            if (existingItem.getId() != null) {
+                existingItemsById.put(existingItem.getId(), existingItem);
+            }
+        }
 
         for (int index = 0; index < input.items().size(); index++) {
             QuotationItemRequest item = input.items().get(index);
@@ -115,14 +125,37 @@ public class QuotationWorkflowService {
 
             subtotal = subtotal.add(lineSubtotal);
             requireMoneyRange(subtotal);
-            items.add(QuotationItem.create(
-                    quotation,
-                    index + 1,
-                    item.description(),
-                    quantity,
-                    unitPrice,
-                    lineSubtotal
-            ));
+
+            QuotationItem quotationItem;
+            if (item.id() == null) {
+                quotationItem = QuotationItem.create(
+                        quotation,
+                        index + 1,
+                        item.description(),
+                        quantity,
+                        unitPrice,
+                        lineSubtotal
+                );
+            } else {
+                if (!referencedItemIds.add(item.id())) {
+                    conflict("El concepto " + item.id() + " está repetido en la solicitud.");
+                }
+
+                quotationItem = existingItemsById.get(item.id());
+                if (quotationItem == null) {
+                    conflict("El concepto " + item.id() + " no pertenece a esta cotización.");
+                }
+
+                quotationItem.updateDetails(
+                        index + 1,
+                        item.description(),
+                        quantity,
+                        unitPrice,
+                        lineSubtotal
+                );
+            }
+
+            items.add(quotationItem);
         }
 
         BigDecimal tax = subtotal
