@@ -91,6 +91,12 @@ public class Quotation {
     @Column(name = "approved_at")
     private Instant approvedAt;
 
+    @Column(name = "rejected_at")
+    private Instant rejectedAt;
+
+    @Column(name = "rejection_reason", columnDefinition = "TEXT")
+    private String rejectionReason;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cancelled_by_user_id")
     private User cancelledByUser;
@@ -155,6 +161,30 @@ public class Quotation {
             throw new IllegalStateException("Solo una revisión SENT puede generar una nueva revisión.");
         }
 
+        return copyRevision(previous, createdByUser, adjustmentNotes);
+    }
+
+    public static Quotation reissuedFrom(
+            Quotation previous,
+            User createdByUser
+    ) {
+        Objects.requireNonNull(previous);
+        if (previous.status != QuotationStatus.EXPIRED
+                && previous.status != QuotationStatus.CANCELLED
+                && previous.status != QuotationStatus.REJECTED) {
+            throw new IllegalStateException(
+                    "Solo una revisión EXPIRED, CANCELLED o REJECTED puede reemitirse."
+            );
+        }
+
+        return copyRevision(previous, createdByUser, null);
+    }
+
+    private static Quotation copyRevision(
+            Quotation previous,
+            User createdByUser,
+            String adjustmentNotes
+    ) {
         Quotation next = new Quotation(
                 previous.jobCase,
                 previous.quotationNumber,
@@ -236,6 +266,13 @@ public class Quotation {
         requireStatus(QuotationStatus.SENT, "Solo una revisión SENT puede aprobarse.");
         this.approvedAt = Objects.requireNonNull(approvedAt);
         this.status = QuotationStatus.APPROVED;
+    }
+
+    public void reject(String reason, Instant rejectedAt) {
+        requireStatus(QuotationStatus.SENT, "Solo una revisión SENT puede rechazarse.");
+        this.rejectionReason = normalizeOptional(reason);
+        this.rejectedAt = Objects.requireNonNull(rejectedAt);
+        this.status = QuotationStatus.REJECTED;
     }
 
     public void expire() {
