@@ -24,7 +24,18 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
             "createdByUser",
             "cancelledByUser"
     })
-    List<Quotation> findAllByOrderByUpdatedAtDesc();
+    @Query("""
+            select quotation
+            from Quotation quotation
+            where not exists (
+                select newer.id
+                from Quotation newer
+                where newer.quotationNumber = quotation.quotationNumber
+                  and newer.revision > quotation.revision
+            )
+            order by quotation.updatedAt desc
+            """)
+    List<Quotation> findCurrentRevisions();
 
     @EntityGraph(attributePaths = {
             "jobCase",
@@ -33,9 +44,23 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
             "createdByUser",
             "cancelledByUser"
     })
-    List<Quotation> findAllByJobCase_CustomerRequest_Customer_IdAndStatusNotOrderByCreatedAtDesc(
-            Long customerId,
-            QuotationStatus status
+    @Query("""
+            select quotation
+            from Quotation quotation
+            where quotation.jobCase.customerRequest.customer.id = :customerId
+              and quotation.status <> :hiddenStatus
+              and not exists (
+                  select newer.id
+                  from Quotation newer
+                  where newer.quotationNumber = quotation.quotationNumber
+                    and newer.status <> :hiddenStatus
+                    and newer.revision > quotation.revision
+              )
+            order by quotation.createdAt desc
+            """)
+    List<Quotation> findLatestVisibleRevisionsForCustomer(
+            @Param("customerId") Long customerId,
+            @Param("hiddenStatus") QuotationStatus hiddenStatus
     );
 
     @EntityGraph(attributePaths = {
