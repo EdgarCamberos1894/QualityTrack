@@ -7,7 +7,8 @@ import com.nocountry.qualitytrack.quotations.dto.request.RequestQuotationAdjustm
 import com.nocountry.qualitytrack.quotations.dto.request.UpdateQuotationRequest;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.quotations.entity.QuotationItem;
-import com.nocountry.qualitytrack.quotations.enums.CustomerQuotationStatus;\nimport com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
+import com.nocountry.qualitytrack.quotations.enums.CustomerQuotationStatus;
+import com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
 import com.nocountry.qualitytrack.quotations.repository.QuotationRepository;
 import com.nocountry.qualitytrack.requests.entity.CustomerRequest;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
