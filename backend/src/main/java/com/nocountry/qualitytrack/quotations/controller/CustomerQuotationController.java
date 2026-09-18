@@ -5,7 +5,9 @@ import com.nocountry.qualitytrack.quotations.documentation.ApproveQuotationApiDo
 import com.nocountry.qualitytrack.quotations.documentation.GetCustomerQuotationApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.ListCustomerQuotationsApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.QuotationApiDocs;
+import com.nocountry.qualitytrack.quotations.documentation.RejectQuotationApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.RequestQuotationAdjustmentApiDocs;
+import com.nocountry.qualitytrack.quotations.dto.request.RejectQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.RequestQuotationAdjustmentRequest;
 import com.nocountry.qualitytrack.quotations.dto.response.CustomerQuotationDetailResponse;
 import com.nocountry.qualitytrack.quotations.dto.response.CustomerQuotationResponse;
@@ -72,6 +74,21 @@ public class CustomerQuotationController {
                 ApiSuccessCode.QUOTATION_APPROVED,
                 "Cotización aprobada correctamente.",
                 workflowService.approve(currentUserId, customerId, quotationId)
+        ));
+    }
+
+    @RejectQuotationApiDocs
+    @PostMapping("/{quotationId}/reject")
+    public ResponseEntity<ApiResponse<CustomerQuotationDetailResponse>> reject(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long customerId,
+            @PathVariable Long quotationId,
+            @Valid @RequestBody(required = false) RejectQuotationRequest request
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.QUOTATION_REJECTED,
+                "Cotización rechazada correctamente.",
+                workflowService.reject(currentUserId, customerId, quotationId, request)
         ));
     }
 
