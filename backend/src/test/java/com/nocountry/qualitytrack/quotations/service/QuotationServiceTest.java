@@ -13,10 +13,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -63,6 +65,7 @@ class QuotationServiceTest {
         when(request.getCustomer()).thenReturn(customer);
         when(customer.getId()).thenReturn(20L);
         when(current.getStatus()).thenReturn(QuotationStatus.SUPERSEDED);
+        when(current.getSentAt()).thenReturn(Instant.now());
         when(current.getQuotationNumber()).thenReturn("QT-00000001");
         when(current.getRevision()).thenReturn(1);
         when(current.getItems()).thenReturn(List.of());
@@ -76,24 +79,55 @@ class QuotationServiceTest {
         var response = service.getForCustomer(42L, 20L, 1L);
 
         assertEquals(CustomerQuotationStatus.ADJUSTMENT_REQUESTED, response.customerStatus());
-        assertEquals("Reducir el plazo de entrega.", response.adjustmentNotes());
+        assertEquals("Reducir el plazo de entrega.", response.adjustment().notes());
+        assertNull(response.adjustment().response());
         verify(accessPolicy).requireCustomerReader(42L, 20L);
     }
 
     @Test
+    void secondAdjustmentDoesNotExposePreviousAdjustmentResponse() {
+        Quotation current = mock(Quotation.class);
+        Quotation next = mock(Quotation.class);
+        JobCase jobCase = mock(JobCase.class);
+        CustomerRequest request = mock(CustomerRequest.class);
+        Customer customer = mock(Customer.class);
+
+        when(quotationRepository.findDetailById(2L)).thenReturn(Optional.of(current));
+        when(current.getJobCase()).thenReturn(jobCase);
+        when(jobCase.getCustomerRequest()).thenReturn(request);
+        when(request.getCustomer()).thenReturn(customer);
+        when(customer.getId()).thenReturn(20L);
+        when(current.getStatus()).thenReturn(QuotationStatus.SUPERSEDED);
+        when(current.getSentAt()).thenReturn(Instant.now());
+        when(current.getQuotationNumber()).thenReturn("QT-00000001");
+        when(current.getRevision()).thenReturn(2);
+        when(current.getAdjustmentNotes()).thenReturn("Primer ajuste.");
+        when(current.getAdjustmentResponse()).thenReturn("Respuesta al primer ajuste.");
+        when(current.getItems()).thenReturn(List.of());
+
+        when(quotationRepository.findByQuotationNumberAndRevision(
+                "QT-00000001",
+                3
+        )).thenReturn(Optional.of(next));
+        when(next.getStatus()).thenReturn(QuotationStatus.DRAFT);
+        when(next.getAdjustmentNotes()).thenReturn("Segundo ajuste.");
+
+        var response = service.getForCustomer(42L, 20L, 2L);
+
+        assertEquals(CustomerQuotationStatus.ADJUSTMENT_REQUESTED, response.customerStatus());
+        assertEquals("Segundo ajuste.", response.adjustment().notes());
+        assertNull(response.adjustment().response());
+    }
+
+    @Test
     void customerListUsesLatestNonDraftRevisionOfEachQuotationFlow() {
-        when(quotationRepository.findLatestVisibleRevisionsForCustomer(
-                20L,
-                QuotationStatus.DRAFT
-        )).thenReturn(List.of());
+        when(quotationRepository.findLatestVisibleRevisionsForCustomer(20L))
+                .thenReturn(List.of());
 
         var response = service.listForCustomer(42L, 20L);
 
         assertTrue(response.isEmpty());
         verify(accessPolicy).requireCustomerReader(42L, 20L);
-        verify(quotationRepository).findLatestVisibleRevisionsForCustomer(
-                20L,
-                QuotationStatus.DRAFT
-        );
+        verify(quotationRepository).findLatestVisibleRevisionsForCustomer(20L);
     }
 }
