@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -193,15 +194,23 @@ public class Quotation {
         this.tax = Objects.requireNonNull(tax);
         this.total = Objects.requireNonNull(total);
 
-        this.items.clear();
-        if (replacementItems != null) {
-            for (QuotationItem item : replacementItems) {
-                if (item.getQuotation() != this) {
-                    throw new IllegalArgumentException("El concepto no pertenece a esta cotización.");
-                }
+        List<QuotationItem> normalizedItems = replacementItems == null
+                ? List.of()
+                : replacementItems;
+
+        for (QuotationItem item : normalizedItems) {
+            if (item.getQuotation() != this) {
+                throw new IllegalArgumentException("El concepto no pertenece a esta cotización.");
+            }
+        }
+
+        this.items.removeIf(item -> !normalizedItems.contains(item));
+        for (QuotationItem item : normalizedItems) {
+            if (!this.items.contains(item)) {
                 this.items.add(item);
             }
         }
+        this.items.sort(Comparator.comparing(QuotationItem::getLineNumber));
     }
 
     public void send(Instant sentAt) {
