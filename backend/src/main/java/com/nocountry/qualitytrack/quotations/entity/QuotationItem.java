@@ -79,6 +79,20 @@ public class QuotationItem {
         );
     }
 
+    public void updateDetails(
+            Integer lineNumber,
+            String description,
+            BigDecimal quantity,
+            BigDecimal unitPrice,
+            BigDecimal subtotal
+    ) {
+        this.lineNumber = Objects.requireNonNull(lineNumber);
+        this.description = requireText(description, "La descripción del concepto es obligatoria.");
+        this.quantity = Objects.requireNonNull(quantity);
+        this.unitPrice = Objects.requireNonNull(unitPrice);
+        this.subtotal = Objects.requireNonNull(subtotal);
+    }
+
     static QuotationItem copyTo(Quotation quotation, QuotationItem source) {
         return create(
                 quotation,
