@@ -4,11 +4,15 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
 public record QuotationItemRequest(
+        @Positive(message = "El id del concepto debe ser mayor que cero.")
+        Long id,
+
         @NotBlank(message = "La descripción del concepto es obligatoria.")
         @Size(max = 1000, message = "La descripción no puede exceder 1000 caracteres.")
         String description,
