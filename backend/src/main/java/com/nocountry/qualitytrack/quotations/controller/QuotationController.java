@@ -8,6 +8,7 @@ import com.nocountry.qualitytrack.quotations.documentation.QuotationApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.SendQuotationApiDocs;
 import com.nocountry.qualitytrack.quotations.documentation.UpdateQuotationApiDocs;
 import com.nocountry.qualitytrack.quotations.dto.request.CancelQuotationRequest;
+import com.nocountry.qualitytrack.quotations.dto.request.SendQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.request.UpdateQuotationRequest;
 import com.nocountry.qualitytrack.quotations.dto.response.QuotationDetailResponse;
 import com.nocountry.qualitytrack.quotations.dto.response.QuotationResponse;
@@ -80,12 +81,13 @@ public class QuotationController {
     @PostMapping("/{quotationId}/send")
     public ResponseEntity<ApiResponse<QuotationDetailResponse>> send(
             @CurrentUserId Long currentUserId,
-            @PathVariable Long quotationId
+            @PathVariable Long quotationId,
+            @Valid @RequestBody(required = false) SendQuotationRequest request
     ) {
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.QUOTATION_SENT,
                 "Cotización enviada al cliente correctamente.",
-                workflowService.send(currentUserId, quotationId)
+                workflowService.send(currentUserId, quotationId, request)
         ));
     }
 
