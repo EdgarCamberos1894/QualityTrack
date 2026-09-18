@@ -33,6 +33,8 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -131,11 +133,13 @@ class QuotationWorkflowServiceTest {
                 today.plusDays(30),
                 List.of(
                         new QuotationItemRequest(
+                                null,
                                 "Mecanizado de eje",
                                 new BigDecimal("2.00"),
                                 new BigDecimal("100.00")
                         ),
                         new QuotationItemRequest(
+                                null,
                                 "Inspección dimensional",
                                 new BigDecimal("1.00"),
                                 new BigDecimal("50.00")
@@ -178,6 +182,7 @@ class QuotationWorkflowServiceTest {
 
         List<QuotationItemRequest> items = List.of(
                 new QuotationItemRequest(
+                        null,
                         "Mecanizado de eje",
                         new BigDecimal("1.00"),
                         new BigDecimal("100.00")
@@ -215,6 +220,112 @@ class QuotationWorkflowServiceTest {
         assertEquals(new BigDecimal("8.0000"), customTax.taxRate());
         assertEquals(new BigDecimal("8.00"), customTax.tax());
         assertEquals(new BigDecimal("108.00"), customTax.total());
+    }
+
+    @Test
+    void updatePreservesExistingItemIdsCreatesNewItemsAndRemovesOmittedOnes() {
+        JobCase jobCase = readyJobCase();
+        Quotation quotation = Quotation.draft(jobCase, "QUO-00000001", commercialUser);
+        LocalDate today = LocalDate.now(ZoneId.of("America/Mexico_City"));
+
+        QuotationItem retained = QuotationItem.create(
+                quotation,
+                1,
+                "Mecanizado original",
+                new BigDecimal("1.00"),
+                new BigDecimal("100.00"),
+                new BigDecimal("100.00")
+        );
+        QuotationItem removed = QuotationItem.create(
+                quotation,
+                2,
+                "Concepto a eliminar",
+                new BigDecimal("1.00"),
+                new BigDecimal("25.00"),
+                new BigDecimal("25.00")
+        );
+        ReflectionTestUtils.setField(retained, "id", 101L);
+        ReflectionTestUtils.setField(removed, "id", 102L);
+
+        quotation.replaceDraftContent(
+                "MXN",
+                new BigDecimal("16.0000"),
+                today.plusDays(10),
+                today.plusDays(20),
+                List.of(retained, removed),
+                new BigDecimal("125.00"),
+                new BigDecimal("20.00"),
+                new BigDecimal("145.00")
+        );
+
+        when(accessPolicy.requireCommercialActor(10L)).thenReturn(commercialUser);
+        when(quotationRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(quotation));
+        when(quotationRepository.saveAndFlush(quotation)).thenReturn(quotation);
+
+        var response = service.update(
+                10L,
+                1L,
+                new UpdateQuotationRequest(
+                        "MXN",
+                        new BigDecimal("16.0000"),
+                        today.plusDays(15),
+                        today.plusDays(30),
+                        List.of(
+                                new QuotationItemRequest(
+                                        101L,
+                                        "Mecanizado actualizado",
+                                        new BigDecimal("2.00"),
+                                        new BigDecimal("100.00")
+                                ),
+                                new QuotationItemRequest(
+                                        null,
+                                        "Inspección dimensional",
+                                        new BigDecimal("1.00"),
+                                        new BigDecimal("50.00")
+                                )
+                        )
+                )
+        );
+
+        assertEquals(2, quotation.getItems().size());
+        assertSame(retained, quotation.getItems().get(0));
+        assertEquals(101L, quotation.getItems().get(0).getId());
+        assertEquals("Mecanizado actualizado", quotation.getItems().get(0).getDescription());
+        assertEquals(new BigDecimal("200.00"), quotation.getItems().get(0).getSubtotal());
+        assertEquals("Inspección dimensional", quotation.getItems().get(1).getDescription());
+        assertEquals(new BigDecimal("250.00"), response.subtotal());
+        assertEquals(new BigDecimal("40.00"), response.tax());
+        assertEquals(new BigDecimal("290.00"), response.total());
+    }
+
+    @Test
+    void updateRejectsItemIdThatDoesNotBelongToQuotation() {
+        JobCase jobCase = readyJobCase();
+        Quotation quotation = Quotation.draft(jobCase, "QUO-00000001", commercialUser);
+        LocalDate today = LocalDate.now(ZoneId.of("America/Mexico_City"));
+
+        when(accessPolicy.requireCommercialActor(10L)).thenReturn(commercialUser);
+        when(quotationRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(quotation));
+
+        assertThrows(
+                com.nocountry.qualitytrack.shared.exception.BusinessException.class,
+                () -> service.update(
+                        10L,
+                        1L,
+                        new UpdateQuotationRequest(
+                                "MXN",
+                                new BigDecimal("16.0000"),
+                                today.plusDays(15),
+                                today.plusDays(30),
+                                List.of(new QuotationItemRequest(
+                                        999L,
+                                        "Concepto ajeno",
+                                        new BigDecimal("1.00"),
+                                        new BigDecimal("100.00")
+                                ))
+                        )
+                )
+        );
     }
 
     @Test
