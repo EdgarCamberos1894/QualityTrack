@@ -102,6 +102,37 @@ class QuotationTest {
     }
 
     @Test
+    void sentQuotationCanBeRejected() {
+        Quotation quotation = Quotation.draft(jobCase, "QUO-00000001", creator);
+        quotation.send(Instant.parse("2026-09-14T20:00:00Z"));
+
+        quotation.reject(
+                "El cliente decidió no continuar.",
+                Instant.parse("2026-09-15T10:00:00Z")
+        );
+
+        assertEquals(QuotationStatus.REJECTED, quotation.getStatus());
+        assertEquals("El cliente decidió no continuar.", quotation.getRejectionReason());
+        assertNotNull(quotation.getRejectedAt());
+    }
+
+    @Test
+    void terminalQuotationCanCreateFreshRevisionWithoutAdjustmentContext() {
+        Quotation quotation = Quotation.draft(jobCase, "QUO-00000001", creator);
+        quotation.send(Instant.parse("2026-09-14T20:00:00Z"));
+        quotation.expire();
+
+        Quotation revised = Quotation.reissuedFrom(quotation, creator);
+
+        assertEquals(QuotationStatus.DRAFT, revised.getStatus());
+        assertEquals(2, revised.getRevision());
+        assertEquals(quotation.getQuotationNumber(), revised.getQuotationNumber());
+        assertEquals(quotation.getTotal(), revised.getTotal());
+        assertEquals(null, revised.getAdjustmentNotes());
+        assertEquals(null, revised.getAdjustmentResponse());
+    }
+
+    @Test
     void onlySentQuotationCanExpire() {
         Quotation quotation = Quotation.draft(jobCase, "QUO-00000001", creator);
 
