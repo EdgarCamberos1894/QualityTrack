@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar bandeja de cotizaciones",
-        description = "Lista las revisiones de cotización disponibles para consulta interna, incluyendo su expediente, cliente, estado e importes principales. La operación es de solo lectura."
+        description = "Lista únicamente la revisión actual de cada flujo de cotización para la bandeja interna. Las revisiones anteriores permanecen conservadas como historial y pueden consultarse por su id. Incluye expediente, cliente, estado e importes principales."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Cotizaciones consultadas correctamente"),
