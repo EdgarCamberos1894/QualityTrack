@@ -7,7 +7,7 @@ import com.nocountry.qualitytrack.quotations.dto.request.RequestQuotationAdjustm
 import com.nocountry.qualitytrack.quotations.dto.request.UpdateQuotationRequest;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.quotations.entity.QuotationItem;
-import com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
+import com.nocountry.qualitytrack.quotations.enums.CustomerQuotationStatus;\nimport com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
 import com.nocountry.qualitytrack.quotations.repository.QuotationRepository;
 import com.nocountry.qualitytrack.requests.entity.CustomerRequest;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
@@ -339,7 +339,7 @@ class QuotationWorkflowServiceTest {
         when(quotationRepository.saveAndFlush(any(Quotation.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        service.requestAdjustment(
+        var response = service.requestAdjustment(
                 42L,
                 20L,
                 1L,
@@ -355,6 +355,8 @@ class QuotationWorkflowServiceTest {
         assertEquals(2, nextRevision.getRevision());
         assertEquals(quotation.getQuotationNumber(), nextRevision.getQuotationNumber());
         assertEquals("Reducir el plazo de entrega.", nextRevision.getAdjustmentNotes());
+        assertEquals(CustomerQuotationStatus.ADJUSTMENT_REQUESTED, response.customerStatus());
+        assertEquals("Reducir el plazo de entrega.", response.adjustmentNotes());
     }
 
     @Test
