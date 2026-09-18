@@ -2,7 +2,6 @@ package com.nocountry.qualitytrack.quotations.dto.response;
 
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.quotations.enums.CustomerQuotationStatus;
-import com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -14,7 +13,6 @@ public record CustomerQuotationResponse(
         String requestNumber,
         String quotationNumber,
         Integer revision,
-        QuotationStatus status,
         CustomerQuotationStatus customerStatus,
         String currency,
         BigDecimal subtotal,
@@ -25,6 +23,7 @@ public record CustomerQuotationResponse(
         LocalDate estimatedDeliveryDate,
         Instant sentAt,
         Instant approvedAt,
+        Instant rejectedAt,
         Instant cancelledAt
 ) {
     public static CustomerQuotationResponse from(
@@ -37,7 +36,6 @@ public record CustomerQuotationResponse(
                 quotation.getJobCase().getCustomerRequest().getRequestNumber(),
                 quotation.getQuotationNumber(),
                 quotation.getRevision(),
-                quotation.getStatus(),
                 customerStatus,
                 quotation.getCurrency(),
                 quotation.getSubtotal(),
@@ -48,6 +46,7 @@ public record CustomerQuotationResponse(
                 quotation.getEstimatedDeliveryDate(),
                 quotation.getSentAt(),
                 quotation.getApprovedAt(),
+                quotation.getRejectedAt(),
                 quotation.getCancelledAt()
         );
     }
