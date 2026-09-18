@@ -69,7 +69,28 @@ public class QuotationService {
             throw notFound();
         }
 
-        return CustomerQuotationDetailResponse.from(quotation);
+        Quotation nextRevision = quotation.getStatus() == QuotationStatus.SUPERSEDED
+                ? quotationRepository.findByQuotationNumberAndRevision(
+                        quotation.getQuotationNumber(),
+                        quotation.getRevision() + 1
+                ).orElse(null)
+                : null;
+
+        boolean adjustmentPending = nextRevision != null
+                && nextRevision.getStatus() == QuotationStatus.DRAFT;
+
+        String adjustmentNotes = nextRevision != null
+                ? nextRevision.getAdjustmentNotes()
+                : quotation.getAdjustmentNotes();
+
+        return CustomerQuotationDetailResponse.from(
+                quotation,
+                CustomerQuotationStatus.fromDomain(
+                        quotation.getStatus(),
+                        adjustmentPending
+                ),
+                adjustmentNotes
+        );
     }
 
     private Quotation requireDetail(Long quotationId) {
