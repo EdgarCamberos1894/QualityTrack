@@ -63,6 +63,11 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
             @Param("hiddenStatus") QuotationStatus hiddenStatus
     );
 
+    Optional<Quotation> findByQuotationNumberAndRevision(
+            String quotationNumber,
+            Integer revision
+    );
+
     @EntityGraph(attributePaths = {
             "jobCase",
             "jobCase.customerRequest",
