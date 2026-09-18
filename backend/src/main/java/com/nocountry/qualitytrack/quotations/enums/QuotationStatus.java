@@ -4,6 +4,7 @@ public enum QuotationStatus {
     DRAFT,
     SENT,
     APPROVED,
+    REJECTED,
     SUPERSEDED,
     EXPIRED,
     CANCELLED
