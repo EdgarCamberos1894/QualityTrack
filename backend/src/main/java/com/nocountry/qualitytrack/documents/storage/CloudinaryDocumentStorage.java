@@ -40,7 +40,16 @@ public class CloudinaryDocumentStorage implements DocumentStorage {
             );
         }
 
-        this.cloudinary = new Cloudinary(cloudinaryUrl.trim());
+        String normalizedCloudinaryUrl = cloudinaryUrl.trim();
+
+        try {
+            this.cloudinary = new Cloudinary(normalizedCloudinaryUrl);
+        } catch (RuntimeException exception) {
+            throw new IllegalStateException(
+                    "CLOUDINARY_URL no tiene una configuración válida.",
+                    exception
+            );
+        }
     }
 
     @Override
