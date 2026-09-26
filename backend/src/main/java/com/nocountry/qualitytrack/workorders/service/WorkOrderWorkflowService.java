@@ -63,6 +63,7 @@ public class WorkOrderWorkflowService {
                 actor
         );
 
+        JobCaseStatus previousCaseStatus = jobCase.getStatus();
         jobCase.markInProduction();
         workOrder = workOrderRepository.saveAndFlush(workOrder);
 
@@ -81,6 +82,21 @@ public class WorkOrderWorkflowService {
                         "quotationNumber", approvedQuotation.getQuotationNumber(),
                         "quotationRevision", approvedQuotation.getRevision(),
                         "agreedDeliveryDate", workOrder.getAgreedDeliveryDate()
+                )
+        );
+
+        traceabilityService.record(
+                jobCase,
+                TraceabilityAggregateType.JOB_CASE,
+                jobCase.getId(),
+                TraceabilityEventType.JOB_CASE_STATUS_CHANGED,
+                previousCaseStatus.name(),
+                jobCase.getStatus().name(),
+                currentUserId,
+                metadata(
+                        "caseNumber", jobCase.getCaseNumber(),
+                        "workOrderId", workOrder.getId(),
+                        "workOrderNumber", workOrder.getWorkOrderNumber()
                 )
         );
 
@@ -106,6 +122,7 @@ public class WorkOrderWorkflowService {
                 ));
 
         WorkOrderStatus previousStatus = workOrder.getStatus();
+        JobCaseStatus previousCaseStatus = workOrder.getJobCase().getStatus();
         String reason = input == null ? null : input.reason();
         Instant cancelledAt = Instant.now();
 
@@ -127,6 +144,22 @@ public class WorkOrderWorkflowService {
                 WorkOrderStatus.CANCELLED.name(),
                 currentUserId,
                 metadata(
+                        "workOrderNumber", workOrder.getWorkOrderNumber(),
+                        "reason", workOrder.getCancellationReason()
+                )
+        );
+
+        traceabilityService.record(
+                workOrder.getJobCase(),
+                TraceabilityAggregateType.JOB_CASE,
+                workOrder.getJobCase().getId(),
+                TraceabilityEventType.JOB_CASE_STATUS_CHANGED,
+                previousCaseStatus.name(),
+                workOrder.getJobCase().getStatus().name(),
+                currentUserId,
+                metadata(
+                        "caseNumber", workOrder.getJobCase().getCaseNumber(),
+                        "workOrderId", workOrder.getId(),
                         "workOrderNumber", workOrder.getWorkOrderNumber(),
                         "reason", workOrder.getCancellationReason()
                 )

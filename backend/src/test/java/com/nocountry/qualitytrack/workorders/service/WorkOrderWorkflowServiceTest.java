@@ -33,6 +33,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -86,7 +87,7 @@ class WorkOrderWorkflowServiceTest {
         assertEquals("WO-00000001", response.workOrderNumber());
         assertEquals(approved.getEstimatedDeliveryDate(), response.agreedDeliveryDate());
         assertEquals(JobCaseStatus.IN_PRODUCTION, jobCase.getStatus());
-        verify(traceabilityService).record(
+        verify(traceabilityService, times(2)).record(
                 any(), any(), any(), any(), any(), any(), any(), any()
         );
     }
