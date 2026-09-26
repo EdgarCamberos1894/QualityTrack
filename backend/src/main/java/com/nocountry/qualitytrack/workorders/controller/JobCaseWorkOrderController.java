@@ -3,10 +3,10 @@ package com.nocountry.qualitytrack.workorders.controller;
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
 import com.nocountry.qualitytrack.shared.response.ApiResponse;
 import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
+import com.nocountry.qualitytrack.workorders.documentation.CreateWorkOrderApiDocs;
 import com.nocountry.qualitytrack.workorders.documentation.WorkOrderApiDocs;
 import com.nocountry.qualitytrack.workorders.dto.response.WorkOrderDetailResponse;
 import com.nocountry.qualitytrack.workorders.service.WorkOrderWorkflowService;
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +23,7 @@ public class JobCaseWorkOrderController {
 
     private final WorkOrderWorkflowService workflowService;
 
-    @Operation(
-            summary = "Crear orden de trabajo",
-            description = "Crea la única orden de trabajo del expediente cuando existe una cotización aprobada."
-    )
+    @CreateWorkOrderApiDocs
     @PostMapping
     public ResponseEntity<ApiResponse<WorkOrderDetailResponse>> create(
             @CurrentUserId Long currentUserId,

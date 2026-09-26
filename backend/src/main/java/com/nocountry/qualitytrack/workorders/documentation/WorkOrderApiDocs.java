@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Documented
 @Tag(
         name = "08 · Órdenes de trabajo",
-        description = "Creación y consulta del trabajo operativo originado por una cotización aprobada."
+        description = "Gestión de la única orden de trabajo 1:1 de cada expediente una vez aprobada la cotización."
 )
 public @interface WorkOrderApiDocs {
 }

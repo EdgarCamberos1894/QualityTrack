@@ -33,6 +33,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -145,6 +146,67 @@ class WorkOrderWorkflowServiceTest {
         assertEquals(WorkOrderStatus.CANCELLED, response.status());
         assertEquals(JobCaseStatus.CANCELLED, jobCase.getStatus());
         assertEquals("Orden detenida por decisión operativa.", response.cancellationReason());
+    }
+
+    @Test
+    void cancelledWorkOrderClosesCaseAndPreventsReplacement() {
+        JobCase jobCase = readyJobCase();
+        jobCase.markInProduction();
+        Quotation approved = approvedQuotation(jobCase);
+        WorkOrder workOrder = WorkOrder.plan(
+                jobCase,
+                "WO-00000001",
+                approved.getEstimatedDeliveryDate(),
+                productionUser
+        );
+        ReflectionTestUtils.setField(workOrder, "id", 7L);
+
+        when(accessPolicy.requireProductionActor(10L)).thenReturn(productionUser);
+        when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
+        when(workOrderRepository.saveAndFlush(workOrder)).thenReturn(workOrder);
+        when(quotationRepository.findByJobCase_IdAndStatus(3L, QuotationStatus.APPROVED))
+                .thenReturn(Optional.of(approved));
+
+        service.cancel(
+                10L,
+                7L,
+                new CancelWorkOrderRequest("Cancelar definitivamente el trabajo.")
+        );
+
+        when(jobCaseRepository.findByIdForUpdate(3L)).thenReturn(Optional.of(jobCase));
+
+        assertThrows(BusinessException.class, () -> service.create(10L, 3L));
+        assertEquals(JobCaseStatus.CANCELLED, jobCase.getStatus());
+        verify(referenceGenerator, never()).nextWorkOrderNumber();
+    }
+
+    @Test
+    void cancelRejectsWorkOrderOutsidePlanning() {
+        JobCase jobCase = readyJobCase();
+        jobCase.markInProduction();
+        Quotation approved = approvedQuotation(jobCase);
+        WorkOrder workOrder = WorkOrder.plan(
+                jobCase,
+                "WO-00000001",
+                approved.getEstimatedDeliveryDate(),
+                productionUser
+        );
+        ReflectionTestUtils.setField(workOrder, "id", 7L);
+        ReflectionTestUtils.setField(workOrder, "status", WorkOrderStatus.READY);
+
+        when(accessPolicy.requireProductionActor(10L)).thenReturn(productionUser);
+        when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
+
+        assertThrows(
+                BusinessException.class,
+                () -> service.cancel(
+                        10L,
+                        7L,
+                        new CancelWorkOrderRequest("Intento inválido.")
+                )
+        );
+
+        verify(workOrderRepository, never()).saveAndFlush(workOrder);
     }
 
     private JobCase readyJobCase() {

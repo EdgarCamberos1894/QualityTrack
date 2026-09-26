@@ -3,13 +3,15 @@ package com.nocountry.qualitytrack.workorders.controller;
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
 import com.nocountry.qualitytrack.shared.response.ApiResponse;
 import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
+import com.nocountry.qualitytrack.workorders.documentation.CancelWorkOrderApiDocs;
+import com.nocountry.qualitytrack.workorders.documentation.GetWorkOrderApiDocs;
+import com.nocountry.qualitytrack.workorders.documentation.ListWorkOrdersApiDocs;
 import com.nocountry.qualitytrack.workorders.documentation.WorkOrderApiDocs;
 import com.nocountry.qualitytrack.workorders.dto.request.CancelWorkOrderRequest;
 import com.nocountry.qualitytrack.workorders.dto.response.WorkOrderDetailResponse;
 import com.nocountry.qualitytrack.workorders.dto.response.WorkOrderResponse;
 import com.nocountry.qualitytrack.workorders.service.WorkOrderService;
 import com.nocountry.qualitytrack.workorders.service.WorkOrderWorkflowService;
-import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +33,7 @@ public class WorkOrderController {
     private final WorkOrderService workOrderService;
     private final WorkOrderWorkflowService workflowService;
 
-    @Operation(summary = "Listar órdenes de trabajo")
+    @ListWorkOrdersApiDocs
     @GetMapping
     public ResponseEntity<ApiResponse<List<WorkOrderResponse>>> list(
             @CurrentUserId Long currentUserId
@@ -43,7 +45,7 @@ public class WorkOrderController {
         ));
     }
 
-    @Operation(summary = "Consultar detalle de una orden de trabajo")
+    @GetWorkOrderApiDocs
     @GetMapping("/{workOrderId}")
     public ResponseEntity<ApiResponse<WorkOrderDetailResponse>> get(
             @CurrentUserId Long currentUserId,
@@ -56,10 +58,7 @@ public class WorkOrderController {
         ));
     }
 
-    @Operation(
-            summary = "Cancelar una orden de trabajo",
-            description = "Cancela una orden que aún se encuentra en planificación y cierra el expediente."
-    )
+    @CancelWorkOrderApiDocs
     @PostMapping("/{workOrderId}/cancel")
     public ResponseEntity<ApiResponse<WorkOrderDetailResponse>> cancel(
             @CurrentUserId Long currentUserId,
