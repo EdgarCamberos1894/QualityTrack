@@ -18,14 +18,13 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar detalle de una orden de trabajo",
-        description = "Devuelve la orden junto con el contexto operativo del expediente: solicitud, cantidad, material, especificación técnica, documentos e información complementaria. También identifica la cotización aprobada y la fecha comprometida, sin exponer precios, impuestos ni totales comerciales."
+        description = "Devuelve la orden junto con prioridad, fechas planeadas, fecha comprometida, contexto operativo del expediente, referencia exacta a la revisión de cotización aprobada y las versiones de documentos fijadas a la OT. Los documentos disponibles del expediente y los documentos fijados se distinguen para no confundir la última versión con la versión autorizada para fabricación. No expone precios, impuestos ni totales comerciales."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Orden de trabajo consultada correctamente"),
         @ApiResponse(responseCode = "401", description = "La petición no contiene una autenticación válida", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
         @ApiResponse(responseCode = "403", description = "El rol interno no permite consultar órdenes de trabajo", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-        @ApiResponse(responseCode = "404", description = "No existe la orden de trabajo indicada", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
-        @ApiResponse(responseCode = "409", description = "No se puede resolver la cotización aprobada asociada al expediente", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
+        @ApiResponse(responseCode = "404", description = "No existe la orden de trabajo indicada", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class)))
 })
 public @interface GetWorkOrderApiDocs {
 }

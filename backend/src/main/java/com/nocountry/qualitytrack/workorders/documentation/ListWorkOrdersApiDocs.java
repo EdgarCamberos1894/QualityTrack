@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Listar órdenes de trabajo",
-        description = "Lista las órdenes de trabajo para usuarios internos autorizados. Incluye expediente, cliente, cantidad solicitada, estado operativo y fecha comprometida de entrega."
+        description = "Lista las órdenes de trabajo para usuarios internos autorizados. Incluye expediente, cliente, cantidad solicitada, estado operativo, prioridad, planificación, fecha comprometida y la revisión de cotización aprobada que originó cada OT."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Órdenes de trabajo consultadas correctamente"),
