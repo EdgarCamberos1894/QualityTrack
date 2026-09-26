@@ -110,8 +110,6 @@ class QuotationServiceTest {
         when(current.getSentAt()).thenReturn(Instant.now());
         when(current.getQuotationNumber()).thenReturn("QT-00000001");
         when(current.getRevision()).thenReturn(2);
-        when(current.getAdjustmentNotes()).thenReturn("Primer ajuste.");
-        when(current.getAdjustmentResponse()).thenReturn("Respuesta al primer ajuste.");
         when(current.getItems()).thenReturn(List.of());
 
         when(quotationRepository.findByQuotationNumberAndRevision(
@@ -150,12 +148,10 @@ class QuotationServiceTest {
 
         when(second.getRevision()).thenReturn(2);
         when(second.getStatus()).thenReturn(QuotationStatus.SENT);
-        when(second.getItems()).thenReturn(List.of());
 
         when(first.getRevision()).thenReturn(1);
         when(first.getStatus()).thenReturn(QuotationStatus.SUPERSEDED);
         when(first.getSentAt()).thenReturn(Instant.now());
-        when(first.getItems()).thenReturn(List.of());
 
         var response = service.listRevisionsForCustomer(42L, 20L, 2L);
 
