@@ -1,9 +1,6 @@
 package com.nocountry.qualitytrack.workorders.service;
 
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
-import com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
-import com.nocountry.qualitytrack.quotations.repository.QuotationRepository;
-import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.users.entity.User;
@@ -29,11 +26,10 @@ import static org.mockito.Mockito.when;
 class WorkOrderServiceTest {
 
     @Mock private WorkOrderRepository workOrderRepository;
-    @Mock private QuotationRepository quotationRepository;
     @Mock private WorkOrderAccessPolicy accessPolicy;
     @Mock private WorkOrderSourceService sourceService;
+    @Mock private WorkOrderDocumentService documentService;
     @Mock private WorkOrder workOrder;
-    @Mock private JobCase jobCase;
     @Mock private Quotation approvedQuotation;
     @Mock private User createdByUser;
     @Mock private WorkOrderSourceResponse source;
@@ -44,9 +40,9 @@ class WorkOrderServiceTest {
     void setUp() {
         service = new WorkOrderService(
                 workOrderRepository,
-                quotationRepository,
                 accessPolicy,
-                sourceService
+                sourceService,
+                documentService
         );
     }
 
@@ -75,26 +71,25 @@ class WorkOrderServiceTest {
     }
 
     @Test
-    void getReturnsOperationalSourceAndApprovedAgreement() {
+    void getReturnsOperationalSourcePinnedDocumentsAndApprovedAgreement() {
         when(workOrderRepository.findById(7L)).thenReturn(Optional.of(workOrder));
-        when(workOrder.getJobCase()).thenReturn(jobCase);
-        when(jobCase.getId()).thenReturn(3L);
-        when(quotationRepository.findByJobCase_IdAndStatus(3L, QuotationStatus.APPROVED))
-                .thenReturn(Optional.of(approvedQuotation));
         when(sourceService.get(10L, workOrder)).thenReturn(source);
+        when(documentService.listPinned(7L)).thenReturn(List.of());
 
         when(workOrder.getId()).thenReturn(7L);
-        when(workOrder.getWorkOrderNumber()).thenReturn("WO-00000001");
+        when(workOrder.getWorkOrderNumber()).thenReturn("OT-00000001");
         when(workOrder.getCreatedByUser()).thenReturn(createdByUser);
         when(createdByUser.getId()).thenReturn(10L);
+        when(workOrder.getApprovedQuotation()).thenReturn(approvedQuotation);
         when(approvedQuotation.getQuotationNumber()).thenReturn("QT-00000001");
         when(approvedQuotation.getRevision()).thenReturn(2);
 
         var response = service.get(10L, 7L);
 
         assertEquals(7L, response.id());
-        assertEquals("WO-00000001", response.workOrderNumber());
+        assertEquals("OT-00000001", response.workOrderNumber());
         assertSame(source, response.source());
+        assertEquals(0, response.pinnedDocuments().size());
         assertEquals("QT-00000001", response.agreement().quotationNumber());
         assertEquals(2, response.agreement().revision());
     }

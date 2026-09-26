@@ -1,6 +1,7 @@
 package com.nocountry.qualitytrack.workorders.repository;
 
 import com.nocountry.qualitytrack.workorders.entity.WorkOrder;
+import com.nocountry.qualitytrack.workorders.enums.WorkOrderPriority;
 import com.nocountry.qualitytrack.workorders.enums.WorkOrderStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,40 +44,68 @@ class WorkOrderRepositoryIntegrationTest {
     private WorkOrderRepository workOrderRepository;
 
     @Test
-    void repositoryMapsPlanningWorkOrderCreatedByMigrationSchema() {
+    void repositoryMapsCreatedWorkOrderWithApprovedQuotationAndPlanning() {
         Fixture fixture = createFixture("mapping");
         Long workOrderId = insertWorkOrder(
-                fixture.caseId(),
-                fixture.internalUserId(),
-                "WO-MAPPING",
-                "PLANNING"
+                fixture,
+                "OT-MAPPING",
+                "CREATED"
         );
 
         WorkOrder workOrder = workOrderRepository.findById(workOrderId).orElseThrow();
 
-        assertEquals("WO-MAPPING", workOrder.getWorkOrderNumber());
-        assertEquals(WorkOrderStatus.PLANNING, workOrder.getStatus());
-        assertEquals(fixture.caseId(), workOrder.getJobCase().getId());
+        assertEquals("OT-MAPPING", workOrder.getWorkOrderNumber());
+        assertEquals(WorkOrderStatus.CREATED, workOrder.getStatus());
+        assertEquals(WorkOrderPriority.NORMAL, workOrder.getPriority());
+        assertEquals(LocalDate.of(2026, 10, 1), workOrder.getPlannedStartDate());
+        assertEquals(LocalDate.of(2026, 10, 15), workOrder.getPlannedEndDate());
+        assertEquals(fixture.quotationId(), workOrder.getApprovedQuotation().getId());
     }
 
     @Test
     void databasePreventsTwoWorkOrdersForSameJobCase() {
         Fixture fixture = createFixture("unique");
 
-        insertWorkOrder(
-                fixture.caseId(),
-                fixture.internalUserId(),
-                "WO-UNIQUE-1",
-                "PLANNING"
-        );
+        insertWorkOrder(fixture, "OT-UNIQUE-1", "CREATED");
 
         assertThrows(
                 DataIntegrityViolationException.class,
                 () -> insertWorkOrder(
+                        fixture,
+                        "OT-UNIQUE-2",
+                        "CREATED"
+                )
+        );
+    }
+
+    @Test
+    void databaseRejectsPlanningEndOnCommittedDelivery() {
+        Fixture fixture = createFixture("planning");
+
+        assertThrows(
+                DataIntegrityViolationException.class,
+                () -> jdbcTemplate.update(
+                        """
+                        INSERT INTO work_orders (
+                            case_id,
+                            approved_quotation_id,
+                            work_order_number,
+                            status,
+                            priority,
+                            planned_start_date,
+                            planned_end_date,
+                            agreed_delivery_date,
+                            created_by_user_id
+                        )
+                        VALUES (?, ?, ?, 'CREATED', 'NORMAL', ?, ?, ?, ?)
+                        """,
                         fixture.caseId(),
-                        fixture.internalUserId(),
-                        "WO-UNIQUE-2",
-                        "PLANNING"
+                        fixture.quotationId(),
+                        "OT-BAD-DATES",
+                        LocalDate.of(2026, 10, 1),
+                        LocalDate.of(2026, 10, 20),
+                        LocalDate.of(2026, 10, 20),
+                        fixture.internalUserId()
                 )
         );
     }
@@ -88,9 +117,8 @@ class WorkOrderRepositoryIntegrationTest {
         assertThrows(
                 DataIntegrityViolationException.class,
                 () -> insertWorkOrder(
-                        fixture.caseId(),
-                        fixture.internalUserId(),
-                        "WO-CANCELLED",
+                        fixture,
+                        "OT-CANCELLED",
                         "CANCELLED"
                 )
         );
@@ -147,7 +175,7 @@ class WorkOrderRepositoryIntegrationTest {
                 RETURNING id
                 """,
                 Long.class,
-                "Industrias WO " + suffix,
+                "Industrias OT " + suffix,
                 internalUserId
         );
 
@@ -168,7 +196,7 @@ class WorkOrderRepositoryIntegrationTest {
                 """,
                 Long.class,
                 customerId,
-                "REQ-WO-" + suffix,
+                "REQ-OT-" + suffix,
                 "Eje " + suffix,
                 "Fabricar conforme a plano.",
                 customerUserId
@@ -189,16 +217,50 @@ class WorkOrderRepositoryIntegrationTest {
                 """,
                 Long.class,
                 requestId,
-                "CASE-WO-" + suffix,
+                "CASE-OT-" + suffix,
                 internalUserId
         );
 
-        return new Fixture(internalUserId, caseId);
+        Long quotationId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO quotations (
+                    case_id,
+                    quotation_number,
+                    revision,
+                    status,
+                    currency,
+                    subtotal,
+                    tax_rate,
+                    tax,
+                    total,
+                    valid_until,
+                    estimated_delivery_date,
+                    sent_at,
+                    approved_at,
+                    created_by_user_id
+                )
+                VALUES (
+                    ?, ?, 1, 'APPROVED', 'MXN',
+                    100.00, 16.0000, 16.00, 116.00,
+                    CURRENT_DATE + 10,
+                    DATE '2026-10-20',
+                    NOW(),
+                    NOW(),
+                    ?
+                )
+                RETURNING id
+                """,
+                Long.class,
+                caseId,
+                "QT-OT-" + suffix,
+                internalUserId
+        );
+
+        return new Fixture(internalUserId, caseId, quotationId);
     }
 
     private Long insertWorkOrder(
-            Long caseId,
-            Long internalUserId,
+            Fixture fixture,
             String workOrderNumber,
             String status
     ) {
@@ -206,26 +268,34 @@ class WorkOrderRepositoryIntegrationTest {
                 """
                 INSERT INTO work_orders (
                     case_id,
+                    approved_quotation_id,
                     work_order_number,
                     status,
+                    priority,
+                    planned_start_date,
+                    planned_end_date,
                     agreed_delivery_date,
                     created_by_user_id
                 )
-                VALUES (?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, 'NORMAL', ?, ?, ?, ?)
                 RETURNING id
                 """,
                 Long.class,
-                caseId,
+                fixture.caseId(),
+                fixture.quotationId(),
                 workOrderNumber,
                 status,
+                LocalDate.of(2026, 10, 1),
+                LocalDate.of(2026, 10, 15),
                 LocalDate.of(2026, 10, 20),
-                internalUserId
+                fixture.internalUserId()
         );
     }
 
     private record Fixture(
             Long internalUserId,
-            Long caseId
+            Long caseId,
+            Long quotationId
     ) {
     }
 }

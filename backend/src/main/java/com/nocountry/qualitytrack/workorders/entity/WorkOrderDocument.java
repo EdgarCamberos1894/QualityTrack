@@ -82,7 +82,12 @@ public class WorkOrderDocument {
             Instant linkedAt
     ) {
         DocumentVersion version = Objects.requireNonNull(documentVersion);
-        if (version.getDocument() != document) {
+        Long expectedDocumentId = document.getId();
+        Long actualDocumentId = version.getDocument() == null
+                ? null
+                : version.getDocument().getId();
+
+        if (expectedDocumentId == null || !expectedDocumentId.equals(actualDocumentId)) {
             throw new IllegalArgumentException(
                     "La versión seleccionada no pertenece al documento fijado."
             );

@@ -30,7 +30,8 @@ ALTER TABLE work_orders
     ADD CONSTRAINT chk_work_orders_planned_end_before_delivery CHECK (
         planned_end_date IS NULL
         OR planned_end_date < agreed_delivery_date
-    );
+    ),
+    DROP CONSTRAINT chk_work_orders_status;
 
 UPDATE work_orders
 SET work_order_number = 'OT-' || SUBSTRING(work_order_number FROM 4)
@@ -46,7 +47,6 @@ SET status = CASE status
 END;
 
 ALTER TABLE work_orders
-    DROP CONSTRAINT chk_work_orders_status,
     ADD CONSTRAINT chk_work_orders_status CHECK (
         status IN (
             'CREATED',

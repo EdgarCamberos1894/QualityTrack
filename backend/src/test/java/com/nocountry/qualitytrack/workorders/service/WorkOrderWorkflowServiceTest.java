@@ -14,7 +14,9 @@ import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.traceability.service.TraceabilityService;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.workorders.dto.request.CancelWorkOrderRequest;
+import com.nocountry.qualitytrack.workorders.dto.request.CreateWorkOrderRequest;
 import com.nocountry.qualitytrack.workorders.entity.WorkOrder;
+import com.nocountry.qualitytrack.workorders.enums.WorkOrderPriority;
 import com.nocountry.qualitytrack.workorders.enums.WorkOrderStatus;
 import com.nocountry.qualitytrack.workorders.repository.WorkOrderRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,6 +49,7 @@ class WorkOrderWorkflowServiceTest {
     @Mock private WorkOrderReferenceGenerator referenceGenerator;
     @Mock private WorkOrderAccessPolicy accessPolicy;
     @Mock private WorkOrderSourceService sourceService;
+    @Mock private WorkOrderDocumentService documentService;
     @Mock private TraceabilityService traceabilityService;
     @Mock private User productionUser;
     @Mock private User commercialUser;
@@ -64,6 +67,7 @@ class WorkOrderWorkflowServiceTest {
                 referenceGenerator,
                 accessPolicy,
                 sourceService,
+                documentService,
                 traceabilityService
         );
     }
@@ -73,19 +77,27 @@ class WorkOrderWorkflowServiceTest {
         JobCase jobCase = readyJobCase();
         Quotation approved = approvedQuotation(jobCase);
 
-        when(accessPolicy.requireProductionActor(10L)).thenReturn(productionUser);
+        when(accessPolicy.requireCreationActor(10L)).thenReturn(productionUser);
         when(jobCaseRepository.findByIdForUpdate(3L)).thenReturn(Optional.of(jobCase));
         when(workOrderRepository.existsByJobCase_Id(3L)).thenReturn(false);
         when(quotationRepository.findByJobCase_IdAndStatus(3L, QuotationStatus.APPROVED))
                 .thenReturn(Optional.of(approved));
-        when(referenceGenerator.nextWorkOrderNumber()).thenReturn("WO-00000001");
+        when(referenceGenerator.nextWorkOrderNumber()).thenReturn("OT-00000001");
         when(workOrderRepository.saveAndFlush(any(WorkOrder.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+                .thenAnswer(invocation -> {
+                    WorkOrder saved = invocation.getArgument(0);
+                    ReflectionTestUtils.setField(saved, "id", 7L);
+                    return saved;
+                });
+        when(documentService.listPinned(7L)).thenReturn(List.of());
 
-        var response = service.create(10L, 3L);
+        var response = service.create(10L, 3L, createRequest());
 
-        assertEquals(WorkOrderStatus.PLANNING, response.status());
-        assertEquals("WO-00000001", response.workOrderNumber());
+        assertEquals(WorkOrderStatus.CREATED, response.status());
+        assertEquals("OT-00000001", response.workOrderNumber());
+        assertEquals(WorkOrderPriority.NORMAL, response.priority());
+        assertEquals(LocalDate.of(2026, 10, 1), response.plannedStartDate());
+        assertEquals(LocalDate.of(2026, 10, 15), response.plannedEndDate());
         assertEquals(approved.getEstimatedDeliveryDate(), response.agreedDeliveryDate());
         assertEquals(JobCaseStatus.IN_PRODUCTION, jobCase.getStatus());
         verify(traceabilityService, times(2)).record(
@@ -97,24 +109,52 @@ class WorkOrderWorkflowServiceTest {
     void createFailsWithoutApprovedQuotation() {
         JobCase jobCase = readyJobCase();
 
-        when(accessPolicy.requireProductionActor(10L)).thenReturn(productionUser);
+        when(accessPolicy.requireCreationActor(10L)).thenReturn(productionUser);
         when(jobCaseRepository.findByIdForUpdate(3L)).thenReturn(Optional.of(jobCase));
         when(workOrderRepository.existsByJobCase_Id(3L)).thenReturn(false);
         when(quotationRepository.findByJobCase_IdAndStatus(3L, QuotationStatus.APPROVED))
                 .thenReturn(Optional.empty());
 
-        assertThrows(BusinessException.class, () -> service.create(10L, 3L));
+        assertThrows(
+                BusinessException.class,
+                () -> service.create(10L, 3L, createRequest())
+        );
     }
 
     @Test
     void createFailsWhenCaseAlreadyHasWorkOrder() {
         JobCase jobCase = readyJobCase();
 
-        when(accessPolicy.requireProductionActor(10L)).thenReturn(productionUser);
+        when(accessPolicy.requireCreationActor(10L)).thenReturn(productionUser);
         when(jobCaseRepository.findByIdForUpdate(3L)).thenReturn(Optional.of(jobCase));
         when(workOrderRepository.existsByJobCase_Id(3L)).thenReturn(true);
 
-        assertThrows(BusinessException.class, () -> service.create(10L, 3L));
+        assertThrows(
+                BusinessException.class,
+                () -> service.create(10L, 3L, createRequest())
+        );
+    }
+
+    @Test
+    void createRejectsPlanningThatFinishesOnCommittedDelivery() {
+        JobCase jobCase = readyJobCase();
+        Quotation approved = approvedQuotation(jobCase);
+
+        when(accessPolicy.requireCreationActor(10L)).thenReturn(productionUser);
+        when(jobCaseRepository.findByIdForUpdate(3L)).thenReturn(Optional.of(jobCase));
+        when(workOrderRepository.existsByJobCase_Id(3L)).thenReturn(false);
+        when(quotationRepository.findByJobCase_IdAndStatus(3L, QuotationStatus.APPROVED))
+                .thenReturn(Optional.of(approved));
+        when(referenceGenerator.nextWorkOrderNumber()).thenReturn("OT-00000001");
+
+        CreateWorkOrderRequest invalid = new CreateWorkOrderRequest(
+                WorkOrderPriority.NORMAL,
+                LocalDate.of(2026, 10, 1),
+                LocalDate.of(2026, 10, 20)
+        );
+
+        assertThrows(BusinessException.class, () -> service.create(10L, 3L, invalid));
+        verify(workOrderRepository, never()).saveAndFlush(any(WorkOrder.class));
     }
 
     @Test
@@ -122,20 +162,13 @@ class WorkOrderWorkflowServiceTest {
         JobCase jobCase = readyJobCase();
         jobCase.markInProduction();
         Quotation approved = approvedQuotation(jobCase);
-        WorkOrder workOrder = WorkOrder.plan(
-                jobCase,
-                "WO-00000001",
-                approved.getEstimatedDeliveryDate(),
-                productionUser
-        );
+        WorkOrder workOrder = workOrder(jobCase, approved);
+        ReflectionTestUtils.setField(workOrder, "id", 7L);
 
         when(accessPolicy.requireProductionActor(10L)).thenReturn(productionUser);
         when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
         when(workOrderRepository.saveAndFlush(workOrder)).thenReturn(workOrder);
-        ReflectionTestUtils.setField(workOrder, "id", 7L);
-
-        when(quotationRepository.findByJobCase_IdAndStatus(3L, QuotationStatus.APPROVED))
-                .thenReturn(Optional.of(approved));
+        when(documentService.listPinned(7L)).thenReturn(List.of());
 
         var response = service.cancel(
                 10L,
@@ -153,19 +186,13 @@ class WorkOrderWorkflowServiceTest {
         JobCase jobCase = readyJobCase();
         jobCase.markInProduction();
         Quotation approved = approvedQuotation(jobCase);
-        WorkOrder workOrder = WorkOrder.plan(
-                jobCase,
-                "WO-00000001",
-                approved.getEstimatedDeliveryDate(),
-                productionUser
-        );
+        WorkOrder workOrder = workOrder(jobCase, approved);
         ReflectionTestUtils.setField(workOrder, "id", 7L);
 
         when(accessPolicy.requireProductionActor(10L)).thenReturn(productionUser);
         when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
         when(workOrderRepository.saveAndFlush(workOrder)).thenReturn(workOrder);
-        when(quotationRepository.findByJobCase_IdAndStatus(3L, QuotationStatus.APPROVED))
-                .thenReturn(Optional.of(approved));
+        when(documentService.listPinned(7L)).thenReturn(List.of());
 
         service.cancel(
                 10L,
@@ -173,26 +200,29 @@ class WorkOrderWorkflowServiceTest {
                 new CancelWorkOrderRequest("Cancelar definitivamente el trabajo.")
         );
 
+        when(accessPolicy.requireCreationActor(10L)).thenReturn(productionUser);
         when(jobCaseRepository.findByIdForUpdate(3L)).thenReturn(Optional.of(jobCase));
 
-        assertThrows(BusinessException.class, () -> service.create(10L, 3L));
+        assertThrows(
+                BusinessException.class,
+                () -> service.create(10L, 3L, createRequest())
+        );
         assertEquals(JobCaseStatus.CANCELLED, jobCase.getStatus());
         verify(referenceGenerator, never()).nextWorkOrderNumber();
     }
 
     @Test
-    void cancelRejectsWorkOrderOutsidePlanning() {
+    void cancelRejectsWorkOrderOutsideCreated() {
         JobCase jobCase = readyJobCase();
         jobCase.markInProduction();
         Quotation approved = approvedQuotation(jobCase);
-        WorkOrder workOrder = WorkOrder.plan(
-                jobCase,
-                "WO-00000001",
-                approved.getEstimatedDeliveryDate(),
-                productionUser
-        );
+        WorkOrder workOrder = workOrder(jobCase, approved);
         ReflectionTestUtils.setField(workOrder, "id", 7L);
-        ReflectionTestUtils.setField(workOrder, "status", WorkOrderStatus.READY);
+        ReflectionTestUtils.setField(
+                workOrder,
+                "status",
+                WorkOrderStatus.READY_FOR_PRODUCTION
+        );
 
         when(accessPolicy.requireProductionActor(10L)).thenReturn(productionUser);
         when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
@@ -207,6 +237,27 @@ class WorkOrderWorkflowServiceTest {
         );
 
         verify(workOrderRepository, never()).saveAndFlush(workOrder);
+    }
+
+    private CreateWorkOrderRequest createRequest() {
+        return new CreateWorkOrderRequest(
+                WorkOrderPriority.NORMAL,
+                LocalDate.of(2026, 10, 1),
+                LocalDate.of(2026, 10, 15)
+        );
+    }
+
+    private WorkOrder workOrder(JobCase jobCase, Quotation approved) {
+        return WorkOrder.create(
+                jobCase,
+                approved,
+                "OT-00000001",
+                WorkOrderPriority.NORMAL,
+                LocalDate.of(2026, 10, 1),
+                LocalDate.of(2026, 10, 15),
+                approved.getEstimatedDeliveryDate(),
+                productionUser
+        );
     }
 
     private JobCase readyJobCase() {
