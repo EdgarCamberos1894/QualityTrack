@@ -20,6 +20,7 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
             "jobCase.customerRequest",
             "jobCase.customerRequest.customer",
             "jobCase.customerRequest.requestedByUser",
+            "approvedQuotation",
             "createdByUser",
             "cancelledByUser"
     })
@@ -31,6 +32,7 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
             "jobCase.customerRequest",
             "jobCase.customerRequest.customer",
             "jobCase.customerRequest.requestedByUser",
+            "approvedQuotation",
             "createdByUser",
             "cancelledByUser"
     })
@@ -44,6 +46,7 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
             join fetch jobCase.customerRequest request
             join fetch request.customer
             join fetch request.requestedByUser
+            join fetch workOrder.approvedQuotation
             join fetch workOrder.createdByUser
             left join fetch workOrder.cancelledByUser
             where workOrder.id = :workOrderId

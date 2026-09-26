@@ -18,10 +18,37 @@ public class WorkOrderAccessPolicy {
     private final UserRepository userRepository;
     private final UserSystemRoleRepository userSystemRoleRepository;
 
+    public User requireCreationActor(Long userId) {
+        User user = requireInternalUser(userId);
+        if (!hasAnyRole(
+                userId,
+                SystemRole.ADMIN,
+                SystemRole.COMMERCIAL,
+                SystemRole.PRODUCTION
+        )) {
+            denied("Tu rol interno no permite crear órdenes de trabajo.");
+        }
+        return user;
+    }
+
+    public User requirePlanningActor(Long userId) {
+        User user = requireInternalUser(userId);
+        if (!hasAnyRole(
+                userId,
+                SystemRole.ADMIN,
+                SystemRole.COMMERCIAL,
+                SystemRole.ENGINEERING,
+                SystemRole.PRODUCTION
+        )) {
+            denied("Tu rol interno no permite preparar órdenes de trabajo.");
+        }
+        return user;
+    }
+
     public User requireProductionActor(Long userId) {
         User user = requireInternalUser(userId);
         if (!hasAnyRole(userId, SystemRole.ADMIN, SystemRole.PRODUCTION)) {
-            denied("Tu rol interno no permite gestionar órdenes de trabajo.");
+            denied("Tu rol interno no permite gestionar producción.");
         }
         return user;
     }

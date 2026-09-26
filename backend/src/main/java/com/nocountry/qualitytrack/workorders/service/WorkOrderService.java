@@ -1,8 +1,5 @@
 package com.nocountry.qualitytrack.workorders.service;
 
-import com.nocountry.qualitytrack.quotations.entity.Quotation;
-import com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
-import com.nocountry.qualitytrack.quotations.repository.QuotationRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.workorders.dto.response.WorkOrderDetailResponse;
@@ -20,9 +17,9 @@ import java.util.List;
 public class WorkOrderService {
 
     private final WorkOrderRepository workOrderRepository;
-    private final QuotationRepository quotationRepository;
     private final WorkOrderAccessPolicy accessPolicy;
     private final WorkOrderSourceService sourceService;
+    private final WorkOrderDocumentService documentService;
 
     @Transactional(readOnly = true)
     public List<WorkOrderResponse> list(Long currentUserId) {
@@ -43,20 +40,10 @@ public class WorkOrderService {
                         "No se encontró la orden de trabajo."
                 ));
 
-        Quotation approvedQuotation = requireApprovedQuotation(workOrder.getJobCase().getId());
-
         return WorkOrderDetailResponse.from(
                 workOrder,
-                approvedQuotation,
-                sourceService.get(currentUserId, workOrder)
+                sourceService.get(currentUserId, workOrder),
+                documentService.listPinned(workOrderId)
         );
-    }
-
-    private Quotation requireApprovedQuotation(Long caseId) {
-        return quotationRepository.findByJobCase_IdAndStatus(caseId, QuotationStatus.APPROVED)
-                .orElseThrow(() -> new BusinessException(
-                        ApiErrorCode.DATA_CONFLICT,
-                        "La orden de trabajo no tiene una cotización aprobada asociada al expediente."
-                ));
     }
 }

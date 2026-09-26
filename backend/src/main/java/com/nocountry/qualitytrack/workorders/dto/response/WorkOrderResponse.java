@@ -3,6 +3,7 @@ package com.nocountry.qualitytrack.workorders.dto.response;
 import com.nocountry.qualitytrack.requests.entity.CustomerRequest;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.workorders.entity.WorkOrder;
+import com.nocountry.qualitytrack.workorders.enums.WorkOrderPriority;
 import com.nocountry.qualitytrack.workorders.enums.WorkOrderStatus;
 
 import java.time.Instant;
@@ -18,8 +19,14 @@ public record WorkOrderResponse(
         String customerName,
         String workOrderNumber,
         WorkOrderStatus status,
+        WorkOrderPriority priority,
         Integer requestedQuantity,
+        LocalDate plannedStartDate,
+        LocalDate plannedEndDate,
         LocalDate agreedDeliveryDate,
+        Long approvedQuotationId,
+        String approvedQuotationNumber,
+        Integer approvedQuotationRevision,
         Long createdByUserId,
         String createdByName,
         Instant cancelledAt,
@@ -39,8 +46,14 @@ public record WorkOrderResponse(
                 request.getCustomer().getName(),
                 workOrder.getWorkOrderNumber(),
                 workOrder.getStatus(),
+                workOrder.getPriority(),
                 request.getQuantity(),
+                workOrder.getPlannedStartDate(),
+                workOrder.getPlannedEndDate(),
                 workOrder.getAgreedDeliveryDate(),
+                workOrder.getApprovedQuotation().getId(),
+                workOrder.getApprovedQuotation().getQuotationNumber(),
+                workOrder.getApprovedQuotation().getRevision(),
                 workOrder.getCreatedByUser().getId(),
                 fullName(workOrder.getCreatedByUser()),
                 workOrder.getCancelledAt(),

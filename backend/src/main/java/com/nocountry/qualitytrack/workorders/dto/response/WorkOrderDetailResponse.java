@@ -1,17 +1,21 @@
 package com.nocountry.qualitytrack.workorders.dto.response;
 
-import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.workorders.entity.WorkOrder;
+import com.nocountry.qualitytrack.workorders.enums.WorkOrderPriority;
 import com.nocountry.qualitytrack.workorders.enums.WorkOrderStatus;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 public record WorkOrderDetailResponse(
         Long id,
         String workOrderNumber,
         WorkOrderStatus status,
+        WorkOrderPriority priority,
+        LocalDate plannedStartDate,
+        LocalDate plannedEndDate,
         LocalDate agreedDeliveryDate,
         Long createdByUserId,
         String createdByName,
@@ -22,17 +26,21 @@ public record WorkOrderDetailResponse(
         Instant createdAt,
         Instant updatedAt,
         WorkOrderSourceResponse source,
-        WorkOrderAgreementResponse agreement
+        WorkOrderAgreementResponse agreement,
+        List<WorkOrderDocumentResponse> pinnedDocuments
 ) {
     public static WorkOrderDetailResponse from(
             WorkOrder workOrder,
-            Quotation approvedQuotation,
-            WorkOrderSourceResponse source
+            WorkOrderSourceResponse source,
+            List<WorkOrderDocumentResponse> pinnedDocuments
     ) {
         return new WorkOrderDetailResponse(
                 workOrder.getId(),
                 workOrder.getWorkOrderNumber(),
                 workOrder.getStatus(),
+                workOrder.getPriority(),
+                workOrder.getPlannedStartDate(),
+                workOrder.getPlannedEndDate(),
                 workOrder.getAgreedDeliveryDate(),
                 workOrder.getCreatedByUser().getId(),
                 fullName(workOrder.getCreatedByUser()),
@@ -43,7 +51,8 @@ public record WorkOrderDetailResponse(
                 workOrder.getCreatedAt(),
                 workOrder.getUpdatedAt(),
                 source,
-                WorkOrderAgreementResponse.from(approvedQuotation)
+                WorkOrderAgreementResponse.from(workOrder.getApprovedQuotation()),
+                pinnedDocuments == null ? List.of() : List.copyOf(pinnedDocuments)
         );
     }
 

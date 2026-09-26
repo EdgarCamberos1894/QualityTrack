@@ -14,6 +14,6 @@ public class WorkOrderReferenceGenerator {
         Number value = (Number) entityManager
                 .createNativeQuery("SELECT nextval('work_order_number_seq')")
                 .getSingleResult();
-        return "WO-%08d".formatted(value.longValue());
+        return "OT-%08d".formatted(value.longValue());
     }
 }
