@@ -63,3 +63,28 @@ ALTER TABLE work_orders
 
 CREATE INDEX idx_work_orders_approved_quotation
     ON work_orders (approved_quotation_id);
+
+CREATE TABLE work_order_documents (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    work_order_id BIGINT NOT NULL,
+    document_id BIGINT NOT NULL,
+    document_version_id BIGINT NOT NULL,
+    linked_by_user_id BIGINT NOT NULL,
+    linked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT uq_work_order_documents_order_document UNIQUE (work_order_id, document_id),
+    CONSTRAINT fk_work_order_documents_order FOREIGN KEY (work_order_id)
+        REFERENCES work_orders (id) ON DELETE CASCADE,
+    CONSTRAINT fk_work_order_documents_document FOREIGN KEY (document_id)
+        REFERENCES documents (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_work_order_documents_version FOREIGN KEY (document_version_id)
+        REFERENCES document_versions (id) ON DELETE RESTRICT,
+    CONSTRAINT fk_work_order_documents_linked_by FOREIGN KEY (linked_by_user_id)
+        REFERENCES users (id) ON DELETE RESTRICT
+);
+
+CREATE INDEX idx_work_order_documents_order
+    ON work_order_documents (work_order_id);
+
+CREATE INDEX idx_work_order_documents_version
+    ON work_order_documents (document_version_id);

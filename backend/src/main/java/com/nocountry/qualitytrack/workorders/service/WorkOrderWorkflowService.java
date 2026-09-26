@@ -13,6 +13,7 @@ import com.nocountry.qualitytrack.traceability.enums.TraceabilityEventType;
 import com.nocountry.qualitytrack.traceability.service.TraceabilityService;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.workorders.dto.request.CancelWorkOrderRequest;
+import com.nocountry.qualitytrack.workorders.dto.request.CreateWorkOrderRequest;
 import com.nocountry.qualitytrack.workorders.dto.response.WorkOrderDetailResponse;
 import com.nocountry.qualitytrack.workorders.entity.WorkOrder;
 import com.nocountry.qualitytrack.workorders.enums.WorkOrderStatus;
@@ -35,11 +36,16 @@ public class WorkOrderWorkflowService {
     private final WorkOrderReferenceGenerator referenceGenerator;
     private final WorkOrderAccessPolicy accessPolicy;
     private final WorkOrderSourceService sourceService;
+    private final WorkOrderDocumentService documentService;
     private final TraceabilityService traceabilityService;
 
     @Transactional
-    public WorkOrderDetailResponse create(Long currentUserId, Long caseId) {
-        User actor = accessPolicy.requireProductionActor(currentUserId);
+    public WorkOrderDetailResponse create(
+            Long currentUserId,
+            Long caseId,
+            CreateWorkOrderRequest input
+    ) {
+        User actor = accessPolicy.requireCreationActor(currentUserId);
         JobCase jobCase = requireCaseForUpdate(caseId);
 
         if (jobCase.getStatus() != JobCaseStatus.READY_FOR_QUOTATION) {
@@ -56,12 +62,22 @@ public class WorkOrderWorkflowService {
                         "El expediente necesita una cotización APPROVED antes de crear la orden de trabajo."
                 ));
 
-        WorkOrder workOrder = WorkOrder.plan(
-                jobCase,
-                referenceGenerator.nextWorkOrderNumber(),
-                approvedQuotation.getEstimatedDeliveryDate(),
-                actor
-        );
+        WorkOrder workOrder;
+        try {
+            workOrder = WorkOrder.create(
+                    jobCase,
+                    approvedQuotation,
+                    referenceGenerator.nextWorkOrderNumber(),
+                    input.priority(),
+                    input.plannedStartDate(),
+                    input.plannedEndDate(),
+                    approvedQuotation.getEstimatedDeliveryDate(),
+                    actor
+            );
+        } catch (IllegalArgumentException exception) {
+            conflict(exception.getMessage());
+            throw exception;
+        }
 
         JobCaseStatus previousCaseStatus = jobCase.getStatus();
         jobCase.markInProduction();
@@ -73,7 +89,7 @@ public class WorkOrderWorkflowService {
                 workOrder.getId(),
                 TraceabilityEventType.WORK_ORDER_CREATED,
                 null,
-                WorkOrderStatus.PLANNING.name(),
+                WorkOrderStatus.CREATED.name(),
                 currentUserId,
                 metadata(
                         "workOrderNumber", workOrder.getWorkOrderNumber(),
@@ -81,6 +97,9 @@ public class WorkOrderWorkflowService {
                         "quotationId", approvedQuotation.getId(),
                         "quotationNumber", approvedQuotation.getQuotationNumber(),
                         "quotationRevision", approvedQuotation.getRevision(),
+                        "priority", workOrder.getPriority(),
+                        "plannedStartDate", workOrder.getPlannedStartDate(),
+                        "plannedEndDate", workOrder.getPlannedEndDate(),
                         "agreedDeliveryDate", workOrder.getAgreedDeliveryDate()
                 )
         );
@@ -100,11 +119,7 @@ public class WorkOrderWorkflowService {
                 )
         );
 
-        return WorkOrderDetailResponse.from(
-                workOrder,
-                approvedQuotation,
-                sourceService.get(currentUserId, workOrder)
-        );
+        return detail(currentUserId, workOrder);
     }
 
     @Transactional
@@ -129,8 +144,8 @@ public class WorkOrderWorkflowService {
         try {
             workOrder.cancel(actor, reason, cancelledAt);
             workOrder.getJobCase().cancelFromProduction(actor, reason, cancelledAt);
-        } catch (IllegalStateException ex) {
-            conflict(ex.getMessage());
+        } catch (IllegalStateException exception) {
+            conflict(exception.getMessage());
         }
 
         workOrder = workOrderRepository.saveAndFlush(workOrder);
@@ -165,17 +180,14 @@ public class WorkOrderWorkflowService {
                 )
         );
 
-        Quotation approvedQuotation = quotationRepository
-                .findByJobCase_IdAndStatus(workOrder.getJobCase().getId(), QuotationStatus.APPROVED)
-                .orElseThrow(() -> new BusinessException(
-                        ApiErrorCode.DATA_CONFLICT,
-                        "La orden de trabajo no tiene una cotización aprobada asociada al expediente."
-                ));
+        return detail(currentUserId, workOrder);
+    }
 
+    private WorkOrderDetailResponse detail(Long currentUserId, WorkOrder workOrder) {
         return WorkOrderDetailResponse.from(
                 workOrder,
-                approvedQuotation,
-                sourceService.get(currentUserId, workOrder)
+                sourceService.get(currentUserId, workOrder),
+                documentService.listPinned(workOrder.getId())
         );
     }
 

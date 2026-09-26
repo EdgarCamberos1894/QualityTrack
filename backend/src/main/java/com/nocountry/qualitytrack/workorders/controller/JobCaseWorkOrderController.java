@@ -5,8 +5,10 @@ import com.nocountry.qualitytrack.shared.response.ApiResponse;
 import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
 import com.nocountry.qualitytrack.workorders.documentation.CreateWorkOrderApiDocs;
 import com.nocountry.qualitytrack.workorders.documentation.WorkOrderApiDocs;
+import com.nocountry.qualitytrack.workorders.dto.request.CreateWorkOrderRequest;
 import com.nocountry.qualitytrack.workorders.dto.response.WorkOrderDetailResponse;
 import com.nocountry.qualitytrack.workorders.service.WorkOrderWorkflowService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,13 +29,14 @@ public class JobCaseWorkOrderController {
     @PostMapping
     public ResponseEntity<ApiResponse<WorkOrderDetailResponse>> create(
             @CurrentUserId Long currentUserId,
-            @PathVariable Long caseId
+            @PathVariable Long caseId,
+            @Valid @org.springframework.web.bind.annotation.RequestBody CreateWorkOrderRequest request
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(
                         ApiSuccessCode.WORK_ORDER_CREATED,
                         "Orden de trabajo creada correctamente.",
-                        workflowService.create(currentUserId, caseId)
+                        workflowService.create(currentUserId, caseId, request)
                 ));
     }
 }
