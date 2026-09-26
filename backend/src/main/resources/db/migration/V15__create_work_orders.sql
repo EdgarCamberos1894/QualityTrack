@@ -35,7 +35,7 @@ CREATE TABLE work_orders (
     CONSTRAINT fk_work_orders_created_by FOREIGN KEY (created_by_user_id)
         REFERENCES users (id) ON DELETE RESTRICT,
     CONSTRAINT fk_work_orders_cancelled_by FOREIGN KEY (cancelled_by_user_id)
-        REFERENCES users (id) ON DELETE SET NULL,
+        REFERENCES users (id) ON DELETE RESTRICT,
     CONSTRAINT chk_work_orders_status CHECK (
         status IN ('PLANNING', 'READY', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED')
     ),
