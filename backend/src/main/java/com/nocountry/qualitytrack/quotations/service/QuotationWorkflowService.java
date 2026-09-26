@@ -52,6 +52,7 @@ public class QuotationWorkflowService {
     private final QuotationReferenceGenerator referenceGenerator;
     private final QuotationAccessPolicy accessPolicy;
     private final TraceabilityService traceabilityService;
+    private final QuotationSourceService quotationSourceService;
 
     @Value("${app.quotations.expiration-zone:America/Mazatlan}")
     private String expirationZone;
@@ -91,7 +92,10 @@ public class QuotationWorkflowService {
                 )
         );
 
-        return QuotationDetailResponse.from(quotation);
+        return QuotationDetailResponse.from(
+                quotation,
+                quotationSourceService.get(currentUserId, quotation)
+        );
     }
 
     @Transactional
@@ -180,7 +184,10 @@ public class QuotationWorkflowService {
         );
         quotation = quotationRepository.saveAndFlush(quotation);
 
-        return QuotationDetailResponse.from(quotation);
+        return QuotationDetailResponse.from(
+                quotation,
+                quotationSourceService.get(currentUserId, quotation)
+        );
     }
 
     @Transactional
@@ -219,7 +226,10 @@ public class QuotationWorkflowService {
                 )
         );
 
-        return QuotationDetailResponse.from(quotation);
+        return QuotationDetailResponse.from(
+                quotation,
+                quotationSourceService.get(currentUserId, quotation)
+        );
     }
 
     @Transactional
@@ -417,7 +427,10 @@ public class QuotationWorkflowService {
                 )
         );
 
-        return QuotationDetailResponse.from(next);
+        return QuotationDetailResponse.from(
+                next,
+                quotationSourceService.get(currentUserId, next)
+        );
     }
 
     @Transactional
@@ -459,7 +472,10 @@ public class QuotationWorkflowService {
                 )
         );
 
-        return QuotationDetailResponse.from(quotation);
+        return QuotationDetailResponse.from(
+                quotation,
+                quotationSourceService.get(currentUserId, quotation)
+        );
     }
 
     private void validateReadyToSend(Quotation quotation) {

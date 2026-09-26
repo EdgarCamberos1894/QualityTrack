@@ -17,6 +17,7 @@ public record QuotationDetailResponse(
         String requestNumber,
         Long customerId,
         String customerName,
+        QuotationSourceResponse source,
         String quotationNumber,
         Integer revision,
         QuotationStatus status,
@@ -42,12 +43,27 @@ public record QuotationDetailResponse(
         List<QuotationItemResponse> items
 ) {
     public static QuotationDetailResponse from(Quotation quotation) {
-        return from(quotation, quotation.getStatus());
+        return from(quotation, quotation.getStatus(), null);
+    }
+
+    public static QuotationDetailResponse from(
+            Quotation quotation,
+            QuotationSourceResponse source
+    ) {
+        return from(quotation, quotation.getStatus(), source);
     }
 
     public static QuotationDetailResponse from(
             Quotation quotation,
             QuotationStatus effectiveStatus
+    ) {
+        return from(quotation, effectiveStatus, null);
+    }
+
+    public static QuotationDetailResponse from(
+            Quotation quotation,
+            QuotationStatus effectiveStatus,
+            QuotationSourceResponse source
     ) {
         return new QuotationDetailResponse(
                 quotation.getId(),
@@ -57,6 +73,7 @@ public record QuotationDetailResponse(
                 quotation.getJobCase().getCustomerRequest().getRequestNumber(),
                 quotation.getJobCase().getCustomerRequest().getCustomer().getId(),
                 quotation.getJobCase().getCustomerRequest().getCustomer().getName(),
+                source,
                 quotation.getQuotationNumber(),
                 quotation.getRevision(),
                 effectiveStatus,

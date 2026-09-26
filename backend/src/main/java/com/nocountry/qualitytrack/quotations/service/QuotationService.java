@@ -27,6 +27,7 @@ public class QuotationService {
 
     private final QuotationRepository quotationRepository;
     private final QuotationAccessPolicy accessPolicy;
+    private final QuotationSourceService quotationSourceService;
 
     @Value("${app.quotations.expiration-zone:America/Mazatlan}")
     private String expirationZone;
@@ -50,7 +51,8 @@ public class QuotationService {
         Quotation quotation = requireDetail(quotationId);
         return QuotationDetailResponse.from(
                 quotation,
-                effectiveInternalStatus(quotation)
+                effectiveInternalStatus(quotation),
+                quotationSourceService.get(currentUserId, quotation)
         );
     }
 

@@ -34,11 +34,18 @@ class QuotationServiceTest {
     @Mock
     private QuotationAccessPolicy accessPolicy;
 
+    @Mock
+    private QuotationSourceService quotationSourceService;
+
     private QuotationService service;
 
     @BeforeEach
     void setUp() {
-        service = new QuotationService(quotationRepository, accessPolicy);
+        service = new QuotationService(
+                quotationRepository,
+                accessPolicy,
+                quotationSourceService
+        );
         ReflectionTestUtils.setField(service, "expirationZone", "America/Mazatlan");
     }
 

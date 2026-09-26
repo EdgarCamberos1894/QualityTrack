@@ -63,6 +63,8 @@ class QuotationWorkflowServiceTest {
     @Mock
     private TraceabilityService traceabilityService;
     @Mock
+    private QuotationSourceService quotationSourceService;
+    @Mock
     private User commercialUser;
     @Mock
     private User customerUser;
@@ -82,7 +84,8 @@ class QuotationWorkflowServiceTest {
                 jobCaseRepository,
                 referenceGenerator,
                 accessPolicy,
-                traceabilityService
+                traceabilityService,
+                quotationSourceService
         );
         ReflectionTestUtils.setField(service, "expirationZone", "America/Mazatlan");
 
