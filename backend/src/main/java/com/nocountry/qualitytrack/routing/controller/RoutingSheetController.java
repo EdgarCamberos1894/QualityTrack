@@ -6,9 +6,11 @@ import com.nocountry.qualitytrack.routing.documentation.CreateRoutingOperationAp
 import com.nocountry.qualitytrack.routing.documentation.DeleteRoutingOperationApiDocs;
 import com.nocountry.qualitytrack.routing.documentation.GetRoutingSheetApiDocs;
 import com.nocountry.qualitytrack.routing.documentation.ReleaseRoutingSheetApiDocs;
+import com.nocountry.qualitytrack.routing.documentation.ReopenRoutingSheetApiDocs;
 import com.nocountry.qualitytrack.routing.documentation.RoutingApiDocs;
 import com.nocountry.qualitytrack.routing.documentation.UpdateRoutingOperationApiDocs;
 import com.nocountry.qualitytrack.routing.dto.request.CreateRoutingOperationRequest;
+import com.nocountry.qualitytrack.routing.dto.request.ReopenRoutingSheetRequest;
 import com.nocountry.qualitytrack.routing.dto.request.UpdateRoutingOperationRequest;
 import com.nocountry.qualitytrack.routing.dto.response.RoutingSheetResponse;
 import com.nocountry.qualitytrack.routing.service.RoutingService;
@@ -109,6 +111,20 @@ public class RoutingSheetController {
                 ApiSuccessCode.ROUTING_SHEET_APPROVED,
                 "Hoja de ruta aprobada correctamente.",
                 workflowService.approve(currentUserId, routingSheetId)
+        ));
+    }
+
+    @ReopenRoutingSheetApiDocs
+    @PostMapping("/{routingSheetId}/reopen")
+    public ResponseEntity<ApiResponse<RoutingSheetResponse>> reopen(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long routingSheetId,
+            @Valid @RequestBody ReopenRoutingSheetRequest request
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.ROUTING_SHEET_REOPENED,
+                "Hoja de ruta reabierta para correcciones.",
+                workflowService.reopen(currentUserId, routingSheetId, request)
         ));
     }
 

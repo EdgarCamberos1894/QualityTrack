@@ -107,7 +107,7 @@ class RoutingServiceTest {
     void addOperationUpdatesDraftRouting() {
         RoutingSheet routingSheet = newRoutingSheet();
         when(accessPolicy.requireDesignerActor(10L)).thenReturn(actor);
-        when(routingSheetRepository.findById(20L)).thenReturn(Optional.of(routingSheet));
+        when(routingSheetRepository.findWorkOrderIdById(20L)).thenReturn(Optional.of(7L));
         when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
         when(routingSheetRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(routingSheet));
         when(routingSheetRepository.saveAndFlush(routingSheet)).thenReturn(routingSheet);
@@ -136,7 +136,7 @@ class RoutingServiceTest {
         routingSheet.approve(actor, java.time.Instant.now());
 
         when(accessPolicy.requireDesignerActor(10L)).thenReturn(actor);
-        when(routingSheetRepository.findById(20L)).thenReturn(Optional.of(routingSheet));
+        when(routingSheetRepository.findWorkOrderIdById(20L)).thenReturn(Optional.of(7L));
         when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
         when(routingSheetRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(routingSheet));
 

@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.routing.service;
 
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
+import com.nocountry.qualitytrack.routing.dto.request.ReopenRoutingSheetRequest;
 import com.nocountry.qualitytrack.routing.entity.RoutingSheet;
 import com.nocountry.qualitytrack.routing.enums.RoutingSheetStatus;
 import com.nocountry.qualitytrack.routing.repository.RoutingSheetRepository;
@@ -113,6 +114,43 @@ class RoutingWorkflowServiceTest {
     }
 
     @Test
+    void reopenReturnsApprovedRoutingToDraft() {
+        routingSheet.approve(actor, Instant.parse("2026-09-27T10:00:00Z"));
+        stubLockedRouting();
+        when(accessPolicy.requireDesignerActor(10L)).thenReturn(actor);
+        when(routingSheetRepository.saveAndFlush(routingSheet)).thenReturn(routingSheet);
+
+        var response = service.reopen(
+                10L,
+                20L,
+                new ReopenRoutingSheetRequest("Corregir tiempo estimado de torneado.")
+        );
+
+        assertEquals(RoutingSheetStatus.DRAFT, response.status());
+        assertEquals(WorkOrderStatus.CREATED, response.workOrderStatus());
+        verify(traceabilityService).record(
+                any(), any(), any(), any(), any(), any(), any(), any()
+        );
+    }
+
+    @Test
+    void releasedRoutingCannotBeReopened() {
+        routingSheet.approve(actor, Instant.parse("2026-09-27T10:00:00Z"));
+        routingSheet.release(actor, Instant.parse("2026-09-27T11:00:00Z"));
+        stubLockedRouting();
+        when(accessPolicy.requireDesignerActor(10L)).thenReturn(actor);
+
+        assertThrows(
+                BusinessException.class,
+                () -> service.reopen(
+                        10L,
+                        20L,
+                        new ReopenRoutingSheetRequest("No debe permitirse.")
+                )
+        );
+    }
+
+    @Test
     void releaseMovesRoutingAndWorkOrderAtomically() {
         routingSheet.approve(actor, Instant.parse("2026-09-27T10:00:00Z"));
         stubLockedRouting();
@@ -142,7 +180,7 @@ class RoutingWorkflowServiceTest {
     }
 
     private void stubLockedRouting() {
-        when(routingSheetRepository.findById(20L)).thenReturn(Optional.of(routingSheet));
+        when(routingSheetRepository.findWorkOrderIdById(20L)).thenReturn(Optional.of(7L));
         when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
         when(routingSheetRepository.findByIdForUpdate(20L)).thenReturn(Optional.of(routingSheet));
     }

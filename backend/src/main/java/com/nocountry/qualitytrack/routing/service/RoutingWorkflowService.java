@@ -1,5 +1,6 @@
 package com.nocountry.qualitytrack.routing.service;
 
+import com.nocountry.qualitytrack.routing.dto.request.ReopenRoutingSheetRequest;
 import com.nocountry.qualitytrack.routing.dto.response.RoutingSheetResponse;
 import com.nocountry.qualitytrack.routing.entity.RoutingSheet;
 import com.nocountry.qualitytrack.routing.enums.RoutingPurpose;
@@ -71,6 +72,52 @@ public class RoutingWorkflowService {
                         "purpose", routingSheet.getPurpose(),
                         "operationCount", routingSheet.getOperations().size(),
                         "estimatedMinutes", routingSheet.totalEstimatedMinutes()
+                )
+        );
+
+        return RoutingSheetResponse.from(routingSheet);
+    }
+
+    @Transactional
+    public RoutingSheetResponse reopen(
+            Long currentUserId,
+            Long routingSheetId,
+            ReopenRoutingSheetRequest input
+    ) {
+        accessPolicy.requireDesignerActor(currentUserId);
+        LockedRouting locked = lockWorkOrderThenRouting(routingSheetId);
+        RoutingSheet routingSheet = locked.routingSheet();
+
+        RoutingSheetStatus previousStatus = routingSheet.getStatus();
+        Long previousApprovedByUserId = routingSheet.getApprovedByUser() == null
+                ? null
+                : routingSheet.getApprovedByUser().getId();
+        Instant previousApprovedAt = routingSheet.getApprovedAt();
+
+        try {
+            routingSheet.reopen();
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            conflict(exception.getMessage());
+        }
+
+        routingSheet = routingSheetRepository.saveAndFlush(routingSheet);
+
+        traceabilityService.record(
+                locked.workOrder().getJobCase(),
+                TraceabilityAggregateType.ROUTING_SHEET,
+                routingSheet.getId(),
+                TraceabilityEventType.ROUTING_SHEET_REOPENED,
+                previousStatus.name(),
+                routingSheet.getStatus().name(),
+                currentUserId,
+                metadata(
+                        "workOrderId", locked.workOrder().getId(),
+                        "workOrderNumber", locked.workOrder().getWorkOrderNumber(),
+                        "revision", routingSheet.getRevision(),
+                        "purpose", routingSheet.getPurpose(),
+                        "reason", input.reason().trim(),
+                        "previousApprovedByUserId", previousApprovedByUserId,
+                        "previousApprovedAt", previousApprovedAt
                 )
         );
 
@@ -161,11 +208,11 @@ public class RoutingWorkflowService {
     }
 
     private LockedRouting lockWorkOrderThenRouting(Long routingSheetId) {
-        RoutingSheet snapshot = routingSheetRepository.findById(routingSheetId)
+        Long workOrderId = routingSheetRepository.findWorkOrderIdById(routingSheetId)
                 .orElseThrow(() -> notFound("No se encontró la hoja de ruta."));
 
         WorkOrder workOrder = workOrderRepository
-                .findByIdForUpdate(snapshot.getWorkOrder().getId())
+                .findByIdForUpdate(workOrderId)
                 .orElseThrow(() -> notFound("No se encontró la orden de trabajo."));
 
         RoutingSheet routingSheet = routingSheetRepository

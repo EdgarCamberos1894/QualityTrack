@@ -135,6 +135,7 @@ public class RoutingSheet {
                 estimatedMinutes
         );
         operations.add(operation);
+        touch();
         return operation;
     }
 
@@ -153,6 +154,7 @@ public class RoutingSheet {
                 ));
         requireSequenceAvailable(sequenceNumber, operation.getId());
         operation.update(sequenceNumber, code, name, instructions, estimatedMinutes);
+        touch();
         return operation;
     }
 
@@ -163,6 +165,7 @@ public class RoutingSheet {
                         "No se encontró la operación dentro de la hoja de ruta."
                 ));
         operations.remove(operation);
+        touch();
     }
 
     public Optional<RoutingOperation> findOperation(Long operationId) {
@@ -187,6 +190,18 @@ public class RoutingSheet {
         this.status = RoutingSheetStatus.APPROVED;
     }
 
+    public void reopen() {
+        requireWorkOrderCreated();
+        requireStatus(
+                RoutingSheetStatus.APPROVED,
+                "Solo una hoja de ruta APPROVED puede reabrirse."
+        );
+        this.approvedByUser = null;
+        this.approvedAt = null;
+        this.status = RoutingSheetStatus.DRAFT;
+        touch();
+    }
+
     public void release(User actor, Instant releasedAt) {
         requireWorkOrderCreated();
         requireStatus(
@@ -207,6 +222,10 @@ public class RoutingSheet {
         return operations.stream()
                 .mapToInt(RoutingOperation::getEstimatedMinutes)
                 .sum();
+    }
+
+    private void touch() {
+        this.updatedAt = Instant.now();
     }
 
     private void requireEditable() {

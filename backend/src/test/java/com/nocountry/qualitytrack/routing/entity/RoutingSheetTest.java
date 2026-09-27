@@ -104,6 +104,29 @@ class RoutingSheetTest {
     }
 
     @Test
+    void approvedRoutingCanBeReopenedForCorrections() {
+        RoutingSheet routingSheet = RoutingSheet.createProduction(workOrder, actor);
+        routingSheet.addOperation(10, "CUT", "Corte", null, 30);
+        routingSheet.approve(actor, Instant.parse("2026-09-27T10:00:00Z"));
+
+        routingSheet.reopen();
+
+        assertEquals(RoutingSheetStatus.DRAFT, routingSheet.getStatus());
+        assertEquals(null, routingSheet.getApprovedByUser());
+        assertEquals(null, routingSheet.getApprovedAt());
+    }
+
+    @Test
+    void releasedRoutingCannotBeReopened() {
+        RoutingSheet routingSheet = RoutingSheet.createProduction(workOrder, actor);
+        routingSheet.addOperation(10, "CUT", "Corte", null, 30);
+        routingSheet.approve(actor, Instant.parse("2026-09-27T10:00:00Z"));
+        routingSheet.release(actor, Instant.parse("2026-09-27T11:00:00Z"));
+
+        assertThrows(IllegalStateException.class, routingSheet::reopen);
+    }
+
+    @Test
     void approvedRoutingCanBeReleased() {
         RoutingSheet routingSheet = RoutingSheet.createProduction(workOrder, actor);
         routingSheet.addOperation(10, "CUT", "Corte", null, 30);

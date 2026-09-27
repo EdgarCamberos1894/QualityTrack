@@ -166,6 +166,16 @@ public class RoutingService {
             throw notFound("No se encontró la operación dentro de la hoja de ruta.");
         }
 
+        var previousOperation = routingSheet.findOperation(operationId)
+                .orElseThrow(() -> notFound(
+                        "No se encontró la operación dentro de la hoja de ruta."
+                ));
+        Integer previousSequenceNumber = previousOperation.getSequenceNumber();
+        String previousCode = previousOperation.getCode();
+        String previousName = previousOperation.getName();
+        String previousInstructions = previousOperation.getInstructions();
+        Integer previousEstimatedMinutes = previousOperation.getEstimatedMinutes();
+
         try {
             routingSheet.updateOperation(
                     operationId,
@@ -191,8 +201,15 @@ public class RoutingService {
                 currentUserId,
                 metadata(
                         "operationId", operationId,
+                        "previousSequenceNumber", previousSequenceNumber,
+                        "previousCode", previousCode,
+                        "previousName", previousName,
+                        "previousInstructions", previousInstructions,
+                        "previousEstimatedMinutes", previousEstimatedMinutes,
                         "sequenceNumber", input.sequenceNumber(),
                         "code", input.code(),
+                        "name", input.name(),
+                        "instructions", input.instructions(),
                         "estimatedMinutes", input.estimatedMinutes()
                 )
         );
@@ -218,7 +235,10 @@ public class RoutingService {
         Map<String, Object> eventMetadata = metadata(
                 "operationId", operation.getId(),
                 "sequenceNumber", operation.getSequenceNumber(),
-                "code", operation.getCode()
+                "code", operation.getCode(),
+                "name", operation.getName(),
+                "instructions", operation.getInstructions(),
+                "estimatedMinutes", operation.getEstimatedMinutes()
         );
 
         try {
@@ -244,8 +264,9 @@ public class RoutingService {
     }
 
     private LockedRouting lockWorkOrderThenRouting(Long routingSheetId) {
-        RoutingSheet snapshot = requireRouting(routingSheetId);
-        WorkOrder workOrder = requireWorkOrderForUpdate(snapshot.getWorkOrder().getId());
+        Long workOrderId = routingSheetRepository.findWorkOrderIdById(routingSheetId)
+                .orElseThrow(() -> notFound("No se encontró la hoja de ruta."));
+        WorkOrder workOrder = requireWorkOrderForUpdate(workOrderId);
         RoutingSheet routingSheet = routingSheetRepository.findByIdForUpdate(routingSheetId)
                 .orElseThrow(() -> notFound("No se encontró la hoja de ruta."));
 

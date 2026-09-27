@@ -23,8 +23,7 @@ public class WorkOrderAccessPolicy {
         if (!hasAnyRole(
                 userId,
                 SystemRole.ADMIN,
-                SystemRole.COMMERCIAL,
-                SystemRole.PRODUCTION
+                SystemRole.COMMERCIAL
         )) {
             denied("Tu rol interno no permite crear órdenes de trabajo.");
         }
@@ -37,8 +36,7 @@ public class WorkOrderAccessPolicy {
                 userId,
                 SystemRole.ADMIN,
                 SystemRole.COMMERCIAL,
-                SystemRole.ENGINEERING,
-                SystemRole.PRODUCTION
+                SystemRole.ENGINEERING
         )) {
             denied("Tu rol interno no permite preparar órdenes de trabajo.");
         }
