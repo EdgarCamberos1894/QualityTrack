@@ -25,6 +25,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -53,11 +54,11 @@ class RoutingServiceTest {
                 traceabilityService
         );
 
-        when(workOrder.getId()).thenReturn(7L);
-        when(workOrder.getWorkOrderNumber()).thenReturn("OT-00126");
-        when(workOrder.getStatus()).thenReturn(WorkOrderStatus.CREATED);
-        when(workOrder.getJobCase()).thenReturn(jobCase);
-        when(actor.getId()).thenReturn(10L);
+        lenient().when(workOrder.getId()).thenReturn(7L);
+        lenient().when(workOrder.getWorkOrderNumber()).thenReturn("OT-00126");
+        lenient().when(workOrder.getStatus()).thenReturn(WorkOrderStatus.CREATED);
+        lenient().when(workOrder.getJobCase()).thenReturn(jobCase);
+        lenient().when(actor.getId()).thenReturn(10L);
     }
 
     @Test

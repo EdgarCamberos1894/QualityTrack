@@ -27,6 +27,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -57,7 +58,7 @@ class RoutingWorkflowServiceTest {
                 traceabilityService
         );
 
-        when(actor.getId()).thenReturn(10L);
+        lenient().when(actor.getId()).thenReturn(10L);
 
         workOrder = WorkOrder.create(
                 jobCase,
