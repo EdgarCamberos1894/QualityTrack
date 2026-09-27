@@ -138,6 +138,22 @@ public class WorkOrder {
         );
     }
 
+    public void releaseToProduction() {
+        if (status != WorkOrderStatus.CREATED) {
+            throw new IllegalStateException(
+                    "Solo una orden de trabajo en CREATED puede liberarse a producción."
+            );
+        }
+        if (plannedQuantity == null || plannedQuantity <= 0
+                || plannedStartDate == null
+                || plannedEndDate == null) {
+            throw new IllegalStateException(
+                    "La orden de trabajo necesita planificación completa antes de liberarse."
+            );
+        }
+        this.status = WorkOrderStatus.READY_FOR_PRODUCTION;
+    }
+
     public void cancel(User actor, String reason, Instant cancelledAt) {
         if (status != WorkOrderStatus.CREATED) {
             throw new IllegalStateException(

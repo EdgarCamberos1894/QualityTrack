@@ -33,6 +33,7 @@ public class WorkOrderDocumentService {
 
     private final WorkOrderDocumentRepository workOrderDocumentRepository;
     private final WorkOrderRepository workOrderRepository;
+    private final RoutingSheetRepository routingSheetRepository;
     private final DocumentRepository documentRepository;
     private final DocumentVersionRepository documentVersionRepository;
     private final WorkOrderAccessPolicy accessPolicy;
@@ -61,6 +62,12 @@ public class WorkOrderDocumentService {
 
         if (workOrder.getStatus() != WorkOrderStatus.CREATED) {
             conflict("Los documentos solo pueden fijarse mientras la orden está en CREATED.");
+        }
+        if (routingSheetRepository.existsByWorkOrder_IdAndStatusIn(
+                workOrderId,
+                List.of(RoutingSheetStatus.APPROVED, RoutingSheetStatus.RELEASED)
+        )) {
+            conflict("Los documentos no pueden cambiar después de aprobar la hoja de ruta.");
         }
 
         Long caseId = workOrder.getJobCase().getId();
