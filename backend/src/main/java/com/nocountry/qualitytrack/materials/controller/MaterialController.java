@@ -1,6 +1,11 @@
 package com.nocountry.qualitytrack.materials.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.materials.documentation.CreateMaterialApiDocs;
+import com.nocountry.qualitytrack.materials.documentation.CreateMaterialLotApiDocs;
+import com.nocountry.qualitytrack.materials.documentation.ListMaterialLotsApiDocs;
+import com.nocountry.qualitytrack.materials.documentation.ListMaterialsApiDocs;
+import com.nocountry.qualitytrack.materials.documentation.MaterialApiDocs;
 import com.nocountry.qualitytrack.materials.dto.request.CreateMaterialLotRequest;
 import com.nocountry.qualitytrack.materials.dto.request.CreateMaterialRequest;
 import com.nocountry.qualitytrack.materials.dto.response.MaterialLotResponse;
@@ -24,10 +29,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/materials")
 @RequiredArgsConstructor
+@MaterialApiDocs
 public class MaterialController {
 
     private final MaterialService materialService;
 
+    @CreateMaterialApiDocs
     @PostMapping
     public ResponseEntity<ApiResponse<MaterialResponse>> createMaterial(
             @CurrentUserId Long currentUserId,
@@ -41,6 +48,7 @@ public class MaterialController {
                 ));
     }
 
+    @ListMaterialsApiDocs
     @GetMapping
     public ResponseEntity<ApiResponse<List<MaterialResponse>>> listMaterials(
             @CurrentUserId Long currentUserId
@@ -52,6 +60,7 @@ public class MaterialController {
         ));
     }
 
+    @CreateMaterialLotApiDocs
     @PostMapping("/{materialId}/lots")
     public ResponseEntity<ApiResponse<MaterialLotResponse>> createLot(
             @CurrentUserId Long currentUserId,
@@ -66,6 +75,7 @@ public class MaterialController {
                 ));
     }
 
+    @ListMaterialLotsApiDocs
     @GetMapping("/{materialId}/lots")
     public ResponseEntity<ApiResponse<List<MaterialLotResponse>>> listLots(
             @CurrentUserId Long currentUserId,

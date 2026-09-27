@@ -1,6 +1,9 @@
 package com.nocountry.qualitytrack.materials.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.materials.documentation.ListWorkOrderMaterialsApiDocs;
+import com.nocountry.qualitytrack.materials.documentation.MaterialApiDocs;
+import com.nocountry.qualitytrack.materials.documentation.RecordMaterialConsumptionApiDocs;
 import com.nocountry.qualitytrack.materials.dto.request.RecordMaterialConsumptionRequest;
 import com.nocountry.qualitytrack.materials.dto.response.WorkOrderMaterialResponse;
 import com.nocountry.qualitytrack.materials.service.MaterialService;
@@ -21,10 +24,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/work-orders")
 @RequiredArgsConstructor
+@MaterialApiDocs
 public class WorkOrderMaterialController {
 
     private final MaterialService materialService;
 
+    @RecordMaterialConsumptionApiDocs
     @PostMapping("/{workOrderId}/materials")
     public ResponseEntity<ApiResponse<WorkOrderMaterialResponse>> recordConsumption(
             @CurrentUserId Long currentUserId,
@@ -38,6 +43,7 @@ public class WorkOrderMaterialController {
         ));
     }
 
+    @ListWorkOrderMaterialsApiDocs
     @GetMapping("/{workOrderId}/materials")
     public ResponseEntity<ApiResponse<List<WorkOrderMaterialResponse>>> listConsumption(
             @CurrentUserId Long currentUserId,

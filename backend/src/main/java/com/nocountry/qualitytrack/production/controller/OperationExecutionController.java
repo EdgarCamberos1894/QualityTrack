@@ -1,6 +1,9 @@
 package com.nocountry.qualitytrack.production.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.production.documentation.CancelOperationExecutionApiDocs;
+import com.nocountry.qualitytrack.production.documentation.CompleteOperationExecutionApiDocs;
+import com.nocountry.qualitytrack.production.documentation.ProductionApiDocs;
 import com.nocountry.qualitytrack.production.dto.request.CancelOperationExecutionRequest;
 import com.nocountry.qualitytrack.production.dto.request.CompleteOperationExecutionRequest;
 import com.nocountry.qualitytrack.production.dto.response.OperationExecutionResponse;
@@ -19,10 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/operation-executions")
 @RequiredArgsConstructor
+@ProductionApiDocs
 public class OperationExecutionController {
 
     private final ProductionWorkflowService productionWorkflowService;
 
+    @CompleteOperationExecutionApiDocs
     @PostMapping("/{executionId}/complete")
     public ResponseEntity<ApiResponse<OperationExecutionResponse>> complete(
             @CurrentUserId Long currentUserId,
@@ -32,14 +37,11 @@ public class OperationExecutionController {
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.OPERATION_EXECUTION_COMPLETED,
                 "Ejecución completada correctamente.",
-                productionWorkflowService.complete(
-                        currentUserId,
-                        executionId,
-                        request
-                )
+                productionWorkflowService.complete(currentUserId, executionId, request)
         ));
     }
 
+    @CancelOperationExecutionApiDocs
     @PostMapping("/{executionId}/cancel")
     public ResponseEntity<ApiResponse<OperationExecutionResponse>> cancel(
             @CurrentUserId Long currentUserId,
@@ -49,11 +51,7 @@ public class OperationExecutionController {
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.OPERATION_EXECUTION_CANCELLED,
                 "Ejecución cancelada correctamente.",
-                productionWorkflowService.cancel(
-                        currentUserId,
-                        executionId,
-                        request
-                )
+                productionWorkflowService.cancel(currentUserId, executionId, request)
         ));
     }
 }

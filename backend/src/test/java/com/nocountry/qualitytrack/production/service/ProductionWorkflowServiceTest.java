@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -129,7 +130,7 @@ class ProductionWorkflowServiceTest {
         assertEquals(OperationExecutionStatus.IN_PROGRESS, response.status());
         assertEquals(WorkOrderStatus.IN_PRODUCTION, workOrder.getStatus());
         assertNotNull(workOrder.getActualStartAt());
-        verify(traceabilityService).record(
+        verify(traceabilityService, times(2)).record(
                 any(), any(), any(), any(), any(), any(), any(), any()
         );
     }

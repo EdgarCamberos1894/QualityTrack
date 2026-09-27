@@ -1,6 +1,8 @@
 package com.nocountry.qualitytrack.production.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.production.documentation.GetProductionStatusApiDocs;
+import com.nocountry.qualitytrack.production.documentation.ProductionApiDocs;
 import com.nocountry.qualitytrack.production.dto.response.ProductionStatusResponse;
 import com.nocountry.qualitytrack.production.service.ProductionWorkflowService;
 import com.nocountry.qualitytrack.shared.response.ApiResponse;
@@ -15,10 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/work-orders")
 @RequiredArgsConstructor
+@ProductionApiDocs
 public class WorkOrderProductionController {
 
     private final ProductionWorkflowService productionWorkflowService;
 
+    @GetProductionStatusApiDocs
     @GetMapping("/{workOrderId}/production")
     public ResponseEntity<ApiResponse<ProductionStatusResponse>> getStatus(
             @CurrentUserId Long currentUserId,
@@ -27,10 +31,7 @@ public class WorkOrderProductionController {
         return ResponseEntity.ok(ApiResponse.success(
                 ApiSuccessCode.PRODUCTION_RETRIEVED,
                 "Estado de producción consultado correctamente.",
-                productionWorkflowService.getStatus(
-                        currentUserId,
-                        workOrderId
-                )
+                productionWorkflowService.getStatus(currentUserId, workOrderId)
         ));
     }
 }

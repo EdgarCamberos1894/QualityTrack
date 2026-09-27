@@ -1,6 +1,9 @@
 package com.nocountry.qualitytrack.machines.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.machines.documentation.CreateMachineApiDocs;
+import com.nocountry.qualitytrack.machines.documentation.ListMachinesApiDocs;
+import com.nocountry.qualitytrack.machines.documentation.MachineApiDocs;
 import com.nocountry.qualitytrack.machines.dto.request.CreateMachineRequest;
 import com.nocountry.qualitytrack.machines.dto.response.MachineResponse;
 import com.nocountry.qualitytrack.machines.service.MachineService;
@@ -21,10 +24,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/machines")
 @RequiredArgsConstructor
+@MachineApiDocs
 public class MachineController {
 
     private final MachineService machineService;
 
+    @CreateMachineApiDocs
     @PostMapping
     public ResponseEntity<ApiResponse<MachineResponse>> create(
             @CurrentUserId Long currentUserId,
@@ -38,6 +43,7 @@ public class MachineController {
                 ));
     }
 
+    @ListMachinesApiDocs
     @GetMapping
     public ResponseEntity<ApiResponse<List<MachineResponse>>> list(
             @CurrentUserId Long currentUserId

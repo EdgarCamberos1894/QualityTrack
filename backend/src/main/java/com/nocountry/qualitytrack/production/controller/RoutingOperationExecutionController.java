@@ -1,6 +1,8 @@
 package com.nocountry.qualitytrack.production.controller;
 
 import com.nocountry.qualitytrack.auth.security.CurrentUserId;
+import com.nocountry.qualitytrack.production.documentation.ProductionApiDocs;
+import com.nocountry.qualitytrack.production.documentation.StartOperationExecutionApiDocs;
 import com.nocountry.qualitytrack.production.dto.request.StartOperationExecutionRequest;
 import com.nocountry.qualitytrack.production.dto.response.OperationExecutionResponse;
 import com.nocountry.qualitytrack.production.service.ProductionWorkflowService;
@@ -19,10 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/routing-operations")
 @RequiredArgsConstructor
+@ProductionApiDocs
 public class RoutingOperationExecutionController {
 
     private final ProductionWorkflowService productionWorkflowService;
 
+    @StartOperationExecutionApiDocs
     @PostMapping("/{operationId}/executions")
     public ResponseEntity<ApiResponse<OperationExecutionResponse>> start(
             @CurrentUserId Long currentUserId,
@@ -33,11 +37,7 @@ public class RoutingOperationExecutionController {
                 .body(ApiResponse.success(
                         ApiSuccessCode.OPERATION_EXECUTION_STARTED,
                         "Ejecución de operación iniciada.",
-                        productionWorkflowService.start(
-                                currentUserId,
-                                operationId,
-                                request
-                        )
+                        productionWorkflowService.start(currentUserId, operationId, request)
                 ));
     }
 }
