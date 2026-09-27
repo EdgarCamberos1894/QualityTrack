@@ -69,6 +69,7 @@ public class WorkOrderWorkflowService {
                     approvedQuotation,
                     referenceGenerator.nextWorkOrderNumber(),
                     input.priority(),
+                    jobCase.getCustomerRequest().getQuantity(),
                     input.plannedStartDate(),
                     input.plannedEndDate(),
                     approvedQuotation.getEstimatedDeliveryDate(),
@@ -98,6 +99,7 @@ public class WorkOrderWorkflowService {
                         "quotationNumber", approvedQuotation.getQuotationNumber(),
                         "quotationRevision", approvedQuotation.getRevision(),
                         "priority", workOrder.getPriority(),
+                        "plannedQuantity", workOrder.getPlannedQuantity(),
                         "plannedStartDate", workOrder.getPlannedStartDate(),
                         "plannedEndDate", workOrder.getPlannedEndDate(),
                         "agreedDeliveryDate", workOrder.getAgreedDeliveryDate()

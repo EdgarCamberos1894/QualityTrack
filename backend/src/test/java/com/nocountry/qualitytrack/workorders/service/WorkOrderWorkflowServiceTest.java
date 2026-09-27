@@ -96,6 +96,7 @@ class WorkOrderWorkflowServiceTest {
         assertEquals(WorkOrderStatus.CREATED, response.status());
         assertEquals("OT-00000001", response.workOrderNumber());
         assertEquals(WorkOrderPriority.NORMAL, response.priority());
+        assertEquals(25, response.plannedQuantity());
         assertEquals(LocalDate.of(2026, 10, 1), response.plannedStartDate());
         assertEquals(LocalDate.of(2026, 10, 15), response.plannedEndDate());
         assertEquals(approved.getEstimatedDeliveryDate(), response.agreedDeliveryDate());
@@ -253,6 +254,7 @@ class WorkOrderWorkflowServiceTest {
                 approved,
                 "OT-00000001",
                 WorkOrderPriority.NORMAL,
+                25,
                 LocalDate.of(2026, 10, 1),
                 LocalDate.of(2026, 10, 15),
                 approved.getEstimatedDeliveryDate(),
