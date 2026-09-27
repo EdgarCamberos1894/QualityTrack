@@ -299,10 +299,7 @@ public class ProductionWorkflowService {
         WorkOrder workOrder = workOrderRepository.findById(workOrderId)
                 .orElseThrow(() -> notFound("No se encontró la orden de trabajo."));
 
-        List<OperationExecutionResponse> executions = executionRepository
-                .findAllByRoutingOperation_RoutingSheet_WorkOrder_IdOrderByRoutingOperation_SequenceNumberAscAttemptNumberAsc(
-                        workOrderId
-                )
+        List<OperationExecutionResponse> executions = executionRepository.findAllByWorkOrderIdOrdered(workOrderId)
                 .stream()
                 .map(OperationExecutionResponse::from)
                 .toList();
