@@ -66,7 +66,7 @@ class MaterialServiceTest {
                 traceabilityService
         );
 
-        when(actor.getId()).thenReturn(10L);
+        lenient().when(actor.getId()).thenReturn(10L);
 
         workOrder = WorkOrder.create(
                 jobCase,
