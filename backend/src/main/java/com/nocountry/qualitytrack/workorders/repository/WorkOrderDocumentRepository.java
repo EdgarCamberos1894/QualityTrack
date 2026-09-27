@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface WorkOrderDocumentRepository extends JpaRepository<WorkOrderDocument, Long> {
 
+    boolean existsByDocument_Id(Long documentId);
+
     @EntityGraph(attributePaths = {
             "document",
             "documentVersion",
