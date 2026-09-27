@@ -35,9 +35,15 @@ public interface OperationExecutionRepository extends JpaRepository<OperationExe
             "operator",
             "machine"
     })
-    List<OperationExecution>
-    findAllByRoutingOperation_RoutingSheet_WorkOrder_IdOrderByRoutingOperation_SequenceNumberAscAttemptNumberAsc(
-            Long workOrderId
+    @Query("""
+            select execution
+            from OperationExecution execution
+            where execution.routingOperation.routingSheet.workOrder.id = :workOrderId
+            order by execution.routingOperation.sequenceNumber asc,
+                     execution.attemptNumber asc
+            """)
+    List<OperationExecution> findAllByWorkOrderIdOrdered(
+            @Param("workOrderId") Long workOrderId
     );
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -46,9 +52,6 @@ public interface OperationExecutionRepository extends JpaRepository<OperationExe
             from OperationExecution execution
             join fetch execution.routingOperation operation
             join fetch operation.routingSheet routingSheet
-            join fetch routingSheet.workOrder
-            join fetch execution.operator
-            left join fetch execution.machine
             where execution.id = :executionId
             """)
     Optional<OperationExecution> findByIdForUpdate(
