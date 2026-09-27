@@ -229,7 +229,8 @@ public class RoutingSheet {
         requirePositive(sequenceNumber, "La secuencia de la operación debe ser mayor a cero.");
         boolean duplicated = operations.stream()
                 .anyMatch(operation ->
-                        !Objects.equals(operation.getId(), ignoredOperationId)
+                        (ignoredOperationId == null
+                                || !Objects.equals(operation.getId(), ignoredOperationId))
                                 && Objects.equals(operation.getSequenceNumber(), sequenceNumber)
                 );
         if (duplicated) {
