@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Aprobar hoja de ruta",
-        description = "Cambia RoutingSheet DRAFT a APPROVED. Requiere al menos una operación y documentos fijados. La aprobación congela la revisión como plan validado, pero todavía no la libera a ejecución."
+        description = "Cambia RoutingSheet DRAFT a APPROVED. Requiere al menos una operación y documentos fijados. La aprobación congela la revisión como plan validado, pero todavía no la libera a ejecución. Si requiere correcciones antes de liberar, debe reabrirse explícitamente a DRAFT."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Operación completada correctamente"),

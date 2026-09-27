@@ -30,8 +30,7 @@ public interface RoutingSheetRepository extends JpaRepository<RoutingSheet, Long
             "workOrder",
             "createdByUser",
             "approvedByUser",
-            "releasedByUser",
-            "operations"
+            "releasedByUser"
     })
     List<RoutingSheet> findAllByWorkOrder_IdOrderByRevisionAsc(Long workOrderId);
 
@@ -40,8 +39,7 @@ public interface RoutingSheetRepository extends JpaRepository<RoutingSheet, Long
             "workOrder",
             "createdByUser",
             "approvedByUser",
-            "releasedByUser",
-            "operations"
+            "releasedByUser"
     })
     Optional<RoutingSheet> findById(Long id);
 
