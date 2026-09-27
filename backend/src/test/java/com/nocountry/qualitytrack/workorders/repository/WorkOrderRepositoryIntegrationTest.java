@@ -79,6 +79,23 @@ class WorkOrderRepositoryIntegrationTest {
     }
 
     @Test
+    void databaseRejectsApprovedQuotationFromAnotherCase() {
+        Fixture first = createFixture("quotation-case-a");
+        Fixture second = createFixture("quotation-case-b");
+
+        assertThrows(
+                DataIntegrityViolationException.class,
+                () -> insertWorkOrder(
+                        first.caseId(),
+                        second.quotationId(),
+                        first.internalUserId(),
+                        "OT-WRONG-QUOTE",
+                        "CREATED"
+                )
+        );
+    }
+
+    @Test
     void databaseRejectsPlanningEndOnCommittedDelivery() {
         Fixture fixture = createFixture("planning");
 
@@ -120,6 +137,44 @@ class WorkOrderRepositoryIntegrationTest {
                         fixture,
                         "OT-CANCELLED",
                         "CANCELLED"
+                )
+        );
+    }
+
+    @Test
+    void databaseRejectsPinnedDocumentFromAnotherCase() {
+        Fixture first = createFixture("document-case-a");
+        Fixture second = createFixture("document-case-b");
+        Long workOrderId = insertWorkOrder(first, "OT-DOC-CASE", "CREATED");
+        DocumentFixture foreignDocument = createDocument(second, "foreign");
+
+        assertThrows(
+                DataIntegrityViolationException.class,
+                () -> insertPinnedDocument(
+                        workOrderId,
+                        first.caseId(),
+                        foreignDocument.documentId(),
+                        foreignDocument.versionId(),
+                        first.internalUserId()
+                )
+        );
+    }
+
+    @Test
+    void databaseRejectsVersionThatBelongsToAnotherDocument() {
+        Fixture fixture = createFixture("document-version");
+        Long workOrderId = insertWorkOrder(fixture, "OT-DOC-VERSION", "CREATED");
+        DocumentFixture selectedDocument = createDocument(fixture, "selected");
+        DocumentFixture otherDocument = createDocument(fixture, "other");
+
+        assertThrows(
+                DataIntegrityViolationException.class,
+                () -> insertPinnedDocument(
+                        workOrderId,
+                        fixture.caseId(),
+                        selectedDocument.documentId(),
+                        otherDocument.versionId(),
+                        fixture.internalUserId()
                 )
         );
     }
@@ -259,8 +314,94 @@ class WorkOrderRepositoryIntegrationTest {
         return new Fixture(internalUserId, caseId, quotationId);
     }
 
+    private DocumentFixture createDocument(Fixture fixture, String suffix) {
+        Long documentId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO documents (
+                    case_id,
+                    document_type,
+                    name,
+                    created_by_user_id
+                )
+                VALUES (?, 'DRAWING', ?, ?)
+                RETURNING id
+                """,
+                Long.class,
+                fixture.caseId(),
+                "Plano " + suffix,
+                fixture.internalUserId()
+        );
+
+        Long versionId = jdbcTemplate.queryForObject(
+                """
+                INSERT INTO document_versions (
+                    document_id,
+                    version,
+                    file_name,
+                    storage_key,
+                    mime_type,
+                    file_size,
+                    checksum,
+                    uploaded_by_user_id
+                )
+                VALUES (?, 1, ?, ?, 'application/pdf', 128, ?, ?)
+                RETURNING id
+                """,
+                Long.class,
+                documentId,
+                "plano-" + suffix + ".pdf",
+                "work-order-tests/" + suffix + "-" + documentId,
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                fixture.internalUserId()
+        );
+
+        return new DocumentFixture(documentId, versionId);
+    }
+
+    private void insertPinnedDocument(
+            Long workOrderId,
+            Long caseId,
+            Long documentId,
+            Long versionId,
+            Long linkedByUserId
+    ) {
+        jdbcTemplate.update(
+                """
+                INSERT INTO work_order_documents (
+                    work_order_id,
+                    case_id,
+                    document_id,
+                    document_version_id,
+                    linked_by_user_id
+                )
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                workOrderId,
+                caseId,
+                documentId,
+                versionId,
+                linkedByUserId
+        );
+    }
+
     private Long insertWorkOrder(
             Fixture fixture,
+            String workOrderNumber,
+            String status
+    ) {
+        return insertWorkOrder(
+                fixture.caseId(),
+                fixture.quotationId(),
+                fixture.internalUserId(),
+                workOrderNumber,
+                status
+        );
+    }
+
+    private Long insertWorkOrder(
+            Long caseId,
+            Long quotationId,
+            Long internalUserId,
             String workOrderNumber,
             String status
     ) {
@@ -281,14 +422,14 @@ class WorkOrderRepositoryIntegrationTest {
                 RETURNING id
                 """,
                 Long.class,
-                fixture.caseId(),
-                fixture.quotationId(),
+                caseId,
+                quotationId,
                 workOrderNumber,
                 status,
                 LocalDate.of(2026, 10, 1),
                 LocalDate.of(2026, 10, 15),
                 LocalDate.of(2026, 10, 20),
-                fixture.internalUserId()
+                internalUserId
         );
     }
 
@@ -296,6 +437,12 @@ class WorkOrderRepositoryIntegrationTest {
             Long internalUserId,
             Long caseId,
             Long quotationId
+    ) {
+    }
+
+    private record DocumentFixture(
+            Long documentId,
+            Long versionId
     ) {
     }
 }

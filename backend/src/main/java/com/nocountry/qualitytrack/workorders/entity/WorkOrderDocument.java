@@ -33,6 +33,9 @@ public class WorkOrderDocument {
     @JoinColumn(name = "work_order_id", nullable = false)
     private WorkOrder workOrder;
 
+    @Column(name = "case_id", nullable = false, updatable = false)
+    private Long caseId;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "document_id", nullable = false)
     private Document document;
@@ -56,6 +59,10 @@ public class WorkOrderDocument {
             Instant linkedAt
     ) {
         this.workOrder = Objects.requireNonNull(workOrder);
+        this.caseId = Objects.requireNonNull(
+                workOrder.getJobCase().getId(),
+                "La orden de trabajo debe pertenecer a un expediente persistido."
+        );
         this.document = Objects.requireNonNull(document);
         rebind(documentVersion, linkedByUser, linkedAt);
     }

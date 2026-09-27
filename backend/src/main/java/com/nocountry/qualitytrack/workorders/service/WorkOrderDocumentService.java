@@ -22,8 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -80,19 +82,27 @@ public class WorkOrderDocumentService {
                 ));
 
         Instant now = Instant.now();
-        WorkOrderDocument link = workOrderDocumentRepository
-                .findByWorkOrder_IdAndDocument_Id(workOrderId, documentId)
-                .map(existing -> {
-                    existing.rebind(version, actor, now);
-                    return existing;
-                })
-                .orElseGet(() -> WorkOrderDocument.pin(
-                        workOrder,
-                        document,
-                        version,
-                        actor,
-                        now
-                ));
+        Optional<WorkOrderDocument> existingLink = workOrderDocumentRepository
+                .findByWorkOrder_IdAndDocument_Id(workOrderId, documentId);
+
+        Long previousVersionId = null;
+        Integer previousVersion = null;
+        WorkOrderDocument link;
+
+        if (existingLink.isPresent()) {
+            link = existingLink.get();
+            previousVersionId = link.getDocumentVersion().getId();
+            previousVersion = link.getDocumentVersion().getVersion();
+            link.rebind(version, actor, now);
+        } else {
+            link = WorkOrderDocument.pin(
+                    workOrder,
+                    document,
+                    version,
+                    actor,
+                    now
+            );
+        }
 
         link = workOrderDocumentRepository.saveAndFlush(link);
 
@@ -104,16 +114,30 @@ public class WorkOrderDocumentService {
                 workOrder.getStatus().name(),
                 workOrder.getStatus().name(),
                 currentUserId,
-                Map.of(
+                metadata(
                         "workOrderNumber", workOrder.getWorkOrderNumber(),
                         "documentId", document.getId(),
                         "documentName", document.getName(),
+                        "changeType", existingLink.isPresent() ? "REPLACED" : "PINNED",
+                        "previousDocumentVersionId", previousVersionId,
+                        "previousVersion", previousVersion,
                         "documentVersionId", version.getId(),
                         "version", version.getVersion()
                 )
         );
 
         return WorkOrderDocumentResponse.from(link);
+    }
+
+    private Map<String, Object> metadata(Object... entries) {
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        for (int index = 0; index < entries.length; index += 2) {
+            Object value = entries[index + 1];
+            if (value != null) {
+                metadata.put(String.valueOf(entries[index]), value);
+            }
+        }
+        return metadata;
     }
 
     private BusinessException notFound(String message) {
