@@ -66,6 +66,23 @@ class WorkOrderTest {
     }
 
     @Test
+    void releaseMovesCreatedWorkOrderToReadyForProduction() {
+        WorkOrder workOrder = newWorkOrder();
+
+        workOrder.releaseToProduction();
+
+        assertEquals(WorkOrderStatus.READY_FOR_PRODUCTION, workOrder.getStatus());
+    }
+
+    @Test
+    void releasedWorkOrderCannotBeReleasedAgain() {
+        WorkOrder workOrder = newWorkOrder();
+        workOrder.releaseToProduction();
+
+        assertThrows(IllegalStateException.class, workOrder::releaseToProduction);
+    }
+
+    @Test
     void cancelMovesCreatedWorkOrderToCancelled() {
         User actor = mock(User.class);
         WorkOrder workOrder = WorkOrder.create(

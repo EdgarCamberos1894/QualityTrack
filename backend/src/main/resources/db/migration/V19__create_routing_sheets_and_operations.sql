@@ -58,6 +58,10 @@ CREATE TABLE routing_sheets (
 CREATE INDEX idx_routing_sheets_work_order
     ON routing_sheets (work_order_id);
 
+CREATE UNIQUE INDEX uq_routing_sheets_production_work_order
+    ON routing_sheets (work_order_id)
+    WHERE purpose = 'PRODUCTION';
+
 CREATE INDEX idx_routing_sheets_status
     ON routing_sheets (status);
 
