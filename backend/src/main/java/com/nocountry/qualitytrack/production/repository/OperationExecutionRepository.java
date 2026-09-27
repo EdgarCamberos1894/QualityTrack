@@ -21,6 +21,13 @@ public interface OperationExecutionRepository extends JpaRepository<OperationExe
 
     long countByRoutingOperation_Id(Long routingOperationId);
 
+    @Query("""
+            select execution.routingOperation.routingSheet.workOrder.id
+            from OperationExecution execution
+            where execution.id = :executionId
+            """)
+    Optional<Long> findWorkOrderIdById(@Param("executionId") Long executionId);
+
     @EntityGraph(attributePaths = {
             "routingOperation",
             "routingOperation.routingSheet",
