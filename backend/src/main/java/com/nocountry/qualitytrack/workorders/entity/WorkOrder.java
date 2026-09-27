@@ -138,6 +138,28 @@ public class WorkOrder {
         );
     }
 
+    public void updatePlanning(
+            WorkOrderPriority priority,
+            LocalDate plannedStartDate,
+            LocalDate plannedEndDate
+    ) {
+        if (status != WorkOrderStatus.CREATED) {
+            throw new IllegalStateException(
+                    "Solo una orden de trabajo en CREATED puede replanificarse."
+            );
+        }
+
+        WorkOrderPriority nextPriority = Objects.requireNonNull(priority);
+        LocalDate nextStartDate = Objects.requireNonNull(plannedStartDate);
+        LocalDate nextEndDate = Objects.requireNonNull(plannedEndDate);
+
+        validatePlanningDates(nextStartDate, nextEndDate, agreedDeliveryDate);
+
+        this.priority = nextPriority;
+        this.plannedStartDate = nextStartDate;
+        this.plannedEndDate = nextEndDate;
+    }
+
     public void releaseToProduction() {
         if (status != WorkOrderStatus.CREATED) {
             throw new IllegalStateException(

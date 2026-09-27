@@ -66,6 +66,50 @@ class WorkOrderTest {
     }
 
     @Test
+    void createdWorkOrderCanUpdatePlanning() {
+        WorkOrder workOrder = newWorkOrder();
+
+        workOrder.updatePlanning(
+                WorkOrderPriority.HIGH,
+                LocalDate.of(2026, 10, 3),
+                LocalDate.of(2026, 10, 18)
+        );
+
+        assertEquals(WorkOrderPriority.HIGH, workOrder.getPriority());
+        assertEquals(LocalDate.of(2026, 10, 3), workOrder.getPlannedStartDate());
+        assertEquals(LocalDate.of(2026, 10, 18), workOrder.getPlannedEndDate());
+    }
+
+    @Test
+    void updatePlanningRejectsEndDateOnCommittedDelivery() {
+        WorkOrder workOrder = newWorkOrder();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> workOrder.updatePlanning(
+                        WorkOrderPriority.NORMAL,
+                        LocalDate.of(2026, 10, 3),
+                        LocalDate.of(2026, 10, 20)
+                )
+        );
+    }
+
+    @Test
+    void releasedWorkOrderCannotUpdatePlanning() {
+        WorkOrder workOrder = newWorkOrder();
+        workOrder.releaseToProduction();
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> workOrder.updatePlanning(
+                        WorkOrderPriority.HIGH,
+                        LocalDate.of(2026, 10, 3),
+                        LocalDate.of(2026, 10, 18)
+                )
+        );
+    }
+
+    @Test
     void releaseMovesCreatedWorkOrderToReadyForProduction() {
         WorkOrder workOrder = newWorkOrder();
 
