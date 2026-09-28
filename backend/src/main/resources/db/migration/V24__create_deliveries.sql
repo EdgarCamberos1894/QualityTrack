@@ -96,6 +96,7 @@ CREATE TABLE deliveries (
             AND dispatched_by_user_id IS NOT NULL
             AND delivered_at IS NOT NULL
             AND delivered_at >= dispatched_at
+            AND received_by_name IS NOT NULL
             AND BTRIM(received_by_name) <> ''
             AND confirmed_by_user_id IS NOT NULL
             AND cancelled_at IS NULL
@@ -110,6 +111,7 @@ CREATE TABLE deliveries (
             AND confirmed_by_user_id IS NULL
             AND cancelled_at IS NOT NULL
             AND cancelled_by_user_id IS NOT NULL
+            AND cancellation_reason IS NOT NULL
             AND BTRIM(cancellation_reason) <> ''
         )
     )
