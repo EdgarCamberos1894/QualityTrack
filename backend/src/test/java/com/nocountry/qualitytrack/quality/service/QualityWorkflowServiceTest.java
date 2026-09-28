@@ -84,8 +84,8 @@ class QualityWorkflowServiceTest {
         );
         ReflectionTestUtils.setField(workOrder, "id", 7L);
         workOrder.releaseToProduction();
-        workOrder.startProduction(Instant.parse("2026-09-28T08:00:00Z"));
-        workOrder.markProductionCompleted(Instant.parse("2026-09-28T16:00:00Z"));
+        workOrder.startProduction(Instant.parse("2026-09-27T08:00:00Z"));
+        workOrder.markProductionCompleted(Instant.parse("2026-09-27T16:00:00Z"));
     }
 
     @Test
@@ -175,7 +175,7 @@ class QualityWorkflowServiceTest {
         QualityInspection inspection = QualityInspection.createPending(workOrder);
         ReflectionTestUtils.setField(inspection, "id", 100L);
         workOrder.sendToQuality();
-        inspection.start(actor, Instant.parse("2026-09-28T17:00:00Z"));
+        inspection.start(actor, Instant.parse("2026-09-27T17:00:00Z"));
         return inspection;
     }
 
