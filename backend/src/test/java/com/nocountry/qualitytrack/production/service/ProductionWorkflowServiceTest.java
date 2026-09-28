@@ -146,6 +146,10 @@ class ProductionWorkflowServiceTest {
                 OperationExecutionStatus.IN_PROGRESS
         )).thenReturn(false);
         when(executionRepository.existsByRoutingOperation_IdAndStatus(
+                102L,
+                OperationExecutionStatus.COMPLETED
+        )).thenReturn(false);
+        when(executionRepository.existsByRoutingOperation_IdAndStatus(
                 101L,
                 OperationExecutionStatus.COMPLETED
         )).thenReturn(false);
