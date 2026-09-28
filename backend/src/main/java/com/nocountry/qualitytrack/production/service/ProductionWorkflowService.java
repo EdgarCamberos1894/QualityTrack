@@ -351,7 +351,7 @@ public class ProductionWorkflowService {
         WorkOrder workOrder = locked.workOrder();
         OperationExecution execution = locked.execution();
 
-        requireProductionOpen(workOrder);
+        requireExecutionOpen(workOrder, execution.getRoutingOperation());
 
         Machine machine = lockAssignedMachine(execution);
         OperationExecutionStatus previousStatus = execution.getStatus();

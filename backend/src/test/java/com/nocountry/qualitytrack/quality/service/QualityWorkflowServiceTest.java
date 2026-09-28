@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.quality.service;
 
 import com.nocountry.qualitytrack.nonconformities.entity.NonConformity;
 import com.nocountry.qualitytrack.nonconformities.enums.NonConformityStatus;
+import com.nocountry.qualitytrack.nonconformities.enums.NonConformityDisposition;
 import com.nocountry.qualitytrack.nonconformities.repository.NonConformityRepository;
 import com.nocountry.qualitytrack.nonconformities.service.NonConformityReferenceGenerator;
 import com.nocountry.qualitytrack.quality.dto.request.SaveQualityMeasurementRequest;
@@ -277,6 +278,120 @@ class QualityWorkflowServiceTest {
                 eq(10L),
                 any()
         );
+    }
+
+    @Test
+    void approvedReinspectionClosesOriginalNonConformity() {
+        NonConformity nonConformity = reworkNonConformity();
+        QualityInspection reinspection = reinspection(nonConformity);
+        QualityMeasurement measurement = QualityMeasurement.create(
+                reinspection,
+                "Diámetro exterior",
+                new BigDecimal("25.000"),
+                new BigDecimal("24.950"),
+                new BigDecimal("25.050"),
+                new BigDecimal("25.020"),
+                "mm",
+                null
+        );
+
+        when(inspectionRepository.findWorkOrderIdById(101L))
+                .thenReturn(Optional.of(7L));
+        when(workOrderRepository.findByIdForUpdate(7L))
+                .thenReturn(Optional.of(workOrder));
+        when(inspectionRepository.findByIdForUpdate(101L))
+                .thenReturn(Optional.of(reinspection));
+        when(accessPolicy.requireAssignedQualityActor(10L, 10L))
+                .thenReturn(actor);
+        when(measurementRepository.findAllByQualityInspection_IdOrderByIdAsc(101L))
+                .thenReturn(List.of(measurement));
+        when(nonConformityRepository.findByIdForUpdate(300L))
+                .thenReturn(Optional.of(nonConformity));
+        when(inspectionRepository.saveAndFlush(reinspection))
+                .thenReturn(reinspection);
+        when(nonConformityRepository.saveAndFlush(nonConformity))
+                .thenReturn(nonConformity);
+
+        var response = service.complete(10L, 101L);
+
+        assertEquals(QualityInspectionStatus.APPROVED, response.status());
+        assertEquals(WorkOrderStatus.READY_FOR_DELIVERY, workOrder.getStatus());
+        assertEquals(NonConformityStatus.CLOSED, nonConformity.getStatus());
+        assertEquals(NonConformityDisposition.REWORK, nonConformity.getDisposition());
+    }
+
+    @Test
+    void failedReinspectionKeepsSameNonConformityOpen() {
+        NonConformity nonConformity = reworkNonConformity();
+        QualityInspection reinspection = reinspection(nonConformity);
+        QualityMeasurement measurement = QualityMeasurement.create(
+                reinspection,
+                "Diámetro exterior",
+                new BigDecimal("25.000"),
+                new BigDecimal("24.950"),
+                new BigDecimal("25.050"),
+                new BigDecimal("25.090"),
+                "mm",
+                null
+        );
+
+        when(inspectionRepository.findWorkOrderIdById(101L))
+                .thenReturn(Optional.of(7L));
+        when(workOrderRepository.findByIdForUpdate(7L))
+                .thenReturn(Optional.of(workOrder));
+        when(inspectionRepository.findByIdForUpdate(101L))
+                .thenReturn(Optional.of(reinspection));
+        when(accessPolicy.requireAssignedQualityActor(10L, 10L))
+                .thenReturn(actor);
+        when(measurementRepository.findAllByQualityInspection_IdOrderByIdAsc(101L))
+                .thenReturn(List.of(measurement));
+        when(nonConformityRepository.findByIdForUpdate(300L))
+                .thenReturn(Optional.of(nonConformity));
+        when(inspectionRepository.saveAndFlush(reinspection))
+                .thenReturn(reinspection);
+        when(nonConformityRepository.saveAndFlush(nonConformity))
+                .thenReturn(nonConformity);
+
+        var response = service.complete(10L, 101L);
+
+        assertEquals(QualityInspectionStatus.REJECTED, response.status());
+        assertEquals(WorkOrderStatus.QUALITY_HOLD, workOrder.getStatus());
+        assertEquals(NonConformityStatus.OPEN, nonConformity.getStatus());
+        assertEquals(300L, response.nonConformity().id());
+    }
+
+    private NonConformity reworkNonConformity() {
+        QualityInspection originalInspection = startedInspection();
+        originalInspection.reject(Instant.parse("2026-09-27T18:00:00Z"));
+        workOrder.holdForQuality();
+
+        NonConformity nonConformity = NonConformity.open(
+                "NC-0001",
+                workOrder,
+                originalInspection,
+                actor,
+                Instant.parse("2026-09-27T18:00:00Z")
+        );
+        ReflectionTestUtils.setField(nonConformity, "id", 300L);
+        nonConformity.updateDetails(
+                1,
+                "MAJOR",
+                "Diámetro fuera de tolerancia."
+        );
+        nonConformity.selectRework();
+        return nonConformity;
+    }
+
+    private QualityInspection reinspection(NonConformity nonConformity) {
+        workOrder.startRework();
+        QualityInspection inspection = QualityInspection.createReinspection(
+                workOrder,
+                nonConformity
+        );
+        ReflectionTestUtils.setField(inspection, "id", 101L);
+        workOrder.sendReworkToQuality();
+        inspection.start(actor, Instant.parse("2026-09-27T19:00:00Z"));
+        return inspection;
     }
 
     private QualityInspection startedInspection() {
