@@ -12,6 +12,7 @@ import com.nocountry.qualitytrack.deliveries.repository.DeliveryRepository;
 import com.nocountry.qualitytrack.documents.entity.DocumentVersion;
 import com.nocountry.qualitytrack.documents.enums.DocumentStatus;
 import com.nocountry.qualitytrack.documents.repository.DocumentVersionRepository;
+import com.nocountry.qualitytrack.documents.service.DocumentAccessService;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
@@ -41,6 +42,7 @@ public class DeliveryService {
     private final WorkOrderRepository workOrderRepository;
     private final JobCaseRepository jobCaseRepository;
     private final DocumentVersionRepository documentVersionRepository;
+    private final DocumentAccessService documentAccessService;
     private final TraceabilityService traceabilityService;
 
     @Transactional
@@ -184,6 +186,7 @@ public class DeliveryService {
                 request.documentVersionId(),
                 locked.workOrder().getJobCase().getId()
         );
+        documentAccessService.requireCanRead(currentUserId, evidence.getDocument());
 
         try {
             delivery.attachEvidence(evidence);
@@ -286,6 +289,9 @@ public class DeliveryService {
                         request.evidenceDocumentVersionId(),
                         workOrder.getJobCase().getId()
                 );
+        if (evidence != null) {
+            documentAccessService.requireCanRead(currentUserId, evidence.getDocument());
+        }
 
         DeliveryStatus previousStatus = delivery.getStatus();
         try {
