@@ -142,6 +142,10 @@ class ProductionWorkflowServiceTest {
         when(routingOperationRepository.findAllByRoutingSheet_IdOrderBySequenceNumberAsc(20L))
                 .thenReturn(List.of(firstOperation, secondOperation));
         when(executionRepository.existsByRoutingOperation_IdAndStatus(
+                102L,
+                OperationExecutionStatus.IN_PROGRESS
+        )).thenReturn(false);
+        when(executionRepository.existsByRoutingOperation_IdAndStatus(
                 101L,
                 OperationExecutionStatus.COMPLETED
         )).thenReturn(false);
