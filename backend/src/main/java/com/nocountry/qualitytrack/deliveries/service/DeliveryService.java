@@ -265,6 +265,7 @@ public class DeliveryService {
                         customerId
                 )
                 .stream()
+                .filter(this::isCustomerVisible)
                 .map(DeliveryResponse::from)
                 .toList();
     }
@@ -285,14 +286,13 @@ public class DeliveryService {
         requireCustomerContext(workOrder, customerId, requestId);
         requireReadyForDelivery(workOrder);
 
-        DocumentVersion evidence = request.evidenceDocumentVersionId() == null
-                ? null
-                : requireEvidence(
-                        request.evidenceDocumentVersionId(),
-                        workOrder.getJobCase().getId()
-                );
-        if (evidence != null) {
-            documentAccessService.requireCanRead(currentUserId, evidence.getDocument());
+        DocumentVersion evidence = delivery.getEvidenceDocumentVersion();
+        if (request.evidenceDocumentVersionId() != null
+                && (evidence == null
+                || !request.evidenceDocumentVersionId().equals(evidence.getId()))) {
+            conflict(
+                    "La evidencia indicada no coincide con la evidencia vinculada a esta entrega."
+            );
         }
 
         DeliveryStatus previousStatus = delivery.getStatus();
@@ -300,7 +300,6 @@ public class DeliveryService {
             delivery.confirmReception(
                     actor,
                     request.receivedByName(),
-                    evidence,
                     Instant.now()
             );
         } catch (IllegalArgumentException | IllegalStateException exception) {
@@ -430,6 +429,13 @@ public class DeliveryService {
             conflict("La versión seleccionada debe pertenecer a un documento DELIVERY_EVIDENCE.");
         }
         return version;
+    }
+
+    private boolean isCustomerVisible(Delivery delivery) {
+        return delivery.getStatus() == DeliveryStatus.DISPATCHED
+                || delivery.getStatus() == DeliveryStatus.DELIVERED
+                || (delivery.getStatus() == DeliveryStatus.CANCELLED
+                && delivery.getDispatchedAt() != null);
     }
 
     private Map<String, Object> metadata(Object... entries) {
