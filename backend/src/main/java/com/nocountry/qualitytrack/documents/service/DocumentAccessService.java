@@ -97,7 +97,7 @@ public class DocumentAccessService {
         }
 
         requireActiveMembership(userId, jobCase);
-        requireCustomerOwnedDocument(document);
+        requireCustomerReadableDocument(document);
         return user;
     }
 
@@ -144,6 +144,20 @@ public class DocumentAccessService {
 
     private void requireCustomerOwnedDocument(Document document) {
         if (document.getCreatedBy().getAccountType() != AccountType.CUSTOMER) {
+            throw new BusinessException(
+                    ApiErrorCode.ACCESS_DENIED,
+                    "Este documento es de uso interno y no está disponible para cuentas de cliente."
+            );
+        }
+    }
+
+    private void requireCustomerReadableDocument(Document document) {
+        boolean customerOwned =
+                document.getCreatedBy().getAccountType() == AccountType.CUSTOMER;
+        boolean deliveryEvidence =
+                "DELIVERY_EVIDENCE".equals(document.getDocumentType());
+
+        if (!customerOwned && !deliveryEvidence) {
             throw new BusinessException(
                     ApiErrorCode.ACCESS_DENIED,
                     "Este documento es de uso interno y no está disponible para cuentas de cliente."
