@@ -78,4 +78,18 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
             @Param("workOrderId") Long workOrderId,
             @Param("deliveredStatus") DeliveryStatus deliveredStatus
     );
+
+    boolean existsByEvidenceDocumentVersion_Document_Id(Long documentId);
+
+    @EntityGraph(attributePaths = {
+            "workOrder",
+            "workOrder.jobCase",
+            "workOrder.jobCase.customerRequest",
+            "workOrder.jobCase.customerRequest.customer",
+            "evidenceDocumentVersion"
+    })
+    List<Delivery> findAllByEvidenceDocumentVersion_IdAndWorkOrder_JobCase_CustomerRequest_Customer_Id(
+            Long documentVersionId,
+            Long customerId
+    );
 }
