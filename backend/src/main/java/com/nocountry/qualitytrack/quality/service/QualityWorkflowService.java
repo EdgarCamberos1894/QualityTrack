@@ -147,6 +147,7 @@ public class QualityWorkflowService {
             Long inspectionId,
             SaveQualityMeasurementRequest request
     ) {
+        accessPolicy.requireQualityActor(currentUserId);
         LockedInspection locked = lockWorkOrderThenInspection(inspectionId);
         WorkOrder workOrder = locked.workOrder();
         QualityInspection inspection = locked.inspection();
@@ -192,6 +193,8 @@ public class QualityWorkflowService {
             Long measurementId,
             SaveQualityMeasurementRequest request
     ) {
+        accessPolicy.requireQualityActor(currentUserId);
+
         Long measurementInspectionId = measurementRepository
                 .findInspectionIdById(measurementId)
                 .orElseThrow(() -> notFound("No se encontró la medición."));
@@ -252,6 +255,7 @@ public class QualityWorkflowService {
 
     @Transactional
     public QualityInspectionResponse complete(Long currentUserId, Long inspectionId) {
+        accessPolicy.requireQualityActor(currentUserId);
         LockedInspection locked = lockWorkOrderThenInspection(inspectionId);
         WorkOrder workOrder = locked.workOrder();
         QualityInspection inspection = locked.inspection();

@@ -13,6 +13,8 @@ import com.nocountry.qualitytrack.quality.repository.QualityInspectionRepository
 import com.nocountry.qualitytrack.quality.repository.QualityMeasurementRepository;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
+import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
+import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.traceability.enums.TraceabilityAggregateType;
 import com.nocountry.qualitytrack.traceability.enums.TraceabilityEventType;
 import com.nocountry.qualitytrack.traceability.service.TraceabilityService;
@@ -38,10 +40,12 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -193,6 +197,41 @@ class QualityWorkflowServiceTest {
                 eq(WorkOrderStatus.QUALITY_HOLD.name()),
                 eq(10L),
                 any()
+        );
+    }
+
+    @Test
+    void updateMeasurementChecksQualityRoleBeforeLookingUpResources() {
+        SaveQualityMeasurementRequest request = new SaveQualityMeasurementRequest(
+                "Diámetro exterior",
+                new BigDecimal("25.000"),
+                new BigDecimal("24.950"),
+                new BigDecimal("25.050"),
+                new BigDecimal("25.020"),
+                "mm",
+                null
+        );
+
+        when(accessPolicy.requireQualityActor(99L))
+                .thenThrow(new BusinessException(
+                        ApiErrorCode.ACCESS_DENIED,
+                        "Acceso denegado."
+                ));
+
+        assertThrows(
+                BusinessException.class,
+                () -> service.updateMeasurement(
+                        99L,
+                        100L,
+                        200L,
+                        request
+                )
+        );
+
+        verifyNoInteractions(
+                measurementRepository,
+                inspectionRepository,
+                workOrderRepository
         );
     }
 
