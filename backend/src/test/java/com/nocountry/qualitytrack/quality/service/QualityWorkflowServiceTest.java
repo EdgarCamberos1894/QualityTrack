@@ -318,6 +318,16 @@ class QualityWorkflowServiceTest {
         assertEquals(WorkOrderStatus.READY_FOR_DELIVERY, workOrder.getStatus());
         assertEquals(NonConformityStatus.CLOSED, nonConformity.getStatus());
         assertEquals(NonConformityDisposition.REWORK, nonConformity.getDisposition());
+        verify(traceabilityService).record(
+                any(),
+                eq(TraceabilityAggregateType.WORK_ORDER),
+                eq(7L),
+                eq(TraceabilityEventType.WORK_ORDER_NC_RESOLVED),
+                eq(WorkOrderStatus.QUALITY_PENDING.name()),
+                eq(WorkOrderStatus.READY_FOR_DELIVERY.name()),
+                eq(10L),
+                any()
+        );
     }
 
     @Test
