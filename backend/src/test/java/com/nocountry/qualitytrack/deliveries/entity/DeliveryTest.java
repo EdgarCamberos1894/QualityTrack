@@ -45,7 +45,6 @@ class DeliveryTest {
         delivery.confirmReception(
                 actor,
                 "Ana López",
-                null,
                 Instant.parse("2026-09-29T12:00:00Z")
         );
 
@@ -69,7 +68,7 @@ class DeliveryTest {
                 actor
         );
         delivery.dispatch(actor, null, null, Instant.parse("2026-09-28T18:00:00Z"));
-        delivery.confirmReception(actor, "Ana López", null, Instant.parse("2026-09-29T12:00:00Z"));
+        delivery.confirmReception(actor, "Ana López", Instant.parse("2026-09-29T12:00:00Z"));
 
         assertThrows(
                 IllegalStateException.class,
@@ -78,6 +77,39 @@ class DeliveryTest {
                         "No aplica",
                         Instant.parse("2026-09-29T13:00:00Z")
                 )
+        );
+    }
+
+    @Test
+    void deliveredDeliveryEvidenceCannotBeReplaced() {
+        User actor = mock(User.class);
+        var firstEvidence = mock(com.nocountry.qualitytrack.documents.entity.DocumentVersion.class);
+        var replacementEvidence = mock(com.nocountry.qualitytrack.documents.entity.DocumentVersion.class);
+
+        Delivery delivery = Delivery.create(
+                readyOrder(actor),
+                5,
+                "Cliente",
+                "Av. Principal 123",
+                "Tepic",
+                "Nayarit",
+                "63000",
+                "México",
+                "PAQUETERIA",
+                actor
+        );
+
+        delivery.attachEvidence(firstEvidence);
+        delivery.dispatch(actor, null, null, Instant.parse("2026-09-28T18:00:00Z"));
+        delivery.confirmReception(
+                actor,
+                "Ana López",
+                Instant.parse("2026-09-29T12:00:00Z")
+        );
+
+        assertThrows(
+                IllegalStateException.class,
+                () -> delivery.attachEvidence(replacementEvidence)
         );
     }
 
