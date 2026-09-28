@@ -13,11 +13,11 @@ import java.util.Optional;
 
 public interface QualityInspectionRepository extends JpaRepository<QualityInspection, Long> {
 
-    @EntityGraph(attributePaths = {"workOrder", "inspector"})
+    @EntityGraph(attributePaths = {"workOrder", "inspector", "reworkNonConformity"})
     List<QualityInspection> findAllByWorkOrder_IdOrderByCreatedAtAscIdAsc(Long workOrderId);
 
     @Override
-    @EntityGraph(attributePaths = {"workOrder", "inspector"})
+    @EntityGraph(attributePaths = {"workOrder", "inspector", "reworkNonConformity"})
     Optional<QualityInspection> findById(Long id);
 
     @Query("""
@@ -34,6 +34,7 @@ public interface QualityInspectionRepository extends JpaRepository<QualityInspec
             join fetch inspection.workOrder workOrder
             join fetch workOrder.jobCase
             left join fetch inspection.inspector
+            left join fetch inspection.reworkNonConformity
             where inspection.id = :inspectionId
             """)
     Optional<QualityInspection> findByIdForUpdate(

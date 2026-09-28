@@ -14,6 +14,7 @@ public record QualityInspectionResponse(
         Long workOrderId,
         String workOrderNumber,
         QualityInspectionStatus status,
+        Long reworkNonConformityId,
         Long inspectorId,
         String inspectorName,
         Instant startedAt,
@@ -36,6 +37,9 @@ public record QualityInspectionResponse(
                 inspection.getWorkOrder().getId(),
                 inspection.getWorkOrder().getWorkOrderNumber(),
                 inspection.getStatus(),
+                inspection.getReworkNonConformity() == null
+                        ? null
+                        : inspection.getReworkNonConformity().getId(),
                 inspector == null ? null : inspector.getId(),
                 inspector == null
                         ? null

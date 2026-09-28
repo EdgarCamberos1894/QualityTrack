@@ -276,9 +276,20 @@ public class QualityWorkflowService {
         QualityInspectionStatus previousStatus = inspection.getStatus();
         WorkOrderStatus previousWorkOrderStatus = workOrder.getStatus();
         Instant completedAt = Instant.now();
-        NonConformity nonConformity = null;
+
+        NonConformity reworkNonConformity = null;
+        if (inspection.getReworkNonConformity() != null) {
+            reworkNonConformity = nonConformityRepository
+                    .findByIdForUpdate(inspection.getReworkNonConformity().getId())
+                    .orElseThrow(() -> notFound(
+                            "No se encontró la no conformidad ligada a la reinspección."
+                    ));
+        }
+
+        NonConformity resultNonConformity = reworkNonConformity;
 
         if (failedMeasurements > 0
+                && reworkNonConformity == null
                 && nonConformityRepository.existsByQualityInspection_Id(inspectionId)) {
             conflict("La inspección ya tiene una no conformidad asociada.");
         }
@@ -287,18 +298,28 @@ public class QualityWorkflowService {
             if (failedMeasurements == 0) {
                 inspection.approve(completedAt);
                 workOrder.approveQuality();
+
+                if (reworkNonConformity != null) {
+                    reworkNonConformity.closeAfterApprovedReinspection(
+                            actor,
+                            completedAt
+                    );
+                }
             } else {
                 inspection.reject(completedAt);
                 workOrder.holdForQuality();
 
-                nonConformity = NonConformity.open(
-                        nonConformityReferenceGenerator.nextNumber(),
-                        workOrder,
-                        inspection,
-                        actor,
-                        completedAt
-                );
-                nonConformity = nonConformityRepository.saveAndFlush(nonConformity);
+                if (reworkNonConformity == null) {
+                    resultNonConformity = NonConformity.open(
+                            nonConformityReferenceGenerator.nextNumber(),
+                            workOrder,
+                            inspection,
+                            actor,
+                            completedAt
+                    );
+                    resultNonConformity = nonConformityRepository
+                            .saveAndFlush(resultNonConformity);
+                }
             }
         } catch (IllegalArgumentException | IllegalStateException exception) {
             conflict(exception.getMessage());
@@ -307,9 +328,15 @@ public class QualityWorkflowService {
         inspection = inspectionRepository.saveAndFlush(inspection);
         workOrderRepository.saveAndFlush(workOrder);
 
-        TraceabilityEventType resultEvent = inspection.getStatus() == QualityInspectionStatus.APPROVED
-                ? TraceabilityEventType.QUALITY_INSPECTION_APPROVED
-                : TraceabilityEventType.QUALITY_INSPECTION_REJECTED;
+        if (reworkNonConformity != null) {
+            resultNonConformity = nonConformityRepository
+                    .saveAndFlush(reworkNonConformity);
+        }
+
+        TraceabilityEventType resultEvent =
+                inspection.getStatus() == QualityInspectionStatus.APPROVED
+                        ? TraceabilityEventType.QUALITY_INSPECTION_APPROVED
+                        : TraceabilityEventType.QUALITY_INSPECTION_REJECTED;
 
         traceabilityService.record(
                 workOrder.getJobCase(),
@@ -323,7 +350,11 @@ public class QualityWorkflowService {
                         "workOrderId", workOrder.getId(),
                         "workOrderStatus", workOrder.getStatus().name(),
                         "measurementCount", measurements.size(),
-                        "failedMeasurements", failedMeasurements
+                        "failedMeasurements", failedMeasurements,
+                        "reworkNonConformityId",
+                        reworkNonConformity == null
+                                ? null
+                                : reworkNonConformity.getId()
                 )
         );
 
@@ -344,31 +375,66 @@ public class QualityWorkflowService {
                         "workOrderNumber", workOrder.getWorkOrderNumber(),
                         "qualityInspectionId", inspection.getId(),
                         "nonConformityId",
-                        nonConformity == null ? null : nonConformity.getId()
+                        resultNonConformity == null
+                                ? null
+                                : resultNonConformity.getId()
                 )
         );
 
-        if (nonConformity != null) {
+        if (reworkNonConformity == null && resultNonConformity != null) {
             traceabilityService.record(
                     workOrder.getJobCase(),
                     TraceabilityAggregateType.NON_CONFORMITY,
-                    nonConformity.getId(),
+                    resultNonConformity.getId(),
                     TraceabilityEventType.NON_CONFORMITY_OPENED,
                     null,
-                    nonConformity.getStatus().name(),
+                    resultNonConformity.getStatus().name(),
                     currentUserId,
                     metadata(
-                            "number", nonConformity.getNonConformityNumber(),
+                            "number", resultNonConformity.getNonConformityNumber(),
                             "workOrderId", workOrder.getId(),
                             "qualityInspectionId", inspection.getId()
                     )
             );
         }
 
+        if (reworkNonConformity != null) {
+            if (inspection.getStatus() == QualityInspectionStatus.APPROVED) {
+                traceabilityService.record(
+                        workOrder.getJobCase(),
+                        TraceabilityAggregateType.NON_CONFORMITY,
+                        reworkNonConformity.getId(),
+                        TraceabilityEventType.NON_CONFORMITY_CLOSED,
+                        com.nocountry.qualitytrack.nonconformities.enums.NonConformityStatus.OPEN.name(),
+                        reworkNonConformity.getStatus().name(),
+                        currentUserId,
+                        metadata(
+                                "disposition", reworkNonConformity.getDisposition(),
+                                "qualityInspectionId", inspection.getId(),
+                                "resolvedByUserId", actor.getId()
+                        )
+                );
+            } else {
+                traceabilityService.record(
+                        workOrder.getJobCase(),
+                        TraceabilityAggregateType.NON_CONFORMITY,
+                        reworkNonConformity.getId(),
+                        TraceabilityEventType.REWORK_REINSPECTION_FAILED,
+                        reworkNonConformity.getStatus().name(),
+                        reworkNonConformity.getStatus().name(),
+                        currentUserId,
+                        metadata(
+                                "qualityInspectionId", inspection.getId(),
+                                "failedMeasurements", failedMeasurements
+                        )
+                );
+            }
+        }
+
         return QualityInspectionResponse.from(
                 inspection,
                 measurements,
-                nonConformity
+                resultNonConformity
         );
     }
 
@@ -445,9 +511,13 @@ public class QualityWorkflowService {
         List<QualityMeasurement> measurements = measurementRepository
                 .findAllByQualityInspection_IdOrderByIdAsc(inspection.getId());
 
-        NonConformity nonConformity = nonConformityRepository
-                .findByQualityInspection_Id(inspection.getId())
-                .orElse(null);
+        NonConformity nonConformity = inspection.getReworkNonConformity();
+
+        if (nonConformity == null) {
+            nonConformity = nonConformityRepository
+                    .findByQualityInspection_Id(inspection.getId())
+                    .orElse(null);
+        }
 
         return QualityInspectionResponse.from(
                 inspection,

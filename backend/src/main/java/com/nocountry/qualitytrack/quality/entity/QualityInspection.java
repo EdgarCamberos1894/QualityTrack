@@ -1,5 +1,8 @@
 package com.nocountry.qualitytrack.quality.entity;
 
+import com.nocountry.qualitytrack.nonconformities.entity.NonConformity;
+import com.nocountry.qualitytrack.nonconformities.enums.NonConformityDisposition;
+import com.nocountry.qualitytrack.nonconformities.enums.NonConformityStatus;
 import com.nocountry.qualitytrack.quality.enums.QualityInspectionStatus;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.workorders.entity.WorkOrder;
@@ -42,6 +45,10 @@ public class QualityInspection {
     @JoinColumn(name = "inspector_user_id")
     private User inspector;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rework_non_conformity_id")
+    private NonConformity reworkNonConformity;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private QualityInspectionStatus status;
@@ -60,19 +67,60 @@ public class QualityInspection {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    private QualityInspection(WorkOrder workOrder) {
+    private QualityInspection(
+            WorkOrder workOrder,
+            NonConformity reworkNonConformity
+    ) {
         this.workOrder = Objects.requireNonNull(workOrder);
-        if (workOrder.getStatus() != WorkOrderStatus.IN_PRODUCTION
-                || !workOrder.isProductionCompleted()) {
-            throw new IllegalStateException(
-                    "La orden debe tener la producción completa antes de crear la inspección."
-            );
+        this.reworkNonConformity = reworkNonConformity;
+
+        if (reworkNonConformity == null) {
+            if (workOrder.getStatus() != WorkOrderStatus.IN_PRODUCTION
+                    || !workOrder.isProductionCompleted()) {
+                throw new IllegalStateException(
+                        "La orden debe tener la producción completa antes de crear la inspección."
+                );
+            }
+        } else {
+            if (workOrder.getStatus() != WorkOrderStatus.REWORK_IN_PROGRESS) {
+                throw new IllegalStateException(
+                        "La orden debe estar REWORK_IN_PROGRESS para crear una reinspección."
+                );
+            }
+            if (reworkNonConformity.getStatus() != NonConformityStatus.OPEN
+                    || reworkNonConformity.getDisposition() != NonConformityDisposition.REWORK) {
+                throw new IllegalStateException(
+                        "La reinspección requiere una no conformidad OPEN con disposición REWORK."
+                );
+            }
+            WorkOrder ncWorkOrder = reworkNonConformity.getWorkOrder();
+            if (ncWorkOrder != workOrder
+                    && (
+                    ncWorkOrder.getId() == null
+                            || workOrder.getId() == null
+                            || !ncWorkOrder.getId().equals(workOrder.getId())
+            )) {
+                throw new IllegalArgumentException(
+                        "La no conformidad no pertenece a la orden de trabajo de la reinspección."
+                );
+            }
         }
+
         this.status = QualityInspectionStatus.PENDING;
     }
 
     public static QualityInspection createPending(WorkOrder workOrder) {
-        return new QualityInspection(workOrder);
+        return new QualityInspection(workOrder, null);
+    }
+
+    public static QualityInspection createReinspection(
+            WorkOrder workOrder,
+            NonConformity nonConformity
+    ) {
+        return new QualityInspection(
+                workOrder,
+                Objects.requireNonNull(nonConformity)
+        );
     }
 
     public void start(User inspector, Instant startedAt) {
