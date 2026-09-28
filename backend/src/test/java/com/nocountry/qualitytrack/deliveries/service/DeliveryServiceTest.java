@@ -28,6 +28,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -135,6 +136,76 @@ class DeliveryServiceTest {
 
         assertEquals(DeliveryStatus.DELIVERED, response.status());
         assertEquals(WorkOrderStatus.READY_FOR_DELIVERY, workOrder.getStatus());
+    }
+
+    @Test
+    void customerOnlySeesDispatchedOrHistoricalShipments() {
+        when(accessPolicy.requireCustomerReader(20L, 40L)).thenReturn(customerUser);
+        when(jobCaseRepository.findByCustomerRequest_IdAndCustomerRequest_Customer_Id(30L, 40L))
+                .thenReturn(Optional.of(jobCase));
+
+        Delivery pending = Delivery.create(
+                workOrder,
+                2,
+                "Cliente SA",
+                "Av. Principal 123",
+                "Tepic",
+                "Nayarit",
+                "63000",
+                "México",
+                "PAQUETERIA",
+                logistics
+        );
+
+        Delivery cancelledBeforeDispatch = Delivery.create(
+                workOrder,
+                2,
+                "Cliente SA",
+                "Av. Principal 123",
+                "Tepic",
+                "Nayarit",
+                "63000",
+                "México",
+                "PAQUETERIA",
+                logistics
+        );
+        cancelledBeforeDispatch.cancel(
+                logistics,
+                "Preparación anulada",
+                Instant.parse("2026-09-28T17:00:00Z")
+        );
+
+        Delivery dispatched = dispatchedDelivery(4);
+
+        when(deliveryRepository
+                .findAllByWorkOrder_JobCase_CustomerRequest_IdAndWorkOrder_JobCase_CustomerRequest_Customer_IdOrderByCreatedAtAscIdAsc(
+                        30L,
+                        40L
+                ))
+                .thenReturn(List.of(pending, cancelledBeforeDispatch, dispatched));
+
+        var response = service.listForCustomerRequest(20L, 40L, 30L);
+
+        assertEquals(1, response.size());
+        assertEquals(DeliveryStatus.DISPATCHED, response.get(0).status());
+    }
+
+    @Test
+    void rejectsEvidenceIdThatIsNotAlreadyLinkedToDelivery() {
+        Delivery delivery = dispatchedDelivery(8);
+        stubLockedDelivery(delivery);
+        when(accessPolicy.requireCustomerReceiver(20L, 40L)).thenReturn(customerUser);
+
+        assertThrows(
+                BusinessException.class,
+                () -> service.confirmReception(
+                        20L,
+                        40L,
+                        30L,
+                        100L,
+                        new ConfirmDeliveryReceptionRequest("Ana López", 999L)
+                )
+        );
     }
 
     @Test
