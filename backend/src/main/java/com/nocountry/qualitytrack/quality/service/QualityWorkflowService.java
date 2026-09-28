@@ -177,7 +177,9 @@ public class QualityWorkflowService {
                 inspection,
                 measurement,
                 TraceabilityEventType.QUALITY_MEASUREMENT_RECORDED,
-                currentUserId
+                currentUserId,
+                null,
+                null
         );
 
         return QualityMeasurementResponse.from(measurement);
@@ -208,6 +210,17 @@ public class QualityWorkflowService {
                 .findByIdForUpdate(measurementId)
                 .orElseThrow(() -> notFound("No se encontró la medición."));
 
+        QualityMeasurementResult previousResult = measurement.getResult();
+        Map<String, Object> previousMeasurement = metadata(
+                "characteristic", measurement.getCharacteristic(),
+                "nominalValue", measurement.getNominalValue(),
+                "lowerLimit", measurement.getLowerLimit(),
+                "upperLimit", measurement.getUpperLimit(),
+                "measuredValue", measurement.getMeasuredValue(),
+                "unit", measurement.getUnit(),
+                "notes", measurement.getNotes()
+        );
+
         try {
             measurement.update(
                     request.characteristic(),
@@ -229,7 +242,9 @@ public class QualityWorkflowService {
                 inspection,
                 measurement,
                 TraceabilityEventType.QUALITY_MEASUREMENT_UPDATED,
-                currentUserId
+                currentUserId,
+                previousResult,
+                previousMeasurement
         );
 
         return QualityMeasurementResponse.from(measurement);
@@ -255,8 +270,14 @@ public class QualityWorkflowService {
                 .count();
 
         QualityInspectionStatus previousStatus = inspection.getStatus();
+        WorkOrderStatus previousWorkOrderStatus = workOrder.getStatus();
         Instant completedAt = Instant.now();
         NonConformity nonConformity = null;
+
+        if (failedMeasurements > 0
+                && nonConformityRepository.existsByQualityInspection_Id(inspectionId)) {
+            conflict("La inspección ya tiene una no conformidad asociada.");
+        }
 
         try {
             if (failedMeasurements == 0) {
@@ -265,10 +286,6 @@ public class QualityWorkflowService {
             } else {
                 inspection.reject(completedAt);
                 workOrder.holdForQuality();
-
-                if (nonConformityRepository.existsByQualityInspection_Id(inspectionId)) {
-                    conflict("La inspección ya tiene una no conformidad asociada.");
-                }
 
                 nonConformity = NonConformity.open(
                         nonConformityReferenceGenerator.nextNumber(),
@@ -303,6 +320,27 @@ public class QualityWorkflowService {
                         "workOrderStatus", workOrder.getStatus().name(),
                         "measurementCount", measurements.size(),
                         "failedMeasurements", failedMeasurements
+                )
+        );
+
+        TraceabilityEventType workOrderResultEvent =
+                inspection.getStatus() == QualityInspectionStatus.APPROVED
+                        ? TraceabilityEventType.WORK_ORDER_QUALITY_APPROVED
+                        : TraceabilityEventType.WORK_ORDER_QUALITY_REJECTED;
+
+        traceabilityService.record(
+                workOrder.getJobCase(),
+                TraceabilityAggregateType.WORK_ORDER,
+                workOrder.getId(),
+                workOrderResultEvent,
+                previousWorkOrderStatus.name(),
+                workOrder.getStatus().name(),
+                currentUserId,
+                metadata(
+                        "workOrderNumber", workOrder.getWorkOrderNumber(),
+                        "qualityInspectionId", inspection.getId(),
+                        "nonConformityId",
+                        nonConformity == null ? null : nonConformity.getId()
                 )
         );
 
@@ -419,23 +457,28 @@ public class QualityWorkflowService {
             QualityInspection inspection,
             QualityMeasurement measurement,
             TraceabilityEventType eventType,
-            Long currentUserId
+            Long currentUserId,
+            QualityMeasurementResult previousResult,
+            Map<String, Object> previousMeasurement
     ) {
         traceabilityService.record(
                 workOrder.getJobCase(),
                 TraceabilityAggregateType.QUALITY_MEASUREMENT,
                 measurement.getId(),
                 eventType,
-                null,
+                previousResult == null ? null : previousResult.name(),
                 measurement.getResult().name(),
                 currentUserId,
                 metadata(
                         "qualityInspectionId", inspection.getId(),
                         "characteristic", measurement.getCharacteristic(),
+                        "nominalValue", measurement.getNominalValue(),
                         "measuredValue", measurement.getMeasuredValue(),
                         "lowerLimit", measurement.getLowerLimit(),
                         "upperLimit", measurement.getUpperLimit(),
                         "unit", measurement.getUnit(),
+                        "notes", measurement.getNotes(),
+                        "previous", previousMeasurement,
                         "inspectorId", inspection.getInspector().getId()
                 )
         );

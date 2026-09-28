@@ -4,13 +4,17 @@ import com.nocountry.qualitytrack.nonconformities.entity.NonConformity;
 import com.nocountry.qualitytrack.nonconformities.enums.NonConformityStatus;
 import com.nocountry.qualitytrack.nonconformities.repository.NonConformityRepository;
 import com.nocountry.qualitytrack.nonconformities.service.NonConformityReferenceGenerator;
+import com.nocountry.qualitytrack.quality.dto.request.SaveQualityMeasurementRequest;
 import com.nocountry.qualitytrack.quality.entity.QualityInspection;
 import com.nocountry.qualitytrack.quality.entity.QualityMeasurement;
 import com.nocountry.qualitytrack.quality.enums.QualityInspectionStatus;
+import com.nocountry.qualitytrack.quality.enums.QualityMeasurementResult;
 import com.nocountry.qualitytrack.quality.repository.QualityInspectionRepository;
 import com.nocountry.qualitytrack.quality.repository.QualityMeasurementRepository;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
+import com.nocountry.qualitytrack.traceability.enums.TraceabilityAggregateType;
+import com.nocountry.qualitytrack.traceability.enums.TraceabilityEventType;
 import com.nocountry.qualitytrack.traceability.service.TraceabilityService;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.workorders.entity.WorkOrder;
@@ -35,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -132,8 +137,18 @@ class QualityWorkflowServiceTest {
         assertEquals(QualityInspectionStatus.APPROVED, response.status());
         assertEquals(WorkOrderStatus.READY_FOR_DELIVERY, workOrder.getStatus());
         assertNull(response.nonConformity());
-        verify(traceabilityService).record(
+        verify(traceabilityService, times(2)).record(
                 any(), any(), any(), any(), any(), any(), any(), any()
+        );
+        verify(traceabilityService).record(
+                any(),
+                eq(TraceabilityAggregateType.WORK_ORDER),
+                eq(7L),
+                eq(TraceabilityEventType.WORK_ORDER_QUALITY_APPROVED),
+                eq(WorkOrderStatus.QUALITY_PENDING.name()),
+                eq(WorkOrderStatus.READY_FOR_DELIVERY.name()),
+                eq(10L),
+                any()
         );
     }
 
@@ -166,8 +181,62 @@ class QualityWorkflowServiceTest {
         assertNotNull(response.nonConformity());
         assertEquals("NC-0001", response.nonConformity().number());
         assertEquals(NonConformityStatus.OPEN, response.nonConformity().status());
-        verify(traceabilityService, times(2)).record(
+        verify(traceabilityService, times(3)).record(
                 any(), any(), any(), any(), any(), any(), any(), any()
+        );
+        verify(traceabilityService).record(
+                any(),
+                eq(TraceabilityAggregateType.WORK_ORDER),
+                eq(7L),
+                eq(TraceabilityEventType.WORK_ORDER_QUALITY_REJECTED),
+                eq(WorkOrderStatus.QUALITY_PENDING.name()),
+                eq(WorkOrderStatus.QUALITY_HOLD.name()),
+                eq(10L),
+                any()
+        );
+    }
+
+    @Test
+    void updatingMeasurementTracesPreviousAndRecalculatedResult() {
+        QualityInspection inspection = startedInspection();
+        QualityMeasurement measurement = measurement(inspection, "25.080");
+
+        stubLockedInspection(inspection);
+        when(accessPolicy.requireAssignedQualityActor(10L, 10L)).thenReturn(actor);
+        when(measurementRepository.findInspectionIdById(200L))
+                .thenReturn(Optional.of(100L));
+        when(measurementRepository.findByIdForUpdate(200L))
+                .thenReturn(Optional.of(measurement));
+        when(measurementRepository.saveAndFlush(measurement))
+                .thenReturn(measurement);
+
+        SaveQualityMeasurementRequest request = new SaveQualityMeasurementRequest(
+                "Diámetro exterior",
+                new BigDecimal("25.000"),
+                new BigDecimal("24.950"),
+                new BigDecimal("25.050"),
+                new BigDecimal("25.020"),
+                "mm",
+                "Lectura corregida"
+        );
+
+        var response = service.updateMeasurement(
+                10L,
+                100L,
+                200L,
+                request
+        );
+
+        assertEquals(QualityMeasurementResult.PASS, response.result());
+        verify(traceabilityService).record(
+                any(),
+                eq(TraceabilityAggregateType.QUALITY_MEASUREMENT),
+                eq(200L),
+                eq(TraceabilityEventType.QUALITY_MEASUREMENT_UPDATED),
+                eq(QualityMeasurementResult.FAIL.name()),
+                eq(QualityMeasurementResult.PASS.name()),
+                eq(10L),
+                any()
         );
     }
 

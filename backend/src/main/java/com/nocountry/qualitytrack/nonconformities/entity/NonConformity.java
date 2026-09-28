@@ -109,7 +109,15 @@ public class NonConformity {
                     "La orden debe estar QUALITY_HOLD al abrir la no conformidad."
             );
         }
-        if (qualityInspection.getWorkOrder() != workOrder) {
+        WorkOrder inspectionWorkOrder = qualityInspection.getWorkOrder();
+        boolean sameWorkOrder = inspectionWorkOrder == workOrder
+                || (
+                inspectionWorkOrder.getId() != null
+                        && workOrder.getId() != null
+                        && inspectionWorkOrder.getId().equals(workOrder.getId())
+        );
+
+        if (!sameWorkOrder) {
             throw new IllegalArgumentException(
                     "La inspección no pertenece a la orden de trabajo indicada."
             );
