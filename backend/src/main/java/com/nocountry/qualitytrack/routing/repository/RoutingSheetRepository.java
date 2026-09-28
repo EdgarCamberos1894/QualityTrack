@@ -78,6 +78,7 @@ public interface RoutingSheetRepository extends JpaRepository<RoutingSheet, Long
             join fetch routingSheet.createdByUser
             left join fetch routingSheet.approvedByUser
             left join fetch routingSheet.releasedByUser
+            left join fetch routingSheet.nonConformity
             where routingSheet.id = :routingSheetId
             """)
     Optional<RoutingSheet> findByIdForUpdate(
