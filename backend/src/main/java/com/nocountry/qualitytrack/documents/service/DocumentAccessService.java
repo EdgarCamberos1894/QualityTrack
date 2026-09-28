@@ -37,7 +37,7 @@ public class DocumentAccessService {
         User user = requireUser(userId);
 
         if (user.getAccountType() == AccountType.INTERNAL) {
-            requireInternalDocumentWriteRole(userId, document.getDocumentType());
+            requireInternalRole(userId, true);
             requireOpenForInternalWrite(jobCase);
             return user;
         }
@@ -97,7 +97,7 @@ public class DocumentAccessService {
         JobCase jobCase = requireCase(document);
 
         if (user.getAccountType() == AccountType.INTERNAL) {
-            requireInternalRole(userId, true);
+            requireInternalDocumentWriteRole(userId, document.getDocumentType());
             requireOpenForInternalWrite(jobCase);
             return user;
         }
