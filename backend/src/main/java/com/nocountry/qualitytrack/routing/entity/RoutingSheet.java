@@ -200,7 +200,7 @@ public class RoutingSheet {
     }
 
     public void approve(User actor, Instant approvedAt) {
-        requireWorkOrderCreated();
+        requireWorkOrderAllowsRouting();
         requireStatus(
                 RoutingSheetStatus.DRAFT,
                 "Solo una hoja de ruta DRAFT puede aprobarse."
@@ -216,7 +216,7 @@ public class RoutingSheet {
     }
 
     public void reopen() {
-        requireWorkOrderCreated();
+        requireWorkOrderAllowsRouting();
         requireStatus(
                 RoutingSheetStatus.APPROVED,
                 "Solo una hoja de ruta APPROVED puede reabrirse."
@@ -228,7 +228,7 @@ public class RoutingSheet {
     }
 
     public void release(User actor, Instant releasedAt) {
-        requireWorkOrderCreated();
+        requireWorkOrderAllowsRouting();
         requireStatus(
                 RoutingSheetStatus.APPROVED,
                 "Solo una hoja de ruta APPROVED puede liberarse."
@@ -254,7 +254,7 @@ public class RoutingSheet {
     }
 
     private void requireEditable() {
-        requireWorkOrderCreated();
+        requireWorkOrderAllowsRouting();
         requireStatus(
                 RoutingSheetStatus.DRAFT,
                 "Solo una hoja de ruta DRAFT puede modificarse."
