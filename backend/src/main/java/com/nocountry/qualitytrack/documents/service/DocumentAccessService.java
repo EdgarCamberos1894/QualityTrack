@@ -200,6 +200,7 @@ public class DocumentAccessService {
     private boolean canWriteInternalDocuments(SystemRole role) {
         return role == SystemRole.ADMIN
                 || role == SystemRole.COMMERCIAL
-                || role == SystemRole.ENGINEERING;
+                || role == SystemRole.ENGINEERING
+                || role == SystemRole.LOGISTICS;
     }
 }
