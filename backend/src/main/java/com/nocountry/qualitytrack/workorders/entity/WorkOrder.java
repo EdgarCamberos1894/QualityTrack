@@ -251,6 +251,33 @@ public class WorkOrder {
         this.status = WorkOrderStatus.QUALITY_HOLD;
     }
 
+    public void startRework() {
+        if (status != WorkOrderStatus.QUALITY_HOLD) {
+            throw new IllegalStateException(
+                    "Solo una orden QUALITY_HOLD puede iniciar retrabajo."
+            );
+        }
+        this.status = WorkOrderStatus.REWORK_IN_PROGRESS;
+    }
+
+    public void sendReworkToQuality() {
+        if (status != WorkOrderStatus.REWORK_IN_PROGRESS) {
+            throw new IllegalStateException(
+                    "Solo una orden REWORK_IN_PROGRESS puede volver a Calidad."
+            );
+        }
+        this.status = WorkOrderStatus.QUALITY_PENDING;
+    }
+
+    public void resolveQualityHoldForDelivery() {
+        if (status != WorkOrderStatus.QUALITY_HOLD) {
+            throw new IllegalStateException(
+                    "Solo una orden QUALITY_HOLD puede liberarse tras resolver la no conformidad."
+            );
+        }
+        this.status = WorkOrderStatus.READY_FOR_DELIVERY;
+    }
+
     public boolean isProductionCompleted() {
         return actualEndAt != null;
     }

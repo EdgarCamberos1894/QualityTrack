@@ -75,6 +75,13 @@ public class NonConformity {
     @Column(name = "closed_at")
     private Instant closedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "resolved_by_user_id")
+    private User resolvedByUser;
+
+    @Column(name = "resolution_notes", columnDefinition = "TEXT")
+    private String resolutionNotes;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -140,6 +147,123 @@ public class NonConformity {
                 openedByUser,
                 openedAt
         );
+    }
+
+    public void updateDetails(
+            Integer affectedQuantity,
+            String severity,
+            String description
+    ) {
+        requireOpen();
+        if (disposition != null) {
+            throw new IllegalStateException(
+                    "Los datos de la no conformidad no pueden modificarse después de elegir una disposición."
+            );
+        }
+        if (affectedQuantity == null || affectedQuantity <= 0) {
+            throw new IllegalArgumentException(
+                    "La cantidad afectada debe ser mayor a cero."
+            );
+        }
+        this.affectedQuantity = affectedQuantity;
+        this.severity = requireText(severity, "La severidad es obligatoria.");
+        this.description = requireText(description, "La descripción es obligatoria.");
+    }
+
+    public void selectRework() {
+        requireOpen();
+        requireDetailsComplete();
+        requireDispositionCompatible(NonConformityDisposition.REWORK);
+        this.disposition = NonConformityDisposition.REWORK;
+    }
+
+    public void recordScrap() {
+        requireOpen();
+        requireDetailsComplete();
+        requireDispositionCompatible(NonConformityDisposition.SCRAP);
+        this.disposition = NonConformityDisposition.SCRAP;
+    }
+
+    public void authorizeUseAsIs(
+            User actor,
+            String authorizationReason,
+            Instant resolvedAt
+    ) {
+        requireOpen();
+        requireDetailsComplete();
+        requireDispositionCompatible(NonConformityDisposition.USE_AS_IS);
+        this.disposition = NonConformityDisposition.USE_AS_IS;
+        close(
+                actor,
+                resolvedAt,
+                requireText(
+                        authorizationReason,
+                        "El motivo de autorización USE_AS_IS es obligatorio."
+                )
+        );
+    }
+
+    public void closeAfterScrap(User actor, Instant resolvedAt) {
+        requireOpen();
+        if (disposition != NonConformityDisposition.SCRAP) {
+            throw new IllegalStateException(
+                    "Solo una no conformidad SCRAP puede cerrarse por descarte."
+            );
+        }
+        close(actor, resolvedAt, "Cantidad comprometida cubierta después del descarte.");
+    }
+
+    public void closeAfterApprovedReinspection(User actor, Instant resolvedAt) {
+        requireOpen();
+        if (disposition != NonConformityDisposition.REWORK) {
+            throw new IllegalStateException(
+                    "Solo una no conformidad REWORK puede cerrarse después de una reinspección aprobada."
+            );
+        }
+        close(actor, resolvedAt, "Retrabajo validado mediante reinspección aprobada.");
+    }
+
+    public boolean hasCompleteDetails() {
+        return affectedQuantity != null
+                && affectedQuantity > 0
+                && severity != null
+                && !severity.isBlank()
+                && description != null
+                && !description.isBlank();
+    }
+
+    private void close(User actor, Instant resolvedAt, String notes) {
+        this.resolvedByUser = Objects.requireNonNull(actor);
+        this.closedAt = Objects.requireNonNull(resolvedAt);
+        this.resolutionNotes = requireText(
+                notes,
+                "Las notas de resolución son obligatorias."
+        );
+        this.status = NonConformityStatus.CLOSED;
+    }
+
+    private void requireOpen() {
+        if (status != NonConformityStatus.OPEN) {
+            throw new IllegalStateException(
+                    "Solo una no conformidad OPEN puede modificarse o resolverse."
+            );
+        }
+    }
+
+    private void requireDetailsComplete() {
+        if (!hasCompleteDetails()) {
+            throw new IllegalStateException(
+                    "La no conformidad necesita cantidad afectada, severidad y descripción antes de elegir una disposición."
+            );
+        }
+    }
+
+    private void requireDispositionCompatible(NonConformityDisposition expected) {
+        if (disposition != null && disposition != expected) {
+            throw new IllegalStateException(
+                    "La no conformidad ya tiene una disposición diferente."
+            );
+        }
     }
 
     private static String requireText(String value, String message) {

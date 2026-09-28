@@ -21,6 +21,11 @@ public interface OperationExecutionRepository extends JpaRepository<OperationExe
 
     long countByRoutingOperation_Id(Long routingOperationId);
 
+    Optional<OperationExecution> findFirstByRoutingOperation_IdAndStatusOrderByAttemptNumberDesc(
+            Long routingOperationId,
+            OperationExecutionStatus status
+    );
+
     @Query("""
             select execution.routingOperation.routingSheet.workOrder.id
             from OperationExecution execution
