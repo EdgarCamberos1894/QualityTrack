@@ -37,6 +37,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class DeliveryService {
 
+    private static final String DELIVERY_EVIDENCE_TYPE = "DELIVERY_EVIDENCE";
+
     private final DeliveryAccessPolicy accessPolicy;
     private final DeliveryRepository deliveryRepository;
     private final WorkOrderRepository workOrderRepository;
@@ -414,7 +416,7 @@ public class DeliveryService {
     }
 
     private DocumentVersion requireEvidence(Long versionId, Long caseId) {
-        return documentVersionRepository
+        DocumentVersion version = documentVersionRepository
                 .findByIdAndDocument_JobCase_IdAndDocument_Status(
                         versionId,
                         caseId,
@@ -423,6 +425,11 @@ public class DeliveryService {
                 .orElseThrow(() -> notFound(
                         "No se encontró la versión de evidencia dentro del expediente."
                 ));
+
+        if (!DELIVERY_EVIDENCE_TYPE.equals(version.getDocument().getDocumentType())) {
+            conflict("La versión seleccionada debe pertenecer a un documento DELIVERY_EVIDENCE.");
+        }
+        return version;
     }
 
     private Map<String, Object> metadata(Object... entries) {
