@@ -185,8 +185,10 @@ public class Delivery {
     }
 
     public void attachEvidence(DocumentVersion evidenceDocumentVersion) {
-        if (status == DeliveryStatus.CANCELLED) {
-            throw new IllegalStateException("No se puede adjuntar evidencia a una entrega CANCELLED.");
+        if (status != DeliveryStatus.PENDING && status != DeliveryStatus.DISPATCHED) {
+            throw new IllegalStateException(
+                    "La evidencia solo puede modificarse antes de confirmar la entrega."
+            );
         }
         this.evidenceDocumentVersion = Objects.requireNonNull(evidenceDocumentVersion);
     }
@@ -194,16 +196,12 @@ public class Delivery {
     public void confirmReception(
             User actor,
             String receivedByName,
-            DocumentVersion evidenceDocumentVersion,
             Instant deliveredAt
     ) {
         if (status != DeliveryStatus.DISPATCHED) {
             throw new IllegalStateException("Solo una entrega DISPATCHED puede confirmarse como recibida.");
         }
         this.receivedByName = requireText(receivedByName, "El nombre de quien recibe es obligatorio.");
-        if (evidenceDocumentVersion != null) {
-            this.evidenceDocumentVersion = evidenceDocumentVersion;
-        }
         this.confirmedByUser = Objects.requireNonNull(actor);
         this.deliveredAt = Objects.requireNonNull(deliveredAt);
         this.status = DeliveryStatus.DELIVERED;
