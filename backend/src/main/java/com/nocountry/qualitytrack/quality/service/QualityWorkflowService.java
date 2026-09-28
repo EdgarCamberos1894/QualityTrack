@@ -414,6 +414,21 @@ public class QualityWorkflowService {
                                 "resolvedByUserId", actor.getId()
                         )
                 );
+
+                traceabilityService.record(
+                        workOrder.getJobCase(),
+                        TraceabilityAggregateType.WORK_ORDER,
+                        workOrder.getId(),
+                        TraceabilityEventType.WORK_ORDER_NC_RESOLVED,
+                        previousWorkOrderStatus.name(),
+                        workOrder.getStatus().name(),
+                        currentUserId,
+                        metadata(
+                                "nonConformityId", reworkNonConformity.getId(),
+                                "disposition", reworkNonConformity.getDisposition(),
+                                "qualityInspectionId", inspection.getId()
+                        )
+                );
             } else {
                 traceabilityService.record(
                         workOrder.getJobCase(),
