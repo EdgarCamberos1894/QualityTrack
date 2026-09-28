@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Cancelar ejecución",
-        description = "Cancela una OperationExecution IN_PROGRESS con motivo obligatorio. Si tenía máquina asignada, la libera para permitir un nuevo intento posterior de la operación."
+        description = "Cancela una OperationExecution IN_PROGRESS con cancellationReason obligatorio y separado de las notas de inicio o finalización. Si tenía máquina asignada, la libera para permitir un nuevo intento posterior de la operación."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Ejecución cancelada correctamente"),

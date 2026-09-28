@@ -106,7 +106,7 @@ public class ProductionWorkflowService {
                     operator,
                     machine,
                     attemptNumber,
-                    request.notes(),
+                    request.startNotes(),
                     startedAt
             );
         } catch (IllegalArgumentException | IllegalStateException exception) {
@@ -176,7 +176,7 @@ public class ProductionWorkflowService {
                     request.quantityProcessed(),
                     request.quantityAccepted(),
                     request.quantityRejected(),
-                    request.notes(),
+                    request.completionNotes(),
                     finishedAt
             );
             if (machine != null) {
@@ -258,7 +258,7 @@ public class ProductionWorkflowService {
         OperationExecutionStatus previousStatus = execution.getStatus();
 
         try {
-            execution.cancel(request.reason(), Instant.now());
+            execution.cancel(request.cancellationReason(), Instant.now());
             if (machine != null) {
                 machine.release();
             }
@@ -282,7 +282,7 @@ public class ProductionWorkflowService {
                         "operationCode", execution.getRoutingOperation().getCode(),
                         "attemptNumber", execution.getAttemptNumber(),
                         "machineId", machine == null ? null : machine.getId(),
-                        "reason", request.reason()
+                        "reason", request.cancellationReason()
                 )
         );
 

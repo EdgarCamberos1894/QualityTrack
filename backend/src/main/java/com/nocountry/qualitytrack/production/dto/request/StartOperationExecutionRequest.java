@@ -6,6 +6,6 @@ import jakarta.validation.constraints.Size;
 public record StartOperationExecutionRequest(
         @Positive Long operatorId,
         @Positive Long machineId,
-        @Size(max = 2000) String notes
+        @Size(max = 2000) String startNotes
 ) {
 }

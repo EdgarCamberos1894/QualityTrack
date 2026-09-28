@@ -31,7 +31,9 @@ public record OperationExecutionResponse(
         Integer quantityProcessed,
         Integer quantityAccepted,
         Integer quantityRejected,
-        String notes
+        String startNotes,
+        String completionNotes,
+        String cancellationReason
 ) {
 
     public static OperationExecutionResponse from(OperationExecution execution) {
@@ -63,7 +65,9 @@ public record OperationExecutionResponse(
                 execution.getQuantityProcessed(),
                 execution.getQuantityAccepted(),
                 execution.getQuantityRejected(),
-                execution.getNotes()
+                execution.getStartNotes(),
+                execution.getCompletionNotes(),
+                execution.getCancellationReason()
         );
     }
 

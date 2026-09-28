@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Completar ejecución",
-        description = "Finaliza una OperationExecution IN_PROGRESS registrando cantidades procesadas, aceptadas y rechazadas. quantityProcessed debe ser igual a quantityAccepted + quantityRejected. Libera la máquina asignada y, si era la última operación pendiente, marca la producción como completa sin enviar todavía la OT a Calidad."
+        description = "Finaliza una OperationExecution IN_PROGRESS registrando cantidades procesadas, aceptadas y rechazadas. quantityProcessed debe ser igual a quantityAccepted + quantityRejected. completionNotes es opcional y se almacena separada de la nota de inicio. Libera la máquina asignada y, si era la última operación pendiente, marca la producción como completa sin enviar todavía la OT a Calidad."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Ejecución completada correctamente"),

@@ -69,8 +69,14 @@ public class OperationExecution {
     @Column(name = "quantity_rejected", nullable = false)
     private Integer quantityRejected;
 
-    @Column(columnDefinition = "TEXT")
-    private String notes;
+    @Column(name = "start_notes", columnDefinition = "TEXT")
+    private String startNotes;
+
+    @Column(name = "completion_notes", columnDefinition = "TEXT")
+    private String completionNotes;
+
+    @Column(name = "cancellation_reason", columnDefinition = "TEXT")
+    private String cancellationReason;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -85,7 +91,7 @@ public class OperationExecution {
             User operator,
             Machine machine,
             Integer attemptNumber,
-            String notes,
+            String startNotes,
             Instant startedAt
     ) {
         this.routingOperation = Objects.requireNonNull(routingOperation);
@@ -93,7 +99,7 @@ public class OperationExecution {
         this.operator = Objects.requireNonNull(operator);
         this.machine = machine;
         this.attemptNumber = requirePositive(attemptNumber, "El número de intento debe ser mayor a cero.");
-        this.notes = normalizeOptional(notes);
+        this.startNotes = normalizeOptional(startNotes);
         this.startedAt = Objects.requireNonNull(startedAt);
         this.status = OperationExecutionStatus.IN_PROGRESS;
         this.quantityProcessed = 0;
@@ -106,7 +112,7 @@ public class OperationExecution {
             User operator,
             Machine machine,
             Integer attemptNumber,
-            String notes,
+            String startNotes,
             Instant startedAt
     ) {
         return new OperationExecution(
@@ -114,7 +120,7 @@ public class OperationExecution {
                 operator,
                 machine,
                 attemptNumber,
-                notes,
+                startNotes,
                 startedAt
         );
     }
@@ -123,7 +129,7 @@ public class OperationExecution {
             Integer quantityProcessed,
             Integer quantityAccepted,
             Integer quantityRejected,
-            String notes,
+            String completionNotes,
             Instant finishedAt
     ) {
         requireInProgress();
@@ -157,7 +163,7 @@ public class OperationExecution {
         this.quantityProcessed = processed;
         this.quantityAccepted = accepted;
         this.quantityRejected = rejected;
-        this.notes = mergeNotes(this.notes, notes);
+        this.completionNotes = normalizeOptional(completionNotes);
         this.finishedAt = nextFinishedAt;
         this.status = OperationExecutionStatus.COMPLETED;
     }
@@ -175,7 +181,7 @@ public class OperationExecution {
             );
         }
 
-        this.notes = mergeNotes(this.notes, normalizedReason);
+        this.cancellationReason = normalizedReason;
         this.finishedAt = nextFinishedAt;
         this.status = OperationExecutionStatus.CANCELLED;
     }
@@ -224,14 +230,4 @@ public class OperationExecution {
         return value.trim();
     }
 
-    private static String mergeNotes(String current, String next) {
-        String normalized = normalizeOptional(next);
-        if (normalized == null) {
-            return current;
-        }
-        if (current == null) {
-            return normalized;
-        }
-        return current + System.lineSeparator() + normalized;
-    }
 }

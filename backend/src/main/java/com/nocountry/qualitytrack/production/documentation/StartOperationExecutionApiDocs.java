@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Iniciar ejecución de una operación",
-        description = "Crea una OperationExecution IN_PROGRESS para una operación habilitada de un RoutingSheet RELEASED. La primera ejecución mueve la WorkOrder de READY_FOR_PRODUCTION a IN_PRODUCTION y, si se asigna una máquina, la cambia de AVAILABLE a IN_USE."
+        description = "Crea una OperationExecution IN_PROGRESS para una operación habilitada de un RoutingSheet RELEASED. La primera ejecución mueve la WorkOrder de READY_FOR_PRODUCTION a IN_PRODUCTION y, si se asigna una máquina, la cambia de AVAILABLE a IN_USE. startNotes es opcional y conserva únicamente la observación registrada al iniciar."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Ejecución iniciada correctamente"),

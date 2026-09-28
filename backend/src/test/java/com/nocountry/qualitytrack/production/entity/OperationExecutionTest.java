@@ -40,6 +40,9 @@ class OperationExecutionTest {
         assertEquals(0, execution.getQuantityProcessed());
         assertEquals(0, execution.getQuantityAccepted());
         assertEquals(0, execution.getQuantityRejected());
+        assertEquals("Inicio de corte.", execution.getStartNotes());
+        assertNull(execution.getCompletionNotes());
+        assertNull(execution.getCancellationReason());
     }
 
     @Test
@@ -84,6 +87,8 @@ class OperationExecutionTest {
         assertEquals(19, execution.getQuantityAccepted());
         assertEquals(1, execution.getQuantityRejected());
         assertEquals(finishedAt, execution.getFinishedAt());
+        assertEquals("Operación terminada.", execution.getCompletionNotes());
+        assertNull(execution.getCancellationReason());
     }
 
     @Test
@@ -103,6 +108,11 @@ class OperationExecutionTest {
         );
 
         assertEquals(OperationExecutionStatus.CANCELLED, execution.getStatus());
+        assertEquals(
+                "Se inició con configuración incorrecta.",
+                execution.getCancellationReason()
+        );
+        assertNull(execution.getCompletionNotes());
         assertThrows(
                 IllegalStateException.class,
                 () -> execution.complete(
