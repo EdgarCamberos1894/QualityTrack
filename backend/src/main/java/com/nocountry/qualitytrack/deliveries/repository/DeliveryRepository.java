@@ -30,7 +30,7 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
 
     @EntityGraph(attributePaths = {
             "workOrder", "createdByUser", "dispatchedByUser",
-            "confirmedByUser", "cancelledByUser", "evidenceDocumentVersion"
+            "deliveredByUser", "cancelledByUser", "evidenceDocumentVersion"
     })
     List<Delivery> findAllByWorkOrder_JobCase_CustomerRequest_IdAndWorkOrder_JobCase_CustomerRequest_Customer_IdOrderByCreatedAtAscIdAsc(
             Long requestId,
