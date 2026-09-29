@@ -29,6 +29,7 @@ public class DocumentAccessService {
     private final UserRepository userRepository;
     private final UserSystemRoleRepository userSystemRoleRepository;
     private static final String DELIVERY_EVIDENCE_TYPE = "DELIVERY_EVIDENCE";
+    private static final String MATERIAL_CERTIFICATE_TYPE = "MATERIAL_CERTIFICATE";
 
     private final CustomerMembershipRepository membershipRepository;
     private final DeliveryRepository deliveryRepository;
@@ -249,7 +250,9 @@ public class DocumentAccessService {
                 .map(UserSystemRole::getRole)
                 .anyMatch(role -> canWriteInternalDocuments(role)
                         || (role == SystemRole.LOGISTICS
-                        && DELIVERY_EVIDENCE_TYPE.equals(documentType)));
+                        && DELIVERY_EVIDENCE_TYPE.equals(documentType))
+                        || (role == SystemRole.PRODUCTION
+                        && MATERIAL_CERTIFICATE_TYPE.equals(documentType)));
 
         if (!allowed) {
             throw new BusinessException(
