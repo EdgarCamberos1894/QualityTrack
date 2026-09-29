@@ -15,6 +15,8 @@ public interface MaterialLotRepository extends JpaRepository<MaterialLot, Long> 
 
     boolean existsByMaterial_IdAndLotNumberIgnoreCase(Long materialId, String lotNumber);
 
+    boolean existsByCertificateDocumentVersion_Document_Id(Long documentId);
+
     @EntityGraph(attributePaths = {"material", "certificateDocumentVersion"})
     List<MaterialLot> findAllByMaterial_IdOrderByReceivedAtDesc(Long materialId);
 
