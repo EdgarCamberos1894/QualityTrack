@@ -50,6 +50,8 @@ class DeliveryTest {
 
         assertEquals(DeliveryStatus.DELIVERED, delivery.getStatus());
         assertEquals("Ana López", delivery.getReceivedByName());
+        assertEquals(Instant.parse("2026-09-28T20:00:00Z"), delivery.getDeliveredAt());
+        assertEquals(actor, delivery.getDeliveredByUser());
     }
 
     @Test
