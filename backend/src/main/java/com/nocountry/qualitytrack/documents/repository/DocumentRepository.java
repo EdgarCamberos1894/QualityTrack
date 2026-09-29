@@ -69,6 +69,18 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
                         where wod.document = d
                           and wod.workOrder.id = :workOrderId
                     )
+                    or exists (
+                        select wom.id
+                        from WorkOrderMaterial wom
+                        where wom.workOrder.id = :workOrderId
+                          and wom.materialLot.certificateDocumentVersion.document = d
+                    )
+                    or exists (
+                        select delivery.id
+                        from Delivery delivery
+                        where delivery.workOrder.id = :workOrderId
+                          and delivery.evidenceDocumentVersion.document = d
+                    )
               )
               and (
                     :materialLotId is null
