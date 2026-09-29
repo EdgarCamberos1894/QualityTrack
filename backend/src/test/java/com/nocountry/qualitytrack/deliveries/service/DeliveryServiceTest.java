@@ -1,7 +1,7 @@
 package com.nocountry.qualitytrack.deliveries.service;
 
 import com.nocountry.qualitytrack.customers.entity.Customer;
-import com.nocountry.qualitytrack.deliveries.dto.request.ConfirmDeliveryReceptionRequest;
+import com.nocountry.qualitytrack.deliveries.dto.request.CompleteDeliveryRequest;
 import com.nocountry.qualitytrack.deliveries.dto.request.CreateDeliveryRequest;
 import com.nocountry.qualitytrack.deliveries.entity.Delivery;
 import com.nocountry.qualitytrack.deliveries.enums.DeliveryStatus;
@@ -118,20 +118,18 @@ class DeliveryServiceTest {
     }
 
     @Test
-    void partialConfirmedReceptionKeepsWorkOrderReadyForDelivery() {
+    void partialLogisticsDeliveryKeepsWorkOrderReadyForDelivery() {
         Delivery delivery = dispatchedDelivery(8);
         stubLockedDelivery(delivery);
-        when(accessPolicy.requireCustomerReceiver(20L, 40L)).thenReturn(customerUser);
+        when(accessPolicy.requireLogisticsActor(10L)).thenReturn(logistics);
         when(deliveryRepository.saveAndFlush(delivery)).thenReturn(delivery);
         when(deliveryRepository.sumDeliveredQuantityByWorkOrderId(7L, DeliveryStatus.DELIVERED))
                 .thenReturn(8L);
 
-        var response = service.confirmReception(
-                20L,
-                40L,
-                30L,
+        var response = service.deliver(
+                10L,
                 100L,
-                new ConfirmDeliveryReceptionRequest("Ana López", null)
+                new CompleteDeliveryRequest("Ana López", null)
         );
 
         assertEquals(DeliveryStatus.DELIVERED, response.status());
@@ -191,38 +189,39 @@ class DeliveryServiceTest {
     }
 
     @Test
-    void rejectsEvidenceIdThatIsNotAlreadyLinkedToDelivery() {
+    void rejectsUnknownEvidenceWhenLogisticsCompletesDelivery() {
         Delivery delivery = dispatchedDelivery(8);
         stubLockedDelivery(delivery);
-        when(accessPolicy.requireCustomerReceiver(20L, 40L)).thenReturn(customerUser);
+        when(accessPolicy.requireLogisticsActor(10L)).thenReturn(logistics);
+        when(documentVersionRepository.findByIdAndDocument_JobCase_IdAndDocument_Status(
+                999L,
+                jobCase.getId(),
+                com.nocountry.qualitytrack.documents.enums.DocumentStatus.ACTIVE
+        )).thenReturn(Optional.empty());
 
         assertThrows(
                 BusinessException.class,
-                () -> service.confirmReception(
-                        20L,
-                        40L,
-                        30L,
+                () -> service.deliver(
+                        10L,
                         100L,
-                        new ConfirmDeliveryReceptionRequest("Ana López", 999L)
+                        new CompleteDeliveryRequest("Ana López", 999L)
                 )
         );
     }
 
     @Test
-    void finalConfirmedReceptionClosesWorkOrder() {
+    void finalLogisticsDeliveryClosesWorkOrder() {
         Delivery delivery = dispatchedDelivery(12);
         stubLockedDelivery(delivery);
-        when(accessPolicy.requireCustomerReceiver(20L, 40L)).thenReturn(customerUser);
+        when(accessPolicy.requireLogisticsActor(10L)).thenReturn(logistics);
         when(deliveryRepository.saveAndFlush(delivery)).thenReturn(delivery);
         when(deliveryRepository.sumDeliveredQuantityByWorkOrderId(7L, DeliveryStatus.DELIVERED))
                 .thenReturn(20L);
 
-        service.confirmReception(
-                20L,
-                40L,
-                30L,
+        service.deliver(
+                10L,
                 100L,
-                new ConfirmDeliveryReceptionRequest("Ana López", null)
+                new CompleteDeliveryRequest("Ana López", null)
         );
 
         assertEquals(WorkOrderStatus.DELIVERED, workOrder.getStatus());
