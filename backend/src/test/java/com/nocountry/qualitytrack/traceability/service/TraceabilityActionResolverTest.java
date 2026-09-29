@@ -56,6 +56,59 @@ class TraceabilityActionResolverTest {
     }
 
     @Test
+    void deliveryAndQuotationMetadataExposeOriginalResources() {
+        TraceabilityEventResponse deliveryEvent = new TraceabilityEventResponse(
+                102L,
+                TraceabilityAggregateType.DELIVERY,
+                50L,
+                TraceabilityEventType.DELIVERY_DELIVERED,
+                "DISPATCHED",
+                "DELIVERED",
+                10L,
+                "Ana López",
+                Map.of(
+                        "workOrderId", 7L,
+                        "evidenceDocumentVersionId", 80L
+                ),
+                Instant.parse("2026-09-28T20:00:00Z")
+        );
+
+        var deliveryActions = resolver.resolve(deliveryEvent);
+
+        assertTrue(deliveryActions.stream().anyMatch(action ->
+                action.label().equals("Ver evidencia")
+                        && action.resourceType() == TraceabilityResourceType.DOCUMENT_VERSION
+                        && action.resourceId().equals(80L)));
+
+        TraceabilityEventResponse quotationEvent = new TraceabilityEventResponse(
+                103L,
+                TraceabilityAggregateType.QUOTATION,
+                22L,
+                TraceabilityEventType.QUOTATION_REVISION_CREATED,
+                null,
+                "DRAFT",
+                10L,
+                "Ana López",
+                Map.of(
+                        "sourceQuotationId", 20L,
+                        "nextQuotationId", 22L
+                ),
+                Instant.parse("2026-09-28T20:10:00Z")
+        );
+
+        var quotationActions = resolver.resolve(quotationEvent);
+
+        assertTrue(quotationActions.stream().anyMatch(action ->
+                action.label().equals("Ver cotización origen")
+                        && action.resourceType() == TraceabilityResourceType.QUOTATION
+                        && action.resourceId().equals(20L)));
+        assertTrue(quotationActions.stream().anyMatch(action ->
+                action.label().equals("Ver cotización")
+                        && action.resourceType() == TraceabilityResourceType.QUOTATION
+                        && action.resourceId().equals(22L)));
+    }
+
+    @Test
     void qualityRejectionLinksInspectionAndNonConformityWithoutDuplicates() {
         TraceabilityEventResponse event = new TraceabilityEventResponse(
                 101L,
