@@ -14,6 +14,7 @@ import com.nocountry.qualitytrack.traceability.dto.response.Traceability360Event
 import com.nocountry.qualitytrack.traceability.service.TraceabilityActionResolver;
 import com.nocountry.qualitytrack.traceability.service.TraceabilityService;
 import com.nocountry.qualitytrack.workorders.dto.response.WorkOrder360DocumentResponse;
+import com.nocountry.qualitytrack.workorders.dto.response.WorkOrder360MaterialResponse;
 import com.nocountry.qualitytrack.workorders.dto.response.WorkOrder360Response;
 import com.nocountry.qualitytrack.workorders.dto.response.WorkOrderDetailResponse;
 import lombok.RequiredArgsConstructor;
@@ -74,6 +75,18 @@ public class WorkOrder360Service {
                 ))
                 .toList();
 
+        List<WorkOrder360MaterialResponse> materials = materialService
+                .listConsumption(currentUserId, workOrderId)
+                .stream()
+                .map(consumption -> new WorkOrder360MaterialResponse(
+                        consumption,
+                        materialService.getLot(
+                                currentUserId,
+                                consumption.materialLotId()
+                        )
+                ))
+                .toList();
+
         List<Traceability360EventResponse> timeline = traceabilityService
                 .timeline(caseId)
                 .stream()
@@ -91,7 +104,7 @@ public class WorkOrder360Service {
                 ),
                 routingService.list(currentUserId, workOrderId),
                 productionService.getStatus(currentUserId, workOrderId),
-                materialService.listConsumption(currentUserId, workOrderId),
+                materials,
                 qualityService.list(currentUserId, workOrderId),
                 nonConformityService.listByWorkOrder(currentUserId, workOrderId),
                 documents,
