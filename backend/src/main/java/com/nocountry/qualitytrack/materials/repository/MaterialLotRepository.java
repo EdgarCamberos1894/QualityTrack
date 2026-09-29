@@ -17,13 +17,10 @@ public interface MaterialLotRepository extends JpaRepository<MaterialLot, Long> 
 
     boolean existsByCertificateDocumentVersion_Document_Id(Long documentId);
 
-    @Query("""
-            select distinct lot.id
-            from MaterialLot lot
-            where lot.certificateDocumentVersion.document.id = :documentId
-            order by lot.id
-            """)
-    List<Long> findIdsByCertificateDocumentId(@Param("documentId") Long documentId);
+    @EntityGraph(attributePaths = {
+            "certificateDocumentVersion"
+    })
+    List<MaterialLot> findAllByCertificateDocumentVersion_Document_IdOrderByIdAsc(Long documentId);
 
     @EntityGraph(attributePaths = {"material", "certificateDocumentVersion"})
     List<MaterialLot> findAllByMaterial_IdOrderByReceivedAtDesc(Long materialId);
