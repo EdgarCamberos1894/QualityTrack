@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -140,37 +141,37 @@ class DocumentCenterServiceTest {
     }
 
     private void stubDocument() {
-        when(document.getId()).thenReturn(7L);
-        when(document.getJobCase()).thenReturn(jobCase);
-        when(document.getDocumentType()).thenReturn("DRAWING");
-        when(document.getName()).thenReturn("Plano de eje");
-        when(document.getDescription()).thenReturn("Plano vigente");
-        when(document.getCreatedBy()).thenReturn(creator);
-        when(document.getCreatedAt()).thenReturn(Instant.parse("2026-09-20T10:00:00Z"));
+        lenient().when(document.getId()).thenReturn(7L);
+        lenient().when(document.getJobCase()).thenReturn(jobCase);
+        lenient().when(document.getDocumentType()).thenReturn("DRAWING");
+        lenient().when(document.getName()).thenReturn("Plano de eje");
+        lenient().when(document.getDescription()).thenReturn("Plano vigente");
+        lenient().when(document.getCreatedBy()).thenReturn(creator);
+        lenient().when(document.getCreatedAt()).thenReturn(Instant.parse("2026-09-20T10:00:00Z"));
 
-        when(jobCase.getId()).thenReturn(12L);
-        when(jobCase.getCustomerRequest()).thenReturn(customerRequest);
-        when(customerRequest.getId()).thenReturn(30L);
-        when(customerRequest.getCustomer()).thenReturn(customer);
-        when(customer.getId()).thenReturn(40L);
+        lenient().when(jobCase.getId()).thenReturn(12L);
+        lenient().when(jobCase.getCustomerRequest()).thenReturn(customerRequest);
+        lenient().when(customerRequest.getId()).thenReturn(30L);
+        lenient().when(customerRequest.getCustomer()).thenReturn(customer);
+        lenient().when(customer.getId()).thenReturn(40L);
 
-        when(creator.getId()).thenReturn(10L);
-        when(creator.getFirstName()).thenReturn("Ana");
-        when(creator.getLastName()).thenReturn("López");
+        lenient().when(creator.getId()).thenReturn(10L);
+        lenient().when(creator.getFirstName()).thenReturn("Ana");
+        lenient().when(creator.getLastName()).thenReturn("López");
 
-        when(version.getId()).thenReturn(21L);
-        when(version.getDocument()).thenReturn(document);
-        when(version.getVersion()).thenReturn(2);
-        when(version.getFileName()).thenReturn("plano-v2.pdf");
-        when(version.getMimeType()).thenReturn("application/pdf");
-        when(version.getFileSize()).thenReturn(100L);
-        when(version.getChecksum()).thenReturn(
+        lenient().when(version.getId()).thenReturn(21L);
+        lenient().when(version.getDocument()).thenReturn(document);
+        lenient().when(version.getVersion()).thenReturn(2);
+        lenient().when(version.getFileName()).thenReturn("plano-v2.pdf");
+        lenient().when(version.getMimeType()).thenReturn("application/pdf");
+        lenient().when(version.getFileSize()).thenReturn(100L);
+        lenient().when(version.getChecksum()).thenReturn(
                 "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
         );
-        when(version.getUploadedBy()).thenReturn(uploader);
-        when(version.getUploadedAt()).thenReturn(Instant.parse("2026-09-21T10:00:00Z"));
-        when(uploader.getId()).thenReturn(11L);
-        when(uploader.getFirstName()).thenReturn("Luis");
-        when(uploader.getLastName()).thenReturn("Pérez");
+        lenient().when(version.getUploadedBy()).thenReturn(uploader);
+        lenient().when(version.getUploadedAt()).thenReturn(Instant.parse("2026-09-21T10:00:00Z"));
+        lenient().when(uploader.getId()).thenReturn(11L);
+        lenient().when(uploader.getFirstName()).thenReturn("Luis");
+        lenient().when(uploader.getLastName()).thenReturn("Pérez");
     }
 }
