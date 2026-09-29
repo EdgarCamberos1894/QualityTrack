@@ -11,14 +11,22 @@ interface CustomerPortalTopbarProps {
 
 function breadcrumb(pathname: string): string {
   if (pathname.includes('/quotations/')) {
-    return 'Portal / Cotizaciones / Detalle'
+    return 'Mi empresa / Cotizaciones / Detalle'
   }
 
   if (pathname.endsWith('/quotations')) {
-    return 'Portal / Cotizaciones'
+    return 'Mi empresa / Cotizaciones'
   }
 
-  return 'Portal / Inicio'
+  return 'Mi empresa / Inicio'
+}
+
+function initials(email: string): string {
+  return email
+    .split('@')[0]
+    ?.replace(/[^a-zA-Z0-9]/g, '')
+    .slice(0, 2)
+    .toUpperCase() || 'QT'
 }
 
 export function CustomerPortalTopbar({
@@ -47,18 +55,25 @@ export function CustomerPortalTopbar({
       </p>
 
       <div className="ml-auto flex items-center gap-3">
-        <div className="hidden text-right md:block">
-          <p className="max-w-[220px] truncate text-[11px] font-semibold text-slate-950">
-            {customer.customerName}
-          </p>
-          <p className="mt-1 max-w-[220px] truncate text-[9px] text-slate-500">
+        <span className="hidden rounded-full bg-emerald-50 px-4 py-1.5 text-[10px] font-semibold text-emerald-700 sm:inline-flex">
+          Cuenta cliente
+        </span>
+
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-[11px] font-semibold text-emerald-700">
+          {initials(user.email)}
+        </div>
+
+        <div className="hidden min-w-0 md:block">
+          <p className="max-w-[180px] truncate text-[11px] font-semibold text-slate-950">
             {user.email}
           </p>
+          <p className="mt-1 text-[9px] text-slate-500">{customer.role}</p>
         </div>
+
         <button
           type="button"
           onClick={onLogout}
-          className="rounded-lg px-2 py-2 text-xs font-semibold text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
+          className="rounded-lg px-2 py-2 text-[11px] font-semibold text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900"
         >
           Salir
         </button>
