@@ -63,6 +63,27 @@ class DocumentAccessServiceTest {
     }
 
     @Test
+    void auditorCanReadDocumentCenter() {
+        when(userRepository.findById(10L)).thenReturn(Optional.of(user));
+        when(user.getAccountType()).thenReturn(AccountType.INTERNAL);
+        when(userSystemRoleRepository.findAllByIdUserId(10L)).thenReturn(List.of(systemRole));
+        when(systemRole.getRole()).thenReturn(SystemRole.AUDITOR);
+
+        assertSame(user, service.requireInternalReader(10L));
+    }
+
+    @Test
+    void customerCannotReadDocumentCenter() {
+        when(userRepository.findById(20L)).thenReturn(Optional.of(user));
+        when(user.getAccountType()).thenReturn(AccountType.CUSTOMER);
+
+        assertThrows(
+                BusinessException.class,
+                () -> service.requireInternalReader(20L)
+        );
+    }
+
+    @Test
     void logisticsCanWriteOnlyDeliveryEvidence() {
         when(userRepository.findById(10L)).thenReturn(Optional.of(user));
         when(user.getAccountType()).thenReturn(AccountType.INTERNAL);
