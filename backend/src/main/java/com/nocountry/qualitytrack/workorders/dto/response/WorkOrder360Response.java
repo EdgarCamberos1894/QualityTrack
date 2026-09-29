@@ -1,7 +1,6 @@
 package com.nocountry.qualitytrack.workorders.dto.response;
 
 import com.nocountry.qualitytrack.deliveries.dto.response.DeliveryResponse;
-import com.nocountry.qualitytrack.materials.dto.response.WorkOrderMaterialResponse;
 import com.nocountry.qualitytrack.nonconformities.dto.response.NonConformityResponse;
 import com.nocountry.qualitytrack.production.dto.response.ProductionStatusResponse;
 import com.nocountry.qualitytrack.quality.dto.response.QualityInspectionResponse;
@@ -16,7 +15,7 @@ public record WorkOrder360Response(
         List<QuotationResponse> quotationRevisions,
         List<RoutingSheetResponse> routingSheets,
         ProductionStatusResponse production,
-        List<WorkOrderMaterialResponse> materials,
+        List<WorkOrder360MaterialResponse> materials,
         List<QualityInspectionResponse> qualityInspections,
         List<NonConformityResponse> nonConformities,
         List<WorkOrder360DocumentResponse> documents,
