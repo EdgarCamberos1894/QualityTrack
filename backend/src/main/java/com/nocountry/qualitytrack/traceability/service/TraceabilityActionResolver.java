@@ -30,6 +30,10 @@ public class TraceabilityActionResolver {
                 TraceabilityResourceType.JOB_CASE);
         addMetadataAction(actions, metadata, "quotationId", "Ver cotización",
                 TraceabilityResourceType.QUOTATION);
+        addMetadataAction(actions, metadata, "sourceQuotationId", "Ver cotización origen",
+                TraceabilityResourceType.QUOTATION);
+        addMetadataAction(actions, metadata, "nextQuotationId", "Ver nueva revisión",
+                TraceabilityResourceType.QUOTATION);
         addMetadataAction(actions, metadata, "workOrderId", "Ver orden de trabajo",
                 TraceabilityResourceType.WORK_ORDER);
         addMetadataAction(actions, metadata, "routingSheetId", "Ver hoja de ruta",
@@ -57,6 +61,8 @@ public class TraceabilityActionResolver {
                     documentVersionId);
         }
 
+        addMetadataAction(actions, metadata, "evidenceDocumentVersionId", "Ver evidencia",
+                TraceabilityResourceType.DOCUMENT_VERSION);
         addMetadataAction(actions, metadata, "materialLotId", "Ver lote",
                 TraceabilityResourceType.MATERIAL_LOT);
         addMetadataAction(actions, metadata, "qualityInspectionId", "Ver inspección",
