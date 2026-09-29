@@ -5,21 +5,22 @@ import com.nocountry.qualitytrack.traceability.enums.TraceabilityEventType;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 public record Traceability360EventResponse(
         Long id,
         TraceabilityAggregateType aggregateType,
         Long aggregateId,
         TraceabilityEventType eventType,
-        String fromStatus,
-        String toStatus,
         Long performedByUserId,
         String performedByName,
-        Map<String, Object> metadata,
         Instant occurredAt,
+        TraceabilitySnapshotResponse snapshot,
         List<TraceabilityActionResponse> actions
 ) {
+    public Traceability360EventResponse {
+        actions = actions == null ? List.of() : List.copyOf(actions);
+    }
+
     public static Traceability360EventResponse from(
             TraceabilityEventResponse event,
             List<TraceabilityActionResponse> actions
@@ -29,13 +30,11 @@ public record Traceability360EventResponse(
                 event.aggregateType(),
                 event.aggregateId(),
                 event.eventType(),
-                event.fromStatus(),
-                event.toStatus(),
                 event.performedByUserId(),
                 event.performedByName(),
-                event.metadata(),
                 event.occurredAt(),
-                actions == null ? List.of() : List.copyOf(actions)
+                TraceabilitySnapshotResponse.from(event),
+                actions
         );
     }
 }
