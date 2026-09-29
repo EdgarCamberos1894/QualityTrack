@@ -1,16 +1,20 @@
 package com.nocountry.qualitytrack.documents.service;
 
+import com.nocountry.qualitytrack.deliveries.entity.Delivery;
 import com.nocountry.qualitytrack.deliveries.repository.DeliveryRepository;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentCenterResponse;
+import com.nocountry.qualitytrack.documents.dto.response.DocumentReferenceResponse;
 import com.nocountry.qualitytrack.documents.entity.Document;
 import com.nocountry.qualitytrack.documents.entity.DocumentVersion;
 import com.nocountry.qualitytrack.documents.enums.DocumentContext;
 import com.nocountry.qualitytrack.documents.enums.DocumentStatus;
 import com.nocountry.qualitytrack.documents.repository.DocumentRepository;
 import com.nocountry.qualitytrack.documents.repository.DocumentVersionRepository;
+import com.nocountry.qualitytrack.materials.entity.MaterialLot;
 import com.nocountry.qualitytrack.materials.repository.MaterialLotRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
+import com.nocountry.qualitytrack.workorders.entity.WorkOrderDocument;
 import com.nocountry.qualitytrack.workorders.repository.WorkOrderDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -77,12 +81,26 @@ public class DocumentCenterService {
         List<DocumentCenterResponse> response = new ArrayList<>();
 
         for (Document document : documents) {
-            List<Long> workOrderIds = workOrderDocumentRepository
-                    .findWorkOrderIdsByDocumentId(document.getId());
-            List<Long> materialLotIds = materialLotRepository
-                    .findIdsByCertificateDocumentId(document.getId());
-            List<Long> deliveryIds = deliveryRepository
-                    .findIdsByEvidenceDocumentId(document.getId());
+            List<WorkOrderDocument> workOrderReferences = workOrderDocumentRepository
+                    .findAllByDocument_IdOrderByWorkOrder_IdAsc(document.getId());
+            List<MaterialLot> materialReferences = materialLotRepository
+                    .findAllByCertificateDocumentVersion_Document_IdOrderByIdAsc(
+                            document.getId()
+                    );
+            List<Delivery> deliveryReferences = deliveryRepository
+                    .findAllByEvidenceDocumentVersion_Document_IdOrderByIdAsc(
+                            document.getId()
+                    );
+
+            List<Long> workOrderIds = workOrderReferences.stream()
+                    .map(reference -> reference.getWorkOrder().getId())
+                    .toList();
+            List<Long> materialLotIds = materialReferences.stream()
+                    .map(MaterialLot::getId)
+                    .toList();
+            List<Long> deliveryIds = deliveryReferences.stream()
+                    .map(Delivery::getId)
+                    .toList();
 
             LinkedHashSet<DocumentContext> contexts = contexts(
                     workOrderIds,
@@ -108,7 +126,12 @@ public class DocumentCenterService {
                     contexts,
                     workOrderIds,
                     materialLotIds,
-                    deliveryIds
+                    deliveryIds,
+                    references(
+                            workOrderReferences,
+                            materialReferences,
+                            deliveryReferences
+                    )
             ));
         }
 
@@ -121,6 +144,7 @@ public class DocumentCenterService {
             List<Long> deliveryIds
     ) {
         LinkedHashSet<DocumentContext> contexts = new LinkedHashSet<>();
+        contexts.add(DocumentContext.CASE);
 
         if (!workOrderIds.isEmpty()) {
             contexts.add(DocumentContext.WORK_ORDER);
@@ -131,11 +155,48 @@ public class DocumentCenterService {
         if (!deliveryIds.isEmpty()) {
             contexts.add(DocumentContext.DELIVERY);
         }
-        if (contexts.isEmpty()) {
-            contexts.add(DocumentContext.CASE);
-        }
 
         return contexts;
+    }
+
+    private List<DocumentReferenceResponse> references(
+            List<WorkOrderDocument> workOrderReferences,
+            List<MaterialLot> materialReferences,
+            List<Delivery> deliveryReferences
+    ) {
+        List<DocumentReferenceResponse> references = new ArrayList<>();
+
+        for (WorkOrderDocument reference : workOrderReferences) {
+            DocumentVersion version = reference.getDocumentVersion();
+            references.add(new DocumentReferenceResponse(
+                    DocumentContext.WORK_ORDER,
+                    reference.getWorkOrder().getId(),
+                    version.getId(),
+                    version.getVersion()
+            ));
+        }
+
+        for (MaterialLot reference : materialReferences) {
+            DocumentVersion version = reference.getCertificateDocumentVersion();
+            references.add(new DocumentReferenceResponse(
+                    DocumentContext.MATERIAL,
+                    reference.getId(),
+                    version.getId(),
+                    version.getVersion()
+            ));
+        }
+
+        for (Delivery reference : deliveryReferences) {
+            DocumentVersion version = reference.getEvidenceDocumentVersion();
+            references.add(new DocumentReferenceResponse(
+                    DocumentContext.DELIVERY,
+                    reference.getId(),
+                    version.getId(),
+                    version.getVersion()
+            ));
+        }
+
+        return references;
     }
 
     private String normalizeType(String documentType) {
