@@ -48,23 +48,28 @@ export function CustomerPortalSidebar({
         </span>
       </div>
 
-      <div className="mt-7 rounded-xl bg-slate-800 px-3.5 py-4">
-        <p className="truncate text-xs font-semibold text-white">
-          {customer.customerName}
-        </p>
-        <p className="mt-1 text-[10px] text-blue-200">Portal de cliente</p>
-        <p className="mt-2 text-[9px] text-slate-400">
-          {roleLabels[customer.role]}
-        </p>
-        {hasMultipleCustomers ? (
-          <Link
-            to="/portal"
-            onClick={onNavigate}
-            className="mt-3 inline-flex text-[10px] font-semibold text-blue-300 hover:text-white"
-          >
-            Cambiar empresa
-          </Link>
-        ) : null}
+      <div className="mt-7 flex items-center gap-3 rounded-xl bg-slate-800 px-3.5 py-4">
+        <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px] bg-teal-700 text-[11px] font-bold text-white">
+          QT
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-xs font-semibold text-white">
+            {customer.customerName}
+          </p>
+          <p className="mt-1 text-[10px] text-teal-200">Portal de cliente</p>
+          <p className="mt-1 text-[9px] text-slate-400">
+            {roleLabels[customer.role]}
+          </p>
+          {hasMultipleCustomers ? (
+            <Link
+              to="/portal"
+              onClick={onNavigate}
+              className="mt-2 inline-flex text-[10px] font-semibold text-blue-300 hover:text-white"
+            >
+              Cambiar empresa
+            </Link>
+          ) : null}
+        </div>
       </div>
 
       <nav className="mt-8" aria-label="Navegación del portal de cliente">
