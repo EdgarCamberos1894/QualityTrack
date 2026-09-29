@@ -23,7 +23,8 @@ public record DocumentCenterResponse(
         Set<DocumentContext> contexts,
         List<Long> workOrderIds,
         List<Long> materialLotIds,
-        List<Long> deliveryIds
+        List<Long> deliveryIds,
+        List<DocumentReferenceResponse> references
 ) {
 
     public static DocumentCenterResponse from(
@@ -32,7 +33,8 @@ public record DocumentCenterResponse(
             Set<DocumentContext> contexts,
             List<Long> workOrderIds,
             List<Long> materialLotIds,
-            List<Long> deliveryIds
+            List<Long> deliveryIds,
+            List<DocumentReferenceResponse> references
     ) {
         var jobCase = document.getJobCase();
         var request = jobCase.getCustomerRequest();
@@ -56,7 +58,8 @@ public record DocumentCenterResponse(
                 Set.copyOf(contexts),
                 List.copyOf(workOrderIds),
                 List.copyOf(materialLotIds),
-                List.copyOf(deliveryIds)
+                List.copyOf(deliveryIds),
+                List.copyOf(references)
         );
     }
 
