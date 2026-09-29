@@ -50,6 +50,9 @@ export function getJobCaseCapabilities(
   const canCompleteReview =
     canAttemptComplete && !openClarification && !missingRequiredMaterial
 
+  const canCreateQuotation =
+    jobCase.status === 'READY_FOR_QUOTATION' && (isAdmin || commercialOwner)
+
   let completeBlockReason: string | null = null
 
   if (canAttemptComplete && openClarification) {
@@ -66,6 +69,7 @@ export function getJobCaseCapabilities(
     canDefineMaterial,
     canAttemptComplete,
     canCompleteReview,
+    canCreateQuotation,
     completeBlockReason,
   }
 }

@@ -20,6 +20,14 @@ function getInitials(email: string): string {
 }
 
 function getBreadcrumb(pathname: string): string {
+  if (pathname.startsWith('/quotations/')) {
+    return 'Comercial / Cotizaciones / Detalle'
+  }
+
+  if (pathname === '/quotations') {
+    return 'Comercial / Cotizaciones'
+  }
+
   if (pathname.startsWith('/job-cases/')) {
     return 'Operación / Expedientes / Revisión'
   }

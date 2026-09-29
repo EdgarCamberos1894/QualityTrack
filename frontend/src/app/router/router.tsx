@@ -5,6 +5,7 @@ import { PublicOnlyRoute } from '@/app/router/PublicOnlyRoute'
 import { LoginPage } from '@/modules/auth'
 import { HomePage } from '@/modules/home'
 import { JobCaseDetailPage, JobCasesPage } from '@/modules/job-cases'
+import { QuotationDetailPage, QuotationsPage } from '@/modules/quotations'
 import { WorkOrderDetailPage, WorkOrdersPage } from '@/modules/work-orders'
 
 export const router = createBrowserRouter([
@@ -23,6 +24,11 @@ export const router = createBrowserRouter([
           {
             path: '/job-cases/:caseId',
             element: <JobCaseDetailPage />,
+          },
+          { path: '/quotations', element: <QuotationsPage /> },
+          {
+            path: '/quotations/:quotationId',
+            element: <QuotationDetailPage />,
           },
           { path: '/work-orders', element: <WorkOrdersPage /> },
           {

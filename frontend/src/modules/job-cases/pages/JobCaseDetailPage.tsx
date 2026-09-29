@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
+import { useCreateQuotation } from '@/modules/quotations'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
@@ -43,6 +44,7 @@ function resolveTab(value: string | null): JobCaseDetailTab {
 
 export function JobCaseDetailPage() {
   const { caseId } = useParams()
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [actionPanel, setActionPanel] = useState<ActionPanel>(null)
   const session = useSessionStore((state) => state.session)
@@ -55,13 +57,15 @@ export function JobCaseDetailPage() {
   const infoMutation = useRequestJobCaseInformation(validId ?? 0)
   const materialMutation = useDefineJobCaseMaterial(validId ?? 0)
   const completeMutation = useCompleteJobCaseReview(validId ?? 0)
+  const createQuotationMutation = useCreateQuotation()
   const activeTab = resolveTab(searchParams.get('tab'))
 
   const mutationError =
     takeMutation.error ??
     infoMutation.error ??
     materialMutation.error ??
-    completeMutation.error
+    completeMutation.error ??
+    createQuotationMutation.error
 
   const content = useMemo(() => {
     if (!detailQuery.data) return null
@@ -157,6 +161,11 @@ export function JobCaseDetailPage() {
     setActionPanel(null)
   }
 
+  const createQuotation = async () => {
+    const quotation = await createQuotationMutation.mutateAsync(validId)
+    navigate(`/quotations/${quotation.id}`)
+  }
+
   const timelineCount = timelineQuery.data?.length ?? 0
 
   return (
@@ -169,10 +178,12 @@ export function JobCaseDetailPage() {
           user={session.user}
           taking={takeMutation.isPending}
           completing={completeMutation.isPending}
+          creatingQuotation={createQuotationMutation.isPending}
           onTake={() => takeMutation.mutate()}
           onRequestInformation={() => setActionPanel('information')}
           onDefineMaterial={() => setActionPanel('material')}
           onComplete={() => completeMutation.mutate()}
+          onCreateQuotation={() => void createQuotation()}
         />
 
         {mutationError ? (

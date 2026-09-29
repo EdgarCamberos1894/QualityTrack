@@ -8,10 +8,12 @@ interface JobCaseActionBarProps {
   user: AuthenticatedUser
   taking: boolean
   completing: boolean
+  creatingQuotation: boolean
   onTake: () => void
   onRequestInformation: () => void
   onDefineMaterial: () => void
   onComplete: () => void
+  onCreateQuotation: () => void
 }
 
 export function JobCaseActionBar({
@@ -19,17 +21,20 @@ export function JobCaseActionBar({
   user,
   taking,
   completing,
+  creatingQuotation,
   onTake,
   onRequestInformation,
   onDefineMaterial,
   onComplete,
+  onCreateQuotation,
 }: JobCaseActionBarProps) {
   const capabilities = getJobCaseCapabilities(jobCase, user)
   const hasActions =
     capabilities.canTake ||
     capabilities.canRequestInformation ||
     capabilities.canDefineMaterial ||
-    capabilities.canAttemptComplete
+    capabilities.canAttemptComplete ||
+    capabilities.canCreateQuotation
 
   if (!hasActions) return null
 
@@ -64,6 +69,16 @@ export function JobCaseActionBar({
             title={capabilities.completeBlockReason ?? undefined}
           >
             {completing ? 'Completando…' : 'Completar revisión'}
+          </Button>
+        ) : null}
+
+        {capabilities.canCreateQuotation ? (
+          <Button
+            size="sm"
+            onClick={onCreateQuotation}
+            disabled={creatingQuotation}
+          >
+            {creatingQuotation ? 'Creando…' : 'Crear cotización'}
           </Button>
         ) : null}
       </div>

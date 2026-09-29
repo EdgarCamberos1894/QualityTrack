@@ -1,0 +1,194 @@
+import { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useSessionStore } from '@/modules/auth'
+import { ErrorState } from '@/shared/components/feedback/ErrorState'
+import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import { PageContainer } from '@/shared/components/layout/PageContainer'
+import { Button } from '@/shared/components/ui/Button'
+import { getErrorMessage } from '@/shared/lib/getErrorMessage'
+import { QuotationAdjustmentCard } from '../components/QuotationAdjustmentCard'
+import { QuotationDetailHeader } from '../components/QuotationDetailHeader'
+import { QuotationEditorForm } from '../components/QuotationEditorForm'
+import { QuotationFlowSteps } from '../components/QuotationFlowSteps'
+import { QuotationPreviewDialog } from '../components/QuotationPreviewDialog'
+import { QuotationRevisionHistory } from '../components/QuotationRevisionHistory'
+import { QuotationSourceCard } from '../components/QuotationSourceCard'
+import { useQuotationDetail } from '../hooks/useQuotationDetail'
+import {
+  useCreateQuotationRevision,
+  useSendQuotation,
+  useUpdateQuotation,
+} from '../hooks/useQuotationMutations'
+import { useQuotationRevisions } from '../hooks/useQuotationRevisions'
+import type {
+  SendQuotationPayload,
+  UpdateQuotationPayload,
+} from '../types/quotation.types'
+import type { QuotationPreviewData } from '../schemas/quotation.schema'
+
+const revisionEligibleStatuses = new Set(['REJECTED', 'EXPIRED', 'CANCELLED'])
+
+export function QuotationDetailPage() {
+  const { quotationId } = useParams()
+  const navigate = useNavigate()
+  const session = useSessionStore((state) => state.session)
+  const [preview, setPreview] = useState<QuotationPreviewData | null>(null)
+  const numericId = Number(quotationId)
+  const validId =
+    Number.isInteger(numericId) && numericId > 0 ? numericId : null
+  const detailQuery = useQuotationDetail(validId)
+  const revisionsQuery = useQuotationRevisions(validId)
+  const updateMutation = useUpdateQuotation(validId ?? 0)
+  const sendMutation = useSendQuotation(validId ?? 0)
+  const revisionMutation = useCreateQuotationRevision(validId ?? 0)
+
+  if (validId === null || !session) {
+    return (
+      <PageContainer>
+        <ErrorState
+          error={new Error('El identificador de la cotización no es válido.')}
+          title="Cotización no disponible"
+        />
+      </PageContainer>
+    )
+  }
+
+  if (detailQuery.isPending) {
+    return (
+      <PageContainer>
+        <LoadingState label="Cargando cotización…" />
+      </PageContainer>
+    )
+  }
+
+  if (detailQuery.isError) {
+    return (
+      <PageContainer>
+        <ErrorState
+          error={detailQuery.error}
+          title="No pudimos cargar la cotización"
+        />
+      </PageContainer>
+    )
+  }
+
+  const quotation = detailQuery.data
+  const roles = session.user.roles
+  const isAdmin = roles.includes('ADMIN')
+  const isCommercialOwner =
+    roles.includes('COMMERCIAL') &&
+    String(quotation.createdByUserId) === session.user.id
+  const canManage = isAdmin || isCommercialOwner
+  const editable = quotation.status === 'DRAFT' && canManage
+  const canCreateRevision =
+    canManage && revisionEligibleStatuses.has(quotation.status)
+
+  const mutationError =
+    updateMutation.error ?? sendMutation.error ?? revisionMutation.error
+
+  const save = async (payload: UpdateQuotationPayload) => {
+    await updateMutation.mutateAsync(payload)
+  }
+
+  const send = async (
+    payload: UpdateQuotationPayload,
+    adjustmentResponse: string | null,
+  ) => {
+    await updateMutation.mutateAsync(payload)
+
+    const sendPayload: SendQuotationPayload | undefined = adjustmentResponse
+      ? { adjustmentResponse }
+      : undefined
+
+    await sendMutation.mutateAsync(sendPayload)
+  }
+
+  const createRevision = async () => {
+    const next = await revisionMutation.mutateAsync()
+    navigate(`/quotations/${next.id}`, { replace: true })
+  }
+
+  const revisions =
+    revisionsQuery.data ?? (revisionsQuery.isPending ? [] : [quotation])
+
+  return (
+    <PageContainer>
+      <QuotationDetailHeader quotation={quotation} />
+
+      <div className="space-y-4">
+        <QuotationFlowSteps />
+        <QuotationSourceCard source={quotation.source} />
+        <QuotationAdjustmentCard quotation={quotation} />
+
+        {mutationError ? (
+          <div
+            role="alert"
+            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+          >
+            {getErrorMessage(mutationError)}
+          </div>
+        ) : null}
+
+        {!editable ? (
+          <section className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-900">
+                {quotation.status === 'DRAFT'
+                  ? 'Revisión de solo lectura'
+                  : 'Revisión congelada'}
+              </p>
+              <p className="mt-1 text-[10px] text-slate-500">
+                {quotation.status === 'DRAFT'
+                  ? 'Solo el responsable comercial o un administrador puede modificar este borrador.'
+                  : 'Una revisión enviada o cerrada conserva sus datos históricos y ya no se edita.'}
+              </p>
+            </div>
+
+            {canCreateRevision ? (
+              <Button
+                size="sm"
+                onClick={() => void createRevision()}
+                disabled={revisionMutation.isPending}
+              >
+                {revisionMutation.isPending
+                  ? 'Creando revisión…'
+                  : 'Crear nueva revisión'}
+              </Button>
+            ) : null}
+          </section>
+        ) : null}
+
+        <QuotationEditorForm
+          quotation={quotation}
+          editable={editable}
+          saving={updateMutation.isPending}
+          sending={sendMutation.isPending}
+          onSave={save}
+          onSend={send}
+          onPreview={setPreview}
+        />
+
+        {revisionsQuery.isError ? (
+          <p className="text-xs text-amber-700">
+            No fue posible cargar el historial de revisiones.
+          </p>
+        ) : revisionsQuery.isPending ? (
+          <LoadingState label="Cargando revisiones…" />
+        ) : (
+          <QuotationRevisionHistory
+            revisions={revisions}
+            currentId={quotation.id}
+          />
+        )}
+      </div>
+
+      {preview ? (
+        <QuotationPreviewDialog
+          quotation={quotation}
+          preview={preview}
+          onClose={() => setPreview(null)}
+        />
+      ) : null}
+    </PageContainer>
+  )
+}
