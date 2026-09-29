@@ -87,8 +87,8 @@ public class Delivery {
     private String receivedByName;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "confirmed_by_user_id")
-    private User confirmedByUser;
+    @JoinColumn(name = "delivered_by_user_id")
+    private User deliveredByUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "evidence_document_version_id")
@@ -199,11 +199,19 @@ public class Delivery {
             Instant deliveredAt
     ) {
         if (status != DeliveryStatus.DISPATCHED) {
-            throw new IllegalStateException("Solo una entrega DISPATCHED puede confirmarse como recibida.");
+            throw new IllegalStateException("Solo una entrega DISPATCHED puede registrarse como entregada.");
         }
+
+        Instant actualDeliveredAt = Objects.requireNonNull(deliveredAt);
+        if (dispatchedAt == null || actualDeliveredAt.isBefore(dispatchedAt)) {
+            throw new IllegalArgumentException(
+                    "La fecha real de entrega no puede ser anterior al despacho."
+            );
+        }
+
         this.receivedByName = requireText(receivedByName, "El nombre de quien recibe es obligatorio.");
-        this.confirmedByUser = Objects.requireNonNull(actor);
-        this.deliveredAt = Objects.requireNonNull(deliveredAt);
+        this.deliveredByUser = Objects.requireNonNull(actor);
+        this.deliveredAt = actualDeliveredAt;
         this.status = DeliveryStatus.DELIVERED;
     }
 
