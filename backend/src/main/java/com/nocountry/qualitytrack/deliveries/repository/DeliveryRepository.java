@@ -18,13 +18,13 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
     @EntityGraph(attributePaths = {
             "workOrder", "workOrder.jobCase", "workOrder.jobCase.customerRequest",
             "workOrder.jobCase.customerRequest.customer", "createdByUser",
-            "dispatchedByUser", "confirmedByUser", "cancelledByUser", "evidenceDocumentVersion"
+            "dispatchedByUser", "deliveredByUser", "cancelledByUser", "evidenceDocumentVersion"
     })
     Optional<Delivery> findById(Long id);
 
     @EntityGraph(attributePaths = {
             "workOrder", "createdByUser", "dispatchedByUser",
-            "confirmedByUser", "cancelledByUser", "evidenceDocumentVersion"
+            "deliveredByUser", "cancelledByUser", "evidenceDocumentVersion"
     })
     List<Delivery> findAllByWorkOrder_IdOrderByCreatedAtAscIdAsc(Long workOrderId);
 
@@ -50,7 +50,7 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
             join fetch request.customer
             join fetch d.createdByUser
             left join fetch d.dispatchedByUser
-            left join fetch d.confirmedByUser
+            left join fetch d.deliveredByUser
             left join fetch d.cancelledByUser
             left join fetch d.evidenceDocumentVersion
             where d.id = :deliveryId
