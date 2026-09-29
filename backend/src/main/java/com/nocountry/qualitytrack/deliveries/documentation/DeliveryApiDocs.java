@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Documented
 @Tag(
         name = "13 · Entregas",
-        description = "Preparación, despacho, recepción confirmada, evidencia documental, entregas parciales y cierre de la orden de trabajo."
+        description = "Preparación, despacho, registro logístico de recepción real, evidencia documental, entregas parciales y cierre de la orden de trabajo."
 )
 public @interface DeliveryApiDocs {
 }
