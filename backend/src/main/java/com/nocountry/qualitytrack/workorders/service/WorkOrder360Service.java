@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
@@ -53,7 +54,20 @@ public class WorkOrder360Service {
         Long caseId = workOrder.source().caseId();
         Long quotationId = workOrder.agreement().quotationId();
 
-        List<DocumentCenterResponse> centerDocuments = documentCenterService.search(
+        LinkedHashMap<Long, DocumentCenterResponse> documentsById = new LinkedHashMap<>();
+
+        documentCenterService.search(
+                currentUserId,
+                null,
+                caseId,
+                null,
+                null,
+                null,
+                null,
+                null
+        ).forEach(document -> documentsById.put(document.id(), document));
+
+        documentCenterService.search(
                 currentUserId,
                 null,
                 null,
@@ -62,9 +76,9 @@ public class WorkOrder360Service {
                 null,
                 null,
                 null
-        );
+        ).forEach(document -> documentsById.putIfAbsent(document.id(), document));
 
-        List<WorkOrder360DocumentResponse> documents = centerDocuments.stream()
+        List<WorkOrder360DocumentResponse> documents = documentsById.values().stream()
                 .map(document -> new WorkOrder360DocumentResponse(
                         document,
                         documentService.listVersions(
