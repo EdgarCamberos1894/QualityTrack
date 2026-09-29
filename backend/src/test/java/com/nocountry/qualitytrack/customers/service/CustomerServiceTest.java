@@ -140,9 +140,9 @@ class CustomerServiceTest {
         List<CustomerContextResponse> response = service.listMyCustomers(10L);
 
         assertEquals(1, response.size());
-        assertEquals(20L, response.getFirst().customerId());
-        assertEquals("Taller Norte", response.getFirst().customerName());
-        assertEquals(CustomerMembershipRole.REQUESTER, response.getFirst().role());
+        assertEquals(20L, response.get(0).customerId());
+        assertEquals("Taller Norte", response.get(0).customerName());
+        assertEquals(CustomerMembershipRole.REQUESTER, response.get(0).role());
 
         verify(membershipRepository).findAllByUser_IdAndStatusOrderByCreatedAtAsc(
                 10L,

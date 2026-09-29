@@ -22,6 +22,7 @@ public record CustomerQuotationDetailResponse(
         BigDecimal total,
         LocalDate validUntil,
         LocalDate estimatedDeliveryDate,
+        CustomerQuotationSourceResponse source,
         CustomerQuotationAdjustmentResponse adjustment,
         Instant sentAt,
         Instant approvedAt,
@@ -31,12 +32,16 @@ public record CustomerQuotationDetailResponse(
         String cancellationReason,
         List<QuotationItemResponse> items
 ) {
-    public static CustomerQuotationDetailResponse from(Quotation quotation) {
+    public static CustomerQuotationDetailResponse from(
+            Quotation quotation,
+            CustomerQuotationSourceResponse source
+    ) {
         return from(
                 quotation,
                 CustomerQuotationStatus.fromDomain(quotation.getStatus(), false),
                 quotation.getAdjustmentNotes(),
-                quotation.getAdjustmentResponse()
+                quotation.getAdjustmentResponse(),
+                source
         );
     }
 
@@ -44,7 +49,8 @@ public record CustomerQuotationDetailResponse(
             Quotation quotation,
             CustomerQuotationStatus customerStatus,
             String adjustmentNotes,
-            String adjustmentResponse
+            String adjustmentResponse,
+            CustomerQuotationSourceResponse source
     ) {
         return new CustomerQuotationDetailResponse(
                 quotation.getId(),
@@ -60,6 +66,7 @@ public record CustomerQuotationDetailResponse(
                 quotation.getTotal(),
                 quotation.getValidUntil(),
                 quotation.getEstimatedDeliveryDate(),
+                source,
                 CustomerQuotationAdjustmentResponse.of(adjustmentNotes, adjustmentResponse),
                 quotation.getSentAt(),
                 quotation.getApprovedAt(),

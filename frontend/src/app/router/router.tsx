@@ -1,11 +1,24 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/app/layout/AppShell'
+import { AccountHomeRedirect } from '@/app/router/AccountHomeRedirect'
+import { CustomerOnlyRoute } from '@/app/router/CustomerOnlyRoute'
+import { InternalOnlyRoute } from '@/app/router/InternalOnlyRoute'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { PublicOnlyRoute } from '@/app/router/PublicOnlyRoute'
 import { LoginPage } from '@/modules/auth'
+import {
+  CustomerPortalHomePage,
+  CustomerPortalLandingPage,
+  CustomerPortalShell,
+} from '@/modules/customer-portal'
 import { HomePage } from '@/modules/home'
 import { JobCaseDetailPage, JobCasesPage } from '@/modules/job-cases'
-import { QuotationDetailPage, QuotationsPage } from '@/modules/quotations'
+import {
+  CustomerQuotationDetailPage,
+  CustomerQuotationsPage,
+  QuotationDetailPage,
+  QuotationsPage,
+} from '@/modules/quotations'
 import { WorkOrderDetailPage, WorkOrdersPage } from '@/modules/work-orders'
 
 export const router = createBrowserRouter([
@@ -17,27 +30,56 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        element: <AppShell />,
+        element: <InternalOnlyRoute />,
         children: [
-          { path: '/', element: <HomePage /> },
-          { path: '/job-cases', element: <JobCasesPage /> },
           {
-            path: '/job-cases/:caseId',
-            element: <JobCaseDetailPage />,
-          },
-          { path: '/quotations', element: <QuotationsPage /> },
-          {
-            path: '/quotations/:quotationId',
-            element: <QuotationDetailPage />,
-          },
-          { path: '/work-orders', element: <WorkOrdersPage /> },
-          {
-            path: '/work-orders/:workOrderId',
-            element: <WorkOrderDetailPage />,
+            element: <AppShell />,
+            children: [
+              { path: '/', element: <HomePage /> },
+              { path: '/job-cases', element: <JobCasesPage /> },
+              {
+                path: '/job-cases/:caseId',
+                element: <JobCaseDetailPage />,
+              },
+              { path: '/quotations', element: <QuotationsPage /> },
+              {
+                path: '/quotations/:quotationId',
+                element: <QuotationDetailPage />,
+              },
+              { path: '/work-orders', element: <WorkOrdersPage /> },
+              {
+                path: '/work-orders/:workOrderId',
+                element: <WorkOrderDetailPage />,
+              },
+            ],
           },
         ],
       },
+      {
+        element: <CustomerOnlyRoute />,
+        children: [
+          { path: '/portal', element: <CustomerPortalLandingPage /> },
+          {
+            element: <CustomerPortalShell />,
+            children: [
+              {
+                path: '/portal/:customerId',
+                element: <CustomerPortalHomePage />,
+              },
+              {
+                path: '/portal/:customerId/quotations',
+                element: <CustomerQuotationsPage />,
+              },
+              {
+                path: '/portal/:customerId/quotations/:quotationId',
+                element: <CustomerQuotationDetailPage />,
+              },
+            ],
+          },
+        ],
+      },
+      { path: '*', element: <AccountHomeRedirect /> },
     ],
   },
-  { path: '*', element: <Navigate to="/" replace /> },
+  { path: '*', element: <Navigate to="/login" replace /> },
 ])

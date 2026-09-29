@@ -5,7 +5,12 @@ export function PublicOnlyRoute() {
   const session = useSessionStore((state) => state.session)
 
   if (session && isSessionActive(session)) {
-    return <Navigate to="/" replace />
+    return (
+      <Navigate
+        to={session.user.accountType === 'CUSTOMER' ? '/portal' : '/'}
+        replace
+      />
+    )
   }
 
   return <Outlet />

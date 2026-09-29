@@ -129,7 +129,8 @@ public class QuotationService {
                 quotation,
                 customerStatusFor(quotation, adjustmentPending),
                 adjustmentNotes,
-                adjustmentResponse
+                adjustmentResponse,
+                quotationSourceService.getForCustomer(quotation)
         );
     }
 

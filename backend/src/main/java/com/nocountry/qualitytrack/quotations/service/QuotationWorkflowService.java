@@ -264,7 +264,10 @@ public class QuotationWorkflowService {
                 )
         );
 
-        return CustomerQuotationDetailResponse.from(quotation);
+        return CustomerQuotationDetailResponse.from(
+                quotation,
+                quotationSourceService.getForCustomer(quotation)
+        );
     }
 
     @Transactional
@@ -327,7 +330,8 @@ public class QuotationWorkflowService {
                 current,
                 CustomerQuotationStatus.ADJUSTMENT_REQUESTED,
                 input.notes(),
-                null
+                null,
+                quotationSourceService.getForCustomer(current)
         );
     }
 
@@ -364,7 +368,10 @@ public class QuotationWorkflowService {
                 )
         );
 
-        return CustomerQuotationDetailResponse.from(quotation);
+        return CustomerQuotationDetailResponse.from(
+                quotation,
+                quotationSourceService.getForCustomer(quotation)
+        );
     }
 
     @Transactional

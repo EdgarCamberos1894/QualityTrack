@@ -84,15 +84,14 @@ class DocumentCenterServiceTest {
         )).thenReturn(List.of(document));
         when(documentVersionRepository.findLatestByDocumentIds(List.of(7L)))
                 .thenReturn(List.of(version));
-        when(workOrderDocumentRepository.findAllByDocument_IdOrderByWorkOrder_IdAsc(7L))
+        when(workOrderDocumentRepository.findAllByDocumentIds(List.of(7L)))
                 .thenReturn(List.of(workOrderDocument));
-        when(materialLotRepository
-                .findAllByCertificateDocumentVersion_Document_IdOrderByIdAsc(7L))
+        when(materialLotRepository.findAllByCertificateDocumentIds(List.of(7L)))
                 .thenReturn(List.of());
-        when(deliveryRepository
-                .findAllByEvidenceDocumentVersion_Document_IdOrderByIdAsc(7L))
+        when(deliveryRepository.findAllByEvidenceDocumentIds(List.of(7L)))
                 .thenReturn(List.of(delivery));
 
+        when(workOrderDocument.getDocument()).thenReturn(document);
         when(workOrderDocument.getWorkOrder()).thenReturn(workOrder);
         when(workOrder.getId()).thenReturn(70L);
         when(workOrderDocument.getDocumentVersion()).thenReturn(historicalVersion);
@@ -150,13 +149,11 @@ class DocumentCenterServiceTest {
         )).thenReturn(List.of(document));
         when(documentVersionRepository.findLatestByDocumentIds(List.of(7L)))
                 .thenReturn(List.of(version));
-        when(workOrderDocumentRepository.findAllByDocument_IdOrderByWorkOrder_IdAsc(7L))
+        when(workOrderDocumentRepository.findAllByDocumentIds(List.of(7L)))
                 .thenReturn(List.of());
-        when(materialLotRepository
-                .findAllByCertificateDocumentVersion_Document_IdOrderByIdAsc(7L))
+        when(materialLotRepository.findAllByCertificateDocumentIds(List.of(7L)))
                 .thenReturn(List.of());
-        when(deliveryRepository
-                .findAllByEvidenceDocumentVersion_Document_IdOrderByIdAsc(7L))
+        when(deliveryRepository.findAllByEvidenceDocumentIds(List.of(7L)))
                 .thenReturn(List.of());
 
         var response = service.search(
