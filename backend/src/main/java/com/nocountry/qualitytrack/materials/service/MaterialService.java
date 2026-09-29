@@ -35,6 +35,8 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -134,6 +136,30 @@ public class MaterialService {
         return materialLotRepository.findById(lotId)
                 .map(MaterialLotResponse::from)
                 .orElseThrow(() -> notFound("No se encontró el lote de material."));
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, MaterialLotResponse> getLotsByIds(
+            Long currentUserId,
+            List<Long> lotIds
+    ) {
+        accessPolicy.requireInternalReader(currentUserId);
+
+        if (lotIds == null || lotIds.isEmpty()) {
+            return Map.of();
+        }
+
+        return materialLotRepository.findAllByIdIn(
+                        lotIds.stream().distinct().toList()
+                )
+                .stream()
+                .map(MaterialLotResponse::from)
+                .collect(Collectors.toMap(
+                        MaterialLotResponse::id,
+                        Function.identity(),
+                        (first, ignored) -> first,
+                        LinkedHashMap::new
+                ));
     }
 
     @Transactional(readOnly = true)
