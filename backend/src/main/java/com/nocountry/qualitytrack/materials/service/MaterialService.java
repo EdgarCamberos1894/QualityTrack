@@ -149,9 +149,12 @@ public class MaterialService {
             return Map.of();
         }
 
-        return materialLotRepository.findAllByIdIn(
-                        lotIds.stream().distinct().toList()
-                )
+        List<Long> distinctLotIds = lotIds.stream()
+                .distinct()
+                .toList();
+
+        Map<Long, MaterialLotResponse> lotsById = materialLotRepository
+                .findAllByIdIn(distinctLotIds)
                 .stream()
                 .map(MaterialLotResponse::from)
                 .collect(Collectors.toMap(
@@ -160,6 +163,15 @@ public class MaterialService {
                         (first, ignored) -> first,
                         LinkedHashMap::new
                 ));
+
+        if (lotsById.size() != distinctLotIds.size()) {
+            throw new BusinessException(
+                    ApiErrorCode.DATA_CONFLICT,
+                    "Uno o más consumos de la orden apuntan a lotes inexistentes."
+            );
+        }
+
+        return lotsById;
     }
 
     @Transactional(readOnly = true)
