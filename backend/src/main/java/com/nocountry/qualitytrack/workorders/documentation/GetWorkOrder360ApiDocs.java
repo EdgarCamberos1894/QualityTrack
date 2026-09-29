@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Operation(
         summary = "Consultar expediente 360 de una orden de trabajo",
-        description = "Compone una vista de auditoría de solo lectura con origen comercial, revisiones de cotización, routing, producción, materiales, Calidad, no conformidades, documentos/versiones, entregas y timeline. Los eventos incluyen acciones navegables hacia los registros originales sin duplicar datos."
+        description = "Compone una vista de auditoría de solo lectura con origen comercial, revisiones de cotización, routing, producción, materiales, Calidad, no conformidades, documentos/versiones, entregas y timeline. Cada evento conserva un snapshot histórico inmutable de estados y metadata, y expone únicamente acciones navegables hacia recursos que siguen siendo válidos. Las acciones incluyen un type estable para que el frontend resuelva navegación sin depender del texto visible."
 )
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Expediente 360 consultado correctamente"),
