@@ -128,6 +128,15 @@ public class MaterialService {
     }
 
     @Transactional(readOnly = true)
+    public MaterialLotResponse getLot(Long currentUserId, Long lotId) {
+        accessPolicy.requireInternalReader(currentUserId);
+
+        return materialLotRepository.findById(lotId)
+                .map(MaterialLotResponse::from)
+                .orElseThrow(() -> notFound("No se encontró el lote de material."));
+    }
+
+    @Transactional(readOnly = true)
     public List<MaterialLotResponse> listLots(Long currentUserId, Long materialId) {
         accessPolicy.requireInternalReader(currentUserId);
 
