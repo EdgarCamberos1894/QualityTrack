@@ -45,7 +45,7 @@ class DeliveryTest {
         delivery.markDelivered(
                 actor,
                 "Ana López",
-                Instant.parse("2026-09-29T12:00:00Z")
+                Instant.parse("2026-09-28T20:00:00Z")
         );
 
         assertEquals(DeliveryStatus.DELIVERED, delivery.getStatus());
@@ -68,7 +68,7 @@ class DeliveryTest {
                 actor
         );
         delivery.dispatch(actor, null, null, Instant.parse("2026-09-28T18:00:00Z"));
-        delivery.markDelivered(actor, "Ana López", Instant.parse("2026-09-29T12:00:00Z"));
+        delivery.markDelivered(actor, "Ana López", Instant.parse("2026-09-28T20:00:00Z"));
 
         assertThrows(
                 IllegalStateException.class,
@@ -104,12 +104,45 @@ class DeliveryTest {
         delivery.markDelivered(
                 actor,
                 "Ana López",
-                Instant.parse("2026-09-29T12:00:00Z")
+                Instant.parse("2026-09-28T20:00:00Z")
         );
 
         assertThrows(
                 IllegalStateException.class,
                 () -> delivery.attachEvidence(replacementEvidence)
+        );
+    }
+
+    @Test
+    void deliveryTimeCannotBeBeforeDispatch() {
+        User actor = mock(User.class);
+        Delivery delivery = Delivery.create(
+                readyOrder(actor),
+                5,
+                "Cliente",
+                "Av. Principal 123",
+                "Tepic",
+                "Nayarit",
+                "63000",
+                "México",
+                "PAQUETERIA",
+                actor
+        );
+
+        delivery.dispatch(
+                actor,
+                null,
+                null,
+                Instant.parse("2026-09-28T18:00:00Z")
+        );
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> delivery.markDelivered(
+                        actor,
+                        "Ana López",
+                        Instant.parse("2026-09-28T17:59:59Z")
+                )
         );
     }
 
