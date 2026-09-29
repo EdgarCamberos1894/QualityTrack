@@ -33,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -195,6 +196,35 @@ public class DocumentService {
                 .stream()
                 .map(DocumentVersionResponse::from)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, List<DocumentVersionResponse>> listVersionsByDocumentIds(
+            Long currentUserId,
+            Long caseId,
+            List<Long> documentIds
+    ) {
+        accessService.requireInternalReader(currentUserId);
+
+        if (documentIds == null || documentIds.isEmpty()) {
+            return Map.of();
+        }
+
+        return documentVersionRepository
+                .findAllActiveByCaseIdAndDocumentIds(
+                        caseId,
+                        DocumentStatus.ACTIVE,
+                        documentIds
+                )
+                .stream()
+                .collect(Collectors.groupingBy(
+                        version -> version.getDocument().getId(),
+                        LinkedHashMap::new,
+                        Collectors.mapping(
+                                DocumentVersionResponse::from,
+                                Collectors.toUnmodifiableList()
+                        )
+                ));
     }
 
     @Transactional(readOnly = true)
