@@ -91,6 +91,16 @@ class WorkOrder360ServiceTest {
         when(documentCenterService.search(
                 10L,
                 null,
+                12L,
+                null,
+                null,
+                null,
+                null,
+                null
+        )).thenReturn(List.of());
+        when(documentCenterService.search(
+                10L,
+                null,
                 null,
                 7L,
                 null,
