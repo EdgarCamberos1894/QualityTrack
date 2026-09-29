@@ -81,13 +81,10 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
 
     boolean existsByEvidenceDocumentVersion_Document_Id(Long documentId);
 
-    @Query("""
-            select distinct d.id
-            from Delivery d
-            where d.evidenceDocumentVersion.document.id = :documentId
-            order by d.id
-            """)
-    List<Long> findIdsByEvidenceDocumentId(@Param("documentId") Long documentId);
+    @EntityGraph(attributePaths = {
+            "evidenceDocumentVersion"
+    })
+    List<Delivery> findAllByEvidenceDocumentVersion_Document_IdOrderByIdAsc(Long documentId);
 
     @EntityGraph(attributePaths = {
             "workOrder",
