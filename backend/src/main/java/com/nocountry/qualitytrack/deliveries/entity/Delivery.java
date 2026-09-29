@@ -193,7 +193,7 @@ public class Delivery {
         this.evidenceDocumentVersion = Objects.requireNonNull(evidenceDocumentVersion);
     }
 
-    public void confirmReception(
+    public void markDelivered(
             User actor,
             String receivedByName,
             Instant deliveredAt
