@@ -13,6 +13,7 @@ import com.nocountry.qualitytrack.quotations.service.QuotationService;
 import com.nocountry.qualitytrack.routing.service.RoutingService;
 import com.nocountry.qualitytrack.traceability.dto.response.TraceabilityActionResponse;
 import com.nocountry.qualitytrack.traceability.dto.response.TraceabilityEventResponse;
+import com.nocountry.qualitytrack.traceability.enums.TraceabilityActionType;
 import com.nocountry.qualitytrack.traceability.enums.TraceabilityAggregateType;
 import com.nocountry.qualitytrack.traceability.enums.TraceabilityEventType;
 import com.nocountry.qualitytrack.traceability.enums.TraceabilityResourceType;
@@ -81,7 +82,7 @@ class WorkOrder360ServiceTest {
     }
 
     @Test
-    void composesWorkOrderHistoryWithoutDuplicatingDomainData() {
+    void composesWorkOrderHistoryUsingBatchReadsAndImmutableSnapshot() {
         when(workOrderService.get(10L, 7L)).thenReturn(workOrder);
         when(workOrder.source()).thenReturn(source);
         when(workOrder.agreement()).thenReturn(agreement);
@@ -97,35 +98,31 @@ class WorkOrder360ServiceTest {
                 null,
                 null,
                 null
-        )).thenReturn(List.of());
-        when(documentCenterService.search(
-                10L,
-                null,
-                null,
-                7L,
-                null,
-                null,
-                null,
-                null
         )).thenReturn(List.of(document));
-        when(document.caseId()).thenReturn(12L);
         when(document.id()).thenReturn(30L);
-        when(documentService.listVersions(10L, 12L, 30L))
-                .thenReturn(List.of(documentVersion));
+        when(documentService.listVersionsByDocumentIds(
+                10L,
+                12L,
+                List.of(30L)
+        )).thenReturn(Map.of(30L, List.of(documentVersion)));
 
         TraceabilityEventResponse event = new TraceabilityEventResponse(
                 100L,
                 TraceabilityAggregateType.DOCUMENT_VERSION,
                 31L,
                 TraceabilityEventType.DOCUMENT_VERSION_ADDED,
-                null,
-                null,
+                "ACTIVE",
+                "ACTIVE",
                 10L,
                 "Ana López",
-                Map.of("documentId", 30L),
+                Map.of(
+                        "documentId", 30L,
+                        "version", 2
+                ),
                 Instant.parse("2026-09-28T18:00:00Z")
         );
         TraceabilityActionResponse action = new TraceabilityActionResponse(
+                TraceabilityActionType.VIEW_DOCUMENT_VERSION,
                 "Ver versión",
                 TraceabilityResourceType.DOCUMENT_VERSION,
                 31L
@@ -137,6 +134,7 @@ class WorkOrder360ServiceTest {
         when(quotationService.listRevisionsInternal(10L, 20L)).thenReturn(List.of());
         when(routingService.list(10L, 7L)).thenReturn(List.of());
         when(materialService.listConsumption(10L, 7L)).thenReturn(List.of());
+        when(materialService.getLotsByIds(10L, List.of())).thenReturn(Map.of());
         when(qualityService.list(10L, 7L)).thenReturn(List.of());
         when(nonConformityService.listByWorkOrder(10L, 7L)).thenReturn(List.of());
         when(deliveryService.listByWorkOrder(10L, 7L)).thenReturn(List.of());
@@ -148,11 +146,20 @@ class WorkOrder360ServiceTest {
         assertSame(document, response.documents().get(0).document());
         assertEquals(1, response.documents().get(0).versions().size());
         assertSame(documentVersion, response.documents().get(0).versions().get(0));
+
         assertEquals(1, response.timeline().size());
-        assertEquals(1, response.timeline().get(0).actions().size());
-        assertEquals(31L, response.timeline().get(0).actions().get(0).resourceId());
+        var timelineEvent = response.timeline().get(0);
+        assertEquals("ACTIVE", timelineEvent.snapshot().fromStatus());
+        assertEquals("ACTIVE", timelineEvent.snapshot().toStatus());
+        assertEquals(2, timelineEvent.snapshot().details().get("version"));
+        assertEquals(1, timelineEvent.actions().size());
+        assertEquals(TraceabilityActionType.VIEW_DOCUMENT_VERSION,
+                timelineEvent.actions().get(0).type());
+        assertEquals(31L, timelineEvent.actions().get(0).resourceId());
 
         verify(accessPolicy).requireInternalReader(10L);
+        verify(documentService).listVersionsByDocumentIds(10L, 12L, List.of(30L));
+        verify(materialService).getLotsByIds(10L, List.of());
         verify(productionService).getStatus(10L, 7L);
     }
 }
