@@ -2,7 +2,7 @@ package com.nocountry.qualitytrack.deliveries.service;
 
 import com.nocountry.qualitytrack.deliveries.dto.request.AttachDeliveryEvidenceRequest;
 import com.nocountry.qualitytrack.deliveries.dto.request.CancelDeliveryRequest;
-import com.nocountry.qualitytrack.deliveries.dto.request.ConfirmDeliveryReceptionRequest;
+import com.nocountry.qualitytrack.deliveries.dto.request.CompleteDeliveryRequest;
 import com.nocountry.qualitytrack.deliveries.dto.request.CreateDeliveryRequest;
 import com.nocountry.qualitytrack.deliveries.dto.request.DispatchDeliveryRequest;
 import com.nocountry.qualitytrack.deliveries.dto.response.DeliveryResponse;
@@ -271,33 +271,35 @@ public class DeliveryService {
     }
 
     @Transactional
-    public DeliveryResponse confirmReception(
+    public DeliveryResponse deliver(
             Long currentUserId,
-            Long customerId,
-            Long requestId,
             Long deliveryId,
-            ConfirmDeliveryReceptionRequest request
+            CompleteDeliveryRequest request
     ) {
-        User actor = accessPolicy.requireCustomerReceiver(currentUserId, customerId);
+        User actor = accessPolicy.requireLogisticsActor(currentUserId);
         LockedDelivery locked = lockWorkOrderThenDelivery(deliveryId);
         WorkOrder workOrder = locked.workOrder();
         Delivery delivery = locked.delivery();
 
-        requireCustomerContext(workOrder, customerId, requestId);
         requireReadyForDelivery(workOrder);
 
-        DocumentVersion evidence = delivery.getEvidenceDocumentVersion();
-        if (request.evidenceDocumentVersionId() != null
-                && (evidence == null
-                || !request.evidenceDocumentVersionId().equals(evidence.getId()))) {
-            conflict(
-                    "La evidencia indicada no coincide con la evidencia vinculada a esta entrega."
+        if (request.evidenceDocumentVersionId() != null) {
+            DocumentVersion evidence = requireEvidence(
+                    request.evidenceDocumentVersionId(),
+                    workOrder.getJobCase().getId()
             );
+            documentAccessService.requireCanRead(currentUserId, evidence.getDocument());
+
+            try {
+                delivery.attachEvidence(evidence);
+            } catch (IllegalArgumentException | IllegalStateException exception) {
+                conflict(exception.getMessage());
+            }
         }
 
         DeliveryStatus previousStatus = delivery.getStatus();
         try {
-            delivery.confirmReception(
+            delivery.markDelivered(
                     actor,
                     request.receivedByName(),
                     Instant.now()
@@ -397,21 +399,6 @@ public class DeliveryService {
         return jobCaseRepository
                 .findByCustomerRequest_IdAndCustomerRequest_Customer_Id(requestId, customerId)
                 .orElseThrow(() -> notFound("No se encontró la solicitud."));
-    }
-
-    private void requireCustomerContext(
-            WorkOrder workOrder,
-            Long customerId,
-            Long requestId
-    ) {
-        if (!workOrder.getJobCase().getCustomerRequest().getId().equals(requestId)
-                || !workOrder.getJobCase()
-                .getCustomerRequest()
-                .getCustomer()
-                .getId()
-                .equals(customerId)) {
-            throw notFound("No se encontró la entrega dentro de la solicitud indicada.");
-        }
     }
 
     private DocumentVersion requireEvidence(Long versionId, Long caseId) {
