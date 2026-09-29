@@ -42,7 +42,7 @@ class DeliveryTest {
 
         assertEquals(DeliveryStatus.DISPATCHED, delivery.getStatus());
 
-        delivery.confirmReception(
+        delivery.markDelivered(
                 actor,
                 "Ana López",
                 Instant.parse("2026-09-29T12:00:00Z")
@@ -68,7 +68,7 @@ class DeliveryTest {
                 actor
         );
         delivery.dispatch(actor, null, null, Instant.parse("2026-09-28T18:00:00Z"));
-        delivery.confirmReception(actor, "Ana López", Instant.parse("2026-09-29T12:00:00Z"));
+        delivery.markDelivered(actor, "Ana López", Instant.parse("2026-09-29T12:00:00Z"));
 
         assertThrows(
                 IllegalStateException.class,
@@ -101,7 +101,7 @@ class DeliveryTest {
 
         delivery.attachEvidence(firstEvidence);
         delivery.dispatch(actor, null, null, Instant.parse("2026-09-28T18:00:00Z"));
-        delivery.confirmReception(
+        delivery.markDelivered(
                 actor,
                 "Ana López",
                 Instant.parse("2026-09-29T12:00:00Z")
