@@ -33,6 +33,19 @@ public class DocumentAccessService {
     private final CustomerMembershipRepository membershipRepository;
     private final DeliveryRepository deliveryRepository;
 
+    public User requireInternalReader(Long userId) {
+        User user = requireUser(userId);
+        if (user.getAccountType() != AccountType.INTERNAL) {
+            throw new BusinessException(
+                    ApiErrorCode.ACCESS_DENIED,
+                    "El centro documental está disponible únicamente para usuarios internos."
+            );
+        }
+
+        requireInternalRole(userId, false);
+        return user;
+    }
+
     public User requireCanCreate(Long userId, JobCase jobCase) {
         User user = requireUser(userId);
 
