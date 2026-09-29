@@ -5,7 +5,7 @@ export interface NavigationItem {
 
 export const navigationItems: NavigationItem[] = [
   { label: 'Inicio', href: '/' },
-  { label: 'Expedientes' },
+  { label: 'Expedientes', href: '/job-cases' },
   { label: 'Cotizaciones' },
   { label: 'Órdenes de trabajo', href: '/work-orders' },
   { label: 'Producción' },

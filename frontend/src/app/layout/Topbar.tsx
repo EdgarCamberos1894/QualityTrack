@@ -20,6 +20,14 @@ function getInitials(email: string): string {
 }
 
 function getBreadcrumb(pathname: string): string {
+  if (pathname.startsWith('/job-cases/')) {
+    return 'Operación / Expedientes / Revisión'
+  }
+
+  if (pathname === '/job-cases') {
+    return 'Operación / Expedientes'
+  }
+
   if (pathname.startsWith('/work-orders/')) {
     return 'Operación / Órdenes de trabajo / Expediente 360'
   }
