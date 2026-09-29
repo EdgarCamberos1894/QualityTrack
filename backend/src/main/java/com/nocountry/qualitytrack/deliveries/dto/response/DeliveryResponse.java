@@ -24,7 +24,7 @@ public record DeliveryResponse(
         Long dispatchedByUserId,
         Instant deliveredAt,
         String receivedByName,
-        Long confirmedByUserId,
+        Long deliveredByUserId,
         Long evidenceDocumentId,
         Long evidenceDocumentVersionId,
         Long createdByUserId,
@@ -54,7 +54,7 @@ public record DeliveryResponse(
                 delivery.getDispatchedByUser() == null ? null : delivery.getDispatchedByUser().getId(),
                 delivery.getDeliveredAt(),
                 delivery.getReceivedByName(),
-                delivery.getConfirmedByUser() == null ? null : delivery.getConfirmedByUser().getId(),
+                delivery.getDeliveredByUser() == null ? null : delivery.getDeliveredByUser().getId(),
                 delivery.getEvidenceDocumentVersion() == null
                         ? null
                         : delivery.getEvidenceDocumentVersion().getDocument().getId(),
