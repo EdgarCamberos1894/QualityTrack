@@ -5,10 +5,12 @@ import com.nocountry.qualitytrack.customers.documentation.CreateCustomerApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.CustomerApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.GetCustomerApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.ListCustomerMembersApiDocs;
+import com.nocountry.qualitytrack.customers.documentation.ListMyCustomersApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.RemoveCustomerMemberApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.UpdateCustomerApiDocs;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerRequest;
 import com.nocountry.qualitytrack.customers.dto.request.UpdateCustomerRequest;
+import com.nocountry.qualitytrack.customers.dto.response.CustomerContextResponse;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerResponse;
 import com.nocountry.qualitytrack.customers.service.CustomerService;
@@ -51,6 +53,18 @@ public class CustomerController {
                         "Empresa creada correctamente.",
                         response
                 ));
+    }
+
+    @ListMyCustomersApiDocs
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<CustomerContextResponse>>> listMyCustomers(
+            @CurrentUserId Long currentUserId
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.CUSTOMERS_RETRIEVED,
+                "Empresas del usuario consultadas correctamente.",
+                customerService.listMyCustomers(currentUserId)
+        ));
     }
 
     @GetCustomerApiDocs

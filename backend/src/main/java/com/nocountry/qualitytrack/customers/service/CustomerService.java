@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.customers.service;
 
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerRequest;
 import com.nocountry.qualitytrack.customers.dto.request.UpdateCustomerRequest;
+import com.nocountry.qualitytrack.customers.dto.response.CustomerContextResponse;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerResponse;
 import com.nocountry.qualitytrack.customers.entity.Customer;
@@ -66,6 +67,17 @@ public class CustomerService {
         membershipRepository.save(initialMembership);
 
         return CustomerResponse.from(customer);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CustomerContextResponse> listMyCustomers(Long currentUserId) {
+        return membershipRepository.findAllByUser_IdAndStatusOrderByCreatedAtAsc(
+                        currentUserId,
+                        CustomerMembershipStatus.ACTIVE
+                )
+                .stream()
+                .map(CustomerContextResponse::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)

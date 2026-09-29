@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.customers.service;
 
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerRequest;
 import com.nocountry.qualitytrack.customers.dto.request.UpdateCustomerRequest;
+import com.nocountry.qualitytrack.customers.dto.response.CustomerContextResponse;
 import com.nocountry.qualitytrack.customers.entity.Customer;
 import com.nocountry.qualitytrack.customers.entity.CustomerMembership;
 import com.nocountry.qualitytrack.customers.enums.CustomerMembershipRole;
@@ -122,6 +123,31 @@ class CustomerServiceTest {
         assertEquals(ApiErrorCode.ACCESS_DENIED, exception.getCode());
         verify(customerRepository, never()).saveAndFlush(any(Customer.class));
         verify(membershipRepository, never()).save(any(CustomerMembership.class));
+    }
+
+    @Test
+    void listsCurrentUserActiveCustomers() {
+        when(membershipRepository.findAllByUser_IdAndStatusOrderByCreatedAtAsc(
+                10L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(List.of(actorMembership));
+        when(actorMembership.getCustomer()).thenReturn(customer);
+        when(customer.getId()).thenReturn(20L);
+        when(customer.getName()).thenReturn("Taller Norte");
+        when(actorMembership.getRole()).thenReturn(CustomerMembershipRole.REQUESTER);
+        when(actorMembership.getStatus()).thenReturn(CustomerMembershipStatus.ACTIVE);
+
+        List<CustomerContextResponse> response = service.listMyCustomers(10L);
+
+        assertEquals(1, response.size());
+        assertEquals(20L, response.getFirst().customerId());
+        assertEquals("Taller Norte", response.getFirst().customerName());
+        assertEquals(CustomerMembershipRole.REQUESTER, response.getFirst().role());
+
+        verify(membershipRepository).findAllByUser_IdAndStatusOrderByCreatedAtAsc(
+                10L,
+                CustomerMembershipStatus.ACTIVE
+        );
     }
 
     @Test

@@ -34,4 +34,9 @@ public interface CustomerMembershipRepository extends JpaRepository<CustomerMemb
             Long customerId,
             CustomerMembershipStatus status
     );
+
+    List<CustomerMembership> findAllByUser_IdAndStatusOrderByCreatedAtAsc(
+            Long userId,
+            CustomerMembershipStatus status
+    );
 }
