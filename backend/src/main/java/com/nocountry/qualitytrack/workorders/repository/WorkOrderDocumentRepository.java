@@ -15,13 +15,11 @@ public interface WorkOrderDocumentRepository extends JpaRepository<WorkOrderDocu
 
     boolean existsByWorkOrder_Id(Long workOrderId);
 
-    @Query("""
-            select distinct wod.workOrder.id
-            from WorkOrderDocument wod
-            where wod.document.id = :documentId
-            order by wod.workOrder.id
-            """)
-    List<Long> findWorkOrderIdsByDocumentId(@Param("documentId") Long documentId);
+    @EntityGraph(attributePaths = {
+            "workOrder",
+            "documentVersion"
+    })
+    List<WorkOrderDocument> findAllByDocument_IdOrderByWorkOrder_IdAsc(Long documentId);
 
     @EntityGraph(attributePaths = {
             "document",
