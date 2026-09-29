@@ -146,6 +146,44 @@ class DocumentCenterRepositoryIntegrationTest {
         );
     }
 
+    @Test
+    void sharedMaterialLotKeepsCertificateSourceCaseProvenance() {
+        Fixture source = createFixture("source-case");
+        Fixture consumer = createFixture("consumer-case");
+
+        DocumentFixture certificate = createDocument(
+                source,
+                "MATERIAL_CERTIFICATE",
+                "Certificado compartido",
+                "shared-certificate"
+        );
+        Long materialId = insertMaterial("MAT-SHARED");
+        Long materialLotId = insertMaterialLot(
+                materialId,
+                certificate.versionId()
+        );
+        insertConsumption(
+                consumer.workOrderId(),
+                materialLotId,
+                consumer.internalUserId()
+        );
+
+        List<Document> documents = documentRepository.searchActiveForCenter(
+                DocumentStatus.ACTIVE,
+                null,
+                null,
+                null,
+                consumer.workOrderId(),
+                null,
+                null
+        );
+
+        assertEquals(1, documents.size());
+        assertEquals(certificate.documentId(), documents.get(0).getId());
+        assertEquals(source.caseId(), documents.get(0).getJobCase().getId());
+        assertTrue(!consumer.caseId().equals(documents.get(0).getJobCase().getId()));
+    }
+
     private Fixture createFixture(String suffix) {
         Long internalUserId = jdbcTemplate.queryForObject(
                 """
