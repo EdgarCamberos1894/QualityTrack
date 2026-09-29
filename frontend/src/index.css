@@ -13,6 +13,11 @@
   background: #f8fafc;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+  --qt-navy: #0f172a;
+  --qt-blue: #2563eb;
+  --qt-green: #10b981;
+  --qt-teal: #0f766e;
+  --qt-surface: #f5f7fb;
 }
 
 * {
@@ -20,10 +25,15 @@
 }
 
 html,
-body {
+body,
+#root {
   min-width: 320px;
   min-height: 100%;
-  background: #f8fafc;
+}
+
+html,
+body {
+  background: var(--qt-surface);
 }
 
 body {
@@ -43,7 +53,15 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 :focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid var(--qt-blue);
   outline-offset: 2px;
 }

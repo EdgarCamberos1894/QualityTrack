@@ -18,6 +18,7 @@ These rules are mandatory for any automated or human implementation in `frontend
 - Shared UI components must not know business rules.
 - Domain-specific components stay in their domain module.
 - Cross-module imports use the module public API (`index.ts`). Never import another module's internal files.
+- Imports between files inside the same module use relative paths; `@/modules/...` aliases are reserved for module boundaries.
 - Avoid `any`. Model unknown data as `unknown` and narrow it.
 - Do not duplicate status labels, colors, event mappings, or formatting logic across screens.
 - Prefer small focused hooks, presenters, mappers, schemas, and components over one large file.
