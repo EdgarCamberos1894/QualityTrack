@@ -1,7 +1,6 @@
 package com.nocountry.qualitytrack.deliveries.service;
 
 import com.nocountry.qualitytrack.customers.entity.CustomerMembership;
-import com.nocountry.qualitytrack.customers.enums.CustomerMembershipRole;
 import com.nocountry.qualitytrack.customers.enums.CustomerMembershipStatus;
 import com.nocountry.qualitytrack.customers.repository.CustomerMembershipRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
@@ -58,15 +57,6 @@ public class DeliveryAccessPolicy {
 
     public User requireCustomerReader(Long userId, Long customerId) {
         return requireActiveCustomerMembership(userId, customerId).getUser();
-    }
-
-    public User requireCustomerReceiver(Long userId, Long customerId) {
-        CustomerMembership membership = requireActiveCustomerMembership(userId, customerId);
-        if (membership.getRole() != CustomerMembershipRole.ADMIN
-                && membership.getRole() != CustomerMembershipRole.REQUESTER) {
-            denied("Tu rol dentro de la empresa no permite confirmar recepciones.");
-        }
-        return membership.getUser();
     }
 
     private CustomerMembership requireActiveCustomerMembership(Long userId, Long customerId) {
