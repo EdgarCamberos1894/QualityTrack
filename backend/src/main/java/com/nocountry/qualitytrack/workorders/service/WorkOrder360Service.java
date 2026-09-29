@@ -2,8 +2,11 @@ package com.nocountry.qualitytrack.workorders.service;
 
 import com.nocountry.qualitytrack.deliveries.service.DeliveryService;
 import com.nocountry.qualitytrack.documents.dto.response.DocumentCenterResponse;
+import com.nocountry.qualitytrack.documents.dto.response.DocumentVersionResponse;
 import com.nocountry.qualitytrack.documents.service.DocumentCenterService;
 import com.nocountry.qualitytrack.documents.service.DocumentService;
+import com.nocountry.qualitytrack.materials.dto.response.MaterialLotResponse;
+import com.nocountry.qualitytrack.materials.dto.response.WorkOrderMaterialResponse;
 import com.nocountry.qualitytrack.materials.service.MaterialService;
 import com.nocountry.qualitytrack.nonconformities.service.NonConformityService;
 import com.nocountry.qualitytrack.production.service.ProductionWorkflowService;
@@ -21,8 +24,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -54,9 +57,7 @@ public class WorkOrder360Service {
         Long caseId = workOrder.source().caseId();
         Long quotationId = workOrder.agreement().quotationId();
 
-        LinkedHashMap<Long, DocumentCenterResponse> documentsById = new LinkedHashMap<>();
-
-        documentCenterService.search(
+        List<DocumentCenterResponse> documentCenter = documentCenterService.search(
                 currentUserId,
                 null,
                 caseId,
@@ -65,39 +66,38 @@ public class WorkOrder360Service {
                 null,
                 null,
                 null
-        ).forEach(document -> documentsById.put(document.id(), document));
+        );
 
-        documentCenterService.search(
-                currentUserId,
-                null,
-                null,
-                workOrderId,
-                null,
-                null,
-                null,
-                null
-        ).forEach(document -> documentsById.putIfAbsent(document.id(), document));
+        Map<Long, List<DocumentVersionResponse>> versionsByDocumentId =
+                documentService.listVersionsByDocumentIds(
+                        currentUserId,
+                        caseId,
+                        documentCenter.stream()
+                                .map(DocumentCenterResponse::id)
+                                .toList()
+                );
 
-        List<WorkOrder360DocumentResponse> documents = documentsById.values().stream()
+        List<WorkOrder360DocumentResponse> documents = documentCenter.stream()
                 .map(document -> new WorkOrder360DocumentResponse(
                         document,
-                        documentService.listVersions(
-                                currentUserId,
-                                document.caseId(),
-                                document.id()
-                        )
+                        versionsByDocumentId.getOrDefault(document.id(), List.of())
                 ))
                 .toList();
 
-        List<WorkOrder360MaterialResponse> materials = materialService
-                .listConsumption(currentUserId, workOrderId)
-                .stream()
+        List<WorkOrderMaterialResponse> consumptions =
+                materialService.listConsumption(currentUserId, workOrderId);
+
+        Map<Long, MaterialLotResponse> lotsById = materialService.getLotsByIds(
+                currentUserId,
+                consumptions.stream()
+                        .map(WorkOrderMaterialResponse::materialLotId)
+                        .toList()
+        );
+
+        List<WorkOrder360MaterialResponse> materials = consumptions.stream()
                 .map(consumption -> new WorkOrder360MaterialResponse(
                         consumption,
-                        materialService.getLot(
-                                currentUserId,
-                                consumption.materialLotId()
-                        )
+                        lotsById.get(consumption.materialLotId())
                 ))
                 .toList();
 
