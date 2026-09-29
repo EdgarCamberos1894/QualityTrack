@@ -210,21 +210,35 @@ public class DocumentService {
             return Map.of();
         }
 
-        return documentVersionRepository
-                .findAllActiveByCaseIdAndDocumentIds(
-                        caseId,
-                        DocumentStatus.ACTIVE,
-                        documentIds
-                )
-                .stream()
-                .collect(Collectors.groupingBy(
-                        version -> version.getDocument().getId(),
-                        LinkedHashMap::new,
-                        Collectors.mapping(
-                                DocumentVersionResponse::from,
-                                Collectors.toUnmodifiableList()
+        List<Long> distinctDocumentIds = documentIds.stream()
+                .distinct()
+                .toList();
+
+        Map<Long, List<DocumentVersionResponse>> versionsByDocumentId =
+                documentVersionRepository
+                        .findAllActiveByCaseIdAndDocumentIds(
+                                caseId,
+                                DocumentStatus.ACTIVE,
+                                distinctDocumentIds
                         )
-                ));
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                version -> version.getDocument().getId(),
+                                LinkedHashMap::new,
+                                Collectors.mapping(
+                                        DocumentVersionResponse::from,
+                                        Collectors.toUnmodifiableList()
+                                )
+                        ));
+
+        if (versionsByDocumentId.size() != distinctDocumentIds.size()) {
+            throw new BusinessException(
+                    ApiErrorCode.DATA_CONFLICT,
+                    "Uno o más documentos del expediente no tienen versiones activas disponibles."
+            );
+        }
+
+        return versionsByDocumentId;
     }
 
     @Transactional(readOnly = true)
