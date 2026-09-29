@@ -4,17 +4,17 @@ Frontend for QualityTrack, rebuilt with a domain-first modular architecture.
 
 ## Core stack
 
-| Concern | Technology |
-| --- | --- |
-| UI | React 19 + TypeScript |
-| Build | Vite |
-| Styling | Tailwind CSS |
-| Routing | React Router |
-| Server state | TanStack Query |
-| HTTP | Axios |
-| Forms | React Hook Form + Zod |
-| Client-global state | Zustand |
-| Quality | ESLint + Prettier + TypeScript strict |
+| Concern             | Technology                            |
+| ------------------- | ------------------------------------- |
+| UI                  | React 19 + TypeScript                 |
+| Build               | Vite                                  |
+| Styling             | Tailwind CSS                          |
+| Routing             | React Router                          |
+| Server state        | TanStack Query                        |
+| HTTP                | Axios                                 |
+| Forms               | React Hook Form + Zod                 |
+| Client-global state | Zustand                               |
+| Quality             | ESLint + Prettier + TypeScript strict |
 
 ## Start
 

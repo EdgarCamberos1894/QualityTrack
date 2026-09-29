@@ -115,15 +115,15 @@ When OpenAPI client/type generation is introduced, generated contracts must live
 
 ## File-size guardrails
 
-| File type | Healthy range |
-| --- | ---: |
-| Small UI component | 50-150 LOC |
-| Complex UI component | <250 LOC |
-| Page | <250 LOC |
-| Hook | <150 LOC |
-| API/service file | <200 LOC |
-| 300+ LOC | review for extraction |
-| 500+ LOC | CI failure |
+| File type            |         Healthy range |
+| -------------------- | --------------------: |
+| Small UI component   |            50-150 LOC |
+| Complex UI component |              <250 LOC |
+| Page                 |              <250 LOC |
+| Hook                 |              <150 LOC |
+| API/service file     |              <200 LOC |
+| 300+ LOC             | review for extraction |
+| 500+ LOC             |            CI failure |
 
 Generated code is excluded from these limits.
 
