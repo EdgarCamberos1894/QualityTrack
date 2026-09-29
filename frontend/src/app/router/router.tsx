@@ -4,6 +4,7 @@ import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { PublicOnlyRoute } from '@/app/router/PublicOnlyRoute'
 import { LoginPage } from '@/modules/auth'
 import { HomePage } from '@/modules/home'
+import { WorkOrderDetailPage, WorkOrdersPage } from '@/modules/work-orders'
 
 export const router = createBrowserRouter([
   {
@@ -15,7 +16,14 @@ export const router = createBrowserRouter([
     children: [
       {
         element: <AppShell />,
-        children: [{ path: '/', element: <HomePage /> }],
+        children: [
+          { path: '/', element: <HomePage /> },
+          { path: '/work-orders', element: <WorkOrdersPage /> },
+          {
+            path: '/work-orders/:workOrderId',
+            element: <WorkOrderDetailPage />,
+          },
+        ],
       },
     ],
   },

@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom'
 import type { AuthenticatedUser } from '@/modules/auth'
 
 interface TopbarProps {
@@ -18,7 +19,20 @@ function getInitials(email: string): string {
   return email.slice(0, 2).toUpperCase()
 }
 
+function getBreadcrumb(pathname: string): string {
+  if (pathname.startsWith('/work-orders/')) {
+    return 'Operación / Órdenes de trabajo / Expediente 360'
+  }
+
+  if (pathname === '/work-orders') {
+    return 'Operación / Órdenes de trabajo'
+  }
+
+  return 'Operación / Inicio'
+}
+
 export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
+  const location = useLocation()
   const roleLabel =
     user.roles.length > 0 ? user.roles.join(' · ') : user.accountType
 
@@ -36,7 +50,7 @@ export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
       </button>
 
       <p className="hidden text-[11px] text-slate-500 sm:block">
-        Operación / Inicio
+        {getBreadcrumb(location.pathname)}
       </p>
 
       <div className="ml-auto flex items-center gap-3">
