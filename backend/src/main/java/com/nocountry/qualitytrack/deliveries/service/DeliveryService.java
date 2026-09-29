@@ -302,7 +302,7 @@ public class DeliveryService {
             delivery.markDelivered(
                     actor,
                     request.receivedByName(),
-                    Instant.now()
+                    request.deliveredAt()
             );
         } catch (IllegalArgumentException | IllegalStateException exception) {
             conflict(exception.getMessage());
