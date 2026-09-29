@@ -129,7 +129,7 @@ class DeliveryServiceTest {
         var response = service.deliver(
                 10L,
                 100L,
-                new CompleteDeliveryRequest("Ana López", null)
+                new CompleteDeliveryRequest("Ana López", Instant.parse("2026-09-28T20:00:00Z"), null)
         );
 
         assertEquals(DeliveryStatus.DELIVERED, response.status());
@@ -204,7 +204,7 @@ class DeliveryServiceTest {
                 () -> service.deliver(
                         10L,
                         100L,
-                        new CompleteDeliveryRequest("Ana López", 999L)
+                        new CompleteDeliveryRequest("Ana López", Instant.parse("2026-09-28T20:00:00Z"), 999L)
                 )
         );
     }
@@ -221,7 +221,7 @@ class DeliveryServiceTest {
         service.deliver(
                 10L,
                 100L,
-                new CompleteDeliveryRequest("Ana López", null)
+                new CompleteDeliveryRequest("Ana López", Instant.parse("2026-09-28T20:00:00Z"), null)
         );
 
         assertEquals(WorkOrderStatus.DELIVERED, workOrder.getStatus());
