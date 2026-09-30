@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
+import { WorkOrderCreationPanel, useWorkOrders } from '@/modules/work-orders'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
@@ -41,6 +42,7 @@ export function QuotationDetailPage() {
   const updateMutation = useUpdateQuotation(validId ?? 0)
   const sendMutation = useSendQuotation(validId ?? 0)
   const revisionMutation = useCreateQuotationRevision(validId ?? 0)
+  const workOrdersQuery = useWorkOrders()
 
   if (validId === null || !session) {
     return (
@@ -82,6 +84,11 @@ export function QuotationDetailPage() {
   const editable = quotation.status === 'DRAFT' && canManage
   const canCreateRevision =
     canManage && revisionEligibleStatuses.has(quotation.status)
+  const canCreateWorkOrder =
+    roles.includes('ADMIN') || roles.includes('COMMERCIAL')
+  const existingWorkOrder = workOrdersQuery.data?.find(
+    (workOrder) => workOrder.caseId === quotation.caseId,
+  )
 
   const mutationError =
     updateMutation.error ?? sendMutation.error ?? revisionMutation.error
@@ -119,6 +126,37 @@ export function QuotationDetailPage() {
         <QuotationFlowSteps />
         <QuotationSourceCard source={quotation.source} />
         <QuotationAdjustmentCard quotation={quotation} />
+
+        {quotation.status === 'APPROVED' ? (
+          workOrdersQuery.isPending ? (
+            <LoadingState label="Comprobando orden de trabajo…" />
+          ) : workOrdersQuery.isError ? (
+            <section className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+              <p className="text-xs font-semibold text-amber-900">
+                No pudimos comprobar si el expediente ya tiene una orden de
+                trabajo.
+              </p>
+              <p className="mt-1 text-[10px] text-amber-800">
+                Vuelve a intentarlo antes de crear una OT para evitar
+                duplicados.
+              </p>
+            </section>
+          ) : (
+            <WorkOrderCreationPanel
+              caseId={quotation.caseId}
+              quotationNumber={quotation.quotationNumber}
+              quotationRevision={quotation.revision}
+              customerName={quotation.customerName}
+              plannedQuantity={quotation.source.quantity}
+              agreedDeliveryDate={quotation.estimatedDeliveryDate}
+              canCreate={canCreateWorkOrder}
+              existingWorkOrder={existingWorkOrder}
+              onCreated={(workOrder) =>
+                navigate(`/work-orders/${workOrder.id}`)
+              }
+            />
+          )
+        ) : null}
 
         {mutationError ? (
           <div
