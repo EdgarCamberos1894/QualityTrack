@@ -15,7 +15,19 @@ import java.util.Optional;
 
 public interface QuotationRepository extends JpaRepository<Quotation, Long> {
 
-    long countByStatus(QuotationStatus status);
+    @Query("""
+            select quotation.status as status,
+                   count(quotation) as total
+            from Quotation quotation
+            group by quotation.status
+            """)
+    List<StatusCount> countGroupedByStatus();
+
+    interface StatusCount {
+        QuotationStatus getStatus();
+
+        long getTotal();
+    }
 
     boolean existsByJobCase_Id(Long caseId);
 
