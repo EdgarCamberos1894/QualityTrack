@@ -19,7 +19,12 @@ import {
   QuotationDetailPage,
   QuotationsPage,
 } from '@/modules/quotations'
-import { WorkOrderDetailPage, WorkOrdersPage } from '@/modules/work-orders'
+import {
+  ProductionPage,
+  QualityPage,
+  WorkOrderDetailPage,
+  WorkOrdersPage,
+} from '@/modules/work-orders'
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +56,8 @@ export const router = createBrowserRouter([
                 path: '/work-orders/:workOrderId',
                 element: <WorkOrderDetailPage />,
               },
+              { path: '/production', element: <ProductionPage /> },
+              { path: '/quality', element: <QualityPage /> },
             ],
           },
         ],

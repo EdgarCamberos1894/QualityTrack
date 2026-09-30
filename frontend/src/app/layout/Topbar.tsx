@@ -19,7 +19,15 @@ function getInitials(email: string): string {
   return email.slice(0, 2).toUpperCase()
 }
 
-function getBreadcrumb(pathname: string): string {
+function getBreadcrumb(pathname: string, search: string): string {
+  if (pathname === '/production') {
+    return 'Operación / Producción'
+  }
+
+  if (pathname === '/quality') {
+    return 'Operación / Calidad'
+  }
+
   if (pathname.startsWith('/quotations/')) {
     return 'Comercial / Cotizaciones / Detalle'
   }
@@ -37,6 +45,16 @@ function getBreadcrumb(pathname: string): string {
   }
 
   if (pathname.startsWith('/work-orders/')) {
+    const tab = new URLSearchParams(search).get('tab')
+
+    if (tab === 'production') {
+      return 'Operación / Producción / Orden de trabajo'
+    }
+
+    if (tab === 'quality') {
+      return 'Operación / Calidad / Orden de trabajo'
+    }
+
     return 'Operación / Órdenes de trabajo / Expediente 360'
   }
 
@@ -66,7 +84,7 @@ export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
       </button>
 
       <p className="hidden text-[11px] text-slate-500 sm:block">
-        {getBreadcrumb(location.pathname)}
+        {getBreadcrumb(location.pathname, location.search)}
       </p>
 
       <div className="ml-auto flex items-center gap-3">

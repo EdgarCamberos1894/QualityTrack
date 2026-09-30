@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom'
-import { navigationItems } from '@/app/layout/navigation'
+import { Link, useLocation } from 'react-router-dom'
+import { navigationItems, type NavigationItem } from '@/app/layout/navigation'
 import { cn } from '@/shared/lib/cn'
 
 interface SidebarProps {
@@ -7,7 +7,40 @@ interface SidebarProps {
   onNavigate: () => void
 }
 
+function isNavigationItemActive(
+  item: NavigationItem,
+  pathname: string,
+  search: string,
+): boolean {
+  if (!item.href) return false
+
+  const workOrderDetail = pathname.startsWith('/work-orders/')
+  const workOrderTab = new URLSearchParams(search).get('tab')
+
+  if (item.workOrderTab) {
+    return (
+      pathname === item.href ||
+      (workOrderDetail && workOrderTab === item.workOrderTab)
+    )
+  }
+
+  if (item.href === '/work-orders') {
+    return (
+      pathname === '/work-orders' ||
+      (workOrderDetail &&
+        workOrderTab !== 'production' &&
+        workOrderTab !== 'quality')
+    )
+  }
+
+  if (item.href === '/') return pathname === '/'
+
+  return pathname === item.href || pathname.startsWith(`${item.href}/`)
+}
+
 export function Sidebar({ open, onNavigate }: SidebarProps) {
+  const location = useLocation()
+
   return (
     <aside
       className={cn(
@@ -42,51 +75,52 @@ export function Sidebar({ open, onNavigate }: SidebarProps) {
 
       <nav className="mt-8" aria-label="Navegación principal">
         <ul className="space-y-1.5">
-          {navigationItems.map((item) => (
-            <li key={item.label}>
-              {item.href ? (
-                <NavLink
-                  to={item.href}
-                  end={item.href === '/'}
-                  onClick={onNavigate}
-                  className={({ isActive }) =>
-                    cn(
+          {navigationItems.map((item) => {
+            const active = isNavigationItemActive(
+              item,
+              location.pathname,
+              location.search,
+            )
+
+            return (
+              <li key={item.label}>
+                {item.href ? (
+                  <Link
+                    to={item.href}
+                    onClick={onNavigate}
+                    className={cn(
                       'flex h-10 items-center gap-3 rounded-[10px] px-3.5 text-xs font-medium transition-colors',
-                      isActive
+                      active
                         ? 'bg-[#234670] text-white'
                         : 'text-slate-300 hover:bg-slate-900 hover:text-white',
-                    )
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      <span
-                        aria-hidden="true"
-                        className={cn(
-                          'h-2.5 w-2.5 rounded-full border',
-                          isActive
-                            ? 'border-blue-300 bg-blue-300'
-                            : 'border-slate-600',
-                        )}
-                      />
-                      {item.label}
-                    </>
-                  )}
-                </NavLink>
-              ) : (
-                <span
-                  aria-disabled="true"
-                  className="flex h-10 cursor-default items-center gap-3 rounded-[10px] px-3.5 text-xs text-slate-500"
-                >
+                    )}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        'h-2.5 w-2.5 rounded-full border',
+                        active
+                          ? 'border-blue-300 bg-blue-300'
+                          : 'border-slate-600',
+                      )}
+                    />
+                    {item.label}
+                  </Link>
+                ) : (
                   <span
-                    aria-hidden="true"
-                    className="h-2.5 w-2.5 rounded-full border border-slate-700"
-                  />
-                  {item.label}
-                </span>
-              )}
-            </li>
-          ))}
+                    aria-disabled="true"
+                    className="flex h-10 cursor-default items-center gap-3 rounded-[10px] px-3.5 text-xs text-slate-500"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="h-2.5 w-2.5 rounded-full border border-slate-700"
+                    />
+                    {item.label}
+                  </span>
+                )}
+              </li>
+            )
+          })}
         </ul>
       </nav>
     </aside>
