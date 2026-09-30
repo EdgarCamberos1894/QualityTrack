@@ -1,4 +1,4 @@
-import type { TraceabilityEventDto } from '../types/workOrder.types'
+import type { TraceabilityEventDto } from '../types/workOrder360.types'
 
 export type TimelinePhase = 'commercial' | 'production' | 'quality' | 'delivery'
 
