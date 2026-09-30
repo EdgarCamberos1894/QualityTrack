@@ -138,7 +138,10 @@ export function CustomerRequestDocuments({
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => setHistory(documentItem)}
+                        onClick={() => {
+                          files.clearError()
+                          setHistory(documentItem)
+                        }}
                       >
                         Historial
                       </Button>
@@ -234,8 +237,12 @@ export function CustomerRequestDocuments({
         requestId={requestId}
         documentId={history?.id ?? null}
         documentName={history?.name ?? ''}
+        fileError={files.error}
         busy={files.busy}
-        onClose={() => setHistory(null)}
+        onClose={() => {
+          files.clearError()
+          setHistory(null)
+        }}
         onOpenVersion={(version) => {
           if (history) void files.openVersion(history.id, version)
         }}
