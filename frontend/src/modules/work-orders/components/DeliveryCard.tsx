@@ -10,7 +10,6 @@ import type { DeliveryDto } from '../types/delivery.types'
 interface DeliveryCardProps {
   delivery: DeliveryDto
   canManage: boolean
-  hasEvidenceOptions: boolean
   onDispatch: () => void
   onComplete: () => void
   onEvidence: () => void
@@ -20,7 +19,6 @@ interface DeliveryCardProps {
 export function DeliveryCard({
   delivery,
   canManage,
-  hasEvidenceOptions,
   onDispatch,
   onComplete,
   onEvidence,
@@ -115,13 +113,11 @@ export function DeliveryCard({
 
         {canManage && mutable ? (
           <div className="flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-4">
-            {hasEvidenceOptions ? (
-              <Button size="sm" variant="secondary" onClick={onEvidence}>
-                {delivery.evidenceDocumentVersionId
-                  ? 'Cambiar evidencia'
-                  : 'Vincular evidencia'}
-              </Button>
-            ) : null}
+            <Button size="sm" variant="secondary" onClick={onEvidence}>
+              {delivery.evidenceDocumentVersionId
+                ? 'Actualizar evidencia'
+                : 'Agregar evidencia'}
+            </Button>
 
             <Button size="sm" variant="danger" onClick={onCancel}>
               Cancelar
