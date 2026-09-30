@@ -1,5 +1,14 @@
-import { useQuery } from '@tanstack/react-query'
-import { getMaterialLots, getMaterials } from '../api/materials.api'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  createMaterial,
+  createMaterialLot,
+  getMaterialLots,
+  getMaterials,
+} from '../api/materials.api'
+import type {
+  CreateMaterialLotPayload,
+  CreateMaterialPayload,
+} from '../types/material.types'
 
 export const materialKeys = {
   all: ['materials'] as const,
@@ -22,4 +31,32 @@ export function useMaterialLots(materialId: number | null) {
     queryFn: () => getMaterialLots(materialId as number),
     enabled: materialId !== null,
   })
+}
+
+export function useMaterialMutations() {
+  const queryClient = useQueryClient()
+
+  const create = useMutation({
+    mutationFn: (payload: CreateMaterialPayload) => createMaterial(payload),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: materialKeys.list() })
+    },
+  })
+
+  const createLot = useMutation({
+    mutationFn: ({
+      materialId,
+      payload,
+    }: {
+      materialId: number
+      payload: CreateMaterialLotPayload
+    }) => createMaterialLot(materialId, payload),
+    onSuccess: async (_, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: materialKeys.lots(variables.materialId),
+      })
+    },
+  })
+
+  return { create, createLot }
 }

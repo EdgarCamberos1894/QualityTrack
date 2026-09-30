@@ -1,6 +1,8 @@
 import { apiClient } from '@/shared/api/apiClient'
 import type { ApiResponse } from '@/shared/api/api.types'
 import type {
+  CreateMaterialLotPayload,
+  CreateMaterialPayload,
   MaterialDto,
   MaterialLotDto,
   RecordMaterialConsumptionPayload,
@@ -13,11 +15,34 @@ export async function getMaterials(): Promise<MaterialDto[]> {
   return response.data.data
 }
 
+export async function createMaterial(
+  payload: CreateMaterialPayload,
+): Promise<MaterialDto> {
+  const response = await apiClient.post<ApiResponse<MaterialDto>>(
+    '/materials',
+    payload,
+  )
+
+  return response.data.data
+}
+
 export async function getMaterialLots(
   materialId: number,
 ): Promise<MaterialLotDto[]> {
   const response = await apiClient.get<ApiResponse<MaterialLotDto[]>>(
     `/materials/${materialId}/lots`,
+  )
+
+  return response.data.data
+}
+
+export async function createMaterialLot(
+  materialId: number,
+  payload: CreateMaterialLotPayload,
+): Promise<MaterialLotDto> {
+  const response = await apiClient.post<ApiResponse<MaterialLotDto>>(
+    `/materials/${materialId}/lots`,
+    payload,
   )
 
   return response.data.data

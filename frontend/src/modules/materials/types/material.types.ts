@@ -21,6 +21,21 @@ export interface MaterialLotDto {
   createdAt: string
 }
 
+export interface CreateMaterialPayload {
+  code: string
+  name: string
+  specification?: string
+  unit: string
+}
+
+export interface CreateMaterialLotPayload {
+  lotNumber: string
+  supplier?: string
+  receivedAt?: string
+  quantityReceived: number
+  certificateDocumentVersionId?: number | null
+}
+
 export interface WorkOrderMaterialDto {
   id: number
   workOrderId: number
