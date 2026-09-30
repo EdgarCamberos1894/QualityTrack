@@ -24,6 +24,25 @@ export function CustomerPortalHomePage() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="p-5">
           <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-600">
+            Solicitudes
+          </p>
+          <h2 className="mt-2 text-lg font-semibold text-slate-950">
+            Inicia y sigue tus trabajos
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Crea solicitudes, adjunta documentos y responde cuando el equipo
+            necesite información adicional.
+          </p>
+          <Link
+            to={`/portal/${customer.customerId}/requests`}
+            className="mt-5 inline-flex text-xs font-semibold text-blue-600 hover:text-blue-700"
+          >
+            Ver solicitudes
+          </Link>
+        </Card>
+
+        <Card className="p-5">
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-600">
             Cotizaciones
           </p>
           <h2 className="mt-2 text-lg font-semibold text-slate-950">
@@ -39,18 +58,6 @@ export function CustomerPortalHomePage() {
           >
             Ver cotizaciones
           </Link>
-        </Card>
-
-        <Card className="p-5">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-            Próximamente
-          </p>
-          <h2 className="mt-2 text-lg font-semibold text-slate-950">
-            Solicitudes y documentos
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-slate-600">
-            Estos módulos se incorporarán sobre el mismo contexto de empresa.
-          </p>
         </Card>
       </div>
     </PageContainer>

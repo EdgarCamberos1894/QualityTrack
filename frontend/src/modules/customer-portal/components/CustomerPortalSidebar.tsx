@@ -24,7 +24,7 @@ export function CustomerPortalSidebar({
   const base = `/portal/${customer.customerId}`
   const items = [
     { label: 'Inicio', href: base, end: true },
-    { label: 'Solicitudes' },
+    { label: 'Solicitudes', href: `${base}/requests` },
     { label: 'Cotizaciones', href: `${base}/quotations` },
     { label: 'Documentos' },
     { label: 'Mi empresa' },

@@ -2,6 +2,9 @@ export { CustomerPortalShell } from './components/CustomerPortalShell'
 export { useCustomerPortalContext } from './hooks/useCustomerPortalContext'
 export { CustomerPortalHomePage } from './pages/CustomerPortalHomePage'
 export { CustomerPortalLandingPage } from './pages/CustomerPortalLandingPage'
+export { CustomerRequestCreatePage } from './pages/CustomerRequestCreatePage'
+export { CustomerRequestDetailPage } from './pages/CustomerRequestDetailPage'
+export { CustomerRequestsPage } from './pages/CustomerRequestsPage'
 export type {
   CustomerContextDto,
   CustomerMembershipRole,

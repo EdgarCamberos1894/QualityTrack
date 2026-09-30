@@ -10,6 +10,9 @@ import {
   CustomerPortalHomePage,
   CustomerPortalLandingPage,
   CustomerPortalShell,
+  CustomerRequestCreatePage,
+  CustomerRequestDetailPage,
+  CustomerRequestsPage,
 } from '@/modules/customer-portal'
 import { HomePage } from '@/modules/home'
 import { JobCaseDetailPage, JobCasesPage } from '@/modules/job-cases'
@@ -74,6 +77,18 @@ export const router = createBrowserRouter([
               {
                 path: '/portal/:customerId',
                 element: <CustomerPortalHomePage />,
+              },
+              {
+                path: '/portal/:customerId/requests',
+                element: <CustomerRequestsPage />,
+              },
+              {
+                path: '/portal/:customerId/requests/new',
+                element: <CustomerRequestCreatePage />,
+              },
+              {
+                path: '/portal/:customerId/requests/:requestId',
+                element: <CustomerRequestDetailPage />,
               },
               {
                 path: '/portal/:customerId/quotations',
