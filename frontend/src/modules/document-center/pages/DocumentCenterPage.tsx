@@ -5,33 +5,16 @@ import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { PageHeader } from '@/shared/components/layout/PageHeader'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
-import { getDocumentContent } from '../api/documentCenter.api'
 import { DocumentCenterFilters } from '../components/DocumentCenterFilters'
 import { DocumentCenterRow } from '../components/DocumentCenterRow'
 import { DocumentHistoryDialog } from '../components/DocumentHistoryDialog'
 import { useDocumentCenter } from '../hooks/useDocumentCenter'
+import { useDocumentFileActions } from '../hooks/useDocumentFileActions'
 import { documentMatchesSearch } from '../model/documentCenterPresenter'
 import type {
   DocumentCenterDto,
   DocumentContextDto,
 } from '../types/documentCenter.types'
-
-function openBlob(blob: Blob) {
-  const url = URL.createObjectURL(blob)
-  window.open(url, '_blank', 'noopener,noreferrer')
-  window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
-}
-
-function downloadBlob(blob: Blob, fileName: string) {
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
-  anchor.href = url
-  anchor.download = fileName
-  document.body.appendChild(anchor)
-  anchor.click()
-  anchor.remove()
-  URL.revokeObjectURL(url)
-}
 
 export function DocumentCenterPage() {
   const query = useDocumentCenter()
@@ -41,8 +24,12 @@ export function DocumentCenterPage() {
   const [customerId, setCustomerId] = useState<number | 'ALL'>('ALL')
   const [historyDocument, setHistoryDocument] =
     useState<DocumentCenterDto | null>(null)
-  const [busyVersionId, setBusyVersionId] = useState<number | null>(null)
-  const [fileError, setFileError] = useState<unknown>(null)
+  const {
+    busyVersionId,
+    error: fileError,
+    openVersion,
+    downloadVersion,
+  } = useDocumentFileActions()
 
   const visibleDocuments = useMemo(() => {
     if (!query.data) return []
@@ -60,44 +47,10 @@ export function DocumentCenterPage() {
     })
   }, [context, customerId, query.data, search, type])
 
-  const loadVersion = async (
-    document: DocumentCenterDto,
-    versionId: number,
-    download: boolean,
-  ) => {
-    setBusyVersionId(versionId)
-    setFileError(null)
-
-    try {
-      return await getDocumentContent(document, versionId, download)
-    } catch (error) {
-      setFileError(error)
-      return null
-    } finally {
-      setBusyVersionId(null)
-    }
-  }
-
-  const openVersion = async (
-    document: DocumentCenterDto,
-    versionId: number,
-  ) => {
-    const blob = await loadVersion(document, versionId, false)
-    if (blob) openBlob(blob)
-  }
-
-  const downloadVersion = async (
-    document: DocumentCenterDto,
-    versionId: number,
-    fileName: string,
-  ) => {
-    const blob = await loadVersion(document, versionId, true)
-    if (blob) downloadBlob(blob, fileName)
-  }
-
   return (
     <PageContainer>
       <PageHeader
+        eyebrow="Operación"
         title="Centro documental"
         description="Consulta transversal. La fuente sigue siendo el expediente y sus versiones; aquí no se duplican archivos."
       />
