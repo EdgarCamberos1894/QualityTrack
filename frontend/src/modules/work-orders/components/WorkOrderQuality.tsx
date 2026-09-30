@@ -4,6 +4,7 @@ import { Badge } from '@/shared/components/ui/Badge'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { CompleteQualityInspectionDialog } from './CompleteQualityInspectionDialog'
+import { NonConformitySection } from './NonConformitySection'
 import { QualityInspectionCard } from './QualityInspectionCard'
 import { QualityMeasurementDialog } from './QualityMeasurementDialog'
 import { useQualityMutations } from '../hooks/useQualityMutations'
@@ -111,7 +112,7 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <section className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -119,12 +120,12 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
               Calidad
             </p>
             <h2 className="mt-1 text-base font-semibold text-slate-950">
-              Inspección formal y evidencia dimensional
+              Inspección formal, NC y corrección trazable
             </h2>
             <p className="mt-1 max-w-2xl text-[10px] leading-5 text-slate-600">
-              Las mediciones reales se contrastan contra sus límites. El backend
-              decide PASS o FAIL y conserva cada inspección como evidencia
-              inmutable una vez finalizada.
+              Las mediciones determinan PASS o FAIL en servidor. Una desviación
+              conserva su inspección original y se resuelve mediante una NC
+              trazable, sin reescribir producción.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -145,8 +146,8 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
 
       {!canManageQuality ? (
         <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[10px] leading-5 text-slate-600">
-          La pestaña es de solo lectura para tu rol. Solo QUALITY o ADMIN pueden
-          iniciar inspecciones, registrar mediciones y finalizarlas.
+          Las inspecciones son de solo lectura para tu rol. Las acciones de NC,
+          ingeniería y retrabajo aparecen únicamente cuando tu rol las permite.
         </p>
       ) : null}
 
@@ -156,56 +157,71 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
         </p>
       ) : null}
 
-      {inspections.length === 0 ? (
-        <EmptyState
-          title="Sin inspecciones"
-          description="La inspección aparece después de completar Producción y ejecutar explícitamente Enviar a Calidad."
-        />
-      ) : (
-        <div className="space-y-4">
-          {inspections.map((inspection) => {
-            const canEdit = canModifyInspection(inspection)
-            const canStart =
-              canManageQuality &&
-              inspection.status === 'PENDING' &&
-              data.workOrder.status === 'QUALITY_PENDING'
+      {data.nonConformities.length > 0 ? (
+        <NonConformitySection data={data} />
+      ) : null}
 
-            return (
-              <QualityInspectionCard
-                key={inspection.id}
-                inspection={inspection}
-                canStart={canStart}
-                canEdit={canEdit}
-                canComplete={canEdit}
-                starting={
-                  mutations.startInspection.isPending &&
-                  mutations.startInspection.variables?.inspectionId ===
-                    inspection.id
-                }
-                onStart={() => void startInspection(inspection.id)}
-                onAddMeasurement={() => {
-                  mutations.addMeasurement.reset()
-                  setMeasurementTarget({
-                    inspectionId: inspection.id,
-                    measurement: null,
-                  })
-                }}
-                onEditMeasurement={(measurement) => {
-                  mutations.updateMeasurement.reset()
-                  setMeasurementTarget({
-                    inspectionId: inspection.id,
-                    measurement,
-                  })
-                }}
-                onComplete={() => {
-                  mutations.completeInspection.reset()
-                  setCompletionTarget(inspection)
-                }}
-              />
-            )
-          })}
+      <section className="space-y-3">
+        <div>
+          <p className="text-[9px] font-semibold uppercase tracking-wide text-emerald-700">
+            Inspecciones
+          </p>
+          <h2 className="mt-1 text-sm font-semibold text-slate-950">
+            Historial de Calidad
+          </h2>
         </div>
-      )}
+
+        {inspections.length === 0 ? (
+          <EmptyState
+            title="Sin inspecciones"
+            description="La inspección aparece después de completar Producción y ejecutar explícitamente Enviar a Calidad."
+          />
+        ) : (
+          <div className="space-y-4">
+            {inspections.map((inspection) => {
+              const canEdit = canModifyInspection(inspection)
+              const canStart =
+                canManageQuality &&
+                inspection.status === 'PENDING' &&
+                data.workOrder.status === 'QUALITY_PENDING'
+
+              return (
+                <QualityInspectionCard
+                  key={inspection.id}
+                  inspection={inspection}
+                  canStart={canStart}
+                  canEdit={canEdit}
+                  canComplete={canEdit}
+                  starting={
+                    mutations.startInspection.isPending &&
+                    mutations.startInspection.variables?.inspectionId ===
+                      inspection.id
+                  }
+                  onStart={() => void startInspection(inspection.id)}
+                  onAddMeasurement={() => {
+                    mutations.addMeasurement.reset()
+                    setMeasurementTarget({
+                      inspectionId: inspection.id,
+                      measurement: null,
+                    })
+                  }}
+                  onEditMeasurement={(measurement) => {
+                    mutations.updateMeasurement.reset()
+                    setMeasurementTarget({
+                      inspectionId: inspection.id,
+                      measurement,
+                    })
+                  }}
+                  onComplete={() => {
+                    mutations.completeInspection.reset()
+                    setCompletionTarget(inspection)
+                  }}
+                />
+              )
+            })}
+          </div>
+        )}
+      </section>
 
       <QualityMeasurementDialog
         open={measurementTarget !== null}

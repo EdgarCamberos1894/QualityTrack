@@ -25,9 +25,9 @@ export interface NonConformitySummaryDto {
   id: number
   number: string
   status: NonConformityStatus
-  affectedQuantity: number
-  severity: string
-  description: string
+  affectedQuantity: number | null
+  severity: string | null
+  description: string | null
   disposition: NonConformityDisposition | null
   openedAt: string
   closedAt: string | null
@@ -57,9 +57,9 @@ export interface NonConformityDto {
   workOrderStatus: WorkOrderStatus
   originalInspectionId: number
   status: NonConformityStatus
-  affectedQuantity: number
-  severity: string
-  description: string
+  affectedQuantity: number | null
+  severity: string | null
+  description: string | null
   disposition: NonConformityDisposition | null
   openedByUserId: number
   openedByName: string | null
@@ -70,6 +70,15 @@ export interface NonConformityDto {
   resolutionNotes: string | null
   createdAt: string
   updatedAt: string
+}
+
+export interface ScrapResolutionDto {
+  nonConformity: NonConformityDto
+  acceptedQuantityBeforeScrap: number
+  affectedQuantity: number
+  remainingAcceptedQuantity: number
+  plannedQuantity: number
+  readyForDelivery: boolean
 }
 
 export interface StartQualityInspectionPayload {
@@ -84,4 +93,14 @@ export interface SaveQualityMeasurementPayload {
   measuredValue: number
   unit: string
   notes?: string
+}
+
+export interface UpdateNonConformityPayload {
+  affectedQuantity: number
+  severity: string
+  description: string
+}
+
+export interface AuthorizeUseAsIsPayload {
+  reason: string
 }

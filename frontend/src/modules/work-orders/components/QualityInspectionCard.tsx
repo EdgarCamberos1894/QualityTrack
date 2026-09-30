@@ -37,6 +37,7 @@ export function QualityInspectionCard({
 }: QualityInspectionCardProps) {
   const status = getQualityInspectionStatusPresentation(inspection.status)
   const totals = countMeasurementResults(inspection.measurements)
+  const isReinspection = inspection.reworkNonConformityId !== null
 
   return (
     <article className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -44,17 +45,21 @@ export function QualityInspectionCard({
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-[9px] font-semibold uppercase tracking-wide text-emerald-700">
-              Inspección #{inspection.id}
+              {isReinspection ? 'Reinspección' : 'Inspección'} #{inspection.id}
             </p>
             <h2 className="mt-1 text-sm font-semibold text-slate-950">
               {inspection.inspectorName ?? 'Inspector por asignar'}
             </h2>
             <p className="mt-1 text-[10px] text-slate-500">
               Creada {formatQualityDateTime(inspection.createdAt)}
+              {isReinspection
+                ? ` · ligada a ${inspection.nonConformity?.number ?? `NC #${inspection.reworkNonConformityId}`}`
+                : ''}
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            {isReinspection ? <Badge tone="warning">REWORK</Badge> : null}
             <Badge tone={status.tone}>{status.label}</Badge>
             {inspection.measurements.length > 0 ? (
               <>
@@ -91,7 +96,11 @@ export function QualityInspectionCard({
         {inspection.status === 'PENDING' && canStart ? (
           <div className="mt-4 flex justify-end">
             <Button onClick={onStart} disabled={starting}>
-              {starting ? 'Iniciando…' : 'Iniciar inspección'}
+              {starting
+                ? 'Iniciando…'
+                : isReinspection
+                  ? 'Iniciar reinspección'
+                  : 'Iniciar inspección'}
             </Button>
           </div>
         ) : null}
@@ -197,7 +206,9 @@ export function QualityInspectionCard({
               onClick={onComplete}
               disabled={inspection.measurements.length === 0}
             >
-              Finalizar inspección
+              {isReinspection
+                ? 'Finalizar reinspección'
+                : 'Finalizar inspección'}
             </Button>
           </div>
         ) : null}
@@ -207,7 +218,7 @@ export function QualityInspectionCard({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-[9px] font-semibold uppercase tracking-wide text-red-700">
-                  No conformidad automática
+                  No conformidad relacionada
                 </p>
                 <h3 className="mt-1 text-sm font-semibold text-red-950">
                   {inspection.nonConformity.number}
@@ -228,13 +239,13 @@ export function QualityInspectionCard({
               <div>
                 <p className="text-red-600">Piezas afectadas</p>
                 <p className="mt-1 font-semibold text-red-950">
-                  {inspection.nonConformity.affectedQuantity}
+                  {inspection.nonConformity.affectedQuantity ?? 'Pendiente'}
                 </p>
               </div>
               <div>
                 <p className="text-red-600">Severidad</p>
                 <p className="mt-1 font-semibold text-red-950">
-                  {inspection.nonConformity.severity}
+                  {inspection.nonConformity.severity ?? 'Pendiente'}
                 </p>
               </div>
               <div>
@@ -247,9 +258,11 @@ export function QualityInspectionCard({
               </div>
             </div>
 
-            <p className="mt-3 text-[10px] leading-5 text-red-800">
-              {inspection.nonConformity.description}
-            </p>
+            {inspection.nonConformity.description ? (
+              <p className="mt-3 text-[10px] leading-5 text-red-800">
+                {inspection.nonConformity.description}
+              </p>
+            ) : null}
           </section>
         ) : null}
       </div>
