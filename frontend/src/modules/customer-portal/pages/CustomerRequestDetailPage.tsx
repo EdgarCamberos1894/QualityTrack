@@ -80,21 +80,27 @@ export function CustomerRequestDetailPage() {
     deliveriesQuery.data ?? [],
     request.quantity,
   )
-  const deliveryProgress = deliverySummary.completedAgainstRequestedQuantity
-    ? 'DELIVERED'
+  const deliveryProgress =
+    request.jobCase.status === 'COMPLETED'
+      ? 'DELIVERED'
+      : deliverySummary.completedAgainstRequestedQuantity
+        ? 'DELIVERED'
     : deliverySummary.hasInTransit
       ? 'IN_TRANSIT'
       : deliverySummary.deliveredQuantity > 0
         ? 'PARTIAL'
-        : undefined
+          : undefined
   const requestStatus = getCustomerRequestStatusPresentation(
     request.jobCase.status,
   )
-  const status = deliverySummary.hasInTransit
-    ? { label: 'En camino', tone: 'info' as const }
-    : deliverySummary.completedAgainstRequestedQuantity
-      ? { label: 'Entregada', tone: 'success' as const }
-      : requestStatus
+  const status =
+    request.jobCase.status === 'COMPLETED'
+      ? requestStatus
+      : deliverySummary.hasInTransit
+        ? { label: 'En camino', tone: 'info' as const }
+        : deliverySummary.completedAgainstRequestedQuantity
+          ? { label: 'Entregada', tone: 'success' as const }
+          : requestStatus
   const canWrite = customer.role !== 'VIEWER'
   const canCancel = canWrite && canCancelCustomerRequest(request)
   const canModifyDocuments =
@@ -234,6 +240,21 @@ export function CustomerRequestDetailPage() {
         </section>
       ) : null}
 
+      {request.jobCase.status === 'COMPLETED' ? (
+        <section className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+          <p className="text-xs font-semibold text-emerald-800">
+            Trabajo completado
+          </p>
+          <p className="mt-1 text-[10px] text-emerald-700">
+            La cantidad solicitada fue entregada y el expediente quedó cerrado
+            {request.jobCase.closedAt
+              ? ` el ${formatCustomerRequestDateTime(request.jobCase.closedAt)}`
+              : ''}
+            .
+          </p>
+        </section>
+      ) : null}
+
       {request.jobCase.status === 'CANCELLED' ? (
         <section className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4">
           <p className="text-xs font-semibold text-red-800">
@@ -307,7 +328,11 @@ export function CustomerRequestDetailPage() {
             <div>
               <dt className="text-[9px] text-slate-500">Etapa visible</dt>
               <dd className="mt-1 text-xs font-semibold text-slate-950">
-                {deliveryProgress ? 'Entrega' : requestStatus.stage}
+                {request.jobCase.status === 'COMPLETED'
+                  ? 'Finalizada'
+                  : deliveryProgress
+                    ? 'Entrega'
+                    : requestStatus.stage}
               </dd>
             </div>
             <div>
