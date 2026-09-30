@@ -1,3 +1,4 @@
+import type { WorkOrder360Dto } from '../types/workOrder360.types'
 import { apiClient } from '@/shared/api/apiClient'
 import type { ApiResponse } from '@/shared/api/api.types'
 import type {
@@ -6,7 +7,6 @@ import type {
   RoutingOperationPayload,
   RoutingSheetDto,
   UpdateWorkOrderPlanningPayload,
-  WorkOrder360Dto,
   WorkOrderDetailDto,
   WorkOrderDocumentDto,
   WorkOrderDto,
