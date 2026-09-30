@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import {
@@ -47,10 +47,6 @@ export function ProductionMaterialsCard({
     defaultValues: { quantityUsed: 0.001 },
   })
 
-  useEffect(() => {
-    setLotId(null)
-  }, [materialId])
-
   const submit = handleSubmit(async (values) => {
     if (lotId === null) return
 
@@ -95,11 +91,12 @@ export function ProductionMaterialsCard({
               id="production-material"
               value={materialId ?? ''}
               disabled={materialsQuery.isPending || submitting}
-              onChange={(event) =>
+              onChange={(event) => {
                 setMaterialId(
                   event.target.value ? Number(event.target.value) : null,
                 )
-              }
+                setLotId(null)
+              }}
               className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
             >
               <option value="">Seleccionar material</option>
