@@ -210,10 +210,47 @@ export interface DeliveryDto {
   updatedAt: string
 }
 
+export type RoutingSheetStatus = 'DRAFT' | 'APPROVED' | 'RELEASED'
+export type RoutingPurpose = 'PRODUCTION' | 'REWORK'
+
+export interface RoutingOperationDto {
+  id: number
+  sequenceNumber: number
+  code: string
+  name: string
+  instructions: string | null
+  estimatedMinutes: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface RoutingSheetDto {
+  id: number
+  workOrderId: number
+  workOrderNumber: string
+  workOrderStatus: WorkOrderStatus
+  revision: number
+  purpose: RoutingPurpose
+  status: RoutingSheetStatus
+  nonConformityId: number | null
+  totalEstimatedMinutes: number
+  operations: RoutingOperationDto[]
+  createdByUserId: number
+  createdByName: string | null
+  approvedByUserId: number | null
+  approvedByName: string | null
+  approvedAt: string | null
+  releasedByUserId: number | null
+  releasedByName: string | null
+  releasedAt: string | null
+  createdAt: string
+  updatedAt: string
+}
+
 export interface WorkOrder360Dto {
   workOrder: WorkOrderDetailDto
   quotationRevisions: unknown[]
-  routingSheets: unknown[]
+  routingSheets: RoutingSheetDto[]
   production: unknown | null
   materials: unknown[]
   qualityInspections: QualityInspectionDto[]
@@ -224,10 +261,34 @@ export interface WorkOrder360Dto {
 }
 
 export type WorkOrderDetailTab =
-  'summary' | 'traceability' | 'documents' | 'quality' | 'delivery'
+  | 'summary'
+  | 'preparation'
+  | 'traceability'
+  | 'documents'
+  | 'quality'
+  | 'delivery'
 
 export interface CreateWorkOrderPayload {
   priority: WorkOrderPriority
   plannedStartDate: string
   plannedEndDate: string
+}
+
+
+export interface UpdateWorkOrderPlanningPayload {
+  priority: WorkOrderPriority
+  plannedStartDate: string
+  plannedEndDate: string
+}
+
+export interface RoutingOperationPayload {
+  sequenceNumber: number
+  code: string
+  name: string
+  instructions: string
+  estimatedMinutes: number
+}
+
+export interface ReopenRoutingSheetPayload {
+  reason: string
 }
