@@ -5,6 +5,7 @@ import com.nocountry.qualitytrack.users.enums.SystemRole;
 import com.nocountry.qualitytrack.users.enums.UserStatus;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Set;
 
 public record InternalUserResponse(
@@ -13,7 +14,7 @@ public record InternalUserResponse(
         String lastName,
         String email,
         UserStatus status,
-        Set<SystemRole> roles,
+        List<SystemRole> roles,
         Instant createdAt,
         Instant updatedAt
 ) {
@@ -24,7 +25,7 @@ public record InternalUserResponse(
                 user.getLastName(),
                 user.getEmail(),
                 user.getStatus(),
-                Set.copyOf(roles),
+                List.copyOf(roles),
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );
