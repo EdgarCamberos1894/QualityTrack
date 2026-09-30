@@ -7,6 +7,7 @@ import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
+import { CancelQuotationDialog } from '../components/CancelQuotationDialog'
 import { QuotationAdjustmentCard } from '../components/QuotationAdjustmentCard'
 import { QuotationDetailHeader } from '../components/QuotationDetailHeader'
 import { QuotationEditorForm } from '../components/QuotationEditorForm'
@@ -16,6 +17,7 @@ import { QuotationRevisionHistory } from '../components/QuotationRevisionHistory
 import { QuotationSourceCard } from '../components/QuotationSourceCard'
 import { useQuotationDetail } from '../hooks/useQuotationDetail'
 import {
+  useCancelQuotation,
   useCreateQuotationRevision,
   useSendQuotation,
   useUpdateQuotation,
@@ -26,6 +28,7 @@ import type {
   UpdateQuotationPayload,
 } from '../types/quotation.types'
 import type { QuotationPreviewData } from '../schemas/quotation.schema'
+import type { CancelQuotationFormValues } from '../schemas/quotationCancellation.schema'
 
 const revisionEligibleStatuses = new Set(['REJECTED', 'EXPIRED', 'CANCELLED'])
 
@@ -34,6 +37,7 @@ export function QuotationDetailPage() {
   const navigate = useNavigate()
   const session = useSessionStore((state) => state.session)
   const [preview, setPreview] = useState<QuotationPreviewData | null>(null)
+  const [cancelOpen, setCancelOpen] = useState(false)
   const numericId = Number(quotationId)
   const validId =
     Number.isInteger(numericId) && numericId > 0 ? numericId : null
@@ -42,6 +46,7 @@ export function QuotationDetailPage() {
   const updateMutation = useUpdateQuotation(validId ?? 0)
   const sendMutation = useSendQuotation(validId ?? 0)
   const revisionMutation = useCreateQuotationRevision(validId ?? 0)
+  const cancelMutation = useCancelQuotation(validId ?? 0)
   const workOrdersQuery = useWorkOrders(detailQuery.data?.status === 'APPROVED')
 
   if (validId === null || !session) {
@@ -86,6 +91,10 @@ export function QuotationDetailPage() {
     canManage && revisionEligibleStatuses.has(quotation.status)
   const canCreateWorkOrder =
     roles.includes('ADMIN') || roles.includes('COMMERCIAL')
+  const canCancel =
+    canManage &&
+    (quotation.status === 'DRAFT' || quotation.status === 'SENT') &&
+    !(quotation.status === 'DRAFT' && Boolean(quotation.adjustmentNotes))
   const existingWorkOrder = workOrdersQuery.data?.find(
     (workOrder) => workOrder.caseId === quotation.caseId,
   )
@@ -115,6 +124,17 @@ export function QuotationDetailPage() {
     navigate(`/quotations/${next.id}`, { replace: true })
   }
 
+  const cancel = async (values: CancelQuotationFormValues) => {
+    try {
+      await cancelMutation.mutateAsync({
+        reason: values.reason.trim() || undefined,
+      })
+      return true
+    } catch {
+      return false
+    }
+  }
+
   const revisions =
     revisionsQuery.data ?? (revisionsQuery.isPending ? [] : [quotation])
 
@@ -126,6 +146,40 @@ export function QuotationDetailPage() {
         <QuotationFlowSteps />
         <QuotationSourceCard source={quotation.source} />
         <QuotationAdjustmentCard quotation={quotation} />
+
+        {quotation.status === 'CANCELLED' ? (
+          <section className="rounded-xl border border-red-200 bg-red-50 px-4 py-4">
+            <p className="text-xs font-semibold text-red-900">
+              Cotización cancelada
+            </p>
+            <p className="mt-1 text-[10px] leading-5 text-red-800">
+              {quotation.cancellationReason?.trim()
+                ? quotation.cancellationReason
+                : 'No se registró un motivo de cancelación.'}
+            </p>
+          </section>
+        ) : canCancel ? (
+          <section className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold text-slate-900">
+                Cancelar esta revisión
+              </p>
+              <p className="mt-1 text-[10px] leading-5 text-slate-500">
+                La revisión quedará cerrada y conservará todo su historial.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => {
+                cancelMutation.reset()
+                setCancelOpen(true)
+              }}
+            >
+              Cancelar cotización
+            </Button>
+          </section>
+        ) : null}
 
         {quotation.status === 'APPROVED' ? (
           workOrdersQuery.isPending ? (
@@ -219,6 +273,17 @@ export function QuotationDetailPage() {
           />
         )}
       </div>
+
+      <CancelQuotationDialog
+        quotation={cancelOpen ? quotation : null}
+        submitting={cancelMutation.isPending}
+        error={cancelMutation.error}
+        onClose={() => {
+          cancelMutation.reset()
+          setCancelOpen(false)
+        }}
+        onSubmit={cancel}
+      />
 
       {preview ? (
         <QuotationPreviewDialog
