@@ -42,7 +42,9 @@ export function QuotationDetailPage() {
   const updateMutation = useUpdateQuotation(validId ?? 0)
   const sendMutation = useSendQuotation(validId ?? 0)
   const revisionMutation = useCreateQuotationRevision(validId ?? 0)
-  const workOrdersQuery = useWorkOrders()
+  const workOrdersQuery = useWorkOrders(
+    detailQuery.data?.status === 'APPROVED',
+  )
 
   if (validId === null || !session) {
     return (
