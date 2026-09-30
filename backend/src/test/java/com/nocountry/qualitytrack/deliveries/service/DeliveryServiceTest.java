@@ -8,6 +8,7 @@ import com.nocountry.qualitytrack.deliveries.enums.DeliveryStatus;
 import com.nocountry.qualitytrack.deliveries.repository.DeliveryRepository;
 import com.nocountry.qualitytrack.documents.repository.DocumentVersionRepository;
 import com.nocountry.qualitytrack.documents.service.DocumentAccessService;
+import com.nocountry.qualitytrack.documents.service.DocumentService;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.requests.entity.CustomerRequest;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
@@ -50,6 +51,7 @@ class DeliveryServiceTest {
     @Mock private JobCaseRepository jobCaseRepository;
     @Mock private DocumentVersionRepository documentVersionRepository;
     @Mock private DocumentAccessService documentAccessService;
+    @Mock private DocumentService documentService;
     @Mock private TraceabilityService traceabilityService;
     @Mock private JobCase jobCase;
     @Mock private CustomerRequest customerRequest;
@@ -70,6 +72,7 @@ class DeliveryServiceTest {
                 jobCaseRepository,
                 documentVersionRepository,
                 documentAccessService,
+                documentService,
                 traceabilityService
         );
 
