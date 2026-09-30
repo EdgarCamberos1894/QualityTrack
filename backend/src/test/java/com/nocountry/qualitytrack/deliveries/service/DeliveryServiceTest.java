@@ -36,6 +36,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -248,6 +249,10 @@ class DeliveryServiceTest {
         when(deliveryRepository.saveAndFlush(delivery)).thenReturn(delivery);
         when(deliveryRepository.sumDeliveredQuantityByWorkOrderId(7L, DeliveryStatus.DELIVERED))
                 .thenReturn(20L);
+        when(deliveryRepository.findLatestDeliveredAtByWorkOrderId(
+                7L,
+                DeliveryStatus.DELIVERED
+        )).thenReturn(Optional.of(Instant.parse("2026-09-28T20:00:00Z")));
 
         service.deliver(
                 10L,
@@ -257,7 +262,7 @@ class DeliveryServiceTest {
 
         assertEquals(WorkOrderStatus.DELIVERED, workOrder.getStatus());
         verify(workOrderRepository).saveAndFlush(workOrder);
-        verify(jobCase).complete(any(Instant.class));
+        verify(jobCase).complete(Instant.parse("2026-09-28T20:00:00Z"));
         verify(jobCaseRepository).saveAndFlush(jobCase);
         verify(traceabilityService).record(
                 eq(jobCase),
