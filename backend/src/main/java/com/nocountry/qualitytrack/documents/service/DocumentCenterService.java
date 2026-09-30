@@ -137,6 +137,7 @@ public class DocumentCenterService {
                     .toList();
 
             LinkedHashSet<DocumentContext> contexts = contexts(
+                    document.getJobCase() != null,
                     workOrderIds,
                     materialLotIds,
                     deliveryIds
@@ -175,12 +176,15 @@ public class DocumentCenterService {
     }
 
     private LinkedHashSet<DocumentContext> contexts(
+            boolean hasCase,
             List<Long> workOrderIds,
             List<Long> materialLotIds,
             List<Long> deliveryIds
     ) {
         LinkedHashSet<DocumentContext> contexts = new LinkedHashSet<>();
-        contexts.add(DocumentContext.CASE);
+        if (hasCase) {
+            contexts.add(DocumentContext.CASE);
+        }
 
         if (!workOrderIds.isEmpty()) {
             contexts.add(DocumentContext.WORK_ORDER);
