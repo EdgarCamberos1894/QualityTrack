@@ -110,3 +110,7 @@ export interface UpdateQuotationPayload {
 export interface SendQuotationPayload {
   adjustmentResponse?: string
 }
+
+export interface CancelQuotationPayload {
+  reason?: string
+}
