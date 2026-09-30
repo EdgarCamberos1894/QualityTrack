@@ -174,10 +174,14 @@ export async function getCustomerRequestDocumentContent(
   requestId: number,
   documentId: number,
   versionId: number,
+  download = false,
 ): Promise<Blob> {
   const response = await apiClient.get<Blob>(
     `${basePath(customerId)}/${requestId}/documents/${documentId}/versions/${versionId}/content`,
-    { responseType: 'blob' },
+    {
+      params: download ? { download: true } : undefined,
+      responseType: 'blob',
+    },
   )
 
   return response.data
