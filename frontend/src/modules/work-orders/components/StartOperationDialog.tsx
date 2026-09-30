@@ -19,9 +19,7 @@ interface StartOperationDialogProps {
   submitting: boolean
   error: unknown
   onClose: () => void
-  onSubmit: (
-    values: StartOperationExecutionFormValues,
-  ) => Promise<boolean>
+  onSubmit: (values: StartOperationExecutionFormValues) => Promise<boolean>
 }
 
 export function StartOperationDialog({

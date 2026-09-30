@@ -1,6 +1,4 @@
-export {
-  recordMaterialConsumption,
-} from './api/materials.api'
+export { recordMaterialConsumption } from './api/materials.api'
 export {
   materialKeys,
   useMaterialLots,

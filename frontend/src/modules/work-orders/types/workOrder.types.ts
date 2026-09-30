@@ -157,10 +157,7 @@ export interface RoutingSheetDto {
   updatedAt: string
 }
 
-export type OperationExecutionStatus =
-  | 'IN_PROGRESS'
-  | 'COMPLETED'
-  | 'CANCELLED'
+export type OperationExecutionStatus = 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
 
 export interface OperationExecutionDto {
   id: number
@@ -234,7 +231,6 @@ export interface RoutingOperationPayload {
 export interface ReopenRoutingSheetPayload {
   reason: string
 }
-
 
 export interface StartOperationExecutionPayload {
   machineId?: number

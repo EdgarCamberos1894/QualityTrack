@@ -8,8 +8,7 @@ import type {
 } from '../types/material.types'
 
 export async function getMaterials(): Promise<MaterialDto[]> {
-  const response =
-    await apiClient.get<ApiResponse<MaterialDto[]>>('/materials')
+  const response = await apiClient.get<ApiResponse<MaterialDto[]>>('/materials')
 
   return response.data.data
 }

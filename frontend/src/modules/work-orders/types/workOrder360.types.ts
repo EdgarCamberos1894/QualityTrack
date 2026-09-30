@@ -1,7 +1,4 @@
-import type {
-  MaterialLotDto,
-  WorkOrderMaterialDto,
-} from '@/modules/materials'
+import type { MaterialLotDto, WorkOrderMaterialDto } from '@/modules/materials'
 import type {
   ProductionStatusDto,
   RoutingSheetDto,

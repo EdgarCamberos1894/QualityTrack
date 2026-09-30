@@ -21,9 +21,7 @@ interface ProductionMaterialsCardProps {
   canRecord: boolean
   submitting: boolean
   error: unknown
-  onRecord: (
-    payload: RecordMaterialConsumptionPayload,
-  ) => Promise<boolean>
+  onRecord: (payload: RecordMaterialConsumptionPayload) => Promise<boolean>
 }
 
 export function ProductionMaterialsCard({
@@ -118,7 +116,9 @@ export function ProductionMaterialsCard({
             <select
               id="production-lot"
               value={lotId ?? ''}
-              disabled={materialId === null || lotsQuery.isPending || submitting}
+              disabled={
+                materialId === null || lotsQuery.isPending || submitting
+              }
               onChange={(event) =>
                 setLotId(event.target.value ? Number(event.target.value) : null)
               }

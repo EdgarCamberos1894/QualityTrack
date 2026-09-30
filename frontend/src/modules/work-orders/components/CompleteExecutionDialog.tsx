@@ -18,9 +18,7 @@ interface CompleteExecutionDialogProps {
   submitting: boolean
   error: unknown
   onClose: () => void
-  onSubmit: (
-    values: CompleteOperationExecutionFormValues,
-  ) => Promise<boolean>
+  onSubmit: (values: CompleteOperationExecutionFormValues) => Promise<boolean>
 }
 
 export function CompleteExecutionDialog({
@@ -74,7 +72,10 @@ export function CompleteExecutionDialog({
   const submit = handleSubmit(async (values) => {
     setQuantityError(null)
 
-    if (values.quantityAccepted + values.quantityRejected !== values.quantityProcessed) {
+    if (
+      values.quantityAccepted + values.quantityRejected !==
+      values.quantityProcessed
+    ) {
       setQuantityError(
         'La cantidad procesada debe ser igual a aceptada + rechazada.',
       )
@@ -138,9 +139,7 @@ export function CompleteExecutionDialog({
 
           <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
-              <span className="text-slate-600">
-                Aceptadas + rechazadas
-              </span>
+              <span className="text-slate-600">Aceptadas + rechazadas</span>
               <span
                 className={
                   accepted + rejected === processed

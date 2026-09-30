@@ -165,9 +165,7 @@ export function ProductionOperationCard({
                   <span className="font-semibold text-slate-900">
                     Intento {execution.attemptNumber}
                   </span>
-                  <Badge tone={presentation.tone}>
-                    {presentation.label}
-                  </Badge>
+                  <Badge tone={presentation.tone}>{presentation.label}</Badge>
                   <span>
                     {execution.operatorName ?? 'Operador'} ·{' '}
                     {execution.machineCode ?? 'Sin máquina'}
@@ -180,7 +178,7 @@ export function ProductionOperationCard({
                     {execution.status === 'COMPLETED'
                       ? `${execution.quantityAccepted} OK / ${execution.quantityRejected} rechazadas`
                       : execution.status === 'CANCELLED'
-                        ? execution.cancellationReason ?? 'Cancelada'
+                        ? (execution.cancellationReason ?? 'Cancelada')
                         : 'En curso'}
                   </span>
                 </div>

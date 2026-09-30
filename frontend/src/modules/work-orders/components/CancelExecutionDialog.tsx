@@ -16,9 +16,7 @@ interface CancelExecutionDialogProps {
   submitting: boolean
   error: unknown
   onClose: () => void
-  onSubmit: (
-    values: CancelOperationExecutionFormValues,
-  ) => Promise<boolean>
+  onSubmit: (values: CancelOperationExecutionFormValues) => Promise<boolean>
 }
 
 export function CancelExecutionDialog({
@@ -98,11 +96,7 @@ export function CancelExecutionDialog({
           <Button variant="secondary" onClick={close} disabled={submitting}>
             Volver
           </Button>
-          <Button
-            type="submit"
-            variant="danger"
-            disabled={submitting}
-          >
+          <Button type="submit" variant="danger" disabled={submitting}>
             {submitting ? 'Cancelando…' : 'Cancelar intento'}
           </Button>
         </div>

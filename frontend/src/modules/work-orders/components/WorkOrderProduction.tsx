@@ -90,9 +90,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
       await mutations.startExecution.mutateAsync({
         operationId: startOperation.id,
         payload: {
-          ...(values.machineId
-            ? { machineId: Number(values.machineId) }
-            : {}),
+          ...(values.machineId ? { machineId: Number(values.machineId) } : {}),
           ...(values.startNotes.trim()
             ? { startNotes: values.startNotes.trim() }
             : {}),
@@ -146,9 +144,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
     }
   }
 
-  const recordMaterial = async (
-    payload: RecordMaterialConsumptionPayload,
-  ) => {
+  const recordMaterial = async (payload: RecordMaterialConsumptionPayload) => {
     try {
       await mutations.recordConsumption.mutateAsync(payload)
       return true
@@ -294,4 +290,3 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
     </div>
   )
 }
-
