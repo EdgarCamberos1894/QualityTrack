@@ -1,12 +1,24 @@
 import { apiClient } from '@/shared/api/apiClient'
 import type { ApiResponse } from '@/shared/api/api.types'
 import type {
+  CreateCustomerCompanyPayload,
   CreateCustomerInvitationPayload,
   CustomerCompanyDto,
   CustomerInvitationDto,
   CustomerMemberDto,
   UpdateCustomerCompanyPayload,
 } from '../types/customerCompany.types'
+
+export async function createCustomerCompany(
+  payload: CreateCustomerCompanyPayload,
+): Promise<CustomerCompanyDto> {
+  const response = await apiClient.post<ApiResponse<CustomerCompanyDto>>(
+    '/customers',
+    payload,
+  )
+
+  return response.data.data
+}
 
 export async function getCustomerCompany(
   customerId: number,

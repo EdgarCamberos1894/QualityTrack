@@ -1,10 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { clearCurrentSession } from '@/modules/auth'
-import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { Button } from '@/shared/components/ui/Button'
+import { CustomerCompanyOnboarding } from '../components/CustomerCompanyOnboarding'
 import { useCustomerContexts } from '../hooks/useCustomerContexts'
 
 export function CustomerPortalLandingPage() {
@@ -41,19 +41,12 @@ export function CustomerPortalLandingPage() {
 
   if (!firstCustomer) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-[#f5f7fb] p-8">
-        <div className="w-full max-w-lg space-y-4">
-          <EmptyState
-            title="Sin empresas activas"
-            description="Tu cuenta no tiene una membresía activa en ninguna empresa cliente."
-          />
-          <div className="flex justify-center">
-            <Button variant="secondary" onClick={logout}>
-              Cerrar sesión
-            </Button>
-          </div>
-        </div>
-      </main>
+      <CustomerCompanyOnboarding
+        onLogout={logout}
+        onCreated={(customerId) =>
+          navigate(`/portal/${customerId}`, { replace: true })
+        }
+      />
     )
   }
 

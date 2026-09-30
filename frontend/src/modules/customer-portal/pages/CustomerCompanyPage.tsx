@@ -5,8 +5,8 @@ import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { Button } from '@/shared/components/ui/Button'
 import { Card } from '@/shared/components/ui/Card'
-import { TextField } from '@/shared/components/ui/TextField'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
+import { CustomerCompanyFields } from '../components/CustomerCompanyFields'
 import { useCustomerCompany } from '../hooks/useCustomerCompany'
 import { useCustomerCompanyMutations } from '../hooks/useCustomerCompanyMutations'
 import { useCustomerPortalContext } from '../hooks/useCustomerPortalContext'
@@ -94,59 +94,11 @@ export function CustomerCompanyPage() {
             </p>
           </div>
 
-          <TextField
-            label="Nombre de la empresa"
-            maxLength={200}
+          <CustomerCompanyFields
+            register={register}
+            errors={errors}
             disabled={!isAdmin}
-            error={errors.name?.message}
-            {...register('name')}
           />
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <TextField
-              label="RFC"
-              maxLength={50}
-              disabled={!isAdmin}
-              error={errors.rfc?.message}
-              {...register('rfc')}
-            />
-            <TextField
-              label="Teléfono"
-              maxLength={30}
-              disabled={!isAdmin}
-              error={errors.phone?.message}
-              {...register('phone')}
-            />
-            <TextField
-              label="Correo administrativo"
-              type="email"
-              maxLength={254}
-              disabled={!isAdmin}
-              error={errors.administrativeEmail?.message}
-              {...register('administrativeEmail')}
-            />
-            <TextField
-              label="Sitio web"
-              maxLength={255}
-              disabled={!isAdmin}
-              error={errors.website?.message}
-              {...register('website')}
-            />
-            <TextField
-              label="Ciudad"
-              maxLength={120}
-              disabled={!isAdmin}
-              error={errors.city?.message}
-              {...register('city')}
-            />
-            <TextField
-              label="Estado"
-              maxLength={120}
-              disabled={!isAdmin}
-              error={errors.state?.message}
-              {...register('state')}
-            />
-          </div>
 
           {mutations.updateCompany.error ? (
             <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">

@@ -35,6 +35,16 @@ export interface CustomerInvitationDto {
   createdAt: string
 }
 
+export interface CreateCustomerCompanyPayload {
+  name: string
+  rfc?: string
+  phone?: string
+  administrativeEmail?: string
+  city?: string
+  state?: string
+  website?: string
+}
+
 export interface UpdateCustomerCompanyPayload {
   name?: string
   rfc?: string
