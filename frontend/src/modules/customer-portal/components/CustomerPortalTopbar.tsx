@@ -22,11 +22,10 @@ function breadcrumb(pathname: string): string {
 }
 
 function initials(email: string): string {
-  return email
-    .split('@')[0]
-    ?.replace(/[^a-zA-Z0-9]/g, '')
-    .slice(0, 2)
-    .toUpperCase() || 'QT'
+  const localPart = email.split('@')[0] ?? ''
+  const normalized = localPart.replace(/[^a-zA-Z0-9]/g, '')
+
+  return normalized.slice(0, 2).toUpperCase() || 'QT'
 }
 
 export function CustomerPortalTopbar({
