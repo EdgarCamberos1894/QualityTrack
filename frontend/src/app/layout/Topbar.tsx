@@ -112,7 +112,7 @@ export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
         </span>
       </button>
 
-      <p className="hidden text-[11px] text-slate-500 sm:block">
+      <p className="hidden text-[11px] text-slate-500 lg:block">
         {getBreadcrumb(location.pathname, location.search)}
       </p>
 
@@ -121,7 +121,7 @@ export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
       </div>
 
       <div className="ml-3 flex items-center gap-3">
-        <span className="hidden rounded-full bg-emerald-50 px-3 py-1.5 text-[10px] font-semibold text-teal-700 md:inline-flex">
+        <span className="hidden rounded-full bg-emerald-50 px-3 py-1.5 text-[10px] font-semibold text-teal-700 xl:inline-flex">
           {getShiftLabel()}
         </span>
 
@@ -129,7 +129,7 @@ export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
           {getInitials(user.email)}
         </div>
 
-        <div className="hidden max-w-[220px] sm:block">
+        <div className="hidden max-w-[220px] lg:block">
           <p className="truncate text-[11px] font-semibold text-slate-950">
             {user.email}
           </p>
