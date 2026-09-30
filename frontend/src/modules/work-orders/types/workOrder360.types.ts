@@ -61,14 +61,24 @@ export interface DocumentVersionDto {
   uploadedAt: string
 }
 
+export type WorkOrderDocumentContext =
+  | 'CASE'
+  | 'WORK_ORDER'
+  | 'MATERIAL'
+  | 'DELIVERY'
+
 export interface DocumentCenterDto {
   id: number
+  caseId: number | null
   documentType: string
   name: string
   description: string | null
   createdByName: string | null
   createdAt: string
   currentVersion: DocumentVersionDto
+  contexts: WorkOrderDocumentContext[]
+  materialLotNumbers: string[]
+  deliveryIds: number[]
 }
 
 export interface WorkOrder360DocumentDto {
