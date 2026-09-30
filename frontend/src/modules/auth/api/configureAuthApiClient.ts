@@ -7,7 +7,28 @@ interface AuthApiClientOptions {
   onUnauthorized?: () => void
 }
 
+const PUBLIC_API_PATHS = new Set([
+  '/auth/register',
+  '/auth/verify-email',
+  '/auth/resend-verification',
+  '/auth/login',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  '/customer-invitations/resolve',
+  '/customer-invitations/accept',
+  '/customer-invitations/complete-registration',
+  '/internal/invitations/resolve',
+  '/internal/invitations/accept',
+])
+
 let configured = false
+
+function isPublicApiRequest(url?: string): boolean {
+  if (!url) return false
+
+  const path = url.split('?')[0]
+  return PUBLIC_API_PATHS.has(path)
+}
 
 export function configureAuthApiClient(
   options: AuthApiClientOptions = {},
@@ -16,6 +37,11 @@ export function configureAuthApiClient(
   configured = true
 
   apiClient.interceptors.request.use((config) => {
+    if (isPublicApiRequest(config.url)) {
+      config.headers.delete('Authorization')
+      return config
+    }
+
     const session = getCurrentSession()
 
     if (!session) return config
