@@ -41,8 +41,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MaterialService {
 
-    private static final String MATERIAL_CERTIFICATE_TYPE = "MATERIAL_CERTIFICATE";
-
     private final MaterialRepository materialRepository;
     private final MaterialLotRepository materialLotRepository;
     private final WorkOrderMaterialRepository workOrderMaterialRepository;
