@@ -1,6 +1,6 @@
 import { Badge } from '@/shared/components/ui/Badge'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
-import type { DeliveryDto } from '../types/workOrder.types'
+import type { DeliveryDto } from '../types/workOrder360.types'
 
 interface WorkOrderDeliveriesProps {
   deliveries: DeliveryDto[]
