@@ -26,7 +26,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
@@ -111,7 +110,6 @@ class InternalCustomerQueryServiceTest {
     void rejectsCustomerAccountFromInternalCustomerDirectory() {
         when(userRepository.findById(10L)).thenReturn(Optional.of(actor));
         when(actor.getAccountType()).thenReturn(AccountType.CUSTOMER);
-        when(actor.getStatus()).thenReturn(UserStatus.ACTIVE);
 
         BusinessException exception = assertThrows(
                 BusinessException.class,
