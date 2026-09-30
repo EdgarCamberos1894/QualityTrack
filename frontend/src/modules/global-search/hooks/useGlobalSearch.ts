@@ -19,10 +19,15 @@ export function useGlobalSearch(query: string) {
     return () => window.clearTimeout(timeout)
   }, [normalized])
 
-  return useQuery({
+  const queryResult = useQuery({
     queryKey: globalSearchKeys.query(debouncedQuery),
     queryFn: () => getGlobalSearch(debouncedQuery),
     enabled: debouncedQuery.length >= 2,
     staleTime: 30_000,
   })
+
+  return {
+    ...queryResult,
+    isDebouncing: normalized !== debouncedQuery,
+  }
 }
