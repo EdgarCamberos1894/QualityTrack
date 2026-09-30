@@ -1,18 +1,11 @@
-import type { SystemRole } from '@/modules/auth'
+import {
+  getSystemRoleLabel,
+  type SystemRole,
+} from '@/modules/auth'
 import type {
   InternalUserDto,
   InternalUserStatus,
 } from '../types/internalUser.types'
-
-const roleLabels: Record<SystemRole, string> = {
-  ADMIN: 'Administrador',
-  COMMERCIAL: 'Comercial',
-  ENGINEERING: 'Ingeniería',
-  PRODUCTION: 'Producción',
-  QUALITY: 'Calidad',
-  LOGISTICS: 'Logística',
-  AUDITOR: 'Auditoría',
-}
 
 const roleDescriptions: Record<SystemRole, string> = {
   ADMIN: 'Administra usuarios y acceso interno.',
@@ -35,7 +28,7 @@ export const internalRoles = [
 ] as const satisfies readonly SystemRole[]
 
 export function getInternalRoleLabel(role: SystemRole): string {
-  return roleLabels[role]
+  return getSystemRoleLabel(role)
 }
 
 export function getInternalRoleDescription(role: SystemRole): string {

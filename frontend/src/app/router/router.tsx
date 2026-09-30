@@ -5,7 +5,16 @@ import { CustomerOnlyRoute } from '@/app/router/CustomerOnlyRoute'
 import { InternalOnlyRoute } from '@/app/router/InternalOnlyRoute'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { PublicOnlyRoute } from '@/app/router/PublicOnlyRoute'
-import { LoginPage } from '@/modules/auth'
+import {
+  CustomerInvitationPage,
+  ForgotPasswordPage,
+  InternalInvitationPage,
+  LoginPage,
+  RegisterPage,
+  ResendVerificationPage,
+  ResetPasswordPage,
+  VerifyEmailPage,
+} from '@/modules/auth'
 import {
   CustomerCompanyPage,
   CustomerMembersPage,
@@ -36,9 +45,24 @@ import {
 } from '@/modules/work-orders'
 
 export const router = createBrowserRouter([
+  { path: '/verify-email', element: <VerifyEmailPage /> },
+  { path: '/reset-password', element: <ResetPasswordPage /> },
+  {
+    path: '/customer-invitations/accept',
+    element: <CustomerInvitationPage />,
+  },
+  {
+    path: '/internal-invitations/accept',
+    element: <InternalInvitationPage />,
+  },
   {
     element: <PublicOnlyRoute />,
-    children: [{ path: '/login', element: <LoginPage /> }],
+    children: [
+      { path: '/login', element: <LoginPage /> },
+      { path: '/register', element: <RegisterPage /> },
+      { path: '/resend-verification', element: <ResendVerificationPage /> },
+      { path: '/forgot-password', element: <ForgotPasswordPage /> },
+    ],
   },
   {
     element: <ProtectedRoute />,
