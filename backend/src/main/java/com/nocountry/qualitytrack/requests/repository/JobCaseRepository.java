@@ -1,6 +1,7 @@
 package com.nocountry.qualitytrack.requests.repository;
 
 import com.nocountry.qualitytrack.requests.entity.JobCase;
+import com.nocountry.qualitytrack.requests.enums.JobCaseStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +13,23 @@ import java.util.List;
 import java.util.Optional;
 
 public interface JobCaseRepository extends JpaRepository<JobCase, Long> {
+
+    @Query("""
+            select jobCase.customerRequest.customer.id as customerId,
+                   jobCase.status as status,
+                   count(jobCase) as total
+            from JobCase jobCase
+            group by jobCase.customerRequest.customer.id, jobCase.status
+            """)
+    List<CustomerStatusCount> countByCustomerAndStatus();
+
+    interface CustomerStatusCount {
+        Long getCustomerId();
+
+        JobCaseStatus getStatus();
+
+        long getTotal();
+    }
 
     @EntityGraph(attributePaths = {
             "customerRequest",
