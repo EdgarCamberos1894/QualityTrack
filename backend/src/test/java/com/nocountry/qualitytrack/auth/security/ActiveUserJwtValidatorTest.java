@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -85,13 +86,8 @@ class ActiveUserJwtValidatorTest {
     }
 
     private Jwt jwtWithSubject(String subject) {
-        Jwt.Builder builder = Jwt.withTokenValue("token")
-                .header("alg", "HS256");
-
-        if (subject != null) {
-            builder.subject(subject);
-        }
-
-        return builder.build();
+        Jwt jwt = mock(Jwt.class);
+        when(jwt.getSubject()).thenReturn(subject);
+        return jwt;
     }
 }
