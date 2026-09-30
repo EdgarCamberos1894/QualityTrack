@@ -13,6 +13,7 @@ interface RequestDocumentHistoryDialogProps {
   requestId: number
   documentId: number | null
   documentName: string
+  busyVersionId: number | null
   onClose: () => void
   onOpenVersion: (version: RequestDocumentVersionDto) => void
   onDownloadVersion: (version: RequestDocumentVersionDto) => void
@@ -23,6 +24,7 @@ export function RequestDocumentHistoryDialog({
   requestId,
   documentId,
   documentName,
+  busyVersionId,
   onClose,
   onOpenVersion,
   onDownloadVersion,
@@ -87,13 +89,15 @@ export function RequestDocumentHistoryDialog({
                     <Button
                       size="sm"
                       variant="secondary"
+                      disabled={busyVersionId === version.id}
                       onClick={() => onOpenVersion(version)}
                     >
-                      Ver
+                      {busyVersionId === version.id ? 'Abriendo…' : 'Ver'}
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
+                      disabled={busyVersionId === version.id}
                       onClick={() => onDownloadVersion(version)}
                     >
                       Descargar
