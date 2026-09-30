@@ -1,6 +1,7 @@
 import { Button } from '@/shared/components/ui/Button'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { useCustomerRequestDocumentVersions } from '../hooks/useCustomerRequests'
 import {
   formatCustomerRequestDateTime,
@@ -13,6 +14,7 @@ interface RequestDocumentHistoryDialogProps {
   requestId: number
   documentId: number | null
   documentName: string
+  fileError: unknown
   busy: {
     versionId: number
     action: 'open' | 'download'
@@ -27,6 +29,7 @@ export function RequestDocumentHistoryDialog({
   requestId,
   documentId,
   documentName,
+  fileError,
   busy,
   onClose,
   onOpenVersion,
@@ -61,6 +64,12 @@ export function RequestDocumentHistoryDialog({
         </div>
 
         <div className="max-h-[60vh] overflow-y-auto px-6 py-5">
+          {fileError ? (
+            <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+              {getErrorMessage(fileError)}
+            </p>
+          ) : null}
+
           {query.isPending ? (
             <LoadingState label="Cargando versiones…" />
           ) : query.isError ? (
