@@ -3,6 +3,7 @@ package com.nocountry.qualitytrack.documents.repository;
 import com.nocountry.qualitytrack.documents.entity.Document;
 import com.nocountry.qualitytrack.documents.enums.DocumentStatus;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -13,6 +14,41 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DocumentRepository extends JpaRepository<Document, Long> {
+
+    @EntityGraph(attributePaths = {
+            "jobCase",
+            "jobCase.customerRequest",
+            "jobCase.customerRequest.customer",
+            "materialLot",
+            "materialLot.material",
+            "createdBy"
+    })
+    @Query("""
+            select document
+            from Document document
+            left join document.jobCase jobCase
+            left join jobCase.customerRequest request
+            left join request.customer customer
+            left join document.materialLot materialLot
+            left join materialLot.material material
+            where document.status = :status
+              and (
+                    lower(document.name) like :pattern
+                    or lower(document.documentType) like :pattern
+                    or lower(coalesce(document.description, '')) like :pattern
+                    or lower(coalesce(jobCase.caseNumber, '')) like :pattern
+                    or lower(coalesce(request.requestNumber, '')) like :pattern
+                    or lower(coalesce(customer.name, '')) like :pattern
+                    or lower(coalesce(materialLot.lotNumber, '')) like :pattern
+                    or lower(coalesce(material.code, '')) like :pattern
+              )
+            order by document.createdAt desc, document.id desc
+            """)
+    List<Document> searchInternal(
+            @Param("status") DocumentStatus status,
+            @Param("pattern") String pattern,
+            Pageable pageable
+    );
 
     @Override
     @EntityGraph(attributePaths = {
