@@ -93,7 +93,12 @@ export function GlobalSearch() {
               setDesktopOpen(true)
             }}
             onKeyDown={(event) => {
-              if (event.key === 'Enter' && results[0]) {
+              if (
+                event.key === 'Enter' &&
+                !search.isDebouncing &&
+                !search.isFetching &&
+                results[0]
+              ) {
                 event.preventDefault()
                 select(results[0])
               }
@@ -141,7 +146,12 @@ export function GlobalSearch() {
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={(event) => {
-                  if (event.key === 'Enter' && results[0]) {
+                  if (
+                    event.key === 'Enter' &&
+                    !search.isDebouncing &&
+                    !search.isFetching &&
+                    results[0]
+                  ) {
                     event.preventDefault()
                     select(results[0])
                   }
