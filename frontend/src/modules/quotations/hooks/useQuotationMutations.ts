@@ -2,10 +2,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   createQuotation,
   createQuotationRevision,
+  cancelQuotation,
   sendQuotation,
   updateQuotation,
 } from '../api/quotations.api'
 import type {
+  CancelQuotationPayload,
   SendQuotationPayload,
   UpdateQuotationPayload,
 } from '../types/quotation.types'
@@ -66,6 +68,17 @@ export function useCreateQuotationRevision(quotationId: number) {
 
   return useMutation({
     mutationFn: () => createQuotationRevision(quotationId),
+    onSuccess: refresh,
+  })
+}
+
+
+export function useCancelQuotation(quotationId: number) {
+  const refresh = useRefreshQuotation(quotationId)
+
+  return useMutation({
+    mutationFn: (payload: CancelQuotationPayload) =>
+      cancelQuotation(quotationId, payload),
     onSuccess: refresh,
   })
 }
