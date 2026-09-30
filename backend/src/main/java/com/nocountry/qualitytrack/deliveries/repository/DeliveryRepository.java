@@ -15,6 +15,8 @@ import java.util.Optional;
 
 public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
 
+    long countByStatus(DeliveryStatus status);
+
     @Override
     @EntityGraph(attributePaths = {
             "workOrder", "workOrder.jobCase", "workOrder.jobCase.customerRequest",
