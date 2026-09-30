@@ -42,6 +42,20 @@ public interface DocumentVersionRepository extends JpaRepository<DocumentVersion
             from DocumentVersion v
             join fetch v.uploadedBy
             join fetch v.document d
+            where d.status = :status
+              and d.id in :documentIds
+            order by d.id asc, v.version asc
+            """)
+    List<DocumentVersion> findAllActiveByDocumentIds(
+            @Param("status") DocumentStatus status,
+            @Param("documentIds") List<Long> documentIds
+    );
+
+    @Query("""
+            select v
+            from DocumentVersion v
+            join fetch v.uploadedBy
+            join fetch v.document d
             where d.id in :documentIds
               and v.version = (
                     select max(v2.version)
