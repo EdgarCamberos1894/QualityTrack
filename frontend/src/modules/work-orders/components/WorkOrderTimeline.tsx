@@ -7,7 +7,7 @@ import {
   getTimelinePhasePresentation,
   type TimelinePhase,
 } from '../model/workOrderTimelinePresenter'
-import type { TraceabilityEventDto } from '../types/workOrder.types'
+import type { TraceabilityEventDto } from '../types/workOrder360.types'
 
 interface WorkOrderTimelineProps {
   events: TraceabilityEventDto[]
