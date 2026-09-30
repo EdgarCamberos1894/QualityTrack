@@ -1,6 +1,7 @@
 export { recordMaterialConsumption } from './api/materials.api'
 export {
   materialKeys,
+  useMaterialCertificateFileActions,
   useMaterialLots,
   useMaterialMutations,
   useMaterials,

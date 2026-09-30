@@ -1,9 +1,12 @@
+import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   createMaterial,
   createMaterialLot,
+  getMaterialCertificateContent,
   getMaterialLots,
   getMaterials,
+  uploadMaterialLotCertificate,
 } from '../api/materials.api'
 import type {
   CreateMaterialLotPayload,
@@ -58,5 +61,80 @@ export function useMaterialMutations() {
     },
   })
 
-  return { create, createLot }
+  const uploadCertificate = useMutation({
+    mutationFn: ({
+      materialId,
+      lotId,
+      file,
+    }: {
+      materialId: number
+      lotId: number
+      file: File
+    }) => uploadMaterialLotCertificate(materialId, lotId, file),
+    onSuccess: async (_, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: materialKeys.lots(variables.materialId),
+        }),
+        queryClient.invalidateQueries({ queryKey: ['document-center'] }),
+      ])
+    },
+  })
+
+  return { create, createLot, uploadCertificate }
+}
+
+function scheduleUrlRelease(url: string) {
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+}
+
+export function useMaterialCertificateFileActions() {
+  const [busyLotId, setBusyLotId] = useState<number | null>(null)
+  const [error, setError] = useState<unknown>(null)
+
+  const open = async (
+    lotId: number,
+    documentId: number,
+    versionId: number,
+  ) => {
+    const previewWindow = window.open('', '_blank')
+    if (previewWindow) {
+      previewWindow.opener = null
+      previewWindow.document.title = 'Cargando certificado…'
+      previewWindow.document.body.textContent = 'Cargando certificado…'
+    }
+
+    setBusyLotId(lotId)
+    setError(null)
+
+    try {
+      const blob = await getMaterialCertificateContent(
+        documentId,
+        versionId,
+        false,
+      )
+      const url = URL.createObjectURL(blob)
+
+      if (previewWindow) {
+        previewWindow.location.replace(url)
+      } else {
+        const anchor = document.createElement('a')
+        anchor.href = url
+        anchor.target = '_blank'
+        anchor.rel = 'noopener noreferrer'
+        document.body.appendChild(anchor)
+        anchor.click()
+        anchor.remove()
+      }
+
+      scheduleUrlRelease(url)
+    } catch (requestError) {
+      previewWindow?.close()
+      setError(requestError)
+    } finally {
+      setBusyLotId(null)
+    }
+  }
+
+  return { busyLotId, error, open }
 }

@@ -17,7 +17,9 @@ export interface MaterialLotDto {
   supplier: string | null
   receivedAt: string
   quantityReceived: number
+  certificateDocumentId: number | null
   certificateDocumentVersionId: number | null
+  certificateFileName: string | null
   createdAt: string
 }
 
@@ -33,7 +35,6 @@ export interface CreateMaterialLotPayload {
   supplier?: string
   receivedAt?: string
   quantityReceived: number
-  certificateDocumentVersionId?: number | null
 }
 
 export interface WorkOrderMaterialDto {
