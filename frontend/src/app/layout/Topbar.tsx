@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom'
 import type { AuthenticatedUser } from '@/modules/auth'
+import { GlobalSearch } from '@/modules/global-search'
 
 interface TopbarProps {
   user: AuthenticatedUser
@@ -42,6 +43,14 @@ function getBreadcrumb(pathname: string, search: string): string {
 
   if (pathname === '/internal-users') {
     return 'Administración / Usuarios y accesos'
+  }
+
+  if (pathname.startsWith('/customers/')) {
+    return 'Comercial / Clientes / Detalle'
+  }
+
+  if (pathname === '/customers') {
+    return 'Comercial / Clientes'
   }
 
   if (pathname.startsWith('/quotations/')) {
@@ -107,7 +116,11 @@ export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
         {getBreadcrumb(location.pathname, location.search)}
       </p>
 
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ml-auto flex min-w-0 items-center gap-3 md:ml-6">
+        <GlobalSearch />
+      </div>
+
+      <div className="ml-3 flex items-center gap-3">
         <span className="hidden rounded-full bg-emerald-50 px-3 py-1.5 text-[10px] font-semibold text-teal-700 md:inline-flex">
           {getShiftLabel()}
         </span>
