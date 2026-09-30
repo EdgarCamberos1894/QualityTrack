@@ -7,6 +7,7 @@ import { WorkOrderDeliveries } from '../components/WorkOrderDeliveries'
 import { WorkOrderDetailHeader } from '../components/WorkOrderDetailHeader'
 import { WorkOrderDocuments } from '../components/WorkOrderDocuments'
 import { WorkOrderOriginChain } from '../components/WorkOrderOriginChain'
+import { WorkOrderPreparation } from '../components/WorkOrderPreparation'
 import { WorkOrderQuality } from '../components/WorkOrderQuality'
 import { WorkOrderSummary } from '../components/WorkOrderSummary'
 import { WorkOrderTabs } from '../components/WorkOrderTabs'
@@ -16,6 +17,7 @@ import type { WorkOrderDetailTab } from '../types/workOrder.types'
 
 const validTabs: WorkOrderDetailTab[] = [
   'summary',
+  'preparation',
   'traceability',
   'documents',
   'quality',
@@ -43,6 +45,10 @@ export function WorkOrderDetailPage() {
 
   const content = useMemo(() => {
     if (!query.data) return null
+
+    if (activeTab === 'preparation') {
+      return <WorkOrderPreparation data={query.data} />
+    }
 
     if (activeTab === 'traceability') {
       return <WorkOrderTimeline events={query.data.timeline} />
