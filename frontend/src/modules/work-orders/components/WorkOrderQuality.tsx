@@ -1,6 +1,6 @@
 import { Badge } from '@/shared/components/ui/Badge'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
-import type { QualityInspectionDto } from '../types/workOrder.types'
+import type { QualityInspectionDto } from '../types/workOrder360.types'
 
 interface WorkOrderQualityProps {
   inspections: QualityInspectionDto[]
