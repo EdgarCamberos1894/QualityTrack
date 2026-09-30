@@ -153,7 +153,7 @@ export function MaterialLotsPanel({
           {lots.map((lot) => (
             <article
               key={lot.id}
-              className="grid gap-4 px-5 py-4 md:grid-cols-[minmax(160px,1fr)_minmax(160px,1fr)_150px_120px] md:items-center"
+              className="grid gap-4 px-5 py-4 md:grid-cols-[minmax(160px,1fr)_minmax(160px,1fr)_150px_minmax(210px,auto)] md:items-center"
             >
               <div>
                 <p className="text-xs font-semibold text-slate-950">
