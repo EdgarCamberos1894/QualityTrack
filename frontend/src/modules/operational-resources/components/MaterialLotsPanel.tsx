@@ -38,6 +38,38 @@ export function MaterialLotsPanel({
     null,
   )
 
+  const lots = lotsQuery.data ?? []
+
+  useEffect(() => {
+    if (
+      !highlightedLotId ||
+      !lots.some((lot) => lot.id === highlightedLotId)
+    ) {
+      return
+    }
+
+    const timeout = window.setTimeout(() => {
+      document
+        .getElementById(`material-lot-${highlightedLotId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 50)
+
+    return () => window.clearTimeout(timeout)
+  }, [highlightedLotId, lots])
+
+  if (!material) {
+    return (
+      <Card className="overflow-hidden">
+        <div className="p-5">
+          <EmptyState
+            title="Selecciona un material"
+            description="Aquí verás sus lotes, proveedor, fecha de recepción y cantidad recibida."
+          />
+        </div>
+      </Card>
+    )
+  }
+
   const createLot = async (values: CreateMaterialLotFormValues) => {
     try {
       await mutations.createLot.mutateAsync({
@@ -71,38 +103,6 @@ export function MaterialLotsPanel({
     } catch {
       return false
     }
-  }
-
-  const lots = lotsQuery.data ?? []
-
-  useEffect(() => {
-    if (
-      !highlightedLotId ||
-      !lots.some((lot) => lot.id === highlightedLotId)
-    ) {
-      return
-    }
-
-    const timeout = window.setTimeout(() => {
-      document
-        .getElementById(`material-lot-${highlightedLotId}`)
-        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }, 50)
-
-    return () => window.clearTimeout(timeout)
-  }, [highlightedLotId, lots])
-
-  if (!material) {
-    return (
-      <Card className="overflow-hidden">
-        <div className="p-5">
-          <EmptyState
-            title="Selecciona un material"
-            description="Aquí verás sus lotes, proveedor, fecha de recepción y cantidad recibida."
-          />
-        </div>
-      </Card>
-    )
   }
 
   return (
