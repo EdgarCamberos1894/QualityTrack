@@ -85,11 +85,11 @@ export function CustomerRequestDetailPage() {
       ? 'DELIVERED'
       : deliverySummary.completedAgainstRequestedQuantity
         ? 'DELIVERED'
-    : deliverySummary.hasInTransit
-      ? 'IN_TRANSIT'
-      : deliverySummary.deliveredQuantity > 0
-        ? 'PARTIAL'
-          : undefined
+        : deliverySummary.hasInTransit
+          ? 'IN_TRANSIT'
+          : deliverySummary.deliveredQuantity > 0
+            ? 'PARTIAL'
+            : undefined
   const requestStatus = getCustomerRequestStatusPresentation(
     request.jobCase.status,
   )
