@@ -1,6 +1,7 @@
 package com.nocountry.qualitytrack.workorders.repository;
 
 import com.nocountry.qualitytrack.workorders.entity.WorkOrder;
+import com.nocountry.qualitytrack.workorders.enums.WorkOrderStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +13,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
+
+    long countByStatus(WorkOrderStatus status);
+
+    long countByStatusIn(List<WorkOrderStatus> statuses);
 
     boolean existsByJobCase_Id(Long caseId);
 
