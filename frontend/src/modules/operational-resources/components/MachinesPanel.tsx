@@ -146,7 +146,11 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
         {filtered.length === 0 ? (
           <div className="p-5">
             <EmptyState
-              title={machines.length === 0 ? 'Sin máquinas registradas' : 'Sin coincidencias'}
+              title={
+                machines.length === 0
+                  ? 'Sin máquinas registradas'
+                  : 'Sin coincidencias'
+              }
               description={
                 machines.length === 0
                   ? 'Registra el parque de máquinas para poder asignarlo a las ejecuciones de producción.'
