@@ -23,7 +23,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -41,12 +43,16 @@ public class InternalDashboardService {
     public InternalDashboardResponse get(Long currentUserId) {
         requireInternalReader(currentUserId);
 
-        long submitted = jobCaseRepository.countByStatus(JobCaseStatus.SUBMITTED);
-        long underReview = jobCaseRepository.countByStatus(JobCaseStatus.UNDER_REVIEW);
-        long waitingCustomer = jobCaseRepository.countByStatus(JobCaseStatus.WAITING_CUSTOMER_INFO);
-        long readyForQuotation = jobCaseRepository.countByStatus(JobCaseStatus.READY_FOR_QUOTATION);
-        long inProduction = jobCaseRepository.countByStatus(JobCaseStatus.IN_PRODUCTION);
-        long completed = jobCaseRepository.countByStatus(JobCaseStatus.COMPLETED);
+        Map<JobCaseStatus, Long> caseCounts = jobCaseCounts();
+        Map<WorkOrderStatus, Long> workOrderCounts = workOrderCounts();
+        Map<QuotationStatus, Long> quotationCounts = quotationCounts();
+
+        long submitted = count(caseCounts, JobCaseStatus.SUBMITTED);
+        long underReview = count(caseCounts, JobCaseStatus.UNDER_REVIEW);
+        long waitingCustomer = count(caseCounts, JobCaseStatus.WAITING_CUSTOMER_INFO);
+        long readyForQuotation = count(caseCounts, JobCaseStatus.READY_FOR_QUOTATION);
+        long inProduction = count(caseCounts, JobCaseStatus.IN_PRODUCTION);
+        long completed = count(caseCounts, JobCaseStatus.COMPLETED);
 
         long openCases = submitted
                 + underReview
@@ -54,19 +60,18 @@ public class InternalDashboardService {
                 + readyForQuotation
                 + inProduction;
 
-        long activeProduction = workOrderRepository.countByStatusIn(List.of(
-                WorkOrderStatus.READY_FOR_PRODUCTION,
-                WorkOrderStatus.IN_PRODUCTION,
-                WorkOrderStatus.REWORK_IN_PROGRESS
-        ));
-        long qualityPending = workOrderRepository.countByStatus(WorkOrderStatus.QUALITY_PENDING);
-        long qualityHold = workOrderRepository.countByStatus(WorkOrderStatus.QUALITY_HOLD);
-        long readyForDelivery = workOrderRepository.countByStatus(WorkOrderStatus.READY_FOR_DELIVERY);
+        long activeProduction =
+                count(workOrderCounts, WorkOrderStatus.READY_FOR_PRODUCTION)
+                + count(workOrderCounts, WorkOrderStatus.IN_PRODUCTION)
+                + count(workOrderCounts, WorkOrderStatus.REWORK_IN_PROGRESS);
+        long qualityPending = count(workOrderCounts, WorkOrderStatus.QUALITY_PENDING);
+        long qualityHold = count(workOrderCounts, WorkOrderStatus.QUALITY_HOLD);
+        long readyForDelivery = count(workOrderCounts, WorkOrderStatus.READY_FOR_DELIVERY);
         long openNonConformities = nonConformityRepository.countByStatus(NonConformityStatus.OPEN);
         long dispatchedDeliveries = deliveryRepository.countByStatus(DeliveryStatus.DISPATCHED);
 
-        long draftQuotations = quotationRepository.countByStatus(QuotationStatus.DRAFT);
-        long sentQuotations = quotationRepository.countByStatus(QuotationStatus.SENT);
+        long draftQuotations = count(quotationCounts, QuotationStatus.DRAFT);
+        long sentQuotations = count(quotationCounts, QuotationStatus.SENT);
 
         return new InternalDashboardResponse(
                 new InternalDashboardResponse.Overview(
@@ -151,6 +156,31 @@ public class InternalDashboardService {
                         .map(this::activity)
                         .toList()
         );
+    }
+
+    private Map<JobCaseStatus, Long> jobCaseCounts() {
+        EnumMap<JobCaseStatus, Long> counts = new EnumMap<>(JobCaseStatus.class);
+        jobCaseRepository.countGroupedByStatus()
+                .forEach(row -> counts.put(row.getStatus(), row.getTotal()));
+        return counts;
+    }
+
+    private Map<WorkOrderStatus, Long> workOrderCounts() {
+        EnumMap<WorkOrderStatus, Long> counts = new EnumMap<>(WorkOrderStatus.class);
+        workOrderRepository.countGroupedByStatus()
+                .forEach(row -> counts.put(row.getStatus(), row.getTotal()));
+        return counts;
+    }
+
+    private Map<QuotationStatus, Long> quotationCounts() {
+        EnumMap<QuotationStatus, Long> counts = new EnumMap<>(QuotationStatus.class);
+        quotationRepository.countGroupedByStatus()
+                .forEach(row -> counts.put(row.getStatus(), row.getTotal()));
+        return counts;
+    }
+
+    private <T extends Enum<T>> long count(Map<T, Long> counts, T status) {
+        return counts.getOrDefault(status, 0L);
     }
 
     private InternalDashboardResponse.AttentionItem attention(
