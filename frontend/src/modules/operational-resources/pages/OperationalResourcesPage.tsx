@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { PageHeader } from '@/shared/components/layout/PageHeader'
@@ -11,7 +11,9 @@ import {
 
 export function OperationalResourcesPage() {
   const session = useSessionStore((state) => state.session)
-  const [tab, setTab] = useState<ResourceTab>('machines')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tab: ResourceTab =
+    searchParams.get('tab') === 'materials' ? 'materials' : 'machines'
   const roles = session?.user.roles ?? []
   const canManage =
     roles.includes('ADMIN') || roles.includes('PRODUCTION')
@@ -32,7 +34,14 @@ export function OperationalResourcesPage() {
         </p>
       </div>
 
-      <ResourceTabs value={tab} onChange={setTab} />
+      <ResourceTabs
+        value={tab}
+        onChange={(nextTab) => {
+          const next = new URLSearchParams(searchParams)
+          next.set('tab', nextTab)
+          setSearchParams(next, { replace: true })
+        }}
+      />
 
       {tab === 'machines' ? (
         <MachinesPanel canManage={canManage} />
