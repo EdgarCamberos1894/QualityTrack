@@ -14,7 +14,19 @@ import java.util.Optional;
 
 public interface JobCaseRepository extends JpaRepository<JobCase, Long> {
 
-    long countByStatus(JobCaseStatus status);
+    @Query("""
+            select jobCase.status as status,
+                   count(jobCase) as total
+            from JobCase jobCase
+            group by jobCase.status
+            """)
+    List<StatusCount> countGroupedByStatus();
+
+    interface StatusCount {
+        JobCaseStatus getStatus();
+
+        long getTotal();
+    }
 
     @Query("""
             select jobCase.customerRequest.customer.id as customerId,
