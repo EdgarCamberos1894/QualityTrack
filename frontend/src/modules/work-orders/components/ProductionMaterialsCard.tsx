@@ -36,7 +36,7 @@ export function ProductionMaterialsCard({
   const materialsQuery = useMaterials(canRecord)
   const [materialId, setMaterialId] = useState<number | null>(null)
   const [lotId, setLotId] = useState<number | null>(null)
-  const lotsQuery = useMaterialLots(materialId)
+  const lotsQuery = useMaterialLots(canRecord ? materialId : null)
   const {
     register,
     handleSubmit,
