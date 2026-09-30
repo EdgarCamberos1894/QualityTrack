@@ -27,6 +27,7 @@ public record DeliveryResponse(
         Long deliveredByUserId,
         Long evidenceDocumentId,
         Long evidenceDocumentVersionId,
+        String evidenceFileName,
         Long createdByUserId,
         Instant cancelledAt,
         Long cancelledByUserId,
@@ -59,6 +60,9 @@ public record DeliveryResponse(
                         ? null
                         : delivery.getEvidenceDocumentVersion().getDocument().getId(),
                 delivery.getEvidenceDocumentVersion() == null ? null : delivery.getEvidenceDocumentVersion().getId(),
+                delivery.getEvidenceDocumentVersion() == null
+                        ? null
+                        : delivery.getEvidenceDocumentVersion().getFileName(),
                 delivery.getCreatedByUser().getId(),
                 delivery.getCancelledAt(),
                 delivery.getCancelledByUser() == null ? null : delivery.getCancelledByUser().getId(),
