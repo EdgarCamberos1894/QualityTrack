@@ -34,6 +34,28 @@ public class DocumentAccessService {
     private final CustomerMembershipRepository membershipRepository;
     private final DeliveryRepository deliveryRepository;
 
+    public User requireCustomerReader(Long userId, Long customerId) {
+        User user = requireUser(userId);
+        if (user.getAccountType() != AccountType.CUSTOMER) {
+            throw new BusinessException(
+                    ApiErrorCode.ACCESS_DENIED,
+                    "El centro documental del portal está disponible únicamente para cuentas de cliente."
+            );
+        }
+
+        membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                        customerId,
+                        userId,
+                        CustomerMembershipStatus.ACTIVE
+                )
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.ACCESS_DENIED,
+                        "No tienes acceso a los documentos de esta empresa."
+                ));
+
+        return user;
+    }
+
     public User requireInternalReader(Long userId) {
         User user = requireUser(userId);
         if (user.getAccountType() != AccountType.INTERNAL) {
@@ -262,7 +284,7 @@ public class DocumentAccessService {
         }
     }
 
-    private boolean isCustomerVisibleDelivery(Delivery delivery) {
+    boolean isCustomerVisibleDelivery(Delivery delivery) {
         return delivery.getStatus() == DeliveryStatus.DISPATCHED
                 || delivery.getStatus() == DeliveryStatus.DELIVERED
                 || (delivery.getStatus() == DeliveryStatus.CANCELLED

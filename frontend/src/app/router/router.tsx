@@ -8,6 +8,7 @@ import { PublicOnlyRoute } from '@/app/router/PublicOnlyRoute'
 import { LoginPage } from '@/modules/auth'
 import {
   CustomerCompanyPage,
+  CustomerDocumentsPage,
   CustomerMembersPage,
   CustomerPortalHomePage,
   CustomerPortalLandingPage,
@@ -91,6 +92,10 @@ export const router = createBrowserRouter([
               {
                 path: '/portal/:customerId/requests/:requestId',
                 element: <CustomerRequestDetailPage />,
+              },
+              {
+                path: '/portal/:customerId/documents',
+                element: <CustomerDocumentsPage />,
               },
               {
                 path: '/portal/:customerId/members',

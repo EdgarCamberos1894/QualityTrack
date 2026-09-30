@@ -10,6 +10,10 @@ interface CustomerPortalTopbarProps {
 }
 
 function breadcrumb(pathname: string): string {
+  if (pathname.endsWith('/documents')) {
+    return 'Mi empresa / Documentos'
+  }
+
   if (pathname.endsWith('/members')) {
     return 'Mi empresa / Miembros'
   }

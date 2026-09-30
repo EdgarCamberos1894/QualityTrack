@@ -63,6 +63,35 @@ class DocumentAccessServiceTest {
     }
 
     @Test
+    void customerCanReadOwnCompanyDocumentCenter() {
+        when(userRepository.findById(20L)).thenReturn(Optional.of(user));
+        when(user.getAccountType()).thenReturn(AccountType.CUSTOMER);
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                40L,
+                20L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.of(membership));
+
+        assertSame(user, service.requireCustomerReader(20L, 40L));
+    }
+
+    @Test
+    void customerCannotReadAnotherCompanyDocumentCenter() {
+        when(userRepository.findById(20L)).thenReturn(Optional.of(user));
+        when(user.getAccountType()).thenReturn(AccountType.CUSTOMER);
+        when(membershipRepository.findByCustomer_IdAndUser_IdAndStatus(
+                41L,
+                20L,
+                CustomerMembershipStatus.ACTIVE
+        )).thenReturn(Optional.empty());
+
+        assertThrows(
+                BusinessException.class,
+                () -> service.requireCustomerReader(20L, 41L)
+        );
+    }
+
+    @Test
     void auditorCanReadDocumentCenter() {
         when(userRepository.findById(10L)).thenReturn(Optional.of(user));
         when(user.getAccountType()).thenReturn(AccountType.INTERNAL);
