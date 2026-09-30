@@ -11,8 +11,10 @@ import com.nocountry.qualitytrack.documents.service.DocumentAccessService;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.requests.entity.CustomerRequest;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
+import com.nocountry.qualitytrack.requests.enums.JobCaseStatus;
 import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
+import com.nocountry.qualitytrack.traceability.enums.TraceabilityEventType;
 import com.nocountry.qualitytrack.traceability.service.TraceabilityService;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.workorders.entity.WorkOrder;
@@ -73,6 +75,9 @@ class DeliveryServiceTest {
         lenient().when(logistics.getId()).thenReturn(10L);
         lenient().when(customerUser.getId()).thenReturn(20L);
         lenient().when(jobCase.getCustomerRequest()).thenReturn(customerRequest);
+        lenient().when(jobCase.getId()).thenReturn(50L);
+        lenient().when(jobCase.getCaseNumber()).thenReturn("CASE-DELIVERY-001");
+        lenient().when(jobCase.getStatus()).thenReturn(JobCaseStatus.IN_PRODUCTION);
         lenient().when(customerRequest.getId()).thenReturn(30L);
         lenient().when(customerRequest.getCustomer()).thenReturn(customer);
         lenient().when(customer.getId()).thenReturn(40L);
@@ -236,7 +241,7 @@ class DeliveryServiceTest {
     }
 
     @Test
-    void finalLogisticsDeliveryClosesWorkOrder() {
+    void finalLogisticsDeliveryClosesWorkOrderAndJobCase() {
         Delivery delivery = dispatchedDelivery(12);
         stubLockedDelivery(delivery);
         when(accessPolicy.requireLogisticsActor(10L)).thenReturn(logistics);
@@ -252,6 +257,18 @@ class DeliveryServiceTest {
 
         assertEquals(WorkOrderStatus.DELIVERED, workOrder.getStatus());
         verify(workOrderRepository).saveAndFlush(workOrder);
+        verify(jobCase).complete(any(Instant.class));
+        verify(jobCaseRepository).saveAndFlush(jobCase);
+        verify(traceabilityService).record(
+                eq(jobCase),
+                eq(com.nocountry.qualitytrack.traceability.enums.TraceabilityAggregateType.JOB_CASE),
+                eq(50L),
+                eq(TraceabilityEventType.JOB_CASE_COMPLETED),
+                eq(JobCaseStatus.IN_PRODUCTION.name()),
+                eq(JobCaseStatus.COMPLETED.name()),
+                eq(10L),
+                any()
+        );
     }
 
     private void stubLockedDelivery(Delivery delivery) {
