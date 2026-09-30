@@ -7,7 +7,7 @@ export const workOrderPlanningSchema = z.object({
 })
 
 export const routingOperationSchema = z.object({
-  sequenceNumber: z.coerce
+  sequenceNumber: z
     .number()
     .int('La secuencia debe ser un entero.')
     .positive('La secuencia debe ser mayor a cero.'),
@@ -22,7 +22,7 @@ export const routingOperationSchema = z.object({
     .min(1, 'El nombre es obligatorio.')
     .max(150, 'El nombre no puede superar 150 caracteres.'),
   instructions: z.string(),
-  estimatedMinutes: z.coerce
+  estimatedMinutes: z
     .number()
     .int('El tiempo debe ser un entero.')
     .positive('El tiempo estimado debe ser mayor a cero.'),
