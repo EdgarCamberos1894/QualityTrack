@@ -42,10 +42,14 @@ export function DocumentCenterFilters({
   ].sort((left, right) => left.localeCompare(right))
   const customers = [
     ...new Map(
-      documents.map((item) => [
-        item.customerId,
-        { id: item.customerId, name: item.customerName },
-      ]),
+      documents
+        .filter(
+          (item) => item.customerId !== null && item.customerName !== null,
+        )
+        .map((item) => [
+          item.customerId as number,
+          { id: item.customerId as number, name: item.customerName as string },
+        ]),
     ).values(),
   ].sort((left, right) => left.name.localeCompare(right.name))
 
