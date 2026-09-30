@@ -57,7 +57,6 @@ export function CompleteExecutionDialog({
       quantityRejected: 0,
       completionNotes: '',
     })
-    setQuantityError(null)
   }, [open, plannedQuantity, reset])
 
   const processed = useWatch({ control, name: 'quantityProcessed' })
