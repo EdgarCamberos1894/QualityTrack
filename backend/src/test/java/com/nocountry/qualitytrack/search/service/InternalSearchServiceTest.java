@@ -82,6 +82,7 @@ class InternalSearchServiceTest {
                 ArgumentMatchers.eq("%acme%"),
                 ArgumentMatchers.any(Pageable.class)
         )).thenReturn(List.of(customer));
+        stubEmptyOperationalSearch("%acme%");
 
         var response = service.search(10L, "Acme");
 
@@ -117,6 +118,15 @@ class InternalSearchServiceTest {
     @Test
     void commercialSearchesQuotations() {
         authorize(SystemRole.COMMERCIAL);
+        when(customerRepository.searchInternal(
+                ArgumentMatchers.eq("%qt-00%"),
+                ArgumentMatchers.any(Pageable.class)
+        )).thenReturn(List.of());
+        stubEmptyOperationalSearch("%qt-00%");
+        when(quotationRepository.searchCurrentInternal(
+                ArgumentMatchers.eq("%qt-00%"),
+                ArgumentMatchers.any(Pageable.class)
+        )).thenReturn(List.of());
 
         service.search(10L, "QT-00");
 
@@ -146,6 +156,30 @@ class InternalSearchServiceTest {
         verifyNoInteractions(materialLotRepository);
         verifyNoInteractions(documentRepository);
         verifyNoInteractions(userSystemRoleRepository);
+    }
+
+    private void stubEmptyOperationalSearch(String pattern) {
+        when(jobCaseRepository.searchInternal(
+                ArgumentMatchers.eq(pattern),
+                ArgumentMatchers.any(Pageable.class)
+        )).thenReturn(List.of());
+        when(workOrderRepository.searchInternal(
+                ArgumentMatchers.eq(pattern),
+                ArgumentMatchers.any(Pageable.class)
+        )).thenReturn(List.of());
+        when(materialRepository.searchInternal(
+                ArgumentMatchers.eq(pattern),
+                ArgumentMatchers.any(Pageable.class)
+        )).thenReturn(List.of());
+        when(materialLotRepository.searchInternal(
+                ArgumentMatchers.eq(pattern),
+                ArgumentMatchers.any(Pageable.class)
+        )).thenReturn(List.of());
+        when(documentRepository.searchInternal(
+                ArgumentMatchers.any(),
+                ArgumentMatchers.eq(pattern),
+                ArgumentMatchers.any(Pageable.class)
+        )).thenReturn(List.of());
     }
 
     private void authorize(SystemRole role) {
