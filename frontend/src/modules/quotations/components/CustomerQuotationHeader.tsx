@@ -54,10 +54,7 @@ export function CustomerQuotationHeader({
     quotation.customerStatus === 'ADJUSTMENT_REQUESTED'
 
   const label = includesAdjustmentResponse ? 'Nueva revisión' : status.label
-  const description = statusDescription(
-    quotation,
-    includesAdjustmentResponse,
-  )
+  const description = statusDescription(quotation, includesAdjustmentResponse)
 
   return (
     <header className="mb-4 flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
@@ -95,11 +92,7 @@ export function CustomerQuotationHeader({
             >
               Solicitar ajuste
             </Button>
-            <Button
-              variant="danger"
-              onClick={onReject}
-              disabled={submitting}
-            >
+            <Button variant="danger" onClick={onReject} disabled={submitting}>
               Rechazar
             </Button>
             <Button onClick={onApprove} disabled={submitting}>
