@@ -15,6 +15,8 @@ import java.util.Optional;
 
 public interface QuotationRepository extends JpaRepository<Quotation, Long> {
 
+    long countByStatus(QuotationStatus status);
+
     boolean existsByJobCase_Id(Long caseId);
 
     boolean existsByQuotationNumberAndRevisionGreaterThan(
