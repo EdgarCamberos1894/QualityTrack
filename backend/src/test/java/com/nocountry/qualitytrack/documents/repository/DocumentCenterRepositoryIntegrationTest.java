@@ -155,7 +155,7 @@ class DocumentCenterRepositoryIntegrationTest {
     }
 
     @Test
-    void sharedMaterialLotKeepsCertificateSourceCaseProvenance() {
+    void legacyCaseOwnedCertificateRemainsSearchableThroughConsumedLot() {
         Fixture source = createFixture("source-case");
         Fixture consumer = createFixture("consumer-case");
 
