@@ -16,6 +16,7 @@ const tabs: Array<{
   label: string
 }> = [
   { id: 'summary', label: 'Resumen' },
+  { id: 'preparation', label: 'Preparación' },
   { id: 'traceability', label: 'Trazabilidad' },
   { id: 'documents', label: 'Documentos' },
   { id: 'quality', label: 'Calidad' },
