@@ -7,9 +7,11 @@ import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { Card } from '@/shared/components/ui/Card'
 import { CancelCustomerRequestDialog } from '../components/CancelCustomerRequestDialog'
+import { CustomerDeliveryTracking } from '../components/CustomerDeliveryTracking'
 import { CustomerRequestDocuments } from '../components/CustomerRequestDocuments'
 import { CustomerRequestFlowSteps } from '../components/CustomerRequestFlowSteps'
 import { RespondInformationDialog } from '../components/RespondInformationDialog'
+import { useCustomerRequestDeliveries } from '../hooks/useCustomerDeliveries'
 import { useCustomerPortalContext } from '../hooks/useCustomerPortalContext'
 import { useCustomerRequestActions } from '../hooks/useCustomerRequestMutations'
 import { useCustomerRequestDetail } from '../hooks/useCustomerRequests'
@@ -24,6 +26,7 @@ import type {
   CancelCustomerRequestFormValues,
   RespondInformationFormValues,
 } from '../schemas/customerRequest.schemas'
+import { getCustomerDeliverySummary } from '../model/customerDeliveryPresenter'
 import type { CustomerInformationRequestDto } from '../types/customerRequest.types'
 
 export function CustomerRequestDetailPage() {
@@ -33,6 +36,10 @@ export function CustomerRequestDetailPage() {
   const validId =
     Number.isInteger(numericId) && numericId > 0 ? numericId : null
   const query = useCustomerRequestDetail(customer.customerId, validId)
+  const deliveriesQuery = useCustomerRequestDeliveries(
+    customer.customerId,
+    validId,
+  )
   const actions = useCustomerRequestActions(customer.customerId, validId ?? 0)
   const [respondingTo, setRespondingTo] =
     useState<CustomerInformationRequestDto | null>(null)
@@ -69,7 +76,25 @@ export function CustomerRequestDetailPage() {
   }
 
   const request = query.data
-  const status = getCustomerRequestStatusPresentation(request.jobCase.status)
+  const deliverySummary = getCustomerDeliverySummary(
+    deliveriesQuery.data ?? [],
+    request.quantity,
+  )
+  const deliveryProgress = deliverySummary.completedAgainstRequestedQuantity
+    ? 'DELIVERED'
+    : deliverySummary.hasInTransit
+      ? 'IN_TRANSIT'
+      : deliverySummary.deliveredQuantity > 0
+        ? 'PARTIAL'
+        : undefined
+  const requestStatus = getCustomerRequestStatusPresentation(
+    request.jobCase.status,
+  )
+  const status = deliverySummary.hasInTransit
+    ? { label: 'En camino', tone: 'info' as const }
+    : deliverySummary.completedAgainstRequestedQuantity
+      ? { label: 'Entregada', tone: 'success' as const }
+      : requestStatus
   const canWrite = customer.role !== 'VIEWER'
   const canCancel = canWrite && canCancelCustomerRequest(request)
   const canModifyDocuments =
@@ -159,7 +184,10 @@ export function CustomerRequestDetailPage() {
         </div>
       </div>
 
-      <CustomerRequestFlowSteps status={request.jobCase.status} />
+      <CustomerRequestFlowSteps
+        status={request.jobCase.status}
+        deliveryProgress={deliveryProgress}
+      />
 
       {openInformationRequest ? (
         <section className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-5">
@@ -279,7 +307,7 @@ export function CustomerRequestDetailPage() {
             <div>
               <dt className="text-[9px] text-slate-500">Etapa visible</dt>
               <dd className="mt-1 text-xs font-semibold text-slate-950">
-                {status.stage}
+                {deliveryProgress ? 'Entrega' : requestStatus.stage}
               </dd>
             </div>
             <div>
@@ -296,6 +324,15 @@ export function CustomerRequestDetailPage() {
             </div>
           </dl>
         </Card>
+      </div>
+
+      <div className="mt-5">
+        <CustomerDeliveryTracking
+          deliveries={deliveriesQuery.data}
+          requestedQuantity={request.quantity}
+          pending={deliveriesQuery.isPending}
+          error={deliveriesQuery.error}
+        />
       </div>
 
       <div className="mt-5">

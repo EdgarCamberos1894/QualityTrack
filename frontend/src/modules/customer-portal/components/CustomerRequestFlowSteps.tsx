@@ -3,6 +3,7 @@ import type { CustomerRequestStatus } from '../types/customerRequest.types'
 
 interface CustomerRequestFlowStepsProps {
   status: CustomerRequestStatus
+  deliveryProgress?: 'IN_TRANSIT' | 'PARTIAL' | 'DELIVERED'
 }
 
 const steps = ['Solicitud', 'Revisión', 'Cotización', 'Producción', 'Entrega']
@@ -24,16 +25,19 @@ function activeStep(status: CustomerRequestStatus): number {
 
 export function CustomerRequestFlowSteps({
   status,
+  deliveryProgress,
 }: CustomerRequestFlowStepsProps) {
-  const current = activeStep(status)
+  const current = deliveryProgress ? 4 : activeStep(status)
   const cancelled = status === 'CANCELLED'
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white px-5 py-4">
       <div className="grid gap-3 sm:grid-cols-5">
         {steps.map((step, index) => {
-          const complete = !cancelled && index < current
-          const active = !cancelled && index === current
+          const deliveryComplete =
+            index === 4 && deliveryProgress === 'DELIVERED'
+          const complete = !cancelled && (index < current || deliveryComplete)
+          const active = !cancelled && index === current && !deliveryComplete
 
           return (
             <div key={step} className="flex items-center gap-3 sm:block">
