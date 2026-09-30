@@ -36,6 +36,11 @@ const statuses: Record<CustomerRequestStatus, RequestStatusPresentation> = {
     stage: 'Producción',
     tone: 'info',
   },
+  COMPLETED: {
+    label: 'Completada',
+    stage: 'Finalizada',
+    tone: 'success',
+  },
   CANCELLED: {
     label: 'Cancelada',
     stage: 'Cancelada',
@@ -66,7 +71,12 @@ export function canCancelCustomerRequest(
 export function canModifyCustomerRequestDocuments(
   request: CustomerRequestSummaryDto,
 ): boolean {
-  return !['READY_FOR_QUOTATION', 'IN_PRODUCTION', 'CANCELLED'].includes(
+  return ![
+    'READY_FOR_QUOTATION',
+    'IN_PRODUCTION',
+    'COMPLETED',
+    'CANCELLED',
+  ].includes(
     request.jobCase.status,
   )
 }
