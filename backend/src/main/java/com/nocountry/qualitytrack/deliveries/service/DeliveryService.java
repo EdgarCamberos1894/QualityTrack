@@ -343,8 +343,14 @@ public class DeliveryService {
 
             completedJobCase = workOrder.getJobCase();
             previousJobCaseStatus = completedJobCase.getStatus();
+            Instant completedAt = deliveryRepository
+                    .findLatestDeliveredAtByWorkOrderId(
+                            workOrder.getId(),
+                            DeliveryStatus.DELIVERED
+                    )
+                    .orElse(delivery.getDeliveredAt());
             try {
-                completedJobCase.complete(Instant.now());
+                completedJobCase.complete(completedAt);
             } catch (IllegalArgumentException | IllegalStateException exception) {
                 conflict(exception.getMessage());
             }
