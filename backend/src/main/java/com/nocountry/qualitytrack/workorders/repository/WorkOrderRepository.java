@@ -14,9 +14,19 @@ import java.util.Optional;
 
 public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long> {
 
-    long countByStatus(WorkOrderStatus status);
+    @Query("""
+            select workOrder.status as status,
+                   count(workOrder) as total
+            from WorkOrder workOrder
+            group by workOrder.status
+            """)
+    List<StatusCount> countGroupedByStatus();
 
-    long countByStatusIn(List<WorkOrderStatus> statuses);
+    interface StatusCount {
+        WorkOrderStatus getStatus();
+
+        long getTotal();
+    }
 
     boolean existsByJobCase_Id(Long caseId);
 
