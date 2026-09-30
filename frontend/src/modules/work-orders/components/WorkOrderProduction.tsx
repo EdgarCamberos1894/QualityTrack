@@ -8,6 +8,7 @@ import { ProductionMaterialsCard } from './ProductionMaterialsCard'
 import { ProductionOperationCard } from './ProductionOperationCard'
 import { ProductionProgressHeader } from './ProductionProgressHeader'
 import { StartOperationDialog } from './StartOperationDialog'
+import { ProductionBlocker } from './ProductionBlocker'
 import { useProductionMutations } from '../hooks/useProductionMutations'
 import type {
   CancelOperationExecutionFormValues,
@@ -17,8 +18,8 @@ import type {
 import type {
   OperationExecutionDto,
   RoutingOperationDto,
-  WorkOrder360Dto,
 } from '../types/workOrder.types'
+import type { WorkOrder360Dto } from '../types/workOrder360.types'
 
 interface WorkOrderProductionProps {
   data: WorkOrder360Dto
@@ -294,10 +295,3 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
   )
 }
 
-function ProductionBlocker({ text }: { text: string }) {
-  return (
-    <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-      {text}
-    </p>
-  )
-}
