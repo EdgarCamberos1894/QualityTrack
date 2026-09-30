@@ -25,6 +25,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
+    boolean existsByIdAndStatus(Long id, UserStatus status);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select u from User u where u.id = :userId")
     Optional<User> findByIdForUpdate(@Param("userId") Long userId);
