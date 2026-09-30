@@ -2,10 +2,8 @@ import { useState } from 'react'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
-import type {
-  WorkOrder360DocumentDto,
-  WorkOrderDocumentDto,
-} from '../types/workOrder.types'
+import type { WorkOrderDocumentDto } from '../types/workOrder.types'
+import type { WorkOrder360DocumentDto } from '../types/workOrder360.types'
 
 interface WorkOrderPinnedDocumentsProps {
   documents: WorkOrder360DocumentDto[]
