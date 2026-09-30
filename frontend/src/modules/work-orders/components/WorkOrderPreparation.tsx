@@ -6,7 +6,7 @@ import type {
   RoutingOperationFormValues,
   WorkOrderPlanningFormValues,
 } from '../schemas/workOrderPreparation.schemas'
-import type { WorkOrder360Dto } from '../types/workOrder.types'
+import type { WorkOrder360Dto } from '../types/workOrder360.types'
 import { WorkOrderPinnedDocuments } from './WorkOrderPinnedDocuments'
 import { WorkOrderPlanningCard } from './WorkOrderPlanningCard'
 import { WorkOrderRoutingCard } from './WorkOrderRoutingCard'
