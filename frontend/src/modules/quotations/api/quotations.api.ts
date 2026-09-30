@@ -3,6 +3,7 @@ import type { ApiResponse } from '@/shared/api/api.types'
 import type {
   QuotationDetailDto,
   QuotationDto,
+  CancelQuotationPayload,
   SendQuotationPayload,
   UpdateQuotationPayload,
 } from '../types/quotation.types'
@@ -73,6 +74,19 @@ export async function createQuotationRevision(
 ): Promise<QuotationDetailDto> {
   const response = await apiClient.post<ApiResponse<QuotationDetailDto>>(
     `/quotations/${quotationId}/revisions`,
+  )
+
+  return response.data.data
+}
+
+
+export async function cancelQuotation(
+  quotationId: number,
+  payload: CancelQuotationPayload,
+): Promise<QuotationDetailDto> {
+  const response = await apiClient.post<ApiResponse<QuotationDetailDto>>(
+    `/quotations/${quotationId}/cancel`,
+    payload,
   )
 
   return response.data.data
