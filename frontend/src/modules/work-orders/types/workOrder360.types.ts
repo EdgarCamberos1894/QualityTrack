@@ -1,4 +1,5 @@
 import type { MaterialLotDto, WorkOrderMaterialDto } from '@/modules/materials'
+import type { NonConformityDto, QualityInspectionDto } from './quality.types'
 import type {
   ProductionStatusDto,
   RoutingSheetDto,
@@ -57,22 +58,6 @@ export interface WorkOrder360DocumentDto {
   versions: DocumentVersionDto[]
 }
 
-export interface QualityInspectionDto {
-  id: number
-  workOrderId: number
-  workOrderNumber: string
-  status: 'PENDING' | 'IN_PROGRESS' | 'APPROVED' | 'REJECTED'
-  reworkNonConformityId: number | null
-  inspectorId: number | null
-  inspectorName: string | null
-  startedAt: string | null
-  completedAt: string | null
-  measurements: unknown[]
-  nonConformity: unknown | null
-  createdAt: string
-  updatedAt: string
-}
-
 export interface DeliveryDto {
   id: number
   workOrderId: number
@@ -107,8 +92,10 @@ export interface WorkOrder360Dto {
   production: ProductionStatusDto
   materials: WorkOrder360MaterialDto[]
   qualityInspections: QualityInspectionDto[]
-  nonConformities: unknown[]
+  nonConformities: NonConformityDto[]
   documents: WorkOrder360DocumentDto[]
   deliveries: DeliveryDto[]
   timeline: TraceabilityEventDto[]
 }
+
+export type { QualityInspectionDto } from './quality.types'

@@ -65,7 +65,7 @@ export function WorkOrderDetailPage() {
     }
 
     if (activeTab === 'quality') {
-      return <WorkOrderQuality inspections={query.data.qualityInspections} />
+      return <WorkOrderQuality data={query.data} />
     }
 
     if (activeTab === 'delivery') {

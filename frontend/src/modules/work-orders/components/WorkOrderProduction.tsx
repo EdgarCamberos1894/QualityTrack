@@ -7,6 +7,7 @@ import { CompleteExecutionDialog } from './CompleteExecutionDialog'
 import { ProductionMaterialsCard } from './ProductionMaterialsCard'
 import { ProductionOperationCard } from './ProductionOperationCard'
 import { ProductionProgressHeader } from './ProductionProgressHeader'
+import { QualityHandoffPanel } from './QualityHandoffPanel'
 import { StartOperationDialog } from './StartOperationDialog'
 import { ProductionBlocker } from './ProductionBlocker'
 import { useProductionMutations } from '../hooks/useProductionMutations'
@@ -234,18 +235,12 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
         onRecord={recordMaterial}
       />
 
-      {data.production.productionCompleted ? (
-        <section className="rounded-xl border border-blue-200 bg-blue-50 px-5 py-4">
-          <p className="text-xs font-semibold text-blue-950">
-            Producción completada · pendiente de handoff a Calidad
-          </p>
-          <p className="mt-1 text-[10px] leading-5 text-blue-800">
-            Todas las operaciones de la ruta de producción terminaron. El
-            siguiente paso es iniciar el flujo formal de inspección en Calidad;
-            los rechazos registrados aquí no sustituyen esa inspección.
-          </p>
-        </section>
-      ) : null}
+      <QualityHandoffPanel
+        workOrderId={data.workOrder.id}
+        workOrderStatus={data.workOrder.status}
+        productionCompleted={data.production.productionCompleted}
+        canHandoff={canExecute}
+      />
 
       <StartOperationDialog
         open={startOperation !== null}
