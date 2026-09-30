@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   useMaterialCertificateFileActions,
   useMaterialLots,
@@ -12,6 +12,7 @@ import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { Card } from '@/shared/components/ui/Card'
+import { cn } from '@/shared/lib/cn'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { formatResourceDate } from '../model/resourcePresenter'
 import type { CreateMaterialLotFormValues } from '../schemas/resource.schemas'
@@ -21,11 +22,13 @@ import { MaterialCertificateDialog } from './MaterialCertificateDialog'
 interface MaterialLotsPanelProps {
   material: MaterialDto | null
   canManage: boolean
+  highlightedLotId: number | null
 }
 
 export function MaterialLotsPanel({
   material,
   canManage,
+  highlightedLotId,
 }: MaterialLotsPanelProps) {
   const lotsQuery = useMaterialLots(material?.id ?? null)
   const mutations = useMaterialMutations()
@@ -84,6 +87,23 @@ export function MaterialLotsPanel({
   }
 
   const lots = lotsQuery.data ?? []
+
+  useEffect(() => {
+    if (
+      !highlightedLotId ||
+      !lots.some((lot) => lot.id === highlightedLotId)
+    ) {
+      return
+    }
+
+    const timeout = window.setTimeout(() => {
+      document
+        .getElementById(`material-lot-${highlightedLotId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 50)
+
+    return () => window.clearTimeout(timeout)
+  }, [highlightedLotId, lots])
 
   return (
     <Card className="overflow-hidden">
@@ -152,8 +172,13 @@ export function MaterialLotsPanel({
         <div className="divide-y divide-slate-100">
           {lots.map((lot) => (
             <article
+              id={`material-lot-${lot.id}`}
               key={lot.id}
-              className="grid gap-4 px-5 py-4 md:grid-cols-[minmax(160px,1fr)_minmax(160px,1fr)_150px_minmax(210px,auto)] md:items-center"
+              className={cn(
+                'scroll-mt-24 grid gap-4 px-5 py-4 transition md:grid-cols-[minmax(160px,1fr)_minmax(160px,1fr)_150px_minmax(210px,auto)] md:items-center',
+                highlightedLotId === lot.id &&
+                  'bg-amber-50/70 ring-2 ring-inset ring-amber-200',
+              )}
             >
               <div>
                 <p className="text-xs font-semibold text-slate-950">
