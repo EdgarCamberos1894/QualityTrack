@@ -50,7 +50,7 @@ export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
 
       <Card className="p-5">
         <h2 className="text-sm font-semibold text-slate-950">
-          Revisión interna
+          Gestión interna
         </h2>
         <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-5">
           <DataItem
@@ -74,6 +74,12 @@ export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
             label="Material técnico"
             value={jobCase.materialSpecification ? 'Definido' : 'Pendiente'}
           />
+          {jobCase.closedAt ? (
+            <DataItem
+              label="Cierre"
+              value={formatJobCaseDate(jobCase.closedAt)}
+            />
+          ) : null}
         </dl>
       </Card>
     </div>
