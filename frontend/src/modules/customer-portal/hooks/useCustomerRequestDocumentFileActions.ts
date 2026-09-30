@@ -39,7 +39,10 @@ export function useCustomerRequestDocumentFileActions(
   customerId: number,
   requestId: number,
 ) {
-  const [busyVersionId, setBusyVersionId] = useState<number | null>(null)
+  const [busy, setBusy] = useState<{
+    versionId: number
+    action: 'open' | 'download'
+  } | null>(null)
   const [error, setError] = useState<unknown>(null)
 
   const openVersion = async (
@@ -54,7 +57,9 @@ export function useCustomerRequestDocumentFileActions(
       previewWindow.document.body.textContent = 'Cargando documento…'
     }
 
-    setBusyVersionId(version.id)
+    if (busy) return
+
+    setBusy({ versionId: version.id, action: 'open' })
     setError(null)
 
     try {
@@ -70,7 +75,7 @@ export function useCustomerRequestDocumentFileActions(
       previewWindow?.close()
       setError(requestError)
     } finally {
-      setBusyVersionId(null)
+      setBusy(null)
     }
   }
 
@@ -78,7 +83,9 @@ export function useCustomerRequestDocumentFileActions(
     documentId: number,
     version: RequestDocumentVersionDto,
   ) => {
-    setBusyVersionId(version.id)
+    if (busy) return
+
+    setBusy({ versionId: version.id, action: 'download' })
     setError(null)
 
     try {
@@ -93,14 +100,14 @@ export function useCustomerRequestDocumentFileActions(
     } catch (requestError) {
       setError(requestError)
     } finally {
-      setBusyVersionId(null)
+      setBusy(null)
     }
   }
 
   const clearError = () => setError(null)
 
   return {
-    busyVersionId,
+    busy,
     error,
     clearError,
     openVersion,
