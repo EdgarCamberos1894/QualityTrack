@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import {
+  useMaterialCertificateFileActions,
   useMaterialLots,
   useMaterialMutations,
   type MaterialDto,
+  type MaterialLotDto,
 } from '@/modules/materials'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
@@ -13,6 +15,7 @@ import { Card } from '@/shared/components/ui/Card'
 import { formatResourceDate } from '../model/resourcePresenter'
 import type { CreateMaterialLotFormValues } from '../schemas/resource.schemas'
 import { CreateMaterialLotDialog } from './CreateMaterialLotDialog'
+import { MaterialCertificateDialog } from './MaterialCertificateDialog'
 
 interface MaterialLotsPanelProps {
   material: MaterialDto | null
@@ -25,7 +28,11 @@ export function MaterialLotsPanel({
 }: MaterialLotsPanelProps) {
   const lotsQuery = useMaterialLots(material?.id ?? null)
   const mutations = useMaterialMutations()
+  const certificateFile = useMaterialCertificateFileActions()
   const [createOpen, setCreateOpen] = useState(false)
+  const [certificateLot, setCertificateLot] = useState<MaterialLotDto | null>(
+    null,
+  )
 
   if (!material) {
     return (
@@ -53,6 +60,22 @@ export function MaterialLotsPanel({
           quantityReceived: values.quantityReceived,
         },
       })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  const uploadCertificate = async (file: File) => {
+    if (!certificateLot) return false
+
+    try {
+      await mutations.uploadCertificate.mutateAsync({
+        materialId: material.id,
+        lotId: certificateLot.id,
+        file,
+      })
+      setCertificateLot(null)
       return true
     } catch {
       return false
@@ -97,6 +120,14 @@ export function MaterialLotsPanel({
           </Button>
         ) : null}
       </div>
+
+      {certificateFile.error ? (
+        <div className="px-5 pt-4">
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            {getErrorMessage(certificateFile.error)}
+          </p>
+        </div>
+      ) : null}
 
       {lotsQuery.isPending ? (
         <div className="p-5">
@@ -150,12 +181,47 @@ export function MaterialLotsPanel({
                 </p>
               </div>
 
-              <div className="md:text-right">
+              <div className="flex flex-wrap items-center gap-2 md:justify-end">
                 {lot.certificateDocumentVersionId ? (
-                  <Badge tone="success">Certificado</Badge>
+                  <>
+                    <Badge tone="success">Certificado</Badge>
+                    {lot.certificateDocumentId ? (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        disabled={certificateFile.busyLotId === lot.id}
+                        onClick={() =>
+                          void certificateFile.open(
+                            lot.id,
+                            lot.certificateDocumentId as number,
+                            lot.certificateDocumentVersionId as number,
+                          )
+                        }
+                      >
+                        {certificateFile.busyLotId === lot.id
+                          ? 'Abriendo…'
+                          : 'Ver'}
+                      </Button>
+                    ) : null}
+                  </>
                 ) : (
                   <Badge tone="neutral">Sin certificado</Badge>
                 )}
+
+                {canManage ? (
+                  <Button
+                    size="sm"
+                    variant={lot.certificateDocumentVersionId ? 'ghost' : 'secondary'}
+                    onClick={() => {
+                      mutations.uploadCertificate.reset()
+                      setCertificateLot(lot)
+                    }}
+                  >
+                    {lot.certificateDocumentVersionId
+                      ? 'Actualizar'
+                      : 'Adjuntar'}
+                  </Button>
+                ) : null}
               </div>
             </article>
           ))}
@@ -171,6 +237,18 @@ export function MaterialLotsPanel({
           setCreateOpen(false)
         }}
         onSubmit={createLot}
+      />
+
+      <MaterialCertificateDialog
+        material={material}
+        lot={certificateLot}
+        submitting={mutations.uploadCertificate.isPending}
+        error={mutations.uploadCertificate.error}
+        onClose={() => {
+          mutations.uploadCertificate.reset()
+          setCertificateLot(null)
+        }}
+        onSubmit={uploadCertificate}
       />
     </Card>
   )
