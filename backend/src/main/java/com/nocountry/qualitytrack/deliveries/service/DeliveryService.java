@@ -9,10 +9,14 @@ import com.nocountry.qualitytrack.deliveries.dto.response.DeliveryResponse;
 import com.nocountry.qualitytrack.deliveries.entity.Delivery;
 import com.nocountry.qualitytrack.deliveries.enums.DeliveryStatus;
 import com.nocountry.qualitytrack.deliveries.repository.DeliveryRepository;
+import com.nocountry.qualitytrack.documents.dto.request.CreateDocumentRequest;
+import com.nocountry.qualitytrack.documents.dto.response.DocumentResponse;
 import com.nocountry.qualitytrack.documents.entity.DocumentVersion;
 import com.nocountry.qualitytrack.documents.enums.DocumentStatus;
 import com.nocountry.qualitytrack.documents.repository.DocumentVersionRepository;
 import com.nocountry.qualitytrack.documents.service.DocumentAccessService;
+import com.nocountry.qualitytrack.documents.service.DocumentService;
+import com.nocountry.qualitytrack.documents.service.DocumentVersionMutationResult;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.requests.enums.JobCaseStatus;
 import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
@@ -28,6 +32,7 @@ import com.nocountry.qualitytrack.workorders.repository.WorkOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -46,6 +51,7 @@ public class DeliveryService {
     private final JobCaseRepository jobCaseRepository;
     private final DocumentVersionRepository documentVersionRepository;
     private final DocumentAccessService documentAccessService;
+    private final DocumentService documentService;
     private final TraceabilityService traceabilityService;
 
     @Transactional
@@ -217,6 +223,113 @@ public class DeliveryService {
                 delivery.getStatus().name(),
                 currentUserId,
                 metadata("documentVersionId", evidence.getId())
+        );
+
+        return DeliveryResponse.from(delivery);
+    }
+
+    @Transactional
+    public DeliveryResponse uploadEvidence(
+            Long currentUserId,
+            Long deliveryId,
+            MultipartFile file
+    ) {
+        accessPolicy.requireLogisticsActor(currentUserId);
+        LockedDelivery locked = lockWorkOrderThenDelivery(deliveryId);
+        WorkOrder workOrder = locked.workOrder();
+        Delivery delivery = locked.delivery();
+        requireReadyForDelivery(workOrder);
+
+        if (delivery.getStatus() != DeliveryStatus.PENDING
+                && delivery.getStatus() != DeliveryStatus.DISPATCHED) {
+            conflict("La evidencia solo puede modificarse antes de confirmar la entrega.");
+        }
+
+        Long caseId = workOrder.getJobCase().getId();
+        DocumentVersion evidence;
+        Long documentId;
+
+        if (delivery.getEvidenceDocumentVersion() == null) {
+            DocumentResponse document = documentService.create(
+                    currentUserId,
+                    new CreateDocumentRequest(
+                            caseId,
+                            DELIVERY_EVIDENCE_TYPE,
+                            "Evidencia entrega #" + delivery.getId(),
+                            "Evidencia de entrega de la OT " + workOrder.getWorkOrderNumber() + "."
+                    ),
+                    file
+            );
+
+            documentId = document.id();
+            evidence = documentVersionRepository.getReferenceById(
+                    document.currentVersion().id()
+            );
+
+            traceabilityService.record(
+                    workOrder.getJobCase(),
+                    TraceabilityAggregateType.DOCUMENT,
+                    documentId,
+                    TraceabilityEventType.DOCUMENT_ADDED,
+                    null,
+                    null,
+                    currentUserId,
+                    metadata(
+                            "deliveryId", delivery.getId(),
+                            "documentType", DELIVERY_EVIDENCE_TYPE,
+                            "fileName", document.currentVersion().fileName()
+                    )
+            );
+        } else {
+            documentId = delivery.getEvidenceDocumentVersion().getDocument().getId();
+            DocumentVersionMutationResult result = documentService.addVersion(
+                    currentUserId,
+                    caseId,
+                    documentId,
+                    file
+            );
+
+            evidence = documentVersionRepository.getReferenceById(
+                    result.version().id()
+            );
+
+            traceabilityService.record(
+                    workOrder.getJobCase(),
+                    TraceabilityAggregateType.DOCUMENT_VERSION,
+                    result.version().id(),
+                    TraceabilityEventType.DOCUMENT_VERSION_ADDED,
+                    null,
+                    null,
+                    currentUserId,
+                    metadata(
+                            "deliveryId", delivery.getId(),
+                            "documentId", documentId,
+                            "version", result.version().version(),
+                            "fileName", result.version().fileName()
+                    )
+            );
+        }
+
+        try {
+            delivery.attachEvidence(evidence);
+        } catch (IllegalArgumentException | IllegalStateException exception) {
+            conflict(exception.getMessage());
+        }
+
+        delivery = deliveryRepository.saveAndFlush(delivery);
+
+        traceabilityService.record(
+                workOrder.getJobCase(),
+                TraceabilityAggregateType.DELIVERY,
+                delivery.getId(),
+                TraceabilityEventType.DELIVERY_EVIDENCE_ATTACHED,
+                delivery.getStatus().name(),
+                delivery.getStatus().name(),
+                currentUserId,
+                metadata(
+                        "documentId", documentId,
+                        "documentVersionId", evidence.getId()
+                )
         );
 
         return DeliveryResponse.from(delivery);
