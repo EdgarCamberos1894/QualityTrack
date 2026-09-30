@@ -4,6 +4,7 @@ export const JOB_CASE_STATUSES = [
   'WAITING_CUSTOMER_INFO',
   'READY_FOR_QUOTATION',
   'IN_PRODUCTION',
+  'COMPLETED',
   'CANCELLED',
 ] as const
 
