@@ -52,7 +52,7 @@ export function DocumentCenterPage() {
       <PageHeader
         eyebrow="Operación"
         title="Centro documental"
-        description="Consulta transversal. La fuente sigue siendo el expediente y sus versiones; aquí no se duplican archivos."
+        description="Consulta transversal de documentos de expediente y recursos operativos, conservando su origen y el historial de versiones."
       />
 
       {query.isPending ? (
