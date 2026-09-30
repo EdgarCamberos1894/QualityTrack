@@ -94,7 +94,11 @@ export function WorkOrderPlanningCard({
         </div>
 
         {canEdit && !editing ? (
-          <Button size="sm" variant="secondary" onClick={() => setEditing(true)}>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => setEditing(true)}
+          >
             Editar planificación
           </Button>
         ) : null}

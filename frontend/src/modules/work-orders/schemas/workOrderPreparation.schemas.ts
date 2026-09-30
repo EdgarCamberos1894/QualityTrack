@@ -39,7 +39,5 @@ export const reopenRoutingSchema = z.object({
 export type WorkOrderPlanningFormValues = z.infer<
   typeof workOrderPlanningSchema
 >
-export type RoutingOperationFormValues = z.infer<
-  typeof routingOperationSchema
->
+export type RoutingOperationFormValues = z.infer<typeof routingOperationSchema>
 export type ReopenRoutingFormValues = z.infer<typeof reopenRoutingSchema>

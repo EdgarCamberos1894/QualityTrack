@@ -122,11 +122,10 @@ export function WorkOrderPinnedDocuments({
                       size="sm"
                       variant={pinned ? 'secondary' : 'primary'}
                       disabled={
-                        saving || pinned?.documentVersionId === selectedVersionId
+                        saving ||
+                        pinned?.documentVersionId === selectedVersionId
                       }
-                      onClick={() =>
-                        void onPin(document.id, selectedVersionId)
-                      }
+                      onClick={() => void onPin(document.id, selectedVersionId)}
                     >
                       {pinned ? 'Actualizar versión' : 'Fijar versión'}
                     </Button>
@@ -140,8 +139,8 @@ export function WorkOrderPinnedDocuments({
 
       {!canEdit ? (
         <p className="mt-4 text-[10px] leading-5 text-slate-500">
-          Las versiones quedan bloqueadas al aprobar la hoja de ruta o cuando
-          la orden sale de preparación.
+          Las versiones quedan bloqueadas al aprobar la hoja de ruta o cuando la
+          orden sale de preparación.
         </p>
       ) : null}
     </section>

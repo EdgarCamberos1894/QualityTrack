@@ -274,7 +274,6 @@ export interface CreateWorkOrderPayload {
   plannedEndDate: string
 }
 
-
 export interface UpdateWorkOrderPlanningPayload {
   priority: WorkOrderPriority
   plannedStartDate: string

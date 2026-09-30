@@ -17,7 +17,9 @@ export function RoutingOperationsList({
   onEdit,
   onRemove,
 }: RoutingOperationsListProps) {
-  const [deleteCandidateId, setDeleteCandidateId] = useState<number | null>(null)
+  const [deleteCandidateId, setDeleteCandidateId] = useState<number | null>(
+    null,
+  )
 
   if (operations.length === 0) {
     return (

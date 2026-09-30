@@ -75,7 +75,9 @@ export function WorkOrderRoutingCard({
 
   const nextSequence = useMemo(() => {
     if (!routing || routing.operations.length === 0) return 1
-    return Math.max(...routing.operations.map((item) => item.sequenceNumber)) + 1
+    return (
+      Math.max(...routing.operations.map((item) => item.sequenceNumber)) + 1
+    )
   }, [routing])
 
   const openCreateOperation = () => {
@@ -109,10 +111,7 @@ export function WorkOrderRoutingCard({
           </div>
 
           {canCreate ? (
-            <Button
-              onClick={() => void onCreate()}
-              disabled={pending.create}
-            >
+            <Button onClick={() => void onCreate()} disabled={pending.create}>
               {pending.create ? 'Creando ruta…' : 'Crear hoja de ruta'}
             </Button>
           ) : null}
@@ -139,13 +138,9 @@ export function WorkOrderRoutingCard({
 
   const editable = routing.status === 'DRAFT' && canDesign
   const canApprove =
-    editable &&
-    routing.operations.length > 0 &&
-    pinnedDocumentCount > 0
+    editable && routing.operations.length > 0 && pinnedDocumentCount > 0
   const canRelease =
-    routing.status === 'APPROVED' &&
-    canDesign &&
-    workOrderStatus === 'CREATED'
+    routing.status === 'APPROVED' && canDesign && workOrderStatus === 'CREATED'
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-5">
@@ -217,9 +212,7 @@ export function WorkOrderRoutingCard({
       {routing.status === 'APPROVED' ? (
         <div className="mt-5 flex flex-col gap-3 rounded-xl border border-blue-200 bg-blue-50/60 p-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs font-semibold text-blue-950">
-              Ruta aprobada
-            </p>
+            <p className="text-xs font-semibold text-blue-950">Ruta aprobada</p>
             <p className="mt-1 text-[10px] leading-5 text-blue-800">
               Liberarla la vuelve histórica y mueve la OT a Lista para
               producción. Si necesita corrección, reábrela primero.

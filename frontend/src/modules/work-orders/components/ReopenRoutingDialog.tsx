@@ -66,8 +66,8 @@ export function ReopenRoutingDialog({
             Reabrir hoja de ruta
           </h2>
           <p className="mt-1 text-xs text-slate-500">
-            La ruta volverá de APPROVED a DRAFT. El motivo quedará registrado
-            en trazabilidad.
+            La ruta volverá de APPROVED a DRAFT. El motivo quedará registrado en
+            trazabilidad.
           </p>
         </div>
 
