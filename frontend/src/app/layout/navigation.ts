@@ -29,7 +29,7 @@ export const navigationItems: NavigationItem[] = [
     workOrderTab: 'delivery',
   },
   { label: 'Documentos', href: '/documents' },
-  { label: 'Clientes' },
+  { label: 'Clientes', href: '/customers' },
   {
     label: 'Usuarios y accesos',
     href: '/internal-users',
