@@ -7,10 +7,7 @@ import {
   formatCustomerRequestDateTime,
   formatFileSize,
 } from '../model/customerRequestPresenter'
-import type {
-  RequestDocumentDto,
-  RequestDocumentVersionDto,
-} from '../types/customerRequest.types'
+import type { RequestDocumentDto } from '../types/customerRequest.types'
 import { RequestDocumentDialog } from './RequestDocumentDialog'
 import { RequestDocumentHistoryDialog } from './RequestDocumentHistoryDialog'
 
@@ -115,24 +112,28 @@ export function CustomerRequestDocuments({
                       <Button
                         size="sm"
                         variant="secondary"
-                        disabled={files.busyVersionId === version.id}
+                        disabled={files.busy !== null}
                         onClick={() =>
                           void files.openVersion(documentItem.id, version)
                         }
                       >
-                        {files.busyVersionId === version.id
+                        {files.busy?.versionId === version.id &&
+                        files.busy.action === 'open'
                           ? 'Abriendo…'
                           : 'Ver'}
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
-                        disabled={files.busyVersionId === version.id}
+                        disabled={files.busy !== null}
                         onClick={() =>
                           void files.downloadVersion(documentItem.id, version)
                         }
                       >
-                        Descargar
+                        {files.busy?.versionId === version.id &&
+                        files.busy.action === 'download'
+                          ? 'Descargando…'
+                          : 'Descargar'}
                       </Button>
                       <Button
                         size="sm"
@@ -233,7 +234,7 @@ export function CustomerRequestDocuments({
         requestId={requestId}
         documentId={history?.id ?? null}
         documentName={history?.name ?? ''}
-        busyVersionId={files.busyVersionId}
+        busy={files.busy}
         onClose={() => setHistory(null)}
         onOpenVersion={(version) => {
           if (history) void files.openVersion(history.id, version)
