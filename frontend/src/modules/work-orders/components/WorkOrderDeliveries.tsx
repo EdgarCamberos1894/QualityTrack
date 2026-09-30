@@ -83,6 +83,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
     mutations.create.error ??
     mutations.dispatch.error ??
     mutations.complete.error ??
+    mutations.uploadEvidence.error ??
     mutations.attachEvidence.error ??
     mutations.cancel.error
 
@@ -154,6 +155,22 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
     }
   }
 
+  const uploadEvidence = async (file: File) => {
+    if (!target) return false
+
+    try {
+      await mutations.uploadEvidence.mutateAsync({
+        deliveryId: target.id,
+        file,
+      })
+      setTarget(null)
+      setDialog(null)
+      return true
+    } catch {
+      return false
+    }
+  }
+
   const attachEvidence = async (values: AttachDeliveryEvidenceFormValues) => {
     if (!target) return false
 
@@ -189,6 +206,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
   const openDialog = (delivery: DeliveryDto, type: DialogType) => {
     mutations.dispatch.reset()
     mutations.complete.reset()
+    mutations.uploadEvidence.reset()
     mutations.attachEvidence.reset()
     mutations.cancel.reset()
     setTarget(delivery)
@@ -273,7 +291,6 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
               key={delivery.id}
               delivery={delivery}
               canManage={canManage}
-              hasEvidenceOptions={evidenceOptions.length > 0}
               onDispatch={() => openDialog(delivery, 'dispatch')}
               onComplete={() => openDialog(delivery, 'complete')}
               onEvidence={() => openDialog(delivery, 'evidence')}
@@ -332,13 +349,17 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
         delivery={dialog === 'evidence' ? target : null}
         options={evidenceOptions}
         submitting={mutations.attachEvidence.isPending}
+        uploading={mutations.uploadEvidence.isPending}
         error={mutations.attachEvidence.error}
+        uploadError={mutations.uploadEvidence.error}
         onClose={() => {
+          mutations.uploadEvidence.reset()
           mutations.attachEvidence.reset()
           setTarget(null)
           setDialog(null)
         }}
         onSubmit={attachEvidence}
+        onUpload={uploadEvidence}
       />
 
       <CancelDeliveryDialog
