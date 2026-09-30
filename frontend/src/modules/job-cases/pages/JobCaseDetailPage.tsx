@@ -1,5 +1,10 @@
-import { useMemo, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { useCreateQuotation } from '@/modules/quotations'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
@@ -44,6 +49,7 @@ function resolveTab(value: string | null): JobCaseDetailTab {
 
 export function JobCaseDetailPage() {
   const { caseId } = useParams()
+  const location = useLocation()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const [actionPanel, setActionPanel] = useState<ActionPanel>(null)
@@ -116,6 +122,20 @@ export function JobCaseDetailPage() {
     timelineQuery.isError,
     timelineQuery.isPending,
   ])
+
+  useEffect(() => {
+    if (!detailQuery.data || !location.hash) return
+
+    const frame = window.requestAnimationFrame(() => {
+      const targetId = decodeURIComponent(location.hash.slice(1))
+      document.getElementById(targetId)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [activeTab, detailQuery.data, location.hash])
 
   if (validId === null || !session) {
     return (

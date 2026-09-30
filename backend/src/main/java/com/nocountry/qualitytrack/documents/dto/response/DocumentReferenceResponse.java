@@ -6,6 +6,7 @@ public record DocumentReferenceResponse(
         DocumentContext context,
         Long resourceId,
         Long documentVersionId,
-        Integer version
+        Integer version,
+        String label
 ) {
 }

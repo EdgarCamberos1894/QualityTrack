@@ -11,8 +11,11 @@ import java.util.Set;
 public record DocumentCenterResponse(
         Long id,
         Long caseId,
+        String caseNumber,
         Long requestId,
+        String requestNumber,
         Long customerId,
+        String customerName,
         String documentType,
         String name,
         String description,
@@ -43,8 +46,11 @@ public record DocumentCenterResponse(
         return new DocumentCenterResponse(
                 document.getId(),
                 jobCase.getId(),
+                jobCase.getCaseNumber(),
                 request.getId(),
+                request.getRequestNumber(),
                 customer.getId(),
+                customer.getName(),
                 document.getDocumentType(),
                 document.getName(),
                 document.getDescription(),

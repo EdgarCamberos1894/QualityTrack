@@ -24,6 +24,7 @@ export const navigationItems: NavigationItem[] = [
     href: '/deliveries',
     workOrderTab: 'delivery',
   },
+  { label: 'Documentos', href: '/documents' },
   { label: 'Clientes' },
   { label: 'Usuarios y accesos' },
 ]

@@ -94,6 +94,7 @@ class DocumentCenterServiceTest {
         when(workOrderDocument.getDocument()).thenReturn(document);
         when(workOrderDocument.getWorkOrder()).thenReturn(workOrder);
         when(workOrder.getId()).thenReturn(70L);
+        when(workOrder.getWorkOrderNumber()).thenReturn("OT-00126");
         when(workOrderDocument.getDocumentVersion()).thenReturn(historicalVersion);
         when(historicalVersion.getId()).thenReturn(20L);
         when(historicalVersion.getVersion()).thenReturn(1);
@@ -114,6 +115,9 @@ class DocumentCenterServiceTest {
 
         assertEquals(1, response.size());
         assertEquals(7L, response.get(0).id());
+        assertEquals("CASE-00126", response.get(0).caseNumber());
+        assertEquals("REQ-00126", response.get(0).requestNumber());
+        assertEquals("Cliente Demo", response.get(0).customerName());
         assertEquals(21L, response.get(0).currentVersion().id());
         assertEquals(List.of(70L), response.get(0).workOrderIds());
         assertEquals(List.of(90L), response.get(0).deliveryIds());
@@ -126,6 +130,7 @@ class DocumentCenterServiceTest {
         assertEquals(70L, response.get(0).references().get(0).resourceId());
         assertEquals(20L, response.get(0).references().get(0).documentVersionId());
         assertEquals(1, response.get(0).references().get(0).version());
+        assertEquals("OT-00126", response.get(0).references().get(0).label());
         assertEquals(DocumentContext.DELIVERY, response.get(0).references().get(1).context());
         assertEquals(90L, response.get(0).references().get(1).resourceId());
         assertEquals(21L, response.get(0).references().get(1).documentVersionId());
@@ -181,10 +186,13 @@ class DocumentCenterServiceTest {
         lenient().when(document.getCreatedAt()).thenReturn(Instant.parse("2026-09-20T10:00:00Z"));
 
         lenient().when(jobCase.getId()).thenReturn(12L);
+        lenient().when(jobCase.getCaseNumber()).thenReturn("CASE-00126");
         lenient().when(jobCase.getCustomerRequest()).thenReturn(customerRequest);
         lenient().when(customerRequest.getId()).thenReturn(30L);
+        lenient().when(customerRequest.getRequestNumber()).thenReturn("REQ-00126");
         lenient().when(customerRequest.getCustomer()).thenReturn(customer);
         lenient().when(customer.getId()).thenReturn(40L);
+        lenient().when(customer.getName()).thenReturn("Cliente Demo");
 
         lenient().when(creator.getId()).thenReturn(10L);
         lenient().when(creator.getFirstName()).thenReturn("Ana");

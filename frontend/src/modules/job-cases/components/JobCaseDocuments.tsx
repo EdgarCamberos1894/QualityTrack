@@ -20,7 +20,8 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
       {documents.map((document) => (
         <article
           key={document.id}
-          className="rounded-xl border border-[#d9e2ee] bg-white p-4"
+          id={`document-${document.id}`}
+          className="scroll-mt-24 rounded-xl border border-[#d9e2ee] bg-white p-4 target:border-blue-400 target:ring-4 target:ring-blue-100"
         >
           <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-600">
             {document.documentType}

@@ -200,7 +200,8 @@ public class DocumentCenterService {
                     DocumentContext.WORK_ORDER,
                     reference.getWorkOrder().getId(),
                     version.getId(),
-                    version.getVersion()
+                    version.getVersion(),
+                    reference.getWorkOrder().getWorkOrderNumber()
             ));
         }
 
@@ -210,7 +211,8 @@ public class DocumentCenterService {
                     DocumentContext.MATERIAL,
                     reference.getId(),
                     version.getId(),
-                    version.getVersion()
+                    version.getVersion(),
+                    "Lote " + reference.getLotNumber()
             ));
         }
 
@@ -220,7 +222,8 @@ public class DocumentCenterService {
                     DocumentContext.DELIVERY,
                     reference.getId(),
                     version.getId(),
-                    version.getVersion()
+                    version.getVersion(),
+                    "Entrega #" + reference.getId()
             ));
         }
 

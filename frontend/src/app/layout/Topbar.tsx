@@ -20,6 +20,10 @@ function getInitials(email: string): string {
 }
 
 function getBreadcrumb(pathname: string, search: string): string {
+  if (pathname === '/documents') {
+    return 'Operación / Centro documental'
+  }
+
   if (pathname === '/production') {
     return 'Operación / Producción'
   }
