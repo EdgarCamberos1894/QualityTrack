@@ -3,6 +3,7 @@ package com.nocountry.qualitytrack.quotations.repository;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -28,6 +29,39 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
 
         long getTotal();
     }
+
+    @EntityGraph(attributePaths = {
+            "jobCase",
+            "jobCase.customerRequest",
+            "jobCase.customerRequest.customer",
+            "createdByUser",
+            "cancelledByUser"
+    })
+    @Query("""
+            select quotation
+            from Quotation quotation
+            join quotation.jobCase jobCase
+            join jobCase.customerRequest request
+            join request.customer customer
+            where (
+                    lower(quotation.quotationNumber) like :pattern
+                    or lower(jobCase.caseNumber) like :pattern
+                    or lower(request.requestNumber) like :pattern
+                    or lower(request.title) like :pattern
+                    or lower(customer.name) like :pattern
+            )
+              and not exists (
+                    select newer.id
+                    from Quotation newer
+                    where newer.quotationNumber = quotation.quotationNumber
+                      and newer.revision > quotation.revision
+              )
+            order by quotation.updatedAt desc, quotation.id desc
+            """)
+    List<Quotation> searchCurrentInternal(
+            @Param("pattern") String pattern,
+            Pageable pageable
+    );
 
     boolean existsByJobCase_Id(Long caseId);
 
