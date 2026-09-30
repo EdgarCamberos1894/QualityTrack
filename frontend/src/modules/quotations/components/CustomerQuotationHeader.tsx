@@ -14,6 +14,26 @@ interface CustomerQuotationHeaderProps {
   onApprove: () => void
 }
 
+function statusDescription(
+  quotation: CustomerQuotationDetailDto,
+  includesAdjustmentResponse: boolean,
+): string {
+  if (includesAdjustmentResponse) {
+    return 'Respuesta al ajuste incluida'
+  }
+
+  if (quotation.customerStatus === 'ADJUSTMENT_REQUESTED') {
+    return 'Nueva revisión en preparación'
+  }
+
+  if (quotation.customerStatus === 'SENT') {
+    return `Vigente hasta ${formatQuotationDate(quotation.validUntil)}`
+  }
+
+  return getCustomerQuotationStatusPresentation(quotation.customerStatus)
+    .description
+}
+
 export function CustomerQuotationHeader({
   quotation,
   customerName,
@@ -34,13 +54,10 @@ export function CustomerQuotationHeader({
     quotation.customerStatus === 'ADJUSTMENT_REQUESTED'
 
   const label = includesAdjustmentResponse ? 'Nueva revisión' : status.label
-  const description = includesAdjustmentResponse
-    ? 'Respuesta al ajuste incluida'
-    : waitingForAdjustment
-      ? 'Nueva revisión en preparación'
-      : quotation.customerStatus === 'SENT'
-        ? `Vigente hasta ${formatQuotationDate(quotation.validUntil)}`
-        : status.description
+  const description = statusDescription(
+    quotation,
+    includesAdjustmentResponse,
+  )
 
   return (
     <header className="mb-4 flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
