@@ -112,7 +112,7 @@ export function GlobalSearch() {
             <GlobalSearchResults
               query={query}
               results={results}
-              pending={search.isFetching}
+              pending={search.isFetching || search.isDebouncing}
               error={search.error}
               onSelect={select}
             />
@@ -162,7 +162,7 @@ export function GlobalSearch() {
             <GlobalSearchResults
               query={query}
               results={results}
-              pending={search.isFetching}
+              pending={search.isFetching || search.isDebouncing}
               error={search.error}
               onSelect={select}
             />
