@@ -17,6 +17,7 @@ export const navigationItems: NavigationItem[] = [
     href: '/production',
     workOrderTab: 'production',
   },
+  { label: 'Recursos', href: '/resources' },
   {
     label: 'Calidad',
     href: '/quality',

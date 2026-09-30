@@ -20,6 +20,7 @@ import { DocumentCenterPage } from '@/modules/document-center'
 import { HomePage } from '@/modules/home'
 import { JobCaseDetailPage, JobCasesPage } from '@/modules/job-cases'
 import { InternalUsersPage } from '@/modules/internal-users'
+import { OperationalResourcesPage } from '@/modules/operational-resources'
 import {
   CustomerQuotationDetailPage,
   CustomerQuotationsPage,
@@ -65,6 +66,7 @@ export const router = createBrowserRouter([
                 element: <WorkOrderDetailPage />,
               },
               { path: '/production', element: <ProductionPage /> },
+              { path: '/resources', element: <OperationalResourcesPage /> },
               { path: '/quality', element: <QualityPage /> },
               { path: '/deliveries', element: <DeliveriesPage /> },
               { path: '/documents', element: <DocumentCenterPage /> },

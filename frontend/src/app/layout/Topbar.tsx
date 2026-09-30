@@ -24,6 +24,10 @@ function getBreadcrumb(pathname: string, search: string): string {
     return 'Operación / Producción'
   }
 
+  if (pathname === '/resources') {
+    return 'Operación / Recursos de producción'
+  }
+
   if (pathname === '/quality') {
     return 'Operación / Calidad'
   }
