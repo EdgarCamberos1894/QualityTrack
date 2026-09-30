@@ -44,17 +44,17 @@ public record DocumentCenterResponse(
             List<DocumentReferenceResponse> references
     ) {
         var jobCase = document.getJobCase();
-        var request = jobCase.getCustomerRequest();
-        var customer = request.getCustomer();
+        var request = jobCase == null ? null : jobCase.getCustomerRequest();
+        var customer = request == null ? null : request.getCustomer();
 
         return new DocumentCenterResponse(
                 document.getId(),
-                jobCase.getId(),
-                request.getId(),
-                customer.getId(),
-                customer.getName(),
-                request.getRequestNumber(),
-                jobCase.getCaseNumber(),
+                jobCase == null ? null : jobCase.getId(),
+                request == null ? null : request.getId(),
+                customer == null ? null : customer.getId(),
+                customer == null ? null : customer.getName(),
+                request == null ? null : request.getRequestNumber(),
+                jobCase == null ? null : jobCase.getCaseNumber(),
                 document.getDocumentType(),
                 document.getName(),
                 document.getDescription(),
