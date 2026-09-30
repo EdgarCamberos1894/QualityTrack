@@ -59,6 +59,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             left join d.jobCase jc
             left join jc.customerRequest cr
             left join cr.customer cust
+            left join d.materialLot ownedLot
             where d.status = :status
               and (:caseId is null or jc.id = :caseId)
               and (:customerId is null or cust.id = :customerId)
@@ -86,7 +87,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
               )
               and (
                     :materialLotId is null
-                    or d.materialLot.id = :materialLotId
+                    or ownedLot.id = :materialLotId
                     or exists (
                         select lot.id
                         from MaterialLot lot
