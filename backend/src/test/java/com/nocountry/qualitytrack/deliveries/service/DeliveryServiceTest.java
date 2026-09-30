@@ -6,6 +6,8 @@ import com.nocountry.qualitytrack.deliveries.dto.request.CreateDeliveryRequest;
 import com.nocountry.qualitytrack.deliveries.entity.Delivery;
 import com.nocountry.qualitytrack.deliveries.enums.DeliveryStatus;
 import com.nocountry.qualitytrack.deliveries.repository.DeliveryRepository;
+import com.nocountry.qualitytrack.documents.entity.Document;
+import com.nocountry.qualitytrack.documents.entity.DocumentVersion;
 import com.nocountry.qualitytrack.documents.repository.DocumentVersionRepository;
 import com.nocountry.qualitytrack.documents.service.DocumentAccessService;
 import com.nocountry.qualitytrack.documents.service.DocumentService;
@@ -209,6 +211,26 @@ class DeliveryServiceTest {
         );
 
         Delivery dispatched = dispatchedDelivery(4);
+        Document evidenceDocument = Document.create(
+                jobCase,
+                "DELIVERY_EVIDENCE",
+                "Acuse de entrega",
+                null,
+                logistics
+        );
+        ReflectionTestUtils.setField(evidenceDocument, "id", 70L);
+        DocumentVersion evidenceVersion = DocumentVersion.upload(
+                evidenceDocument,
+                1,
+                "acuse-firmado.pdf",
+                "deliveries/acuse-firmado.pdf",
+                "application/pdf",
+                120L,
+                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                logistics
+        );
+        ReflectionTestUtils.setField(evidenceVersion, "id", 71L);
+        dispatched.attachEvidence(evidenceVersion);
 
         when(deliveryRepository
                 .findAllByWorkOrder_JobCase_CustomerRequest_IdAndWorkOrder_JobCase_CustomerRequest_Customer_IdOrderByCreatedAtAscIdAsc(
@@ -221,6 +243,9 @@ class DeliveryServiceTest {
 
         assertEquals(1, response.size());
         assertEquals(DeliveryStatus.DISPATCHED, response.get(0).status());
+        assertEquals(70L, response.get(0).evidenceDocumentId());
+        assertEquals(71L, response.get(0).evidenceDocumentVersionId());
+        assertEquals("acuse-firmado.pdf", response.get(0).evidenceFileName());
     }
 
     @Test
