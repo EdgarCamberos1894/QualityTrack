@@ -31,12 +31,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("""
-            select distinct u
+            select u
             from User u
-            join UserSystemRole r on r.user = u
             where u.accountType = :accountType
               and u.status = :status
-              and r.id.role = :role
+              and u.id in (
+                  select r.user.id
+                  from UserSystemRole r
+                  where r.id.role = :role
+              )
             order by u.id
             """)
     List<User> findInternalUsersByRoleAndStatusForUpdate(
