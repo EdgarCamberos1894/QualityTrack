@@ -5,6 +5,7 @@ import { useDocumentVersions } from '../hooks/useDocumentCenter'
 import {
   formatDocumentDateTime,
   formatDocumentFileSize,
+  getDocumentSourceLabel,
 } from '../model/documentCenterPresenter'
 import type { DocumentCenterDto } from '../types/documentCenter.types'
 
@@ -46,7 +47,7 @@ export function DocumentHistoryDialog({
             {document.name}
           </h2>
           <p className="mt-1 text-xs text-slate-500">
-            {document.customerName} · {document.requestNumber}
+            {getDocumentSourceLabel(document)}
           </p>
         </div>
 
