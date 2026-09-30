@@ -22,7 +22,8 @@ public record CustomerDeliveryResponse(
         Instant deliveredAt,
         String receivedByName,
         Long evidenceDocumentId,
-        Long evidenceDocumentVersionId
+        Long evidenceDocumentVersionId,
+        String evidenceFileName
 ) {
     public static CustomerDeliveryResponse from(DeliveryResponse delivery) {
         return new CustomerDeliveryResponse(
@@ -43,7 +44,8 @@ public record CustomerDeliveryResponse(
                 delivery.deliveredAt(),
                 delivery.receivedByName(),
                 delivery.evidenceDocumentId(),
-                delivery.evidenceDocumentVersionId()
+                delivery.evidenceDocumentVersionId(),
+                delivery.evidenceFileName()
         );
     }
 }
