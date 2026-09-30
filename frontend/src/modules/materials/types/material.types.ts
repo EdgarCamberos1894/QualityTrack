@@ -1,0 +1,42 @@
+export interface MaterialDto {
+  id: number
+  code: string
+  name: string
+  specification: string | null
+  unit: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface MaterialLotDto {
+  id: number
+  materialId: number
+  materialCode: string
+  materialName: string
+  lotNumber: string
+  supplier: string | null
+  receivedAt: string
+  quantityReceived: number
+  certificateDocumentVersionId: number | null
+  createdAt: string
+}
+
+export interface WorkOrderMaterialDto {
+  id: number
+  workOrderId: number
+  materialLotId: number
+  materialId: number
+  materialCode: string
+  materialName: string
+  lotNumber: string
+  quantityUsed: number
+  unit: string
+  recordedByUserId: number
+  recordedByName: string | null
+  recordedAt: string
+}
+
+export interface RecordMaterialConsumptionPayload {
+  materialLotId: number
+  quantityUsed: number
+}
