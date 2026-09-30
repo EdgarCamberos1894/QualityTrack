@@ -1,7 +1,7 @@
 export interface NavigationItem {
   label: string
   href?: string
-  workOrderTab?: 'production' | 'quality'
+  workOrderTab?: 'production' | 'quality' | 'delivery'
 }
 
 export const navigationItems: NavigationItem[] = [
@@ -18,6 +18,11 @@ export const navigationItems: NavigationItem[] = [
     label: 'Calidad',
     href: '/quality',
     workOrderTab: 'quality',
+  },
+  {
+    label: 'Entregas',
+    href: '/deliveries',
+    workOrderTab: 'delivery',
   },
   { label: 'Clientes' },
   { label: 'Usuarios y accesos' },

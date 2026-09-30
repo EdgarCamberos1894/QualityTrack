@@ -28,6 +28,10 @@ function getBreadcrumb(pathname: string, search: string): string {
     return 'Operación / Calidad'
   }
 
+  if (pathname === '/deliveries') {
+    return 'Operación / Entregas'
+  }
+
   if (pathname.startsWith('/quotations/')) {
     return 'Comercial / Cotizaciones / Detalle'
   }
@@ -53,6 +57,10 @@ function getBreadcrumb(pathname: string, search: string): string {
 
     if (tab === 'quality') {
       return 'Operación / Calidad / Orden de trabajo'
+    }
+
+    if (tab === 'delivery') {
+      return 'Operación / Entregas / Orden de trabajo'
     }
 
     return 'Operación / Órdenes de trabajo / Expediente 360'

@@ -1,4 +1,5 @@
 import type { MaterialLotDto, WorkOrderMaterialDto } from '@/modules/materials'
+import type { DeliveryDto } from './delivery.types'
 import type { NonConformityDto, QualityInspectionDto } from './quality.types'
 import type {
   ProductionStatusDto,
@@ -56,28 +57,6 @@ export interface DocumentCenterDto {
 export interface WorkOrder360DocumentDto {
   document: DocumentCenterDto
   versions: DocumentVersionDto[]
-}
-
-export interface DeliveryDto {
-  id: number
-  workOrderId: number
-  workOrderNumber: string
-  quantity: number
-  status: 'PENDING' | 'DISPATCHED' | 'DELIVERED' | 'CANCELLED'
-  destinationRecipientName: string | null
-  destinationAddress: string | null
-  destinationCity: string | null
-  destinationState: string | null
-  destinationPostalCode: string | null
-  destinationCountry: string | null
-  deliveryMethod: string | null
-  carrier: string | null
-  trackingNumber: string | null
-  dispatchedAt: string | null
-  deliveredAt: string | null
-  receivedByName: string | null
-  createdAt: string
-  updatedAt: string
 }
 
 export interface WorkOrder360MaterialDto {

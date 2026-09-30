@@ -20,6 +20,7 @@ import {
   QuotationsPage,
 } from '@/modules/quotations'
 import {
+  DeliveriesPage,
   ProductionPage,
   QualityPage,
   WorkOrderDetailPage,
@@ -58,6 +59,7 @@ export const router = createBrowserRouter([
               },
               { path: '/production', element: <ProductionPage /> },
               { path: '/quality', element: <QualityPage /> },
+              { path: '/deliveries', element: <DeliveriesPage /> },
             ],
           },
         ],

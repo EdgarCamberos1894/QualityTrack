@@ -69,7 +69,7 @@ export function WorkOrderDetailPage() {
     }
 
     if (activeTab === 'delivery') {
-      return <WorkOrderDeliveries deliveries={query.data.deliveries} />
+      return <WorkOrderDeliveries data={query.data} />
     }
 
     return <WorkOrderSummary workOrder={query.data.workOrder} />

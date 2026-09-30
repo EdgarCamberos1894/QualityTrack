@@ -29,7 +29,8 @@ function isNavigationItemActive(
       pathname === '/work-orders' ||
       (workOrderDetail &&
         workOrderTab !== 'production' &&
-        workOrderTab !== 'quality')
+        workOrderTab !== 'quality' &&
+        workOrderTab !== 'delivery')
     )
   }
 
