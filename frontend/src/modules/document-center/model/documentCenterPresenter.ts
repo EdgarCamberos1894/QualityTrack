@@ -42,7 +42,19 @@ export function getDocumentContextSummary(document: DocumentCenterDto): string {
     return `${first}${suffix}`
   }
 
-  return document.caseNumber
+  return document.caseNumber ?? 'Documento operativo'
+}
+
+export function getDocumentSourceLabel(document: DocumentCenterDto): string {
+  if (document.customerName && document.requestNumber) {
+    return `${document.customerName} · ${document.requestNumber}`
+  }
+
+  if (document.materialLotNumbers.length > 0) {
+    return `Recurso global · lote ${document.materialLotNumbers[0]}`
+  }
+
+  return 'Recurso operativo global'
 }
 
 export function formatDocumentDateTime(value: string): string {
@@ -72,9 +84,9 @@ export function documentMatchesSearch(
     document.name,
     document.documentType,
     document.description ?? '',
-    document.customerName,
-    document.requestNumber,
-    document.caseNumber,
+    document.customerName ?? '',
+    document.requestNumber ?? '',
+    document.caseNumber ?? '',
     document.currentVersion.fileName,
     document.currentVersion.uploadedByName,
     ...document.workOrderNumbers,

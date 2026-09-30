@@ -12,11 +12,6 @@ export interface DocumentCenterVersionDto {
   uploadedAt: string
 }
 
-export interface RequestDocumentVersionDto extends DocumentCenterVersionDto {
-  contentUrl: string
-  downloadUrl: string
-}
-
 export interface DocumentReferenceDto {
   context: DocumentContextDto
   resourceId: number
@@ -26,12 +21,12 @@ export interface DocumentReferenceDto {
 
 export interface DocumentCenterDto {
   id: number
-  caseId: number
-  requestId: number
-  customerId: number
-  customerName: string
-  requestNumber: string
-  caseNumber: string
+  caseId: number | null
+  requestId: number | null
+  customerId: number | null
+  customerName: string | null
+  requestNumber: string | null
+  caseNumber: string | null
   documentType: string
   name: string
   description: string | null

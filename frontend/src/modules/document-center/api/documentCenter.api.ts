@@ -2,7 +2,7 @@ import { apiClient } from '@/shared/api/apiClient'
 import type { ApiResponse } from '@/shared/api/api.types'
 import type {
   DocumentCenterDto,
-  RequestDocumentVersionDto,
+  DocumentCenterVersionDto,
 } from '../types/documentCenter.types'
 
 export async function getDocumentCenter(): Promise<DocumentCenterDto[]> {
@@ -13,24 +13,22 @@ export async function getDocumentCenter(): Promise<DocumentCenterDto[]> {
 }
 
 export async function getDocumentVersions(
-  document: Pick<DocumentCenterDto, 'customerId' | 'requestId' | 'id'>,
-): Promise<RequestDocumentVersionDto[]> {
+  document: Pick<DocumentCenterDto, 'id'>,
+): Promise<DocumentCenterVersionDto[]> {
   const response = await apiClient.get<
-    ApiResponse<RequestDocumentVersionDto[]>
-  >(
-    `/customers/${document.customerId}/requests/${document.requestId}/documents/${document.id}/versions`,
-  )
+    ApiResponse<DocumentCenterVersionDto[]>
+  >(`/documents/${document.id}/versions`)
 
   return response.data.data
 }
 
 export async function getDocumentContent(
-  document: Pick<DocumentCenterDto, 'customerId' | 'requestId' | 'id'>,
+  document: Pick<DocumentCenterDto, 'id'>,
   versionId: number,
   download = false,
 ): Promise<Blob> {
   const response = await apiClient.get<Blob>(
-    `/customers/${document.customerId}/requests/${document.requestId}/documents/${document.id}/versions/${versionId}/content`,
+    `/documents/${document.id}/versions/${versionId}/content`,
     {
       params: download ? { download: true } : undefined,
       responseType: 'blob',
