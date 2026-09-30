@@ -6,6 +6,7 @@ export type CustomerRequestStatus =
   | 'WAITING_CUSTOMER_INFO'
   | 'READY_FOR_QUOTATION'
   | 'IN_PRODUCTION'
+  | 'COMPLETED'
   | 'CANCELLED'
 
 export interface CustomerRequestJobCaseDto {
@@ -15,6 +16,7 @@ export interface CustomerRequestJobCaseDto {
   assignedToName: string | null
   assignedAt: string | null
   openedAt: string
+  closedAt: string | null
   cancelledByUserId: number | null
   cancelledAt: string | null
   cancellationReason: string | null
