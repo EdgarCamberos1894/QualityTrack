@@ -19,6 +19,7 @@ import {
 import { DocumentCenterPage } from '@/modules/document-center'
 import { HomePage } from '@/modules/home'
 import { JobCaseDetailPage, JobCasesPage } from '@/modules/job-cases'
+import { InternalUsersPage } from '@/modules/internal-users'
 import {
   CustomerQuotationDetailPage,
   CustomerQuotationsPage,
@@ -67,6 +68,7 @@ export const router = createBrowserRouter([
               { path: '/quality', element: <QualityPage /> },
               { path: '/deliveries', element: <DeliveriesPage /> },
               { path: '/documents', element: <DocumentCenterPage /> },
+              { path: '/internal-users', element: <InternalUsersPage /> },
             ],
           },
         ],

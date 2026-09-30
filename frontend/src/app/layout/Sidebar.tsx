@@ -1,9 +1,11 @@
 import { Link, useLocation } from 'react-router-dom'
 import { navigationItems, type NavigationItem } from '@/app/layout/navigation'
+import type { AuthenticatedUser } from '@/modules/auth'
 import { cn } from '@/shared/lib/cn'
 
 interface SidebarProps {
   open: boolean
+  user: AuthenticatedUser
   onNavigate: () => void
 }
 
@@ -39,8 +41,11 @@ function isNavigationItemActive(
   return pathname === item.href || pathname.startsWith(`${item.href}/`)
 }
 
-export function Sidebar({ open, onNavigate }: SidebarProps) {
+export function Sidebar({ open, user, onNavigate }: SidebarProps) {
   const location = useLocation()
+  const visibleItems = navigationItems.filter(
+    (item) => !item.requiredRole || user.roles.includes(item.requiredRole),
+  )
 
   return (
     <aside
@@ -76,7 +81,7 @@ export function Sidebar({ open, onNavigate }: SidebarProps) {
 
       <nav className="mt-8" aria-label="Navegación principal">
         <ul className="space-y-1.5">
-          {navigationItems.map((item) => {
+          {visibleItems.map((item) => {
             const active = isNavigationItemActive(
               item,
               location.pathname,

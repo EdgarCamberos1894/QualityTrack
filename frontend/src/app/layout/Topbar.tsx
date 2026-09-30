@@ -36,6 +36,10 @@ function getBreadcrumb(pathname: string, search: string): string {
     return 'Operación / Documentos'
   }
 
+  if (pathname === '/internal-users') {
+    return 'Administración / Usuarios y accesos'
+  }
+
   if (pathname.startsWith('/quotations/')) {
     return 'Comercial / Cotizaciones / Detalle'
   }

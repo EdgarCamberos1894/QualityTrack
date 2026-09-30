@@ -1,7 +1,10 @@
+import type { SystemRole } from '@/modules/auth'
+
 export interface NavigationItem {
   label: string
   href?: string
   workOrderTab?: 'production' | 'quality' | 'delivery'
+  requiredRole?: SystemRole
 }
 
 export const navigationItems: NavigationItem[] = [
@@ -26,5 +29,9 @@ export const navigationItems: NavigationItem[] = [
   },
   { label: 'Documentos', href: '/documents' },
   { label: 'Clientes' },
-  { label: 'Usuarios y accesos' },
+  {
+    label: 'Usuarios y accesos',
+    href: '/internal-users',
+    requiredRole: 'ADMIN',
+  },
 ]
