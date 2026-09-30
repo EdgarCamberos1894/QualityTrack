@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Operation(summary = "Crear lote de material", description = "Registra un lote físico recibido para un material. Puede vincular opcionalmente la versión exacta del certificado documental.")
+@Operation(summary = "Crear lote de material", description = "Registra un lote físico recibido para un material. El certificado se gestiona después desde el propio contexto del lote.")
 @ApiResponses({
         @ApiResponse(responseCode = "201", description = "Lote creado correctamente"),
         @ApiResponse(responseCode = "400", description = "Datos inválidos", content = @Content(mediaType = "application/problem+json", schema = @Schema(implementation = ProblemDetail.class))),
