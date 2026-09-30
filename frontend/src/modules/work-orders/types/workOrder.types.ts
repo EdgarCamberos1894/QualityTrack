@@ -1,3 +1,8 @@
+import type {
+  MaterialLotDto,
+  WorkOrderMaterialDto,
+} from '@/modules/materials'
+
 export const WORK_ORDER_STATUSES = [
   'CREATED',
   'READY_FOR_PRODUCTION',
@@ -247,12 +252,62 @@ export interface RoutingSheetDto {
   updatedAt: string
 }
 
+export type OperationExecutionStatus =
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'CANCELLED'
+
+export interface OperationExecutionDto {
+  id: number
+  workOrderId: number
+  workOrderNumber: string
+  workOrderStatus: WorkOrderStatus
+  routingSheetId: number
+  routingRevision: number
+  routingPurpose: RoutingPurpose
+  routingOperationId: number
+  sequenceNumber: number
+  operationCode: string
+  operationName: string
+  attemptNumber: number
+  status: OperationExecutionStatus
+  operatorId: number
+  operatorName: string | null
+  machineId: number | null
+  machineCode: string | null
+  machineName: string | null
+  startedAt: string
+  finishedAt: string | null
+  quantityProcessed: number
+  quantityAccepted: number
+  quantityRejected: number
+  startNotes: string | null
+  completionNotes: string | null
+  cancellationReason: string | null
+}
+
+export interface ProductionStatusDto {
+  workOrderId: number
+  workOrderNumber: string
+  status: WorkOrderStatus
+  plannedQuantity: number | null
+  actualStartAt: string | null
+  actualEndAt: string | null
+  productionCompleted: boolean
+  executions: OperationExecutionDto[]
+}
+
+export interface WorkOrder360MaterialDto {
+  consumption: WorkOrderMaterialDto
+  lot: MaterialLotDto
+}
+
 export interface WorkOrder360Dto {
   workOrder: WorkOrderDetailDto
   quotationRevisions: unknown[]
   routingSheets: RoutingSheetDto[]
-  production: unknown | null
-  materials: unknown[]
+  production: ProductionStatusDto
+  materials: WorkOrder360MaterialDto[]
   qualityInspections: QualityInspectionDto[]
   nonConformities: unknown[]
   documents: WorkOrder360DocumentDto[]
@@ -263,6 +318,7 @@ export interface WorkOrder360Dto {
 export type WorkOrderDetailTab =
   | 'summary'
   | 'preparation'
+  | 'production'
   | 'traceability'
   | 'documents'
   | 'quality'
@@ -290,4 +346,21 @@ export interface RoutingOperationPayload {
 
 export interface ReopenRoutingSheetPayload {
   reason: string
+}
+
+
+export interface StartOperationExecutionPayload {
+  machineId?: number
+  startNotes?: string
+}
+
+export interface CompleteOperationExecutionPayload {
+  quantityProcessed: number
+  quantityAccepted: number
+  quantityRejected: number
+  completionNotes?: string
+}
+
+export interface CancelOperationExecutionPayload {
+  cancellationReason: string
 }
