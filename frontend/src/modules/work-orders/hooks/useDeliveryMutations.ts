@@ -5,6 +5,7 @@ import {
   completeDelivery,
   createDelivery,
   dispatchDelivery,
+  uploadDeliveryEvidence,
 } from '../api/deliveries.api'
 import type {
   AttachDeliveryEvidencePayload,
@@ -23,6 +24,7 @@ export function useDeliveryMutations() {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: workOrderKeys.all }),
       queryClient.invalidateQueries({ queryKey: deliveryKeys.all }),
+      queryClient.invalidateQueries({ queryKey: ['document-center'] }),
     ])
   }
 
@@ -59,6 +61,17 @@ export function useDeliveryMutations() {
     onSuccess: refresh,
   })
 
+  const uploadEvidence = useMutation({
+    mutationFn: ({
+      deliveryId,
+      file,
+    }: {
+      deliveryId: number
+      file: File
+    }) => uploadDeliveryEvidence(deliveryId, file),
+    onSuccess: refresh,
+  })
+
   const attachEvidence = useMutation({
     mutationFn: ({
       deliveryId,
@@ -81,5 +94,12 @@ export function useDeliveryMutations() {
     onSuccess: refresh,
   })
 
-  return { create, dispatch, complete, attachEvidence, cancel }
+  return {
+    create,
+    dispatch,
+    complete,
+    uploadEvidence,
+    attachEvidence,
+    cancel,
+  }
 }
