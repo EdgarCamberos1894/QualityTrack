@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { Button } from '@/shared/components/ui/Button'
 import { TextField } from '@/shared/components/ui/TextField'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
+import { formatWorkOrderDate } from '../model/workOrderPresenter'
 import {
   createWorkOrderSchema,
   type CreateWorkOrderFormValues,
@@ -151,7 +152,7 @@ export function CreateWorkOrderDialog({
                   Entrega comprometida
                 </p>
                 <p className="mt-1 text-xs font-semibold text-slate-950">
-                  {agreedDeliveryDate ?? 'Sin definir'}
+                  {formatWorkOrderDate(agreedDeliveryDate)}
                 </p>
               </div>
             </div>
