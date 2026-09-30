@@ -64,7 +64,7 @@ export function JobCasesPage() {
       <PageHeader
         eyebrow="Revisión interna"
         title="Expedientes"
-        description="Consulta la bandeja de solicitudes en revisión, responsables y preparación para cotización."
+        description="Consulta el ciclo completo de los expedientes, desde la revisión inicial hasta su cierre."
       />
 
       <Card className="overflow-hidden">
