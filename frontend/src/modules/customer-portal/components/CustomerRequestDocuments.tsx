@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { Button } from '@/shared/components/ui/Button'
 import { Card } from '@/shared/components/ui/Card'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
-import { getCustomerRequestDocumentContent } from '../api/customerRequests.api'
+import { useCustomerRequestDocumentFileActions } from '../hooks/useCustomerRequestDocumentFileActions'
 import {
   formatCustomerRequestDateTime,
   formatFileSize,
@@ -29,21 +29,6 @@ interface CustomerRequestDocumentsProps {
   onResetErrors: () => void
 }
 
-function openBlob(blob: Blob, fileName: string, download: boolean) {
-  const url = URL.createObjectURL(blob)
-
-  if (download) {
-    const anchor = document.createElement('a')
-    anchor.href = url
-    anchor.download = fileName
-    anchor.click()
-  } else {
-    window.open(url, '_blank', 'noopener,noreferrer')
-  }
-
-  window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
-}
-
 export function CustomerRequestDocuments({
   customerId,
   requestId,
@@ -61,27 +46,8 @@ export function CustomerRequestDocuments({
   const [addOpen, setAddOpen] = useState(false)
   const [history, setHistory] = useState<RequestDocumentDto | null>(null)
   const [removeId, setRemoveId] = useState<number | null>(null)
-  const [contentError, setContentError] = useState<string | null>(null)
+  const files = useCustomerRequestDocumentFileActions(customerId, requestId)
   const versionInputRefs = useRef<Record<number, HTMLInputElement | null>>({})
-
-  const fetchContent = async (
-    documentId: number,
-    version: RequestDocumentVersionDto,
-    download: boolean,
-  ) => {
-    try {
-      setContentError(null)
-      const blob = await getCustomerRequestDocumentContent(
-        customerId,
-        requestId,
-        documentId,
-        version.id,
-      )
-      openBlob(blob, version.fileName, download)
-    } catch (error) {
-      setContentError(getErrorMessage(error))
-    }
-  }
 
   return (
     <>
@@ -100,6 +66,7 @@ export function CustomerRequestDocuments({
               size="sm"
               onClick={() => {
                 onResetErrors()
+                files.clearError()
                 setAddOpen(true)
               }}
             >
@@ -108,9 +75,9 @@ export function CustomerRequestDocuments({
           ) : null}
         </div>
 
-        {contentError ? (
+        {files.error ? (
           <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
-            {contentError}
+            {getErrorMessage(files.error)}
           </p>
         ) : null}
 
@@ -148,17 +115,21 @@ export function CustomerRequestDocuments({
                       <Button
                         size="sm"
                         variant="secondary"
+                        disabled={files.busyVersionId === version.id}
                         onClick={() =>
-                          void fetchContent(documentItem.id, version, false)
+                          void files.openVersion(documentItem.id, version)
                         }
                       >
-                        Ver
+                        {files.busyVersionId === version.id
+                          ? 'Abriendo…'
+                          : 'Ver'}
                       </Button>
                       <Button
                         size="sm"
                         variant="ghost"
+                        disabled={files.busyVersionId === version.id}
                         onClick={() =>
-                          void fetchContent(documentItem.id, version, true)
+                          void files.downloadVersion(documentItem.id, version)
                         }
                       >
                         Descargar
@@ -262,12 +233,13 @@ export function CustomerRequestDocuments({
         requestId={requestId}
         documentId={history?.id ?? null}
         documentName={history?.name ?? ''}
+        busyVersionId={files.busyVersionId}
         onClose={() => setHistory(null)}
         onOpenVersion={(version) => {
-          if (history) void fetchContent(history.id, version, false)
+          if (history) void files.openVersion(history.id, version)
         }}
         onDownloadVersion={(version) => {
-          if (history) void fetchContent(history.id, version, true)
+          if (history) void files.downloadVersion(history.id, version)
         }}
       />
     </>
