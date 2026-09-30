@@ -75,10 +75,7 @@ export function CreateWorkOrderDialog({
       return
     }
 
-    if (
-      agreedDeliveryDate &&
-      values.plannedEndDate >= agreedDeliveryDate
-    ) {
+    if (agreedDeliveryDate && values.plannedEndDate >= agreedDeliveryDate) {
       setPlanningError(
         'La fabricación debe terminar antes de la fecha comprometida de entrega.',
       )

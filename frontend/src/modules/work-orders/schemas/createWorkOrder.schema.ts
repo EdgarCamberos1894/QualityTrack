@@ -6,6 +6,4 @@ export const createWorkOrderSchema = z.object({
   plannedEndDate: z.string().min(1, 'Selecciona la fecha de fin.'),
 })
 
-export type CreateWorkOrderFormValues = z.infer<
-  typeof createWorkOrderSchema
->
+export type CreateWorkOrderFormValues = z.infer<typeof createWorkOrderSchema>

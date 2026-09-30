@@ -24,7 +24,6 @@ export async function getWorkOrder360(
   return response.data.data
 }
 
-
 export async function createWorkOrder(
   caseId: number,
   payload: CreateWorkOrderPayload,

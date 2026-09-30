@@ -4,10 +4,7 @@ import { Button } from '@/shared/components/ui/Button'
 import { useCreateWorkOrder } from '../hooks/useCreateWorkOrder'
 import { getWorkOrderStatusPresentation } from '../model/workOrderPresenter'
 import type { CreateWorkOrderFormValues } from '../schemas/createWorkOrder.schema'
-import type {
-  WorkOrderDetailDto,
-  WorkOrderDto,
-} from '../types/workOrder.types'
+import type { WorkOrderDetailDto, WorkOrderDto } from '../types/workOrder.types'
 import { CreateWorkOrderDialog } from './CreateWorkOrderDialog'
 
 interface WorkOrderCreationPanelProps {
@@ -90,9 +87,7 @@ export function WorkOrderCreationPanel({
         </div>
 
         {canCreate ? (
-          <Button onClick={() => setOpen(true)}>
-            Crear orden de trabajo
-          </Button>
+          <Button onClick={() => setOpen(true)}>Crear orden de trabajo</Button>
         ) : (
           <p className="max-w-xs text-[10px] leading-5 text-slate-500">
             Solo ADMIN o COMMERCIAL pueden crear la orden de trabajo.
