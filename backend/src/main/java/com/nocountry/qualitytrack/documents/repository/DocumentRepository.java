@@ -41,6 +41,12 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
                     or lower(coalesce(customer.name, '')) like :pattern
                     or lower(coalesce(materialLot.lotNumber, '')) like :pattern
                     or lower(coalesce(material.code, '')) like :pattern
+                    or exists (
+                        select version.id
+                        from DocumentVersion version
+                        where version.document = document
+                          and lower(version.fileName) like :pattern
+                    )
               )
             order by document.createdAt desc, document.id desc
             """)
