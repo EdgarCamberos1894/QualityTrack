@@ -225,3 +225,10 @@ export interface WorkOrder360Dto {
 
 export type WorkOrderDetailTab =
   'summary' | 'traceability' | 'documents' | 'quality' | 'delivery'
+
+
+export interface CreateWorkOrderPayload {
+  priority: WorkOrderPriority
+  plannedStartDate: string
+  plannedEndDate: string
+}
