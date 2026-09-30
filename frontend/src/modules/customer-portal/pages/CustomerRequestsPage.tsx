@@ -19,6 +19,7 @@ const filters: Array<{ value: Filter; label: string }> = [
   { value: 'WAITING_CUSTOMER_INFO', label: 'Por responder' },
   { value: 'READY_FOR_QUOTATION', label: 'Cotización' },
   { value: 'IN_PRODUCTION', label: 'Producción' },
+  { value: 'COMPLETED', label: 'Completadas' },
 ]
 
 export function CustomerRequestsPage() {
