@@ -9,11 +9,19 @@ import {
   type ResourceTab,
 } from '../components/ResourceTabs'
 
+function parsePositiveId(value: string | null): number | null {
+  if (!value) return null
+  const parsed = Number(value)
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null
+}
+
 export function OperationalResourcesPage() {
   const session = useSessionStore((state) => state.session)
   const [searchParams, setSearchParams] = useSearchParams()
   const tab: ResourceTab =
     searchParams.get('tab') === 'materials' ? 'materials' : 'machines'
+  const requestedMaterialId = parsePositiveId(searchParams.get('materialId'))
+  const requestedLotId = parsePositiveId(searchParams.get('lotId'))
   const roles = session?.user.roles ?? []
   const canManage =
     roles.includes('ADMIN') || roles.includes('PRODUCTION')
@@ -39,6 +47,10 @@ export function OperationalResourcesPage() {
         onChange={(nextTab) => {
           const next = new URLSearchParams(searchParams)
           next.set('tab', nextTab)
+          if (nextTab !== 'materials') {
+            next.delete('materialId')
+            next.delete('lotId')
+          }
           setSearchParams(next, { replace: true })
         }}
       />
@@ -46,7 +58,18 @@ export function OperationalResourcesPage() {
       {tab === 'machines' ? (
         <MachinesPanel canManage={canManage} />
       ) : (
-        <MaterialsPanel canManage={canManage} />
+        <MaterialsPanel
+          canManage={canManage}
+          requestedMaterialId={requestedMaterialId}
+          requestedLotId={requestedLotId}
+          onSelectMaterial={(materialId) => {
+            const next = new URLSearchParams(searchParams)
+            next.set('tab', 'materials')
+            next.set('materialId', String(materialId))
+            next.delete('lotId')
+            setSearchParams(next, { replace: true })
+          }}
+        />
       )}
     </PageContainer>
   )
