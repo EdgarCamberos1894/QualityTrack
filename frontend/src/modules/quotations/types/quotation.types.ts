@@ -77,6 +77,8 @@ export interface QuotationSourceDto {
   requestedDeliveryDate: string | null
   requestedByUserId: number
   requestedByName: string | null
+  assignedToUserId: number | null
+  assignedToName: string | null
   materialSpecification: QuotationMaterialSpecificationDto | null
   documents: unknown[]
   informationRequests: unknown[]
