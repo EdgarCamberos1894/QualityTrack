@@ -53,7 +53,10 @@ export const createMaterialLotSchema = z.object({
     .string()
     .trim()
     .max(255, 'El proveedor no puede superar 255 caracteres.'),
-  receivedAt: z.string(),
+  receivedAt: z.string().refine(
+    (value) => !value || !Number.isNaN(new Date(value).getTime()),
+    'Ingresa una fecha de recepción válida.',
+  ),
   quantityReceived: z
     .number({ error: 'Ingresa una cantidad válida.' })
     .min(0.001, 'La cantidad debe ser al menos 0.001.'),
