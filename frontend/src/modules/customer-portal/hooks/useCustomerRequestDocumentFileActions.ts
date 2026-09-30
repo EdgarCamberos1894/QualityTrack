@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { getCustomerRequestDocumentContent } from '../api/customerRequests.api'
 import type { RequestDocumentVersionDto } from '../types/customerRequest.types'
 
@@ -39,6 +39,7 @@ export function useCustomerRequestDocumentFileActions(
   customerId: number,
   requestId: number,
 ) {
+  const actionLock = useRef(false)
   const [busy, setBusy] = useState<{
     versionId: number
     action: 'open' | 'download'
@@ -49,6 +50,9 @@ export function useCustomerRequestDocumentFileActions(
     documentId: number,
     version: RequestDocumentVersionDto,
   ) => {
+    if (actionLock.current) return
+    actionLock.current = true
+
     const previewWindow = window.open('', '_blank')
 
     if (previewWindow) {
@@ -56,8 +60,6 @@ export function useCustomerRequestDocumentFileActions(
       previewWindow.document.title = 'Cargando documento…'
       previewWindow.document.body.textContent = 'Cargando documento…'
     }
-
-    if (busy) return
 
     setBusy({ versionId: version.id, action: 'open' })
     setError(null)
@@ -75,6 +77,7 @@ export function useCustomerRequestDocumentFileActions(
       previewWindow?.close()
       setError(requestError)
     } finally {
+      actionLock.current = false
       setBusy(null)
     }
   }
@@ -83,7 +86,8 @@ export function useCustomerRequestDocumentFileActions(
     documentId: number,
     version: RequestDocumentVersionDto,
   ) => {
-    if (busy) return
+    if (actionLock.current) return
+    actionLock.current = true
 
     setBusy({ versionId: version.id, action: 'download' })
     setError(null)
@@ -100,6 +104,7 @@ export function useCustomerRequestDocumentFileActions(
     } catch (requestError) {
       setError(requestError)
     } finally {
+      actionLock.current = false
       setBusy(null)
     }
   }
