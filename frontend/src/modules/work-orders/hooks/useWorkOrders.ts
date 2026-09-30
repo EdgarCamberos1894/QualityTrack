@@ -6,9 +6,10 @@ export const workOrderKeys = {
   list: () => [...workOrderKeys.all, 'list'] as const,
 }
 
-export function useWorkOrders() {
+export function useWorkOrders(enabled = true) {
   return useQuery({
     queryKey: workOrderKeys.list(),
     queryFn: getWorkOrders,
+    enabled,
   })
 }
