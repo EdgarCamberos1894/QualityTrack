@@ -13,9 +13,17 @@ import { MaterialLotsPanel } from './MaterialLotsPanel'
 
 interface MaterialsPanelProps {
   canManage: boolean
+  requestedMaterialId: number | null
+  requestedLotId: number | null
+  onSelectMaterial: (materialId: number) => void
 }
 
-export function MaterialsPanel({ canManage }: MaterialsPanelProps) {
+export function MaterialsPanel({
+  canManage,
+  requestedMaterialId,
+  requestedLotId,
+  onSelectMaterial,
+}: MaterialsPanelProps) {
   const query = useMaterials()
   const mutations = useMaterialMutations()
   const [search, setSearch] = useState('')
@@ -31,12 +39,22 @@ export function MaterialsPanel({ canManage }: MaterialsPanelProps) {
     }
 
     if (
+      requestedMaterialId &&
+      materials.some((material) => material.id === requestedMaterialId)
+    ) {
+      if (selectedId !== requestedMaterialId) {
+        setSelectedId(requestedMaterialId)
+      }
+      return
+    }
+
+    if (
       !selectedId ||
       !materials.some((material) => material.id === selectedId)
     ) {
       setSelectedId(materials[0].id)
     }
-  }, [materials, selectedId])
+  }, [materials, requestedMaterialId, selectedId])
 
   const selectedMaterial =
     materials.find((material) => material.id === selectedId) ?? null
@@ -74,6 +92,7 @@ export function MaterialsPanel({ canManage }: MaterialsPanelProps) {
         unit: values.unit.trim(),
       })
       setSelectedId(created.id)
+      onSelectMaterial(created.id)
       return true
     } catch {
       return false
@@ -147,7 +166,10 @@ export function MaterialsPanel({ canManage }: MaterialsPanelProps) {
                 <button
                   key={material.id}
                   type="button"
-                  onClick={() => setSelectedId(material.id)}
+                  onClick={() => {
+                    setSelectedId(material.id)
+                    onSelectMaterial(material.id)
+                  }}
                   className={cn(
                     'w-full px-5 py-4 text-left transition',
                     selectedId === material.id
@@ -176,6 +198,11 @@ export function MaterialsPanel({ canManage }: MaterialsPanelProps) {
         <MaterialLotsPanel
           material={selectedMaterial}
           canManage={canManage}
+          highlightedLotId={
+            selectedMaterial?.id === requestedMaterialId
+              ? requestedLotId
+              : null
+          }
         />
       </div>
 
