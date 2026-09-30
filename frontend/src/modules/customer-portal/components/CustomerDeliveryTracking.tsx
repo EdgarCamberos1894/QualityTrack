@@ -1,23 +1,38 @@
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { Badge } from '@/shared/components/ui/Badge'
+import { Button } from '@/shared/components/ui/Button'
 import { Card } from '@/shared/components/ui/Card'
+import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import {
   formatCustomerDeliveryDateTime,
   getCustomerDeliveryAddress,
   getCustomerDeliveryStatusPresentation,
   getCustomerDeliverySummary,
 } from '../model/customerDeliveryPresenter'
+import { useCustomerDeliveryEvidence } from '../hooks/useCustomerDeliveryEvidence'
 import type { CustomerDeliveryDto } from '../types/customerDelivery.types'
 
 interface CustomerDeliveryTrackingProps {
+  customerId: number
+  requestId: number
   deliveries: CustomerDeliveryDto[] | undefined
   requestedQuantity: number
   pending: boolean
   error: unknown
 }
 
-function DeliveryCard({ delivery }: { delivery: CustomerDeliveryDto }) {
+function DeliveryCard({
+  delivery,
+  busy,
+  onOpenEvidence,
+  onDownloadEvidence,
+}: {
+  delivery: CustomerDeliveryDto
+  busy: boolean
+  onOpenEvidence: () => void
+  onDownloadEvidence: () => void
+}) {
   const status = getCustomerDeliveryStatusPresentation(delivery.status)
 
   return (
@@ -94,20 +109,51 @@ function DeliveryCard({ delivery }: { delivery: CustomerDeliveryDto }) {
       </div>
 
       {delivery.evidenceDocumentVersionId ? (
-        <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-[10px] text-emerald-800">
-          Evidencia de entrega registrada por logística.
-        </p>
+        <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold text-emerald-800">
+                Evidencia de entrega
+              </p>
+              <p className="mt-1 truncate text-[9px] text-emerald-700">
+                {delivery.evidenceFileName ?? 'Archivo registrado por logística'}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                disabled={busy}
+                onClick={onOpenEvidence}
+              >
+                {busy ? 'Abriendo…' : 'Ver'}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                disabled={busy}
+                onClick={onDownloadEvidence}
+              >
+                Descargar
+              </Button>
+            </div>
+          </div>
+        </div>
       ) : null}
     </article>
   )
 }
 
 export function CustomerDeliveryTracking({
+  customerId,
+  requestId,
   deliveries,
   requestedQuantity,
   pending,
   error,
 }: CustomerDeliveryTrackingProps) {
+  const evidence = useCustomerDeliveryEvidence(customerId, requestId)
   if (pending) {
     return (
       <Card className="p-5">
@@ -170,9 +216,21 @@ export function CustomerDeliveryTracking({
         </p>
       </div>
 
+      {evidence.error ? (
+        <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+          {getErrorMessage(evidence.error)}
+        </p>
+      ) : null}
+
       <div className="space-y-3">
         {deliveries.map((delivery) => (
-          <DeliveryCard key={delivery.id} delivery={delivery} />
+          <DeliveryCard
+            key={delivery.id}
+            delivery={delivery}
+            busy={evidence.busyDeliveryId === delivery.id}
+            onOpenEvidence={() => void evidence.openEvidence(delivery)}
+            onDownloadEvidence={() => void evidence.downloadEvidence(delivery)}
+          />
         ))}
       </div>
     </section>
