@@ -26,7 +26,6 @@ export function CustomerPortalSidebar({
     { label: 'Inicio', href: base, end: true },
     { label: 'Solicitudes', href: `${base}/requests` },
     { label: 'Cotizaciones', href: `${base}/quotations` },
-    { label: 'Documentos' },
     { label: 'Miembros', href: `${base}/members` },
     { label: 'Empresa', href: `${base}/company` },
   ]
