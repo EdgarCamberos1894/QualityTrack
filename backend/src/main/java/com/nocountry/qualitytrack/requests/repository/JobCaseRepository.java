@@ -3,6 +3,7 @@ package com.nocountry.qualitytrack.requests.repository;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.requests.enums.JobCaseStatus;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -44,6 +45,30 @@ public interface JobCaseRepository extends JpaRepository<JobCase, Long> {
 
         long getTotal();
     }
+
+    @EntityGraph(attributePaths = {
+            "customerRequest",
+            "customerRequest.customer",
+            "customerRequest.requestedByUser",
+            "assignedToUser",
+            "cancelledByUser"
+    })
+    @Query("""
+            select jobCase
+            from JobCase jobCase
+            join jobCase.customerRequest request
+            join request.customer customer
+            where lower(jobCase.caseNumber) like :pattern
+               or lower(request.requestNumber) like :pattern
+               or lower(request.title) like :pattern
+               or lower(coalesce(request.customerReference, '')) like :pattern
+               or lower(customer.name) like :pattern
+            order by jobCase.updatedAt desc, jobCase.id desc
+            """)
+    List<JobCase> searchInternal(
+            @Param("pattern") String pattern,
+            Pageable pageable
+    );
 
     @EntityGraph(attributePaths = {
             "customerRequest",
