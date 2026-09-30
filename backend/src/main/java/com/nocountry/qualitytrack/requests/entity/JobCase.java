@@ -133,6 +133,24 @@ public class JobCase {
         this.status = JobCaseStatus.IN_PRODUCTION;
     }
 
+    public void complete(Instant completedAt) {
+        if (status != JobCaseStatus.IN_PRODUCTION) {
+            throw new IllegalStateException(
+                    "Solo un expediente IN_PRODUCTION puede completarse."
+            );
+        }
+
+        Instant actualCompletedAt = Objects.requireNonNull(completedAt);
+        if (actualCompletedAt.isBefore(openedAt)) {
+            throw new IllegalArgumentException(
+                    "La fecha de cierre no puede ser anterior a la apertura del expediente."
+            );
+        }
+
+        this.closedAt = actualCompletedAt;
+        this.status = JobCaseStatus.COMPLETED;
+    }
+
     public boolean canBeCancelled() {
         return status == JobCaseStatus.SUBMITTED
                 || status == JobCaseStatus.UNDER_REVIEW
