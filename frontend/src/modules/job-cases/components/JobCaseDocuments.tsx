@@ -19,8 +19,9 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
     <div className="grid gap-3">
       {documents.map((document) => (
         <article
+          id={`document-${document.id}`}
           key={document.id}
-          className="rounded-xl border border-[#d9e2ee] bg-white p-4"
+          className="scroll-mt-24 rounded-xl border border-[#d9e2ee] bg-white p-4 target:ring-2 target:ring-blue-300"
         >
           <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-600">
             {document.documentType}

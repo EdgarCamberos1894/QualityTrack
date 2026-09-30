@@ -16,6 +16,7 @@ import {
   CustomerRequestDetailPage,
   CustomerRequestsPage,
 } from '@/modules/customer-portal'
+import { DocumentCenterPage } from '@/modules/document-center'
 import { HomePage } from '@/modules/home'
 import { JobCaseDetailPage, JobCasesPage } from '@/modules/job-cases'
 import {
@@ -65,6 +66,7 @@ export const router = createBrowserRouter([
               { path: '/production', element: <ProductionPage /> },
               { path: '/quality', element: <QualityPage /> },
               { path: '/deliveries', element: <DeliveriesPage /> },
+              { path: '/documents', element: <DocumentCenterPage /> },
             ],
           },
         ],

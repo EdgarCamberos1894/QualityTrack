@@ -13,6 +13,9 @@ public record DocumentCenterResponse(
         Long caseId,
         Long requestId,
         Long customerId,
+        String customerName,
+        String requestNumber,
+        String caseNumber,
         String documentType,
         String name,
         String description,
@@ -22,7 +25,9 @@ public record DocumentCenterResponse(
         DocumentVersionResponse currentVersion,
         Set<DocumentContext> contexts,
         List<Long> workOrderIds,
+        List<String> workOrderNumbers,
         List<Long> materialLotIds,
+        List<String> materialLotNumbers,
         List<Long> deliveryIds,
         List<DocumentReferenceResponse> references
 ) {
@@ -32,7 +37,9 @@ public record DocumentCenterResponse(
             DocumentVersion currentVersion,
             Set<DocumentContext> contexts,
             List<Long> workOrderIds,
+            List<String> workOrderNumbers,
             List<Long> materialLotIds,
+            List<String> materialLotNumbers,
             List<Long> deliveryIds,
             List<DocumentReferenceResponse> references
     ) {
@@ -45,6 +52,9 @@ public record DocumentCenterResponse(
                 jobCase.getId(),
                 request.getId(),
                 customer.getId(),
+                customer.getName(),
+                request.getRequestNumber(),
+                jobCase.getCaseNumber(),
                 document.getDocumentType(),
                 document.getName(),
                 document.getDescription(),
@@ -57,7 +67,9 @@ public record DocumentCenterResponse(
                 DocumentVersionResponse.from(currentVersion),
                 Set.copyOf(contexts),
                 List.copyOf(workOrderIds),
+                List.copyOf(workOrderNumbers),
                 List.copyOf(materialLotIds),
+                List.copyOf(materialLotNumbers),
                 List.copyOf(deliveryIds),
                 List.copyOf(references)
         );

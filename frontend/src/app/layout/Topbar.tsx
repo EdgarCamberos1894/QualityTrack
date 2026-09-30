@@ -32,6 +32,10 @@ function getBreadcrumb(pathname: string, search: string): string {
     return 'Operación / Entregas'
   }
 
+  if (pathname === '/documents') {
+    return 'Operación / Documentos'
+  }
+
   if (pathname.startsWith('/quotations/')) {
     return 'Comercial / Cotizaciones / Detalle'
   }
