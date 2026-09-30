@@ -1,9 +1,7 @@
 package com.nocountry.qualitytrack.materials.service;
 
 import com.nocountry.qualitytrack.documents.entity.DocumentVersion;
-import com.nocountry.qualitytrack.documents.enums.DocumentStatus;
-import com.nocountry.qualitytrack.documents.repository.DocumentVersionRepository;
-import com.nocountry.qualitytrack.documents.service.DocumentAccessService;
+import com.nocountry.qualitytrack.documents.service.DocumentService;
 import com.nocountry.qualitytrack.materials.dto.request.CreateMaterialLotRequest;
 import com.nocountry.qualitytrack.materials.dto.request.CreateMaterialRequest;
 import com.nocountry.qualitytrack.materials.dto.request.RecordMaterialConsumptionRequest;
@@ -29,6 +27,7 @@ import com.nocountry.qualitytrack.workorders.service.WorkOrderAccessPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -47,8 +46,7 @@ public class MaterialService {
     private final MaterialRepository materialRepository;
     private final MaterialLotRepository materialLotRepository;
     private final WorkOrderMaterialRepository workOrderMaterialRepository;
-    private final DocumentVersionRepository documentVersionRepository;
-    private final DocumentAccessService documentAccessService;
+    private final DocumentService documentService;
     private final WorkOrderRepository workOrderRepository;
     private final WorkOrderAccessPolicy accessPolicy;
     private final TraceabilityService traceabilityService;
@@ -104,13 +102,6 @@ public class MaterialService {
             conflict("Ya existe ese número de lote para el material.");
         }
 
-        DocumentVersion certificateVersion = request.certificateDocumentVersionId() == null
-                ? null
-                : requireMaterialCertificate(
-                        currentUserId,
-                        request.certificateDocumentVersionId()
-                );
-
         MaterialLot lot;
         try {
             lot = MaterialLot.create(
@@ -119,8 +110,40 @@ public class MaterialService {
                     request.supplier(),
                     request.receivedAt() == null ? Instant.now() : request.receivedAt(),
                     request.quantityReceived(),
-                    certificateVersion
+                    null
             );
+        } catch (IllegalArgumentException exception) {
+            conflict(exception.getMessage());
+            throw exception;
+        }
+
+        return MaterialLotResponse.from(materialLotRepository.saveAndFlush(lot));
+    }
+
+    @Transactional
+    public MaterialLotResponse attachCertificate(
+            Long currentUserId,
+            Long materialId,
+            Long lotId,
+            MultipartFile file
+    ) {
+        accessPolicy.requireProductionActor(currentUserId);
+
+        MaterialLot lot = materialLotRepository.findByIdForUpdate(lotId)
+                .orElseThrow(() -> notFound("No se encontró el lote de material."));
+
+        if (!lot.getMaterial().getId().equals(materialId)) {
+            throw notFound("No se encontró el lote para el material indicado.");
+        }
+
+        DocumentVersion certificate = documentService.upsertMaterialCertificate(
+                currentUserId,
+                lot,
+                file
+        );
+
+        try {
+            lot.attachCertificate(certificate);
         } catch (IllegalArgumentException exception) {
             conflict(exception.getMessage());
             throw exception;
@@ -300,29 +323,6 @@ public class MaterialService {
             }
         }
         return metadata;
-    }
-
-    private DocumentVersion requireMaterialCertificate(
-            Long currentUserId,
-            Long documentVersionId
-    ) {
-        DocumentVersion version = documentVersionRepository
-                .findByIdAndDocument_Status(
-                        documentVersionId,
-                        DocumentStatus.ACTIVE
-                )
-                .orElseThrow(() -> notFound(
-                        "No se encontró una versión documental activa para el certificado."
-                ));
-
-        if (!MATERIAL_CERTIFICATE_TYPE.equals(version.getDocument().getDocumentType())) {
-            conflict(
-                    "La versión documental del lote debe pertenecer a un documento MATERIAL_CERTIFICATE."
-            );
-        }
-
-        documentAccessService.requireCanReadVersion(currentUserId, version);
-        return version;
     }
 
     private BusinessException notFound(String message) {
