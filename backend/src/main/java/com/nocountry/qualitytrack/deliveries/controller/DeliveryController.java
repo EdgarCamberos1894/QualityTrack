@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/deliveries")
 @RequiredArgsConstructor
@@ -29,6 +31,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class DeliveryController {
 
     private final DeliveryService deliveryService;
+
+    @Operation(summary = "Listar entregas para operación interna")
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<DeliveryResponse>>> list(
+            @CurrentUserId Long currentUserId
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.DELIVERIES_RETRIEVED,
+                "Entregas consultadas correctamente.",
+                deliveryService.listAll(currentUserId)
+        ));
+    }
 
     @Operation(summary = "Consultar una entrega")
     @GetMapping("/{deliveryId}")

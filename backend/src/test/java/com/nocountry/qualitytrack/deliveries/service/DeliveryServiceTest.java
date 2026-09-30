@@ -82,6 +82,32 @@ class DeliveryServiceTest {
     }
 
     @Test
+    void listsDeliveriesForInternalReaders() {
+        Delivery delivery = Delivery.create(
+                workOrder,
+                5,
+                "Cliente SA",
+                "Av. Principal 123",
+                "Tepic",
+                "Nayarit",
+                "63000",
+                "México",
+                "PAQUETERIA",
+                logistics
+        );
+        ReflectionTestUtils.setField(delivery, "id", 99L);
+        when(deliveryRepository.findAllByOrderByCreatedAtDescIdDesc())
+                .thenReturn(List.of(delivery));
+
+        var response = service.listAll(10L);
+
+        assertEquals(1, response.size());
+        assertEquals(99L, response.get(0).id());
+        assertEquals(DeliveryStatus.PENDING, response.get(0).status());
+        verify(accessPolicy).requireInternalReader(10L);
+    }
+
+    @Test
     void createsPartialDeliveryWhileReservedQuantityFitsPlan() {
         when(accessPolicy.requireLogisticsActor(10L)).thenReturn(logistics);
         when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));

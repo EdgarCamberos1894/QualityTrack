@@ -122,6 +122,15 @@ public class DeliveryService {
     }
 
     @Transactional(readOnly = true)
+    public List<DeliveryResponse> listAll(Long currentUserId) {
+        accessPolicy.requireInternalReader(currentUserId);
+        return deliveryRepository.findAllByOrderByCreatedAtDescIdDesc()
+                .stream()
+                .map(DeliveryResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public DeliveryResponse get(Long currentUserId, Long deliveryId) {
         accessPolicy.requireInternalReader(currentUserId);
         return DeliveryResponse.from(
