@@ -54,7 +54,7 @@ export function DocumentCenterRow({
           </Link>
         ) : (
           <Link
-            to="/resources"
+            to="/resources?tab=materials"
             className="mt-1 inline-flex text-[9px] font-semibold text-blue-600 hover:underline"
           >
             Recursos · Materiales
