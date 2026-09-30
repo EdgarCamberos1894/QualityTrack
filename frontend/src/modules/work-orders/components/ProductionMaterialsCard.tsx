@@ -14,7 +14,7 @@ import {
   materialConsumptionSchema,
   type MaterialConsumptionFormValues,
 } from '../schemas/production.schemas'
-import type { WorkOrder360MaterialDto } from '../types/workOrder.types'
+import type { WorkOrder360MaterialDto } from '../types/workOrder360.types'
 
 interface ProductionMaterialsCardProps {
   consumptions: WorkOrder360MaterialDto[]
