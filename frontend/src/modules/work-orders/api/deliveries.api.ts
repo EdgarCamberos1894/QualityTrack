@@ -48,6 +48,20 @@ export async function completeDelivery(
   return response.data.data
 }
 
+export async function uploadDeliveryEvidence(
+  deliveryId: number,
+  file: File,
+): Promise<DeliveryDto> {
+  const form = new FormData()
+  form.append('file', file)
+
+  const response = await apiClient.post<ApiResponse<DeliveryDto>>(
+    `/deliveries/${deliveryId}/evidence-file`,
+    form,
+  )
+  return response.data.data
+}
+
 export async function attachDeliveryEvidence(
   deliveryId: number,
   payload: AttachDeliveryEvidencePayload,
