@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.materials.repository;
 
 import com.nocountry.qualitytrack.materials.entity.MaterialLot;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -12,6 +13,26 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MaterialLotRepository extends JpaRepository<MaterialLot, Long> {
+
+    @EntityGraph(attributePaths = {
+            "material",
+            "certificateDocumentVersion",
+            "certificateDocumentVersion.document"
+    })
+    @Query("""
+            select lot
+            from MaterialLot lot
+            join lot.material material
+            where lower(lot.lotNumber) like :pattern
+               or lower(coalesce(lot.supplier, '')) like :pattern
+               or lower(material.code) like :pattern
+               or lower(material.name) like :pattern
+            order by lot.receivedAt desc, lot.id desc
+            """)
+    List<MaterialLot> searchInternal(
+            @Param("pattern") String pattern,
+            Pageable pageable
+    );
 
     boolean existsByMaterial_IdAndLotNumberIgnoreCase(Long materialId, String lotNumber);
 
