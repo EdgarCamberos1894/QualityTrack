@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/Button'
 import { useCreateWorkOrder } from '../hooks/useCreateWorkOrder'
+import { getWorkOrderStatusPresentation } from '../model/workOrderPresenter'
 import type { CreateWorkOrderFormValues } from '../schemas/createWorkOrder.schema'
 import type {
   WorkOrderDetailDto,
@@ -47,6 +48,8 @@ export function WorkOrderCreationPanel({
   }
 
   if (existingWorkOrder) {
+    const status = getWorkOrderStatusPresentation(existingWorkOrder.status)
+
     return (
       <section className="flex flex-col gap-4 rounded-xl border border-emerald-200 bg-emerald-50/60 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -54,7 +57,7 @@ export function WorkOrderCreationPanel({
             Orden de trabajo creada
           </p>
           <p className="mt-1 text-sm font-semibold text-slate-950">
-            {existingWorkOrder.workOrderNumber} · En preparación
+            {existingWorkOrder.workOrderNumber} · {status.label}
           </p>
           <p className="mt-1 text-[10px] text-slate-600">
             La revisión aprobada ya fue convertida en un paquete operativo.
