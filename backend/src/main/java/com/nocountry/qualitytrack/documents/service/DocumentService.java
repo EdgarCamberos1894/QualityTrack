@@ -362,6 +362,47 @@ public class DocumentService {
     }
 
     @Transactional(readOnly = true)
+    public Map<Long, List<DocumentVersionResponse>> listVersionsByDocumentIdsInternal(
+            Long currentUserId,
+            List<Long> documentIds
+    ) {
+        accessService.requireInternalReader(currentUserId);
+
+        if (documentIds == null || documentIds.isEmpty()) {
+            return Map.of();
+        }
+
+        List<Long> distinctDocumentIds = documentIds.stream()
+                .distinct()
+                .toList();
+
+        Map<Long, List<DocumentVersionResponse>> versionsByDocumentId =
+                documentVersionRepository
+                        .findAllActiveByDocumentIds(
+                                DocumentStatus.ACTIVE,
+                                distinctDocumentIds
+                        )
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                version -> version.getDocument().getId(),
+                                LinkedHashMap::new,
+                                Collectors.mapping(
+                                        DocumentVersionResponse::from,
+                                        Collectors.toUnmodifiableList()
+                                )
+                        ));
+
+        if (versionsByDocumentId.size() != distinctDocumentIds.size()) {
+            throw new BusinessException(
+                    ApiErrorCode.DATA_CONFLICT,
+                    "Uno o más documentos operativos no tienen versiones activas disponibles."
+            );
+        }
+
+        return versionsByDocumentId;
+    }
+
+    @Transactional(readOnly = true)
     public DocumentDownload download(
             Long currentUserId,
             Long caseId,
