@@ -108,7 +108,8 @@ function DeliveryCard({
         </div>
       </div>
 
-      {delivery.evidenceDocumentVersionId ? (
+      {delivery.evidenceDocumentId !== null &&
+      delivery.evidenceDocumentVersionId !== null ? (
         <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
