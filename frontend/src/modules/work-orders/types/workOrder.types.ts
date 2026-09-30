@@ -232,6 +232,10 @@ export interface ReopenRoutingSheetPayload {
   reason: string
 }
 
+export interface CancelWorkOrderPayload {
+  reason?: string
+}
+
 export interface StartOperationExecutionPayload {
   machineId?: number
   startNotes?: string
