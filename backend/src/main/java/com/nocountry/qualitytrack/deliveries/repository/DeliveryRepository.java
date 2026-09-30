@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -81,6 +82,17 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
               and d.status = :deliveredStatus
             """)
     long sumDeliveredQuantityByWorkOrderId(
+            @Param("workOrderId") Long workOrderId,
+            @Param("deliveredStatus") DeliveryStatus deliveredStatus
+    );
+
+    @Query("""
+            select max(d.deliveredAt)
+            from Delivery d
+            where d.workOrder.id = :workOrderId
+              and d.status = :deliveredStatus
+            """)
+    Optional<Instant> findLatestDeliveredAtByWorkOrderId(
             @Param("workOrderId") Long workOrderId,
             @Param("deliveredStatus") DeliveryStatus deliveredStatus
     );
