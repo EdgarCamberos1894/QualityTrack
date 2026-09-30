@@ -4,9 +4,7 @@ import { useCustomerPortalContext } from '@/modules/customer-portal'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
-import { Button } from '@/shared/components/ui/Button'
 import { ApproveQuotationDialog } from '../components/ApproveQuotationDialog'
-import { CustomerQuotationAdjustmentNotice } from '../components/CustomerQuotationAdjustmentNotice'
 import { CustomerQuotationDocument } from '../components/CustomerQuotationDocument'
 import { CustomerQuotationHeader } from '../components/CustomerQuotationHeader'
 import { CustomerQuotationRevisionHistory } from '../components/CustomerQuotationRevisionHistory'
@@ -23,7 +21,6 @@ import {
   useRejectCustomerQuotation,
   useRequestCustomerQuotationAdjustment,
 } from '../hooks/useCustomerQuotationMutations'
-import { formatQuotationDate } from '../model/quotationPresenter'
 import type {
   CustomerAdjustmentFormValues,
   CustomerRejectionFormValues,
@@ -146,6 +143,11 @@ export function CustomerQuotationDetailPage() {
       <CustomerQuotationHeader
         quotation={quotation}
         customerName={customer.customerName}
+        canDecide={canDecide}
+        submitting={mutationPending}
+        onRequestAdjustment={() => openDialog('adjust')}
+        onReject={() => openDialog('reject')}
+        onApprove={() => openDialog('approve')}
       />
 
       <div className="space-y-4">
@@ -155,41 +157,6 @@ export function CustomerQuotationDetailPage() {
           caseNumber={quotation.caseNumber}
           requestNumber={quotation.requestNumber}
         />
-        <CustomerQuotationAdjustmentNotice quotation={quotation} />
-
-        <section className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-              Condiciones principales
-            </p>
-            <p className="mt-1 text-xs text-slate-700">
-              Vigencia: {formatQuotationDate(quotation.validUntil)} · Entrega
-              estimada: {formatQuotationDate(quotation.estimatedDeliveryDate)}
-            </p>
-          </div>
-
-          {canDecide ? (
-            <div className="flex flex-wrap gap-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={() => openDialog('adjust')}
-              >
-                Solicitar ajuste
-              </Button>
-              <Button
-                size="sm"
-                variant="danger"
-                onClick={() => openDialog('reject')}
-              >
-                Rechazar
-              </Button>
-              <Button size="sm" onClick={() => openDialog('approve')}>
-                Aprobar cotización
-              </Button>
-            </div>
-          ) : null}
-        </section>
 
         {customer.role === 'VIEWER' && quotation.customerStatus === 'SENT' ? (
           <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
