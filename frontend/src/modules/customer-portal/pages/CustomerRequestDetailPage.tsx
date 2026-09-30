@@ -353,6 +353,8 @@ export function CustomerRequestDetailPage() {
 
       <div className="mt-5">
         <CustomerDeliveryTracking
+          customerId={customer.customerId}
+          requestId={request.id}
           deliveries={deliveriesQuery.data}
           requestedQuantity={request.quantity}
           pending={deliveriesQuery.isPending}
