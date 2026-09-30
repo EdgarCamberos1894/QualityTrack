@@ -82,10 +82,11 @@ export function QuotationDetailPage() {
   const quotation = detailQuery.data
   const roles = session.user.roles
   const isAdmin = roles.includes('ADMIN')
-  const isCommercialOwner =
+  const isAssignedCommercial =
     roles.includes('COMMERCIAL') &&
-    String(quotation.createdByUserId) === session.user.id
-  const canManage = isAdmin || isCommercialOwner
+    quotation.source.assignedToUserId !== null &&
+    String(quotation.source.assignedToUserId) === session.user.id
+  const canManage = isAdmin || isAssignedCommercial
   const editable = quotation.status === 'DRAFT' && canManage
   const canCreateRevision =
     canManage && revisionEligibleStatuses.has(quotation.status)
