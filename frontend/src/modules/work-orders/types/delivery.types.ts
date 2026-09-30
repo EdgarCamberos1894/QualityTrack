@@ -25,6 +25,7 @@ export interface DeliveryDto {
   deliveredByUserId: number | null
   evidenceDocumentId: number | null
   evidenceDocumentVersionId: number | null
+  evidenceFileName: string | null
   createdByUserId: number
   cancelledAt: string | null
   cancelledByUserId: number | null
