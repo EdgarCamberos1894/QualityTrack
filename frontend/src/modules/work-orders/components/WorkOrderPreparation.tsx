@@ -203,7 +203,9 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
       />
 
       <WorkOrderPinnedDocuments
-        documents={data.documents}
+        documents={data.documents.filter(
+          ({ document }) => document.caseId !== null,
+        )}
         pinnedDocuments={data.workOrder.pinnedDocuments}
         canEdit={documentsEditable}
         saving={mutations.pinDocument.isPending}
