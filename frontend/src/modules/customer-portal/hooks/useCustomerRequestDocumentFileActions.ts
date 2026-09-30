@@ -1,0 +1,109 @@
+import { useState } from 'react'
+import { getCustomerRequestDocumentContent } from '../api/customerRequests.api'
+import type { RequestDocumentVersionDto } from '../types/customerRequest.types'
+
+function scheduleUrlRelease(url: string) {
+  window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
+}
+
+function downloadBlob(blob: Blob, fileName: string) {
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = fileName
+  document.body.appendChild(anchor)
+  anchor.click()
+  anchor.remove()
+  URL.revokeObjectURL(url)
+}
+
+function openBlob(blob: Blob, previewWindow: Window | null) {
+  const url = URL.createObjectURL(blob)
+
+  if (previewWindow) {
+    previewWindow.location.replace(url)
+  } else {
+    const anchor = document.createElement('a')
+    anchor.href = url
+    anchor.target = '_blank'
+    anchor.rel = 'noopener noreferrer'
+    document.body.appendChild(anchor)
+    anchor.click()
+    anchor.remove()
+  }
+
+  scheduleUrlRelease(url)
+}
+
+export function useCustomerRequestDocumentFileActions(
+  customerId: number,
+  requestId: number,
+) {
+  const [busyVersionId, setBusyVersionId] = useState<number | null>(null)
+  const [error, setError] = useState<unknown>(null)
+
+  const openVersion = async (
+    documentId: number,
+    version: RequestDocumentVersionDto,
+  ) => {
+    const previewWindow = window.open('', '_blank')
+
+    if (previewWindow) {
+      previewWindow.opener = null
+      previewWindow.document.title = 'Cargando documento…'
+      previewWindow.document.body.textContent = 'Cargando documento…'
+    }
+
+    setBusyVersionId(version.id)
+    setError(null)
+
+    try {
+      const blob = await getCustomerRequestDocumentContent(
+        customerId,
+        requestId,
+        documentId,
+        version.id,
+        false,
+      )
+      openBlob(blob, previewWindow)
+    } catch (requestError) {
+      previewWindow?.close()
+      setError(requestError)
+    } finally {
+      setBusyVersionId(null)
+    }
+  }
+
+  const downloadVersion = async (
+    documentId: number,
+    version: RequestDocumentVersionDto,
+  ) => {
+    setBusyVersionId(version.id)
+    setError(null)
+
+    try {
+      const blob = await getCustomerRequestDocumentContent(
+        customerId,
+        requestId,
+        documentId,
+        version.id,
+        true,
+      )
+      downloadBlob(blob, version.fileName)
+    } catch (requestError) {
+      setError(requestError)
+    } finally {
+      setBusyVersionId(null)
+    }
+  }
+
+  const clearError = () => setError(null)
+
+  return {
+    busyVersionId,
+    error,
+    clearError,
+    openVersion,
+    downloadVersion,
+  }
+}
