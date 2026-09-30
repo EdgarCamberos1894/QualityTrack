@@ -18,6 +18,8 @@ function activeStep(status: CustomerRequestStatus): number {
       return 2
     case 'IN_PRODUCTION':
       return 3
+    case 'COMPLETED':
+      return 4
     case 'CANCELLED':
       return 0
   }
