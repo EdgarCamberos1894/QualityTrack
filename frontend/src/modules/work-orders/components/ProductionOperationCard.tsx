@@ -92,8 +92,9 @@ export function ProductionOperationCard({
                 <Badge tone="success">Completada</Badge>
               ) : cancelledCount > 0 ? (
                 <Badge tone="danger">
-                  {cancelledCount} intento{cancelledCount === 1 ? '' : 's'} cancelado
-                  {cancelledCount === 1 ? '' : 's'}
+                  {cancelledCount === 1
+                    ? '1 intento cancelado'
+                    : `${cancelledCount} intentos cancelados`}
                 </Badge>
               ) : !unlocked ? (
                 <Badge tone="neutral">Bloqueada</Badge>
