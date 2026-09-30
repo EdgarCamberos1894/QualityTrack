@@ -12,3 +12,22 @@ export async function getCustomerRequestDeliveries(
 
   return response.data.data
 }
+
+
+export async function getCustomerDeliveryEvidenceContent(
+  customerId: number,
+  requestId: number,
+  documentId: number,
+  versionId: number,
+  download = false,
+): Promise<Blob> {
+  const response = await apiClient.get<Blob>(
+    `/customers/${customerId}/requests/${requestId}/documents/${documentId}/versions/${versionId}/content`,
+    {
+      params: download ? { download: true } : undefined,
+      responseType: 'blob',
+    },
+  )
+
+  return response.data
+}
