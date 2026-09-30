@@ -14,6 +14,7 @@ import com.nocountry.qualitytrack.documents.enums.DocumentStatus;
 import com.nocountry.qualitytrack.documents.repository.DocumentVersionRepository;
 import com.nocountry.qualitytrack.documents.service.DocumentAccessService;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
+import com.nocountry.qualitytrack.requests.enums.JobCaseStatus;
 import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
@@ -329,6 +330,8 @@ public class DeliveryService {
 
         boolean workOrderCompleted = deliveredQuantity == workOrder.getPlannedQuantity();
         WorkOrderStatus previousWorkOrderStatus = workOrder.getStatus();
+        JobCase completedJobCase = null;
+        JobCaseStatus previousJobCaseStatus = null;
 
         if (workOrderCompleted) {
             try {
@@ -337,6 +340,15 @@ public class DeliveryService {
                 conflict(exception.getMessage());
             }
             workOrderRepository.saveAndFlush(workOrder);
+
+            completedJobCase = workOrder.getJobCase();
+            previousJobCaseStatus = completedJobCase.getStatus();
+            try {
+                completedJobCase.complete(Instant.now());
+            } catch (IllegalArgumentException | IllegalStateException exception) {
+                conflict(exception.getMessage());
+            }
+            jobCaseRepository.saveAndFlush(completedJobCase);
         }
 
         traceabilityService.record(
@@ -372,6 +384,25 @@ public class DeliveryService {
                     metadata(
                             "workOrderNumber", workOrder.getWorkOrderNumber(),
                             "deliveredQuantity", deliveredQuantity
+                    )
+            );
+
+            traceabilityService.record(
+                    completedJobCase,
+                    TraceabilityAggregateType.JOB_CASE,
+                    completedJobCase.getId(),
+                    TraceabilityEventType.JOB_CASE_COMPLETED,
+                    previousJobCaseStatus.name(),
+                    JobCaseStatus.COMPLETED.name(),
+                    currentUserId,
+                    metadata(
+                            "caseNumber", completedJobCase.getCaseNumber(),
+                            "workOrderId", workOrder.getId(),
+                            "workOrderNumber", workOrder.getWorkOrderNumber(),
+                            "finalDeliveryId", delivery.getId(),
+                            "finalDeliveredAt", delivery.getDeliveredAt(),
+                            "deliveredQuantity", deliveredQuantity,
+                            "plannedQuantity", workOrder.getPlannedQuantity()
                     )
             );
         }
