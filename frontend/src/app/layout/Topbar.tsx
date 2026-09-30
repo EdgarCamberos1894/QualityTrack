@@ -116,7 +116,7 @@ export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
         {getBreadcrumb(location.pathname, location.search)}
       </p>
 
-      <div className="ml-auto flex min-w-0 items-center gap-3 md:ml-6">
+      <div className="ml-auto flex min-w-0 flex-1 items-center justify-end md:ml-6">
         <GlobalSearch />
       </div>
 
