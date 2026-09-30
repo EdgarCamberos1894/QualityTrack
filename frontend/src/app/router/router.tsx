@@ -7,6 +7,8 @@ import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { PublicOnlyRoute } from '@/app/router/PublicOnlyRoute'
 import { LoginPage } from '@/modules/auth'
 import {
+  CustomerCompanyPage,
+  CustomerMembersPage,
   CustomerPortalHomePage,
   CustomerPortalLandingPage,
   CustomerPortalShell,
@@ -89,6 +91,14 @@ export const router = createBrowserRouter([
               {
                 path: '/portal/:customerId/requests/:requestId',
                 element: <CustomerRequestDetailPage />,
+              },
+              {
+                path: '/portal/:customerId/members',
+                element: <CustomerMembersPage />,
+              },
+              {
+                path: '/portal/:customerId/company',
+                element: <CustomerCompanyPage />,
               },
               {
                 path: '/portal/:customerId/quotations',
