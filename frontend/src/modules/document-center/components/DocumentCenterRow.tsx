@@ -5,6 +5,7 @@ import {
   formatDocumentDateTime,
   formatDocumentFileSize,
   getDocumentContextSummary,
+  getDocumentSourceLabel,
 } from '../model/documentCenterPresenter'
 import type { DocumentCenterDto } from '../types/documentCenter.types'
 
@@ -32,7 +33,7 @@ export function DocumentCenterRow({
           {formatDocumentFileSize(document.currentVersion.fileSize)}
         </p>
         <p className="mt-1 truncate text-[9px] text-slate-400">
-          {document.customerName} · {document.requestNumber}
+          {getDocumentSourceLabel(document)}
         </p>
       </div>
 
@@ -44,12 +45,21 @@ export function DocumentCenterRow({
         <p className="text-[10px] font-semibold text-slate-700">
           {getDocumentContextSummary(document)}
         </p>
-        <Link
-          to={`/job-cases/${document.caseId}?tab=documents#document-${document.id}`}
-          className="mt-1 inline-flex text-[9px] font-semibold text-blue-600 hover:underline"
-        >
-          {document.caseNumber}
-        </Link>
+        {document.caseId && document.caseNumber ? (
+          <Link
+            to={`/job-cases/${document.caseId}?tab=documents#document-${document.id}`}
+            className="mt-1 inline-flex text-[9px] font-semibold text-blue-600 hover:underline"
+          >
+            {document.caseNumber}
+          </Link>
+        ) : (
+          <Link
+            to="/resources"
+            className="mt-1 inline-flex text-[9px] font-semibold text-blue-600 hover:underline"
+          >
+            Recursos · Materiales
+          </Link>
+        )}
       </div>
 
       <p className="text-[10px] font-semibold text-slate-700">
