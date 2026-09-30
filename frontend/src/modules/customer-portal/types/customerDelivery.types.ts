@@ -19,4 +19,5 @@ export interface CustomerDeliveryDto {
   receivedByName: string | null
   evidenceDocumentId: number | null
   evidenceDocumentVersionId: number | null
+  evidenceFileName: string | null
 }
