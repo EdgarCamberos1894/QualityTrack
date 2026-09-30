@@ -1,5 +1,5 @@
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
-import type { WorkOrder360DocumentDto } from '../types/workOrder.types'
+import type { WorkOrder360DocumentDto } from '../types/workOrder360.types'
 
 interface WorkOrderDocumentsProps {
   documents: WorkOrder360DocumentDto[]
