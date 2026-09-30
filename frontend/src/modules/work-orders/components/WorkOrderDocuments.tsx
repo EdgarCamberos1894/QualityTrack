@@ -19,8 +19,9 @@ export function WorkOrderDocuments({ documents }: WorkOrderDocumentsProps) {
     <div className="grid gap-3">
       {documents.map(({ document, versions }) => (
         <article
+          id={`document-${document.id}`}
           key={document.id}
-          className="rounded-xl border border-[#d9e2ee] bg-white p-4"
+          className="scroll-mt-24 rounded-xl border border-[#d9e2ee] bg-white p-4 target:ring-2 target:ring-blue-300"
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>

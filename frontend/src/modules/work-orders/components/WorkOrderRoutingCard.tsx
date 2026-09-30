@@ -143,7 +143,10 @@ export function WorkOrderRoutingCard({
     routing.status === 'APPROVED' && canDesign && workOrderStatus === 'CREATED'
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5">
+    <section
+      id={`routing-sheet-${routing.id}`}
+      className="scroll-mt-24 rounded-xl border border-slate-200 bg-white p-5 target:ring-2 target:ring-blue-300"
+    >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-[9px] font-semibold uppercase tracking-wide text-amber-700">

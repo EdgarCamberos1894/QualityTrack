@@ -40,7 +40,10 @@ export function QualityInspectionCard({
   const isReinspection = inspection.reworkNonConformityId !== null
 
   return (
-    <article className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <article
+      id={`quality-inspection-${inspection.id}`}
+      className="scroll-mt-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm target:ring-2 target:ring-blue-300"
+    >
       <div className="border-b border-slate-200 px-5 py-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -145,7 +148,11 @@ export function QualityInspectionCard({
               </thead>
               <tbody className="divide-y divide-slate-100 text-[10px] text-slate-700">
                 {inspection.measurements.map((measurement) => (
-                  <tr key={measurement.id}>
+                  <tr
+                    id={`quality-measurement-${measurement.id}`}
+                    key={measurement.id}
+                    className="scroll-mt-24 target:bg-blue-50"
+                  >
                     <td className="px-3 py-3">
                       <p className="font-semibold text-slate-900">
                         {measurement.characteristic}

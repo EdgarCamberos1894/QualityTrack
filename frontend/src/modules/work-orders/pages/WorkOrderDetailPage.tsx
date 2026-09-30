@@ -1,12 +1,11 @@
-import { useMemo } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useEffect, useMemo } from 'react'
+import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { WorkOrderDeliveries } from '../components/WorkOrderDeliveries'
 import { WorkOrderDetailHeader } from '../components/WorkOrderDetailHeader'
 import { WorkOrderDocuments } from '../components/WorkOrderDocuments'
-import { WorkOrderOriginChain } from '../components/WorkOrderOriginChain'
 import { WorkOrderPreparation } from '../components/WorkOrderPreparation'
 import { WorkOrderProduction } from '../components/WorkOrderProduction'
 import { WorkOrderQuality } from '../components/WorkOrderQuality'
@@ -34,6 +33,7 @@ function resolveTab(value: string | null): WorkOrderDetailTab {
 
 export function WorkOrderDetailPage() {
   const { workOrderId } = useParams()
+  const location = useLocation()
   const [searchParams, setSearchParams] = useSearchParams()
   const numericId = Number(workOrderId)
   const validId =
@@ -57,7 +57,7 @@ export function WorkOrderDetailPage() {
     }
 
     if (activeTab === 'traceability') {
-      return <WorkOrderTimeline events={query.data.timeline} />
+      return <WorkOrderTimeline data={query.data} />
     }
 
     if (activeTab === 'documents') {
@@ -72,8 +72,22 @@ export function WorkOrderDetailPage() {
       return <WorkOrderDeliveries data={query.data} />
     }
 
-    return <WorkOrderSummary workOrder={query.data.workOrder} />
+    return <WorkOrderSummary data={query.data} />
   }, [activeTab, query.data])
+
+  useEffect(() => {
+    if (!query.data || !location.hash) return
+
+    const frame = window.requestAnimationFrame(() => {
+      const targetId = decodeURIComponent(location.hash.slice(1))
+      document.getElementById(targetId)?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [activeTab, location.hash, query.data])
 
   if (validId === null) {
     return (
@@ -110,11 +124,6 @@ export function WorkOrderDetailPage() {
       <WorkOrderDetailHeader workOrder={query.data.workOrder} />
 
       <div className="space-y-4">
-        <WorkOrderOriginChain
-          workOrder={query.data.workOrder}
-          eventCount={query.data.timeline.length}
-        />
-
         <WorkOrderTabs
           activeTab={activeTab}
           counts={{

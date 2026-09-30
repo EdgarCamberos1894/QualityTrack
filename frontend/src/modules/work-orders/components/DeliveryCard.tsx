@@ -31,7 +31,10 @@ export function DeliveryCard({
     delivery.status === 'PENDING' || delivery.status === 'DISPATCHED'
 
   return (
-    <article className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <article
+      id={`delivery-${delivery.id}`}
+      className="scroll-mt-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm target:ring-2 target:ring-blue-300"
+    >
       <div className="border-b border-slate-100 px-5 py-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>

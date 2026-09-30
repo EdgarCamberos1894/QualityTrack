@@ -52,6 +52,7 @@ export function ReworkOperationCard({
 
   return (
     <article
+      id={`routing-operation-${operation.id}`}
       className={
         inProgress
           ? 'rounded-xl border border-amber-300 bg-amber-50/40 p-4'
@@ -152,8 +153,9 @@ export function ReworkOperationCard({
 
               return (
                 <div
+                  id={`operation-execution-${execution.id}`}
                   key={execution.id}
-                  className="grid gap-2 rounded-lg bg-white px-3 py-3 text-[10px] text-slate-600 sm:grid-cols-[70px_110px_1fr_1fr_auto]"
+                  className="scroll-mt-24 grid gap-2 rounded-lg bg-white px-3 py-3 text-[10px] text-slate-600 target:ring-2 target:ring-blue-300 sm:grid-cols-[70px_110px_1fr_1fr_auto]"
                 >
                   <span className="font-semibold text-slate-900">
                     Intento {execution.attemptNumber}

@@ -144,7 +144,10 @@ export function NonConformityCard({
   const open = nonConformity.status === 'OPEN'
 
   return (
-    <article className="overflow-hidden rounded-xl border border-red-200 bg-white shadow-sm">
+    <article
+      id={`non-conformity-${nonConformity.id}`}
+      className="scroll-mt-24 overflow-hidden rounded-xl border border-red-200 bg-white shadow-sm target:ring-2 target:ring-blue-300"
+    >
       <div className="border-b border-red-100 bg-red-50/60 px-5 py-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>

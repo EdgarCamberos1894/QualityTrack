@@ -1,4 +1,5 @@
 import type { MaterialLotDto, WorkOrderMaterialDto } from '@/modules/materials'
+import type { QuotationDto } from '@/modules/quotations'
 import type { DeliveryDto } from './delivery.types'
 import type { NonConformityDto, QualityInspectionDto } from './quality.types'
 import type {
@@ -13,8 +14,24 @@ export interface TraceabilitySnapshotDto {
   details: Record<string, unknown>
 }
 
+export type TraceabilityActionType =
+  | 'VIEW_CUSTOMER_REQUEST'
+  | 'VIEW_JOB_CASE'
+  | 'VIEW_QUOTATION'
+  | 'VIEW_WORK_ORDER'
+  | 'VIEW_ROUTING_SHEET'
+  | 'VIEW_ROUTING_OPERATION'
+  | 'VIEW_OPERATION_EXECUTION'
+  | 'VIEW_DOCUMENT'
+  | 'VIEW_DOCUMENT_VERSION'
+  | 'VIEW_MATERIAL_LOT'
+  | 'VIEW_QUALITY_INSPECTION'
+  | 'VIEW_QUALITY_MEASUREMENT'
+  | 'VIEW_NON_CONFORMITY'
+  | 'VIEW_DELIVERY'
+
 export interface TraceabilityActionDto {
-  type: string
+  type: TraceabilityActionType
   label: string
   resourceType: string
   resourceId: number
@@ -66,7 +83,7 @@ export interface WorkOrder360MaterialDto {
 
 export interface WorkOrder360Dto {
   workOrder: WorkOrderDetailDto
-  quotationRevisions: unknown[]
+  quotationRevisions: QuotationDto[]
   routingSheets: RoutingSheetDto[]
   production: ProductionStatusDto
   materials: WorkOrder360MaterialDto[]

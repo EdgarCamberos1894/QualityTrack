@@ -59,12 +59,13 @@ export function ProductionOperationCard({
 
   return (
     <article
+      id={`routing-operation-${operation.id}`}
       className={
         inProgress
-          ? 'rounded-xl border border-amber-300 bg-amber-50/40 p-4'
+          ? 'scroll-mt-24 rounded-xl border border-amber-300 bg-amber-50/40 p-4 target:ring-2 target:ring-blue-300'
           : completed
-            ? 'rounded-xl border border-emerald-200 bg-emerald-50/30 p-4'
-            : 'rounded-xl border border-slate-200 bg-white p-4'
+            ? 'scroll-mt-24 rounded-xl border border-emerald-200 bg-emerald-50/30 p-4 target:ring-2 target:ring-blue-300'
+            : 'scroll-mt-24 rounded-xl border border-slate-200 bg-white p-4 target:ring-2 target:ring-blue-300'
       }
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -159,8 +160,9 @@ export function ProductionOperationCard({
 
               return (
                 <div
+                  id={`operation-execution-${execution.id}`}
                   key={execution.id}
-                  className="grid gap-2 rounded-lg bg-white px-3 py-3 text-[10px] text-slate-600 sm:grid-cols-[70px_110px_1fr_1fr_auto]"
+                  className="scroll-mt-24 grid gap-2 rounded-lg bg-white px-3 py-3 text-[10px] text-slate-600 target:ring-2 target:ring-blue-300 sm:grid-cols-[70px_110px_1fr_1fr_auto]"
                 >
                   <span className="font-semibold text-slate-900">
                     Intento {execution.attemptNumber}

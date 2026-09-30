@@ -181,8 +181,9 @@ export function ProductionMaterialsCard({
           <div className="grid gap-2">
             {consumptions.map(({ consumption, lot }) => (
               <article
+                id={`material-lot-${lot.id}`}
                 key={consumption.id}
-                className="grid gap-2 rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-[10px] sm:grid-cols-[1fr_1fr_auto]"
+                className="scroll-mt-24 grid gap-2 rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-[10px] target:ring-2 target:ring-blue-300 sm:grid-cols-[1fr_1fr_auto]"
               >
                 <div>
                   <p className="font-semibold text-slate-950">

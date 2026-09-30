@@ -38,8 +38,9 @@ export function RoutingOperationsList({
     <div className="space-y-2">
       {operations.map((item) => (
         <article
+          id={`routing-operation-${item.id}`}
           key={item.id}
-          className="rounded-xl border border-slate-200 bg-slate-50/70 p-4"
+          className="scroll-mt-24 rounded-xl border border-slate-200 bg-slate-50/70 p-4 target:ring-2 target:ring-blue-300"
         >
           <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div className="flex min-w-0 gap-3">
