@@ -18,7 +18,8 @@ public interface MaterialLotRepository extends JpaRepository<MaterialLot, Long> 
     boolean existsByCertificateDocumentVersion_Document_Id(Long documentId);
 
     @EntityGraph(attributePaths = {
-            "certificateDocumentVersion"
+            "certificateDocumentVersion",
+            "certificateDocumentVersion.document"
     })
     List<MaterialLot> findAllByCertificateDocumentVersion_Document_IdOrderByIdAsc(Long documentId);
 
@@ -34,10 +35,18 @@ public interface MaterialLotRepository extends JpaRepository<MaterialLot, Long> 
             @Param("documentIds") List<Long> documentIds
     );
 
-    @EntityGraph(attributePaths = {"material", "certificateDocumentVersion"})
+    @EntityGraph(attributePaths = {
+            "material",
+            "certificateDocumentVersion",
+            "certificateDocumentVersion.document"
+    })
     List<MaterialLot> findAllByMaterial_IdOrderByReceivedAtDesc(Long materialId);
 
-    @EntityGraph(attributePaths = {"material", "certificateDocumentVersion"})
+    @EntityGraph(attributePaths = {
+            "material",
+            "certificateDocumentVersion",
+            "certificateDocumentVersion.document"
+    })
     List<MaterialLot> findAllByIdIn(List<Long> lotIds);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
@@ -45,7 +54,8 @@ public interface MaterialLotRepository extends JpaRepository<MaterialLot, Long> 
             select lot
             from MaterialLot lot
             join fetch lot.material
-            left join fetch lot.certificateDocumentVersion
+            left join fetch lot.certificateDocumentVersion version
+            left join fetch version.document
             where lot.id = :lotId
             """)
     Optional<MaterialLot> findByIdForUpdate(@Param("lotId") Long lotId);
