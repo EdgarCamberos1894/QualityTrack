@@ -63,7 +63,7 @@ class InternalUserServiceTest {
                 ))
         );
 
-        assertEquals(Set.of(SystemRole.ENGINEERING, SystemRole.QUALITY), response.roles());
+        assertEquals(List.of(SystemRole.ENGINEERING, SystemRole.QUALITY), response.roles());
         verify(roleRepository).deleteAllByIdUserId(2L);
         verify(roleRepository).saveAll(any());
     }
