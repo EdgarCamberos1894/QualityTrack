@@ -17,6 +17,7 @@ const tabs: Array<{
 }> = [
   { id: 'summary', label: 'Resumen' },
   { id: 'preparation', label: 'Preparación' },
+  { id: 'production', label: 'Producción' },
   { id: 'traceability', label: 'Trazabilidad' },
   { id: 'documents', label: 'Documentos' },
   { id: 'quality', label: 'Calidad' },
