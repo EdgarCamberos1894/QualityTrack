@@ -2,6 +2,7 @@ import type { WorkOrder360Dto } from '../types/workOrder360.types'
 import { apiClient } from '@/shared/api/apiClient'
 import type { ApiResponse } from '@/shared/api/api.types'
 import type {
+  CancelWorkOrderPayload,
   CreateWorkOrderPayload,
   ReopenRoutingSheetPayload,
   RoutingOperationPayload,
@@ -139,6 +140,19 @@ export async function releaseRoutingSheet(
 ): Promise<RoutingSheetDto> {
   const response = await apiClient.post<ApiResponse<RoutingSheetDto>>(
     `/routing-sheets/${routingSheetId}/release`,
+  )
+
+  return response.data.data
+}
+
+
+export async function cancelWorkOrder(
+  workOrderId: number,
+  payload: CancelWorkOrderPayload,
+): Promise<WorkOrderDetailDto> {
+  const response = await apiClient.post<ApiResponse<WorkOrderDetailDto>>(
+    `/work-orders/${workOrderId}/cancel`,
+    payload,
   )
 
   return response.data.data
