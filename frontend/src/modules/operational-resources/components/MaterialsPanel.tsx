@@ -33,7 +33,9 @@ export function MaterialsPanel({
   const materials = query.data ?? []
 
   useEffect(() => {
-    if (materials.length === 0) {
+    const [firstMaterial] = materials
+
+    if (!firstMaterial) {
       setSelectedId(null)
       return
     }
@@ -52,7 +54,7 @@ export function MaterialsPanel({
       !selectedId ||
       !materials.some((material) => material.id === selectedId)
     ) {
-      setSelectedId(materials[0].id)
+      setSelectedId(firstMaterial.id)
     }
   }, [materials, requestedMaterialId, selectedId])
 
