@@ -34,7 +34,7 @@ export function DeliveryCard({
       className="scroll-mt-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm target:ring-2 target:ring-blue-300"
     >
       <div className="border-b border-slate-100 px-5 py-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex flex-col gap-4 @3xl/page:flex-row @3xl/page:items-start @3xl/page:justify-between">
           <div>
             <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-700">
               Entrega #{delivery.id}
