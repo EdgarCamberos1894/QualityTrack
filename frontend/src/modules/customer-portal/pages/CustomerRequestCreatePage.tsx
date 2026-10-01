@@ -9,6 +9,7 @@ import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { CustomerRequestDetailsStep } from '../components/CustomerRequestDetailsStep'
 import { CustomerRequestRequirementsStep } from '../components/CustomerRequestRequirementsStep'
 import { CustomerRequestReviewStep } from '../components/CustomerRequestReviewStep'
+import { CustomerRequestStepActions } from '../components/CustomerRequestStepActions'
 import { CustomerRequestWizardSteps } from '../components/CustomerRequestWizardSteps'
 import { useCustomerPortalContext } from '../hooks/useCustomerPortalContext'
 import { useSubmitCustomerRequest } from '../hooks/useCustomerRequestMutations'
@@ -157,7 +158,20 @@ export function CustomerRequestCreatePage() {
         >
           <div>
             {step === 0 ? (
-              <CustomerRequestDetailsStep register={register} errors={errors} />
+              <CustomerRequestDetailsStep
+                register={register}
+                errors={errors}
+                actions={
+                  <CustomerRequestStepActions
+                    step={step}
+                    customerId={customer.customerId}
+                    pending={mutation.isPending}
+                    onBack={() => setStep((current) => current - 1)}
+                    onContinue={() => void goToRequirements()}
+                    onReview={() => void goToReview()}
+                  />
+                }
+              />
             ) : null}
 
             {step === 1 ? (
@@ -174,6 +188,16 @@ export function CustomerRequestCreatePage() {
                     current.filter((_, itemIndex) => itemIndex !== index),
                   )
                 }
+                actions={
+                  <CustomerRequestStepActions
+                    step={step}
+                    customerId={customer.customerId}
+                    pending={mutation.isPending}
+                    onBack={() => setStep((current) => current - 1)}
+                    onContinue={() => void goToRequirements()}
+                    onReview={() => void goToReview()}
+                  />
+                }
               />
             ) : null}
 
@@ -183,6 +207,16 @@ export function CustomerRequestCreatePage() {
                 documents={documents}
                 onEditDetails={() => setStep(0)}
                 onEditRequirements={() => setStep(1)}
+                actions={
+                  <CustomerRequestStepActions
+                    step={step}
+                    customerId={customer.customerId}
+                    pending={mutation.isPending}
+                    onBack={() => setStep((current) => current - 1)}
+                    onContinue={() => void goToRequirements()}
+                    onReview={() => void goToReview()}
+                  />
+                }
               />
             ) : null}
           </div>
@@ -193,64 +227,6 @@ export function CustomerRequestCreatePage() {
             </p>
           ) : null}
 
-          <div className="mt-4 flex shrink-0 flex-col gap-3 border-t border-slate-200 pt-3 sm:flex-row sm:items-center sm:justify-between lg:mt-auto">
-            <div>
-              <p className="text-[9px] font-medium text-slate-400">
-                Paso {step + 1} de 3
-              </p>
-              <p className="mt-0.5 text-[9px] text-slate-500">
-                {step === 0
-                  ? 'Completa los detalles básicos para continuar.'
-                  : step === 1
-                    ? 'Revisa requisitos y documentos antes de confirmar.'
-                    : 'Confirma la información antes de enviar la solicitud.'}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-              {step === 0 ? (
-                <Link
-                  to={`/portal/${customer.customerId}/requests`}
-                  className="inline-flex h-10 min-w-32 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-                >
-                  Cancelar
-                </Link>
-              ) : (
-                <Button
-                  variant="secondary"
-                  onClick={() => setStep((current) => current - 1)}
-                  disabled={mutation.isPending}
-                  className="min-w-32"
-                >
-                  Atrás
-                </Button>
-              )}
-
-              {step === 0 ? (
-                <Button
-                  onClick={() => void goToRequirements()}
-                  className="min-w-40"
-                >
-                  Continuar
-                </Button>
-              ) : step === 1 ? (
-                <Button
-                  onClick={() => void goToReview()}
-                  className="min-w-44"
-                >
-                  Revisar solicitud
-                </Button>
-              ) : (
-                <Button
-                  type="submit"
-                  disabled={mutation.isPending}
-                  className="min-w-44"
-                >
-                  {mutation.isPending ? 'Enviando…' : 'Enviar solicitud'}
-                </Button>
-              )}
-            </div>
-          </div>
         </form>
       </div>
     </PageContainer>
