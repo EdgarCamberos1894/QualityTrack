@@ -34,7 +34,7 @@ export function QuotationSourceCard({ source }: QuotationSourceCardProps) {
         Origen · {source.caseNumber} / {source.requestNumber}
       </p>
 
-      <dl className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <dl className="mt-4 grid gap-4 sm:grid-cols-2 @5xl/page:grid-cols-4">
         <SourceItem label="Trabajo" value={source.title} />
         <SourceItem label="Cantidad" value={`${source.quantity} piezas`} />
         <SourceItem label="Material" value={materialLabel} />
