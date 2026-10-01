@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
+import { useCustomerQuotations } from '@/modules/quotations'
 import { Card } from '@/shared/components/ui/Card'
 import { CancelCustomerRequestDialog } from '../components/CancelCustomerRequestDialog'
 import { CustomerDeliveryTracking } from '../components/CustomerDeliveryTracking'
@@ -32,6 +33,10 @@ export function CustomerRequestDetailPage() {
   const validId =
     Number.isInteger(numericId) && numericId > 0 ? numericId : null
   const query = useCustomerRequestDetail(customer.customerId, validId)
+  const quotationsQuery = useCustomerQuotations(
+    customer.customerId,
+    query.data?.jobCase.status === 'READY_FOR_QUOTATION',
+  )
   const deliveriesQuery = useCustomerRequestDeliveries(
     customer.customerId,
     validId,
@@ -72,6 +77,10 @@ export function CustomerRequestDetailPage() {
   }
 
   const request = query.data
+  const relatedQuotation =
+    quotationsQuery.data?.find(
+      (quotation) => quotation.requestNumber === request.requestNumber,
+    ) ?? null
   const deliverySummary = getCustomerDeliverySummary(
     deliveriesQuery.data ?? [],
     request.quantity,
@@ -142,6 +151,7 @@ export function CustomerRequestDetailPage() {
       <CustomerRequestOverview
         customerId={customer.customerId}
         request={request}
+        quotationId={relatedQuotation?.id}
         deliveryProgress={deliveryProgress}
         canWrite={canWrite}
         canCancel={canCancel}
