@@ -55,7 +55,7 @@ export function CustomerQuotationDetailPage() {
 
   if (validId === null) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <ErrorState
           error={new Error('El identificador de la cotización no es válido.')}
           title="Cotización no disponible"
@@ -141,6 +141,7 @@ export function CustomerQuotationDetailPage() {
   return (
     <PageContainer>
       <CustomerQuotationHeader
+        customerId={customer.customerId}
         quotation={quotation}
         customerName={customer.customerName}
         canDecide={canDecide}
