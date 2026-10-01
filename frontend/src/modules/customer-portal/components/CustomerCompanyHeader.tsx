@@ -31,9 +31,9 @@ export function CustomerCompanyHeader({
     <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-white via-white to-slate-100/75 shadow-[0_12px_34px_-30px_rgba(15,23,42,0.35)]">
       <div className="pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full bg-slate-200/50 blur-3xl" />
 
-      <div className="relative px-5 py-4 lg:px-6">
+      <div className="relative px-5 py-3 lg:px-6">
         <div className="flex min-w-0 items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200/60">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm shadow-blue-200/60">
             <SidebarNavIcon name="company" className="h-4 w-4" />
           </div>
 
@@ -52,13 +52,13 @@ export function CustomerCompanyHeader({
                 {formatStatus(status)}
               </Badge>
             </div>
-            <p className="mt-1 max-w-2xl text-[11px] leading-5 text-slate-600">
+            <p className="mt-0.5 max-w-2xl text-[10px] leading-4 text-slate-600">
               Información administrativa y de contacto usada dentro de QualityTrack.
             </p>
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-slate-200/80 pt-3">
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-1.5 border-t border-slate-200/80 pt-2.5">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
             <span className="text-[9px] font-medium text-slate-500">
