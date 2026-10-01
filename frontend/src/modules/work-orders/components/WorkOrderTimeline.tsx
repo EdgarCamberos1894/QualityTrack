@@ -43,15 +43,17 @@ export function WorkOrderTimeline({ data }: WorkOrderTimelineProps) {
   )
 
   return (
-    <section className="rounded-xl border border-[#d9e2ee] bg-white p-4">
-      <div className="flex flex-col gap-4 border-b border-slate-100 pb-4 sm:flex-row sm:items-end sm:justify-between">
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-30px_rgba(15,23,42,0.3)]">
+      <div className="flex flex-col gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-[15px] font-semibold text-slate-950">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+            Expediente 360
+          </p>
+          <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
             Historial completo
           </h2>
-          <p className="mt-1 text-[10px] leading-5 text-slate-500">
-            Eventos ordenados por occurred_at, actor y entidad afectada. Las
-            acciones Ver abren el registro real dentro de QualityTrack.
+          <p className="mt-0.5 text-[8px] leading-4 text-slate-400">
+            Eventos auditables y accesos a sus registros de origen.
           </p>
         </div>
 
@@ -62,7 +64,7 @@ export function WorkOrderTimeline({ data }: WorkOrderTimelineProps) {
               type="button"
               onClick={() => setFilter(item.id)}
               className={cn(
-                'rounded-full px-3 py-1.5 text-[9px] font-semibold',
+                'rounded-full px-2.5 py-1 text-[8px] font-semibold',
                 filter === item.id
                   ? 'bg-blue-50 text-blue-700'
                   : 'bg-slate-50 text-slate-600 hover:bg-slate-100',
@@ -76,14 +78,14 @@ export function WorkOrderTimeline({ data }: WorkOrderTimelineProps) {
       </div>
 
       {visibleEvents.length === 0 ? (
-        <div className="mt-4">
+        <div className="p-4">
           <EmptyState
             title="Sin eventos en esta etapa"
             description="No hay registros de trazabilidad que coincidan con el filtro seleccionado."
           />
         </div>
       ) : (
-        <div className="relative mt-4 space-y-3 pl-7 before:absolute before:bottom-2 before:left-[6px] before:top-2 before:w-px before:bg-slate-200">
+        <div className="relative space-y-2.5 px-4 py-3.5 pl-9 before:absolute before:bottom-5 before:left-[21px] before:top-5 before:w-px before:bg-slate-200">
           {visibleEvents.map((event) => {
             const phase = getTimelinePhase(event)
             const presentation = getTimelinePhasePresentation(phase)
@@ -132,20 +134,20 @@ export function WorkOrderTimeline({ data }: WorkOrderTimelineProps) {
                   }
                 }}
                 className={cn(
-                  'relative rounded-[9px] border border-[#d9e2ee] bg-white p-3 transition',
+                  'relative rounded-lg border border-slate-200 bg-white px-3 py-2.5 transition',
                   primaryHref &&
                     'cursor-pointer hover:border-blue-200 hover:bg-blue-50/30 focus:outline-none focus:ring-2 focus:ring-blue-200',
                 )}
               >
                 <span
                   className={cn(
-                    'absolute -left-[28px] top-4 h-3 w-3 rounded-full ring-4 ring-white',
+                    'absolute -left-[23px] top-3.5 h-2.5 w-2.5 rounded-full ring-4 ring-white',
                     presentation.dotClassName,
                   )}
                 />
 
-                <div className="grid gap-3 lg:grid-cols-[126px_minmax(180px,0.8fr)_minmax(160px,0.7fr)_minmax(0,1.5fr)] lg:items-start">
-                  <time className="text-[9px] font-medium text-slate-500">
+                <div className="grid gap-2.5 lg:grid-cols-[110px_minmax(150px,0.72fr)_minmax(140px,0.65fr)_minmax(0,1.5fr)] lg:items-start">
+                  <time className="text-[8px] font-medium text-slate-500">
                     {formatTimelineDate(event.occurredAt)}
                   </time>
 
@@ -153,34 +155,34 @@ export function WorkOrderTimeline({ data }: WorkOrderTimelineProps) {
                     <div className="flex flex-wrap items-center gap-2">
                       <span
                         className={cn(
-                          'rounded-full px-2.5 py-1 text-[9px] font-semibold',
+                          'rounded-full px-2.5 py-1 text-[8px] font-semibold',
                           presentation.badgeClassName,
                         )}
                       >
                         {presentation.label}
                       </span>
                     </div>
-                    <h3 className="mt-2 text-[10px] font-semibold text-slate-950">
+                    <h3 className="mt-2 text-[8px] font-semibold text-slate-950">
                       {getTimelineEventLabel(event.eventType)}
                     </h3>
                   </div>
 
                   <div>
-                    <p className="text-[10px] font-medium text-slate-700">
+                    <p className="text-[8px] font-medium text-slate-700">
                       {event.performedByName ?? 'Sistema'}
                     </p>
-                    <p className="mt-1 text-[9px] text-slate-500">
+                    <p className="mt-1 text-[8px] text-slate-500">
                       {event.aggregateType} #{event.aggregateId}
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-[10px] leading-5 text-slate-600">
+                    <p className="text-[8px] leading-5 text-slate-600">
                       {getTimelineEventSummary(event)}
                     </p>
 
                     {primaryHref ? (
-                      <p className="mt-2 text-[9px] font-semibold text-blue-600">
+                      <p className="mt-2 text-[8px] font-semibold text-blue-600">
                         Abrir registro de origen →
                       </p>
                     ) : null}
@@ -194,7 +196,7 @@ export function WorkOrderTimeline({ data }: WorkOrderTimelineProps) {
                             onClick={(clickEvent) =>
                               clickEvent.stopPropagation()
                             }
-                            className="text-[9px] font-semibold text-blue-600 hover:text-blue-800 hover:underline"
+                            className="text-[8px] font-semibold text-blue-600 hover:text-blue-800 hover:underline"
                           >
                             {action.label}
                           </Link>
@@ -209,7 +211,7 @@ export function WorkOrderTimeline({ data }: WorkOrderTimelineProps) {
         </div>
       )}
 
-      <p className="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[9px] leading-5 text-slate-500">
+      <p className="border-t border-slate-100 bg-slate-50/60 px-4 py-2 text-[7px] leading-3 text-slate-400">
         Fuente: traceability_events + registros originales. La línea de tiempo
         conserva snapshots históricos y no reescribe eventos anteriores.
       </p>
