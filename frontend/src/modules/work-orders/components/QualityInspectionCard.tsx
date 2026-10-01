@@ -42,18 +42,18 @@ export function QualityInspectionCard({
   return (
     <article
       id={`quality-inspection-${inspection.id}`}
-      className="scroll-mt-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm target:ring-2 target:ring-blue-300"
+      className="scroll-mt-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_10px_28px_-28px_rgba(15,23,42,0.28)] target:ring-2 target:ring-blue-200"
     >
-      <div className="border-b border-slate-200 px-5 py-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="border-b border-slate-100 px-3.5 py-3">
+        <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-emerald-700">
+            <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-blue-600">
               {isReinspection ? 'Reinspección' : 'Inspección'} #{inspection.id}
             </p>
-            <h2 className="mt-1 text-sm font-semibold text-slate-950">
+            <h2 className="mt-0.5 text-[10px] font-semibold text-slate-950">
               {inspection.inspectorName ?? 'Inspector por asignar'}
             </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-0.5 text-[8px] text-slate-400">
               Creada {formatQualityDateTime(inspection.createdAt)}
               {isReinspection
                 ? ` · ligada a ${inspection.nonConformity?.number ?? `NC #${inspection.reworkNonConformityId}`}`
@@ -61,13 +61,24 @@ export function QualityInspectionCard({
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            {isReinspection ? <Badge tone="warning">REWORK</Badge> : null}
-            <Badge tone={status.tone}>{status.label}</Badge>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {isReinspection ? (
+              <Badge tone="warning" className="px-2 py-0.5 text-[7px]">
+                RETRABAJO
+              </Badge>
+            ) : null}
+            <Badge tone={status.tone} className="px-2 py-0.5 text-[7px]">
+              {status.label}
+            </Badge>
             {inspection.measurements.length > 0 ? (
               <>
-                <Badge tone="success">{totals.pass} PASS</Badge>
-                <Badge tone={totals.fail > 0 ? 'danger' : 'neutral'}>
+                <Badge tone="success" className="px-2 py-0.5 text-[7px]">
+                  {totals.pass} PASS
+                </Badge>
+                <Badge
+                  tone={totals.fail > 0 ? 'danger' : 'neutral'}
+                  className="px-2 py-0.5 text-[7px]"
+                >
                   {totals.fail} FAIL
                 </Badge>
               </>
@@ -75,30 +86,34 @@ export function QualityInspectionCard({
           </div>
         </div>
 
-        <div className="mt-4 grid gap-3 text-[10px] sm:grid-cols-3">
+        <div className="mt-2.5 grid gap-2 text-[8px] sm:grid-cols-3">
           <div>
             <p className="text-slate-400">Inicio</p>
-            <p className="mt-1 font-medium text-slate-700">
+            <p className="mt-0.5 font-medium text-slate-700">
               {formatQualityDateTime(inspection.startedAt)}
             </p>
           </div>
           <div>
             <p className="text-slate-400">Cierre</p>
-            <p className="mt-1 font-medium text-slate-700">
+            <p className="mt-0.5 font-medium text-slate-700">
               {formatQualityDateTime(inspection.completedAt)}
             </p>
           </div>
           <div>
             <p className="text-slate-400">Mediciones</p>
-            <p className="mt-1 font-medium text-slate-700">
+            <p className="mt-0.5 font-medium text-slate-700">
               {inspection.measurements.length}
             </p>
           </div>
         </div>
 
         {inspection.status === 'PENDING' && canStart ? (
-          <div className="mt-4 flex justify-end">
-            <Button onClick={onStart} disabled={starting}>
+          <div className="mt-2.5 flex justify-end">
+            <Button
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={onStart}
+              disabled={starting}
+            >
               {starting
                 ? 'Iniciando…'
                 : isReinspection
@@ -109,93 +124,93 @@ export function QualityInspectionCard({
         ) : null}
       </div>
 
-      <div className="space-y-3 px-5 py-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="space-y-2.5 px-3.5 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-2.5">
           <div>
-            <h3 className="text-xs font-semibold text-slate-950">
+            <h3 className="text-[9px] font-semibold text-slate-950">
               Mediciones dimensionales y de proceso
             </h3>
-            <p className="mt-1 text-[9px] text-slate-500">
-              El resultado se calcula en servidor. No existe edición manual de
-              PASS o FAIL.
+            <p className="mt-0.5 text-[7px] text-slate-400">
+              El resultado PASS o FAIL se calcula en servidor.
             </p>
           </div>
 
           {inspection.status === 'IN_PROGRESS' && canEdit ? (
-            <Button size="sm" variant="secondary" onClick={onAddMeasurement}>
-              + Registrar medición
+            <Button
+              size="sm"
+              variant="secondary"
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={onAddMeasurement}
+            >
+              Registrar medición
             </Button>
           ) : null}
         </div>
 
         {inspection.measurements.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-[10px] text-slate-500">
-            Todavía no hay mediciones. Se requiere al menos una para finalizar
-            la inspección.
+          <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50 px-3 py-2.5 text-[8px] text-slate-500">
+            Todavía no hay mediciones. Se requiere al menos una para finalizar la inspección.
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-slate-200">
-            <table className="min-w-[760px] w-full text-left">
-              <thead className="bg-slate-50 text-[9px] uppercase tracking-wide text-slate-500">
+          <div className="overflow-x-auto rounded-lg border border-slate-200">
+            <table className="w-full min-w-[700px] text-left">
+              <thead className="bg-slate-50 text-[7px] font-bold uppercase tracking-wide text-slate-400">
                 <tr>
-                  <th className="px-3 py-2 font-semibold">Característica</th>
-                  <th className="px-3 py-2 font-semibold">Nominal</th>
-                  <th className="px-3 py-2 font-semibold">Rango</th>
-                  <th className="px-3 py-2 font-semibold">Medido</th>
-                  <th className="px-3 py-2 font-semibold">Resultado</th>
-                  <th className="px-3 py-2 text-right font-semibold">Acción</th>
+                  <th className="px-3 py-2">Característica</th>
+                  <th className="px-3 py-2">Nominal</th>
+                  <th className="px-3 py-2">Rango</th>
+                  <th className="px-3 py-2">Medido</th>
+                  <th className="px-3 py-2">Resultado</th>
+                  <th className="px-3 py-2 text-right">Acción</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-[10px] text-slate-700">
+              <tbody className="divide-y divide-slate-100 text-[8px] text-slate-600">
                 {inspection.measurements.map((measurement) => (
                   <tr
                     id={`quality-measurement-${measurement.id}`}
                     key={measurement.id}
-                    className="scroll-mt-24 target:bg-blue-50"
+                    className="scroll-mt-24 target:bg-blue-50/40"
                   >
-                    <td className="px-3 py-3">
+                    <td className="px-3 py-2.5">
                       <p className="font-semibold text-slate-900">
                         {measurement.characteristic}
                       </p>
                       {measurement.notes ? (
-                        <p className="mt-1 max-w-xs text-[9px] text-slate-500">
+                        <p className="mt-0.5 max-w-xs text-[7px] text-slate-400">
                           {measurement.notes}
                         </p>
                       ) : null}
                     </td>
-                    <td className="px-3 py-3">
-                      {formatQualityNumber(measurement.nominalValue)}{' '}
-                      {measurement.unit}
+                    <td className="px-3 py-2.5">
+                      {formatQualityNumber(measurement.nominalValue)} {measurement.unit}
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-3 py-2.5">
                       {formatQualityNumber(measurement.lowerLimit)} –{' '}
-                      {formatQualityNumber(measurement.upperLimit)}{' '}
-                      {measurement.unit}
+                      {formatQualityNumber(measurement.upperLimit)} {measurement.unit}
                     </td>
-                    <td className="px-3 py-3 font-semibold text-slate-950">
-                      {formatQualityNumber(measurement.measuredValue)}{' '}
-                      {measurement.unit}
+                    <td className="px-3 py-2.5 font-semibold text-slate-900">
+                      {formatQualityNumber(measurement.measuredValue)} {measurement.unit}
                     </td>
-                    <td className="px-3 py-3">
+                    <td className="px-3 py-2.5">
                       <Badge
-                        tone={
-                          measurement.result === 'PASS' ? 'success' : 'danger'
-                        }
+                        tone={measurement.result === 'PASS' ? 'success' : 'danger'}
+                        className="px-2 py-0.5 text-[7px]"
                       >
                         {measurement.result}
                       </Badge>
                     </td>
-                    <td className="px-3 py-3 text-right">
+                    <td className="px-3 py-2.5 text-right">
                       {inspection.status === 'IN_PROGRESS' && canEdit ? (
                         <Button
                           size="sm"
                           variant="ghost"
+                          className="!h-7 !px-2 !text-[8px]"
                           onClick={() => onEditMeasurement(measurement)}
                         >
                           Editar
                         </Button>
                       ) : (
-                        <span className="text-[9px] text-slate-400">
+                        <span className="text-[7px] text-slate-400">
                           Bloqueada
                         </span>
                       )}
@@ -208,8 +223,9 @@ export function QualityInspectionCard({
         )}
 
         {inspection.status === 'IN_PROGRESS' && canComplete ? (
-          <div className="flex justify-end border-t border-slate-100 pt-3">
+          <div className="flex justify-end border-t border-slate-100 pt-2.5">
             <Button
+              className="!h-7 !px-2.5 !text-[8px]"
               onClick={onComplete}
               disabled={inspection.measurements.length === 0}
             >
@@ -221,13 +237,13 @@ export function QualityInspectionCard({
         ) : null}
 
         {inspection.nonConformity ? (
-          <section className="rounded-xl border border-red-200 bg-red-50 p-4">
-            <div className="flex flex-wrap items-start justify-between gap-3">
+          <section className="rounded-lg border border-red-200 bg-red-50/60 px-3 py-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <p className="text-[9px] font-semibold uppercase tracking-wide text-red-700">
+                <p className="text-[7px] font-bold uppercase tracking-wide text-red-600">
                   No conformidad relacionada
                 </p>
-                <h3 className="mt-1 text-sm font-semibold text-red-950">
+                <h3 className="mt-0.5 text-[10px] font-semibold text-red-950">
                   {inspection.nonConformity.number}
                 </h3>
               </div>
@@ -237,36 +253,31 @@ export function QualityInspectionCard({
                     ? 'danger'
                     : 'success'
                 }
+                className="px-2 py-0.5 text-[7px]"
               >
                 {inspection.nonConformity.status}
               </Badge>
             </div>
 
-            <div className="mt-3 grid gap-3 text-[10px] sm:grid-cols-3">
-              <div>
-                <p className="text-red-600">Piezas afectadas</p>
-                <p className="mt-1 font-semibold text-red-950">
-                  {inspection.nonConformity.affectedQuantity ?? 'Pendiente'}
-                </p>
-              </div>
-              <div>
-                <p className="text-red-600">Severidad</p>
-                <p className="mt-1 font-semibold text-red-950">
-                  {inspection.nonConformity.severity ?? 'Pendiente'}
-                </p>
-              </div>
-              <div>
-                <p className="text-red-600">Disposición</p>
-                <p className="mt-1 font-semibold text-red-950">
-                  {getNonConformityDispositionLabel(
-                    inspection.nonConformity.disposition,
-                  )}
-                </p>
-              </div>
+            <div className="mt-2 grid gap-2 text-[8px] sm:grid-cols-3">
+              <DataItem
+                label="Piezas afectadas"
+                value={inspection.nonConformity.affectedQuantity ?? 'Pendiente'}
+              />
+              <DataItem
+                label="Severidad"
+                value={inspection.nonConformity.severity ?? 'Pendiente'}
+              />
+              <DataItem
+                label="Disposición"
+                value={getNonConformityDispositionLabel(
+                  inspection.nonConformity.disposition,
+                )}
+              />
             </div>
 
             {inspection.nonConformity.description ? (
-              <p className="mt-3 text-[10px] leading-5 text-red-800">
+              <p className="mt-2 text-[8px] leading-4 text-red-800">
                 {inspection.nonConformity.description}
               </p>
             ) : null}
@@ -274,5 +285,14 @@ export function QualityInspectionCard({
         ) : null}
       </div>
     </article>
+  )
+}
+
+function DataItem({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div>
+      <p className="text-red-600">{label}</p>
+      <p className="mt-0.5 font-semibold text-red-950">{value}</p>
+    </div>
   )
 }
