@@ -153,9 +153,9 @@ export function CustomerRequestCreatePage() {
 
         <form
           onSubmit={(event) => void submit(event)}
-          className="lg:flex lg:flex-1 lg:flex-col"
+          className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col"
         >
-          <div>
+          <div className="lg:min-h-0 lg:flex-1">
             {step === 0 ? (
               <CustomerRequestDetailsStep
                 register={register}
