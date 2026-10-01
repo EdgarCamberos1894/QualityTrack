@@ -19,40 +19,40 @@ export function PublicAuthLayout({
   wide = false,
 }: PublicAuthLayoutProps) {
   return (
-    <main className="min-h-screen bg-[#f5f7fb] lg:grid lg:grid-cols-[minmax(380px,0.9fr)_minmax(520px,1.1fr)]">
+    <main className="min-h-screen bg-[#f6f8fc] lg:grid lg:grid-cols-[minmax(340px,0.78fr)_minmax(520px,1.22fr)]">
       <AuthBrandPanel />
 
-      <section className="flex min-h-screen items-center justify-center px-5 py-10 sm:px-8">
-        <div className={wide ? 'w-full max-w-[560px]' : 'w-full max-w-[440px]'}>
-          <div className="mb-8 flex items-center gap-3 lg:hidden">
+      <section className="flex min-h-screen items-center justify-center px-5 py-6 sm:px-8 lg:py-8">
+        <div className={wide ? 'w-full max-w-[520px]' : 'w-full max-w-[420px]'}>
+          <div className="mb-5 flex items-center gap-2.5 lg:hidden">
             <img
               src="/brand/qualitytrack-mark.svg"
               alt=""
-              className="h-11 w-11"
+              className="h-9 w-9"
             />
-            <span className="text-xl font-bold tracking-tight text-slate-950">
+            <span className="text-lg font-bold tracking-tight text-slate-950">
               Quality<span className="text-blue-600">Track</span>
             </span>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <div className="mb-7">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-blue-600">
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_18px_52px_-38px_rgba(15,23,42,0.38)]">
+            <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/60 px-5 py-4 sm:px-6">
+              <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-600">
                 {eyebrow}
               </p>
-              <h1 className="text-2xl font-bold tracking-tight text-slate-950">
+              <h1 className="mt-1 text-lg font-bold tracking-tight text-slate-950">
                 {title}
               </h1>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
+              <p className="mt-1 text-[10px] leading-4 text-slate-600">
                 {description}
               </p>
             </div>
 
-            {children}
+            <div className="px-5 py-5 sm:px-6">{children}</div>
           </div>
 
           {footer ? (
-            <div className="mt-6 text-center text-xs text-slate-500">
+            <div className="mt-4 text-center text-[9px] text-slate-500">
               {footer}
             </div>
           ) : null}
