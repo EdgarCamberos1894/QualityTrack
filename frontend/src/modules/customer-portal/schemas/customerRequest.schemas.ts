@@ -47,7 +47,10 @@ export const cancelCustomerRequestSchema = z.object({
 })
 
 export const requestDocumentSchema = z.object({
-  name: z.string().max(255, 'El nombre no puede superar 255 caracteres.'),
+  name: z.string().max(180, 'El nombre no puede superar 180 caracteres.'),
+  description: z
+    .string()
+    .max(500, 'La descripción no puede superar 500 caracteres.'),
 })
 
 export type CustomerRequestFormValues = z.infer<
