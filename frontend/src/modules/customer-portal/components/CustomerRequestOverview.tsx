@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import type { CustomerQuotationStatus } from '@/modules/quotations'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge, type BadgeProps } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
@@ -19,6 +20,7 @@ interface CustomerRequestOverviewProps {
   customerId: number
   request: CustomerRequestDetailDto
   quotationId?: number
+  quotationStatus?: CustomerQuotationStatus
   deliveryProgress?: 'IN_TRANSIT' | 'PARTIAL' | 'DELIVERED'
   canWrite: boolean
   canCancel: boolean
@@ -81,6 +83,7 @@ function getNextStep(
   deliveryProgress: 'IN_TRANSIT' | 'PARTIAL' | 'DELIVERED' | undefined,
   openInformationRequest: CustomerInformationRequestDto | null,
   quotationId?: number,
+  quotationStatus?: CustomerQuotationStatus,
 ): NextStepPresentation {
   if (request.jobCase.status === 'CANCELLED') {
     return {
@@ -148,8 +151,19 @@ function getNextStep(
         tone: 'warning',
       }
     case 'READY_FOR_QUOTATION':
-      return quotationId
-        ? {
+      if (!quotationId || !quotationStatus) {
+        return {
+          eyebrow: 'Siguiente etapa',
+          title: 'La revisión técnica terminó',
+          description:
+            'El equipo está preparando la propuesta comercial. Te avisaremos cuando esté disponible.',
+          tone: 'info',
+        }
+      }
+
+      switch (quotationStatus) {
+        case 'SENT':
+          return {
             eyebrow: 'Propuesta disponible',
             title: 'Tu cotización ya está lista',
             description:
@@ -157,13 +171,61 @@ function getNextStep(
             tone: 'info',
             action: 'quotation',
           }
-        : {
-            eyebrow: 'Siguiente etapa',
-            title: 'La revisión técnica terminó',
+        case 'ADJUSTMENT_REQUESTED':
+          return {
+            eyebrow: 'Ajuste en preparación',
+            title: 'Comercial está preparando una nueva revisión',
             description:
-              'El equipo está preparando la propuesta comercial. Te avisaremos cuando esté disponible.',
-            tone: 'info',
+              'Tu solicitud de ajuste fue recibida. La revisión anterior permanece disponible como referencia.',
+            tone: 'warning',
+            action: 'quotation',
           }
+        case 'APPROVED':
+          return {
+            eyebrow: 'Propuesta aprobada',
+            title: 'La cotización ya fue aceptada',
+            description:
+              'El equipo interno está preparando la orden de trabajo para iniciar la etapa operativa.',
+            tone: 'success',
+            action: 'quotation',
+          }
+        case 'REJECTED':
+          return {
+            eyebrow: 'Propuesta cerrada',
+            title: 'La cotización fue rechazada',
+            description:
+              'Comercial puede preparar una nueva revisión si el trabajo continúa.',
+            tone: 'danger',
+            action: 'quotation',
+          }
+        case 'EXPIRED':
+          return {
+            eyebrow: 'Vigencia terminada',
+            title: 'La cotización venció',
+            description:
+              'La propuesta ya no admite respuesta. Comercial deberá emitir una nueva revisión para continuar.',
+            tone: 'warning',
+            action: 'quotation',
+          }
+        case 'CANCELLED':
+          return {
+            eyebrow: 'Revisión cancelada',
+            title: 'La cotización ya no está activa',
+            description:
+              'Comercial puede generar una nueva revisión si el proceso debe continuar.',
+            tone: 'danger',
+            action: 'quotation',
+          }
+        case 'REPLACED':
+          return {
+            eyebrow: 'Revisión reemplazada',
+            title: 'Existe una revisión posterior',
+            description:
+              'Consulta la cotización para revisar el historial comercial de esta solicitud.',
+            tone: 'neutral',
+            action: 'quotation',
+          }
+      }
     case 'IN_PRODUCTION':
       return {
         eyebrow: 'Producción activa',
@@ -179,6 +241,7 @@ export function CustomerRequestOverview({
   customerId,
   request,
   quotationId,
+  quotationStatus,
   deliveryProgress,
   canWrite,
   canCancel,
@@ -194,6 +257,7 @@ export function CustomerRequestOverview({
     deliveryProgress,
     openInformationRequest,
     quotationId,
+    quotationStatus,
   )
 
   return (
