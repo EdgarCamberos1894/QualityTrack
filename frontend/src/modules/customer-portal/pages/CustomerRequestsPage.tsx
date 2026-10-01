@@ -96,7 +96,7 @@ export function CustomerRequestsPage() {
       />
 
       <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-30px_rgba(15,23,42,0.38)]">
-        <div className="border-b border-slate-200 bg-gradient-to-r from-slate-50 via-slate-50 to-blue-50/70 px-4 py-3.5 sm:px-5">
+        <div className="border-b border-slate-300/80 bg-gradient-to-r from-slate-100 via-slate-100 to-blue-100/70 px-4 py-3.5 sm:px-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-blue-600">
@@ -126,7 +126,7 @@ export function CustomerRequestsPage() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Buscar por folio, referencia o proyecto…"
-                className="h-9 w-full rounded-xl border border-slate-200 bg-slate-50/80 pl-9 pr-3 text-[11px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                className="h-9 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[11px] text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
               />
             </label>
           </div>
