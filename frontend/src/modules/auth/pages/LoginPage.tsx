@@ -38,7 +38,7 @@ export function LoginPage() {
         onAuthenticated={() => navigate(destination, { replace: true })}
       />
 
-      <div className="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-5 text-center text-xs sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-4 flex flex-col gap-2.5 border-t border-slate-100 pt-4 text-center text-[9px] sm:flex-row sm:items-center sm:justify-between">
         <Link
           className="font-semibold text-blue-600 hover:text-blue-700"
           to="/forgot-password"
