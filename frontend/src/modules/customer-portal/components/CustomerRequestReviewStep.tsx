@@ -184,6 +184,8 @@ export function CustomerRequestReviewStep({
             revisión puede reiniciarse.
           </p>
         </Card>
+
+        {actions}
       </div>
     </div>
   )
