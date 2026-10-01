@@ -81,6 +81,8 @@ export function CustomerRequestsPage() {
       ? total
       : query.data.filter((request) => request.jobCase.status === value).length
 
+  const hasFilters = filter !== 'ALL' || search.length > 0
+
   return (
     <PageContainer>
       <CustomerRequestsHeader
@@ -92,16 +94,19 @@ export function CustomerRequestsPage() {
         canCreate={canCreate}
       />
 
-      <Card className="mb-5 mt-5 overflow-hidden shadow-[0_12px_35px_-24px_rgba(15,23,42,0.35)]">
-        <div className="border-b border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/30 px-5 py-4">
+      <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_16px_45px_-30px_rgba(15,23,42,0.4)]">
+        <div className="border-b border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/40 px-5 py-4">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">
-                Buscar y filtrar
+              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                Solicitudes registradas
               </p>
               <h2 className="mt-1 text-sm font-semibold text-slate-950">
-                Encuentra un trabajo
+                Seguimiento de trabajos
               </h2>
+              <p className="mt-1 text-[10px] text-slate-500">
+                Busca, filtra y abre cualquier solicitud desde un mismo lugar.
+              </p>
             </div>
 
             <label className="relative block lg:w-[420px]">
@@ -123,97 +128,99 @@ export function CustomerRequestsPage() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Buscar por folio, referencia o proyecto…"
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/70 pl-10 pr-3 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/80 pl-10 pr-3 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
               />
             </label>
           </div>
-        </div>
 
-        <div className="flex flex-wrap gap-2 px-5 py-3.5">
-          {filters.map((item) => {
-            const active = filter === item.value
-            const count = filterCount(item.value)
+          <div className="mt-4 flex flex-wrap gap-2">
+            {filters.map((item) => {
+              const active = filter === item.value
+              const count = filterCount(item.value)
 
-            return (
-              <button
-                key={item.value}
-                type="button"
-                onClick={() => setFilter(item.value)}
-                className={
-                  active
-                    ? 'inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-[10px] font-semibold text-blue-700 shadow-sm'
-                    : 'inline-flex items-center gap-2 rounded-full border border-transparent bg-slate-50 px-3 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:border-slate-200 hover:bg-white'
-                }
-              >
-                {item.label}
-                <span
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => setFilter(item.value)}
                   className={
                     active
-                      ? 'rounded-full bg-blue-100 px-1.5 py-0.5 text-[9px] text-blue-700'
-                      : 'rounded-full bg-white px-1.5 py-0.5 text-[9px] text-slate-500'
+                      ? 'inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-[10px] font-semibold text-blue-700 shadow-sm'
+                      : 'inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white px-3 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50'
                   }
                 >
-                  {count}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </Card>
-
-      <div className="mb-3 flex items-center justify-between gap-4 px-1">
-        <div>
-          <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-400">
-            Resultados
-          </p>
-          <p className="mt-1 text-xs font-semibold text-slate-700">
-            {visibleRequests.length}{' '}
-            {visibleRequests.length === 1 ? 'solicitud visible' : 'solicitudes visibles'}
-          </p>
+                  {item.label}
+                  <span
+                    className={
+                      active
+                        ? 'rounded-full bg-blue-100 px-1.5 py-0.5 text-[9px] text-blue-700'
+                        : 'rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] text-slate-500'
+                    }
+                  >
+                    {count}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </div>
 
-        {filter !== 'ALL' || search ? (
-          <button
-            type="button"
-            onClick={() => {
-              setFilter('ALL')
-              setSearch('')
-            }}
-            className="text-[10px] font-semibold text-blue-600 transition hover:text-blue-700"
-          >
-            Limpiar filtros
-          </button>
-        ) : null}
-      </div>
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/70 px-5 py-3">
+          <div className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-blue-500" />
+            <p className="text-[10px] font-semibold text-slate-700">
+              {visibleRequests.length}{' '}
+              {visibleRequests.length === 1
+                ? 'solicitud visible'
+                : 'solicitudes visibles'}
+            </p>
+          </div>
 
-      {visibleRequests.length > 0 ? (
-        <div className="space-y-4">
-          {visibleRequests.map((request) => (
-            <CustomerRequestCard
-              key={request.id}
-              customerId={customer.customerId}
-              request={request}
-            />
-          ))}
+          {hasFilters ? (
+            <button
+              type="button"
+              onClick={() => {
+                setFilter('ALL')
+                setSearch('')
+              }}
+              className="text-[10px] font-semibold text-blue-600 transition hover:text-blue-700"
+            >
+              Limpiar filtros
+            </button>
+          ) : null}
         </div>
-      ) : (
-        <Card className="overflow-hidden p-5 shadow-[0_12px_35px_-24px_rgba(15,23,42,0.35)]">
-          <EmptyState
-            title={
-              query.data.length === 0
-                ? 'Todavía no hay solicitudes'
-                : 'No hay solicitudes que coincidan'
-            }
-            description={
-              query.data.length === 0
-                ? canCreate
-                  ? 'Crea una solicitud para iniciar un nuevo trabajo con el equipo.'
-                  : 'Aún no hay trabajos registrados para esta empresa.'
-                : 'Prueba con otro folio, proyecto o filtro.'
-            }
-          />
-        </Card>
-      )}
+
+        <div className="bg-slate-50/45 p-4 sm:p-5">
+          {visibleRequests.length > 0 ? (
+            <div className="space-y-4">
+              {visibleRequests.map((request) => (
+                <CustomerRequestCard
+                  key={request.id}
+                  customerId={customer.customerId}
+                  request={request}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="overflow-hidden p-5 shadow-none">
+              <EmptyState
+                title={
+                  query.data.length === 0
+                    ? 'Todavía no hay solicitudes'
+                    : 'No hay solicitudes que coincidan'
+                }
+                description={
+                  query.data.length === 0
+                    ? canCreate
+                      ? 'Crea una solicitud para iniciar un nuevo trabajo con el equipo.'
+                      : 'Aún no hay trabajos registrados para esta empresa.'
+                    : 'Prueba con otro folio, proyecto o filtro.'
+                }
+              />
+            </Card>
+          )}
+        </div>
+      </section>
     </PageContainer>
   )
 }
