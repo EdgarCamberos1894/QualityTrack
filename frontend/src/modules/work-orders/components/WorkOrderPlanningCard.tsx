@@ -106,7 +106,7 @@ export function WorkOrderPlanningCard({
 
       {editing ? (
         <form
-          className="mt-5 grid gap-4 lg:grid-cols-3"
+          className="mt-5 grid gap-4 @4xl/page:grid-cols-3"
           onSubmit={(event) => void submit(event)}
         >
           <div>
@@ -143,18 +143,18 @@ export function WorkOrderPlanningCard({
           />
 
           {dateError ? (
-            <p className="lg:col-span-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <p className="@4xl/page:col-span-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
               {dateError}
             </p>
           ) : null}
 
           {error ? (
-            <p className="lg:col-span-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            <p className="@4xl/page:col-span-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
               {getErrorMessage(error)}
             </p>
           ) : null}
 
-          <div className="flex justify-end gap-2 lg:col-span-3">
+          <div className="flex justify-end gap-2 @4xl/page:col-span-3">
             <Button
               variant="secondary"
               onClick={() => {
@@ -172,7 +172,7 @@ export function WorkOrderPlanningCard({
           </div>
         </form>
       ) : (
-        <dl className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <dl className="mt-5 grid gap-4 sm:grid-cols-2 @4xl/page:grid-cols-5">
           <div>
             <dt className="text-[9px] text-slate-500">Cantidad planeada</dt>
             <dd className="mt-1 text-xs font-semibold text-slate-950">
