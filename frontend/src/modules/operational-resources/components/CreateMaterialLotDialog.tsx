@@ -59,30 +59,32 @@ export function CreateMaterialLotDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-material-lot-title"
-        className="w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
         onSubmit={(event) => void submit(event)}
       >
-        <div className="border-b border-slate-200 px-6 py-5">
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-amber-700">
-            Recursos / Materiales / Lotes
+        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/60 px-4 py-3.5">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+            Materiales · Lotes
           </p>
           <h2
             id="create-material-lot-title"
-            className="mt-1 text-lg font-semibold text-slate-950"
+            className="mt-0.5 text-[14px] font-semibold text-slate-950"
           >
             Registrar lote
           </h2>
-          <p className="mt-1 text-xs text-slate-500">
-            {material.code} · {material.name} · unidad {material.unit}
+          <p className="mt-1 text-[9px] text-slate-500">
+            {material.code} · {material.name} · {material.unit}
           </p>
         </div>
 
-        <div className="grid gap-4 px-6 py-5 sm:grid-cols-2">
+        <div className="grid gap-3 px-4 py-3.5 sm:grid-cols-2">
           <TextField
             label="Número de lote"
             maxLength={100}
             placeholder="L-2026-009"
             disabled={submitting}
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
             error={errors.lotNumber?.message}
             {...register('lotNumber')}
           />
@@ -91,6 +93,8 @@ export function CreateMaterialLotDialog({
             maxLength={255}
             placeholder="Opcional"
             disabled={submitting}
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
             error={errors.supplier?.message}
             {...register('supplier')}
           />
@@ -100,11 +104,13 @@ export function CreateMaterialLotDialog({
             min="0.001"
             step="0.001"
             endAdornment={
-              <span className="text-xs font-medium text-slate-500">
+              <span className="text-[8px] font-medium text-slate-500">
                 {material.unit}
               </span>
             }
             disabled={submitting}
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
             error={errors.quantityReceived?.message}
             {...register('quantityReceived', { valueAsNumber: true })}
           />
@@ -112,26 +118,37 @@ export function CreateMaterialLotDialog({
             label="Fecha de recepción"
             type="datetime-local"
             disabled={submitting}
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
             error={errors.receivedAt?.message}
-            hint="Si se deja vacía, el backend utilizará la hora actual."
+            hint="Vacío = hora actual del backend."
             {...register('receivedAt')}
           />
 
           {error ? (
             <p
               role="alert"
-              className="sm:col-span-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
+              className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700 sm:col-span-2"
             >
               {getErrorMessage(error)}
             </p>
           ) : null}
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-6 py-4">
-          <Button variant="secondary" onClick={close} disabled={submitting}>
+        <div className="flex justify-end gap-1.5 border-t border-slate-100 bg-slate-50/60 px-4 py-2.5">
+          <Button
+            variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
+            onClick={close}
+            disabled={submitting}
+          >
             Cancelar
           </Button>
-          <Button type="submit" disabled={submitting}>
+          <Button
+            type="submit"
+            className="!h-7 !px-2.5 !text-[8px]"
+            disabled={submitting}
+          >
             {submitting ? 'Registrando…' : 'Registrar lote'}
           </Button>
         </div>
