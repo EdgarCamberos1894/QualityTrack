@@ -1,5 +1,4 @@
 import { Badge } from '@/shared/components/ui/Badge'
-import { Card } from '@/shared/components/ui/Card'
 import {
   formatInternalCustomerDate,
   getInternalCustomerRoleLabel,
@@ -15,45 +14,52 @@ export function InternalCustomerMembers({
   members,
 }: InternalCustomerMembersProps) {
   return (
-    <Card className="overflow-hidden">
-      <div className="border-b border-slate-200 px-5 py-4">
-        <h2 className="text-sm font-semibold text-slate-950">
-          Miembros activos
-        </h2>
-        <p className="mt-1 text-[10px] text-slate-500">
-          {members.length} usuarios con acceso actual a esta empresa.
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-30px_rgba(15,23,42,0.32)]">
+      <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/55 px-4 py-3">
+        <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+          Accesos
         </p>
+        <div className="mt-0.5 flex items-center justify-between gap-3">
+          <h2 className="text-[12px] font-semibold text-slate-950">
+            Miembros activos
+          </h2>
+          <span className="text-[8px] font-medium text-slate-400">
+            {members.length} usuarios
+          </span>
+        </div>
       </div>
 
       <div className="divide-y divide-slate-100">
         {members.map((member) => (
           <div
             key={member.membershipId}
-            className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+            className="flex items-center justify-between gap-3 px-4 py-2.5"
           >
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-[10px] font-bold text-slate-700">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-[9px] font-bold text-slate-700">
                 {getMemberInitials(member.firstName, member.lastName)}
               </div>
               <div className="min-w-0">
-                <p className="truncate text-xs font-semibold text-slate-950">
+                <p className="truncate text-[10px] font-semibold text-slate-950">
                   {member.firstName} {member.lastName}
                 </p>
-                <p className="mt-1 truncate text-[10px] text-slate-500">
+                <p className="mt-0.5 truncate text-[8px] text-slate-400">
                   {member.email}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 sm:text-right">
-              <Badge tone="info">{getInternalCustomerRoleLabel(member.role)}</Badge>
-              <p className="text-[9px] text-slate-500">
+            <div className="shrink-0 text-right">
+              <Badge tone="info" className="px-2 py-0.5 text-[8px]">
+                {getInternalCustomerRoleLabel(member.role)}
+              </Badge>
+              <p className="mt-1 text-[7px] text-slate-400">
                 Desde {formatInternalCustomerDate(member.joinedAt)}
               </p>
             </div>
           </div>
         ))}
       </div>
-    </Card>
+    </section>
   )
 }
