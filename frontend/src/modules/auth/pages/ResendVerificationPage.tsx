@@ -28,17 +28,22 @@ export function ResendVerificationPage() {
       <PublicAuthLayout
         eyebrow="Verificación"
         title="Revisa tu correo"
-        description="Si la cuenta sigue pendiente de verificación, enviaremos un nuevo enlace."
+        description="Si la cuenta sigue pendiente, enviaremos un nuevo enlace de verificación."
         footer={
-          <Link className="font-semibold text-blue-600" to="/login">
+          <Link
+            className="font-semibold text-blue-600 transition hover:text-blue-700"
+            to="/login"
+          >
             Volver al inicio de sesión
           </Link>
         }
+        immersive
       >
         <AuthResultPanel
+          compact
           tone="success"
           title="Solicitud recibida"
-          description="Revisa también la carpeta de correo no deseado. Por seguridad, no confirmamos si una cuenta existe."
+          description="Revisa también correo no deseado. Por seguridad, no confirmamos si una cuenta existe."
         />
       </PublicAuthLayout>
     )
@@ -51,16 +56,20 @@ export function ResendVerificationPage() {
   return (
     <PublicAuthLayout
       eyebrow="Verificación"
-      title="Reenviar correo"
-      description="Ingresa el correo de la cuenta que todavía necesita ser verificada."
+      title="Reenviar verificación"
+      description="Ingresa el correo de la cuenta que todavía necesita ser activada."
       footer={
-        <Link className="font-semibold text-blue-600" to="/login">
+        <Link
+          className="font-semibold text-blue-600 transition hover:text-blue-700"
+          to="/login"
+        >
           Volver al inicio de sesión
         </Link>
       }
+      immersive
     >
       <form
-        className="space-y-5"
+        className="space-y-4"
         onSubmit={(event) => void submit(event)}
         noValidate
       >
@@ -68,17 +77,24 @@ export function ResendVerificationPage() {
           label="Correo electrónico"
           type="email"
           autoComplete="email"
+          placeholder="tucorreo@empresa.com"
+          labelClassName="!text-[10px] !font-semibold"
+          className="!h-9 !rounded-lg !px-3 !text-[10px] !shadow-sm placeholder:!text-[9px]"
           error={errors.email?.message}
           {...register('email')}
         />
 
         {mutation.error ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700">
             {getErrorMessage(mutation.error)}
           </p>
         ) : null}
 
-        <Button type="submit" className="w-full" disabled={mutation.isPending}>
+        <Button
+          type="submit"
+          className="!h-9 w-full !rounded-lg !text-[10px] !font-semibold"
+          disabled={mutation.isPending}
+        >
           {mutation.isPending ? 'Enviando…' : 'Enviar nuevo enlace'}
         </Button>
       </form>
