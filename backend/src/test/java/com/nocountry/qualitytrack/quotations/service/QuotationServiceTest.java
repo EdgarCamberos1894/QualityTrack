@@ -160,6 +160,31 @@ class QuotationServiceTest {
     }
 
     @Test
+    void sentAdjustedRevisionExposesRequestAndCommercialResponse() {
+        Quotation quotation = mock(Quotation.class);
+        JobCase jobCase = mock(JobCase.class);
+        CustomerRequest request = mock(CustomerRequest.class);
+        Customer customer = mock(Customer.class);
+
+        when(quotationRepository.findDetailById(2L)).thenReturn(Optional.of(quotation));
+        when(quotation.getJobCase()).thenReturn(jobCase);
+        when(jobCase.getCustomerRequest()).thenReturn(request);
+        when(request.getCustomer()).thenReturn(customer);
+        when(customer.getId()).thenReturn(20L);
+        when(quotation.getStatus()).thenReturn(QuotationStatus.SENT);
+        when(quotation.getSentAt()).thenReturn(Instant.now());
+        when(quotation.getAdjustmentNotes()).thenReturn("Reducir el plazo de entrega.");
+        when(quotation.getAdjustmentResponse()).thenReturn("Entrega ajustada a 12 días.");
+        when(quotation.getItems()).thenReturn(List.of());
+
+        var response = service.getForCustomer(42L, 20L, 2L);
+
+        assertEquals(CustomerQuotationStatus.SENT, response.customerStatus());
+        assertEquals("Reducir el plazo de entrega.", response.adjustment().notes());
+        assertEquals("Entrega ajustada a 12 días.", response.adjustment().response());
+    }
+
+    @Test
     void customerHistoryMarksOlderSupersededRevisionAsReplacedAfterNextRevisionWasSent() {
         Quotation first = mock(Quotation.class);
         Quotation second = mock(Quotation.class);
