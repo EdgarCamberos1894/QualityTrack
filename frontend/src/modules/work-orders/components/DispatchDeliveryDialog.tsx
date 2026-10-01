@@ -51,50 +51,49 @@ export function DispatchDeliveryDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="dispatch-delivery-title"
-        className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
         onSubmit={(event) => void submit(event)}
       >
-        <div className="border-b border-slate-200 px-6 py-5">
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-700">
-            Despachar entrega #{delivery.id}
+        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/60 px-4 py-3.5">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+            Entrega #{delivery.id}
           </p>
-          <h2
-            id="dispatch-delivery-title"
-            className="mt-1 text-lg font-semibold text-slate-950"
-          >
+          <h2 id="dispatch-delivery-title" className="mt-0.5 text-[14px] font-semibold text-slate-950">
             Confirmar salida de planta
           </h2>
-          <p className="mt-1 text-xs text-slate-500">
-            PENDING → DISPATCHED. La OT permanece READY_FOR_DELIVERY.
+          <p className="mt-1 text-[9px] text-slate-500">
+            PENDING → DISPATCHED. La OT permanece lista para entrega.
           </p>
         </div>
 
-        <div className="space-y-4 px-6 py-5">
+        <div className="space-y-3 px-4 py-3.5">
           <TextField
             label="Transportista (opcional)"
             maxLength={120}
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
             error={errors.carrier?.message}
             {...register('carrier')}
           />
           <TextField
             label="Guía / tracking (opcional)"
             maxLength={160}
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
             error={errors.trackingNumber?.message}
             {...register('trackingNumber')}
           />
 
           {error ? (
-            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
               {getErrorMessage(error)}
             </p>
           ) : null}
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-6 py-4">
-          <Button variant="secondary" onClick={close} disabled={submitting}>
-            Cancelar
-          </Button>
-          <Button type="submit" disabled={submitting}>
+        <div className="flex justify-end gap-1.5 border-t border-slate-100 bg-slate-50/60 px-4 py-2.5">
+          <Button variant="secondary" className="!h-7 !px-2.5 !text-[8px]" onClick={close} disabled={submitting}>Cancelar</Button>
+          <Button type="submit" className="!h-7 !px-2.5 !text-[8px]" disabled={submitting}>
             {submitting ? 'Despachando…' : 'Confirmar despacho'}
           </Button>
         </div>
