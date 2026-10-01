@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 export type SidebarNavIconName =
   | 'panel'
   | 'customers'
@@ -32,7 +34,7 @@ export function SidebarNavIcon({
     strokeLinejoin: 'round' as const,
   }
 
-  const paths: Record<SidebarNavIconName, React.ReactNode> = {
+  const paths: Record<SidebarNavIconName, ReactNode> = {
     panel: (
       <>
         <rect x="3" y="3" width="7" height="7" rx="1.5" />
