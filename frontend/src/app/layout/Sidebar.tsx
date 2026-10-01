@@ -73,7 +73,7 @@ export function Sidebar({ open, user, onNavigate }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-40 flex h-screen max-h-screen w-[248px] flex-col overflow-y-auto overscroll-contain border-r border-slate-800 bg-slate-950 px-5 py-6 text-slate-200 transition-transform lg:sticky lg:top-0 lg:self-start lg:translate-x-0',
+        'fixed inset-y-0 left-0 z-40 flex h-screen max-h-screen w-[248px] flex-col overflow-y-auto border-r border-slate-800 bg-slate-950 px-5 py-6 text-slate-200 transition-transform lg:sticky lg:top-0 lg:self-start lg:overflow-hidden lg:translate-x-0',
         open ? 'translate-x-0' : '-translate-x-full',
       )}
     >
@@ -106,7 +106,7 @@ export function Sidebar({ open, user, onNavigate }: SidebarProps) {
       </div>
 
       <nav
-        className="mt-7 space-y-6 pb-5"
+        className="mt-7 space-y-6 pb-5 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pr-1 [scrollbar-width:thin] [scrollbar-color:#334155_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700 hover:[&::-webkit-scrollbar-thumb]:bg-slate-600"
         aria-label="Navegación principal"
       >
         {visibleGroups.map((group) => (
