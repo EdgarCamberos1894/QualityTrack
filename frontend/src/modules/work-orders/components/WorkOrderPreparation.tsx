@@ -166,7 +166,7 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
   return (
     <div className="space-y-4">
       <section className="rounded-xl border border-violet-200 bg-violet-50/60 p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 @3xl/page:flex-row @3xl/page:items-center @3xl/page:justify-between">
           <div>
             <p className="text-[9px] font-semibold uppercase tracking-wide text-violet-700">
               Preparación operativa
