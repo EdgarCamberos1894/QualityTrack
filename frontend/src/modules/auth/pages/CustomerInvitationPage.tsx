@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link, useLocation } from 'react-router-dom'
+import { isSessionActive } from '../model/session'
 import { Button } from '@/shared/components/ui/Button'
 import { TextField } from '@/shared/components/ui/TextField'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -18,6 +19,7 @@ import {
   getCustomerInvitationRoleLabel,
 } from '../model/publicAuthPresenter'
 import { getFragmentToken } from '../model/publicToken'
+import { useSessionStore } from '../store/sessionStore'
 import {
   customerInvitationRegistrationSchema,
   type CustomerInvitationRegistrationFormValues,
@@ -86,6 +88,11 @@ export function CustomerInvitationPage() {
   const completeMutation = useCompleteCustomerInvitation(token)
   const [registrationRequired, setRegistrationRequired] = useState(false)
   const [accepted, setAccepted] = useState(false)
+  const session = useSessionStore((state) => state.session)
+  const hasActiveCustomerSession =
+    Boolean(session) &&
+    isSessionActive(session!) &&
+    session?.user.accountType === 'CUSTOMER'
   const {
     register,
     handleSubmit,
@@ -180,9 +187,9 @@ export function CustomerInvitationPage() {
         footer={
           <Link
             className="font-semibold text-blue-600 transition hover:text-blue-700"
-            to="/login"
+            to={hasActiveCustomerSession ? '/portal' : '/login'}
           >
-            Iniciar sesión
+            {hasActiveCustomerSession ? 'Ir a mis empresas' : 'Iniciar sesión'}
           </Link>
         }
         immersive
@@ -193,7 +200,7 @@ export function CustomerInvitationPage() {
             compact
             tone="success"
             title="Membresía activada"
-            description="Inicia sesión con la cuenta asociada a esta invitación para abrir el portal de la empresa."
+            description={hasActiveCustomerSession ? "Tu nueva empresa ya está disponible. Vuelve al portal para abrirla." : "Inicia sesión con la cuenta asociada a esta invitación para abrir el portal de la empresa."}
           />
         </div>
       </PublicAuthLayout>
