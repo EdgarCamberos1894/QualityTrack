@@ -8,6 +8,7 @@ import {
 } from '@/modules/auth'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import { useDesktopCanvasStyle } from '@/shared/hooks/useDesktopCanvasStyle'
 import { CustomerPortalContextProvider } from '../context/CustomerPortalContext'
 import { useCustomerContexts } from '../hooks/useCustomerContexts'
 import { CustomerPortalSidebar } from './CustomerPortalSidebar'
@@ -20,6 +21,7 @@ export function CustomerPortalShell() {
   const queryClient = useQueryClient()
   const session = useSessionStore((state) => state.session)
   const contextsQuery = useCustomerContexts()
+  const desktopCanvasStyle = useDesktopCanvasStyle()
 
   useSessionExpiry()
 
@@ -63,7 +65,10 @@ export function CustomerPortalShell() {
     <CustomerPortalContextProvider
       value={{ customer, contexts: contextsQuery.data }}
     >
-      <div className="min-h-screen bg-[#f5f7fb] shell:grid shell:grid-cols-[248px_minmax(0,1fr)]">
+      <div
+        className="min-h-screen bg-[#f5f7fb] shell:grid shell:grid-cols-[248px_minmax(0,1fr)]"
+        style={desktopCanvasStyle}
+      >
         <CustomerPortalSidebar
           customer={customer}
           hasMultipleCustomers={contextsQuery.data.length > 1}
