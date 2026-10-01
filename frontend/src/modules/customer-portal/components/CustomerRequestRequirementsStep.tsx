@@ -3,7 +3,6 @@ import type {
   UseFormRegister,
   UseFormSetValue,
 } from 'react-hook-form'
-import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Card } from '@/shared/components/ui/Card'
 import { TextareaField } from '@/shared/components/ui/TextareaField'
 import type { CustomerRequestFormValues } from '../schemas/customerRequest.schemas'
@@ -34,28 +33,18 @@ export function CustomerRequestRequirementsStep({
   onRemoveFile,
 }: CustomerRequestRequirementsStepProps) {
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,640px)_452px]">
-      <Card className="relative overflow-hidden p-5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)]">
-        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-indigo-500 to-violet-400" />
-
-        <div className="mb-5 flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-            <SidebarNavIcon name="production" className="h-[17px] w-[17px]" />
-          </div>
-          <div>
-            <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-indigo-600">
-              Definición técnica
-            </p>
-            <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
-              Requisitos técnicos
-            </h2>
-            <p className="mt-1 text-[10px] leading-5 text-slate-500">
-              Puedes especificar el material o pedir apoyo para definirlo.
-            </p>
-          </div>
+    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.12fr)_minmax(360px,0.88fr)]">
+      <Card className="p-5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+        <div>
+          <h2 className="text-base font-semibold text-slate-950">
+            Requisitos técnicos
+          </h2>
+          <p className="mt-1 text-[10px] leading-5 text-slate-500">
+            Puedes especificar el material o pedir apoyo para definirlo.
+          </p>
         </div>
 
-        <div className="grid gap-2.5 sm:grid-cols-2">
+        <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {[
             {
               value: 'SPECIFIED' as const,
@@ -81,21 +70,27 @@ export function CustomerRequestRequirementsStep({
                 }
                 className={
                   selected
-                    ? 'relative overflow-hidden rounded-xl border border-blue-300 bg-blue-50/75 p-3.5 text-left shadow-sm ring-2 ring-blue-100'
-                    : 'rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 text-left transition hover:border-slate-300 hover:bg-white'
+                    ? 'flex items-start gap-3 rounded-xl border border-blue-500 bg-blue-50/70 p-3.5 text-left shadow-sm'
+                    : 'flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 text-left transition hover:border-slate-300 hover:bg-white'
                 }
               >
-                {selected ? (
-                  <span className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-[9px] font-bold text-white">
-                    ✓
+                <span
+                  className={
+                    selected
+                      ? 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-600 text-[9px] font-bold text-white'
+                      : 'mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white'
+                  }
+                >
+                  {selected ? '✓' : ''}
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[11px] font-semibold text-slate-950">
+                    {option.title}
                   </span>
-                ) : null}
-                <p className="pr-7 text-[11px] font-semibold text-slate-950">
-                  {option.title}
-                </p>
-                <p className="mt-1 text-[9px] leading-4 text-slate-500">
-                  {option.detail}
-                </p>
+                  <span className="mt-1 block text-[9px] leading-4 text-slate-500">
+                    {option.detail}
+                  </span>
+                </span>
               </button>
             )
           })}
@@ -115,10 +110,7 @@ export function CustomerRequestRequirementsStep({
           />
         </div>
 
-        <div className="mt-4 flex gap-2.5 rounded-xl border border-blue-100 bg-blue-50/60 px-3.5 py-3">
-          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[10px] font-bold text-blue-700">
-            i
-          </span>
+        <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50/65 px-3.5 py-3">
           <p className="text-[10px] leading-5 text-slate-700">
             No necesitas elegir el proceso de fabricación. Comercial e
             Ingeniería lo determinan durante la revisión.
@@ -126,35 +118,21 @@ export function CustomerRequestRequirementsStep({
         </div>
       </Card>
 
-      <Card className="relative overflow-hidden p-5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
-        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-teal-500 to-emerald-400" />
-
-        <div className="flex items-start gap-3">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700">
-            <SidebarNavIcon name="documents" className="h-[17px] w-[17px]" />
-          </div>
-          <div>
-            <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-teal-700">
-              Archivos de apoyo
-            </p>
-            <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
-              Documentos
-            </h2>
-            <p className="mt-1 text-[10px] leading-5 text-slate-500">
-              Planos, fotografías o referencias. Máximo 5 archivos de 25 MB.
-            </p>
-          </div>
+      <Card className="p-5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+        <div>
+          <h2 className="text-base font-semibold text-slate-950">Documentos</h2>
+          <p className="mt-1 text-[10px] leading-5 text-slate-500">
+            Planos, fotos, especificaciones u otra referencia útil.
+          </p>
         </div>
 
-        <label className="group mt-4 flex cursor-pointer flex-col items-center rounded-xl border border-dashed border-slate-300 bg-slate-50/80 px-4 py-5 text-center transition hover:border-blue-300 hover:bg-blue-50/45">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-lg font-light text-blue-600 shadow-sm transition group-hover:border-blue-200">
-            +
-          </span>
-          <span className="mt-2 text-[10px] font-semibold text-slate-800">
+        <label className="group mt-5 flex cursor-pointer flex-col items-center rounded-xl border border-dashed border-blue-300 bg-blue-50/35 px-4 py-5 text-center transition hover:border-blue-400 hover:bg-blue-50/60">
+          <span className="text-2xl font-light leading-none text-blue-600">+</span>
+          <span className="mt-2 text-[10px] font-semibold text-blue-700">
             Agregar archivos
           </span>
-          <span className="mt-1 text-[9px] text-slate-500">
-            Selecciona uno o varios documentos
+          <span className="mt-1 text-[8px] text-slate-500">
+            Máximo 5 archivos · 25 MB por archivo
           </span>
           <input
             type="file"
@@ -174,34 +152,38 @@ export function CustomerRequestRequirementsStep({
         ) : null}
 
         <div className="mt-4 space-y-2">
-          {documents.length > 0 ? (
-            documents.map((document, index) => (
-              <div
-                key={`${document.file.name}-${index}`}
-                className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-[10px] font-semibold text-slate-800">
-                    {document.file.name}
-                  </p>
-                  <p className="mt-0.5 text-[8px] text-slate-500">
-                    {(document.file.size / (1024 * 1024)).toFixed(1)} MB
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onRemoveFile(index)}
-                  className="shrink-0 rounded-lg px-2 py-1 text-[9px] font-semibold text-red-600 transition hover:bg-red-50"
-                >
-                  Quitar
-                </button>
+          {documents.map((document, index) => (
+            <div
+              key={`${document.file.name}-${index}`}
+              className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/55 px-3 py-2.5"
+            >
+              <div className="min-w-0">
+                <p className="truncate text-[10px] font-semibold text-slate-800">
+                  {document.file.name}
+                </p>
+                <p className="mt-0.5 text-[8px] text-slate-500">
+                  {(document.file.size / (1024 * 1024)).toFixed(1)} MB
+                </p>
               </div>
-            ))
-          ) : (
-            <p className="py-2 text-center text-[9px] text-slate-400">
-              Aún no has adjuntado documentos.
-            </p>
-          )}
+              <button
+                type="button"
+                onClick={() => onRemoveFile(index)}
+                className="shrink-0 rounded-lg px-2 py-1 text-[9px] font-semibold text-red-600 transition hover:bg-red-50"
+              >
+                Quitar
+              </button>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3.5 py-3">
+          <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-emerald-700">
+            Trazabilidad de documentos
+          </p>
+          <p className="mt-1.5 text-[9px] leading-4 text-emerald-800/80">
+            Los archivos enviados quedan vinculados a la solicitud y sus
+            versiones posteriores mantienen el historial.
+          </p>
         </div>
       </Card>
     </div>
