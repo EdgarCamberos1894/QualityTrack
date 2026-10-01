@@ -155,8 +155,8 @@ export function ProductionMaterialsCard({
         </form>
       ) : (
         <p className="mx-4 my-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[8px] leading-4 text-slate-500">
-          El consumo solo puede registrarse mientras la producción está en
-          ejecución y por un usuario PRODUCTION o ADMIN.
+          El consumo solo puede registrarse durante producción o retrabajo
+          activo y por un usuario PRODUCTION o ADMIN.
         </p>
       )}
 
