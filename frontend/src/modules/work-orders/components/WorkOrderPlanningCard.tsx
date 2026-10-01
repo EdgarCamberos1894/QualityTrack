@@ -73,30 +73,26 @@ export function WorkOrderPlanningCard({
       return
     }
 
-    if (await onSave(values)) {
-      setEditing(false)
-    }
+    if (await onSave(values)) setEditing(false)
   })
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+      <div className="flex items-center justify-between gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
         <div>
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-violet-700">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
             01 · Planificación
           </p>
-          <h2 className="mt-1 text-sm font-semibold text-slate-950">
+          <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
             Parámetros operativos
           </h2>
-          <p className="mt-1 text-[10px] text-slate-500">
-            Cantidad, prioridad y fechas que guían la preparación de la orden.
-          </p>
         </div>
 
         {canEdit && !editing ? (
           <Button
             size="sm"
             variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
             onClick={() => setEditing(true)}
           >
             Editar planificación
@@ -106,19 +102,19 @@ export function WorkOrderPlanningCard({
 
       {editing ? (
         <form
-          className="mt-5 grid gap-4 lg:grid-cols-3"
+          className="grid gap-3 px-4 py-3.5 lg:grid-cols-3"
           onSubmit={(event) => void submit(event)}
         >
           <div>
             <label
               htmlFor="planning-priority"
-              className="mb-2 block text-sm font-semibold text-slate-800"
+              className="mb-1.5 block text-[10px] font-semibold text-slate-800"
             >
               Prioridad
             </label>
             <select
               id="planning-priority"
-              className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              className="h-8 w-full rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] text-slate-950 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
               {...register('priority')}
             >
               <option value="LOW">Baja</option>
@@ -131,6 +127,8 @@ export function WorkOrderPlanningCard({
           <TextField
             label="Inicio planeado"
             type="date"
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
             error={errors.plannedStartDate?.message}
             {...register('plannedStartDate')}
           />
@@ -138,25 +136,28 @@ export function WorkOrderPlanningCard({
           <TextField
             label="Fin planeado"
             type="date"
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
             error={errors.plannedEndDate?.message}
             {...register('plannedEndDate')}
           />
 
           {dateError ? (
-            <p className="lg:col-span-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[8px] leading-4 text-amber-800 lg:col-span-3">
               {dateError}
             </p>
           ) : null}
 
           {error ? (
-            <p className="lg:col-span-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700 lg:col-span-3">
               {getErrorMessage(error)}
             </p>
           ) : null}
 
-          <div className="flex justify-end gap-2 lg:col-span-3">
+          <div className="flex justify-end gap-1.5 lg:col-span-3">
             <Button
               variant="secondary"
+              className="!h-7 !px-2.5 !text-[8px]"
               onClick={() => {
                 reset()
                 setDateError(null)
@@ -166,45 +167,33 @@ export function WorkOrderPlanningCard({
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={saving}>
+            <Button
+              type="submit"
+              className="!h-7 !px-2.5 !text-[8px]"
+              disabled={saving}
+            >
               {saving ? 'Guardando…' : 'Guardar planificación'}
             </Button>
           </div>
         </form>
       ) : (
-        <dl className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <div>
-            <dt className="text-[9px] text-slate-500">Cantidad planeada</dt>
-            <dd className="mt-1 text-xs font-semibold text-slate-950">
-              {workOrder.plannedQuantity ?? 'Sin definir'}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-[9px] text-slate-500">Prioridad</dt>
-            <dd className="mt-1 text-xs font-semibold text-slate-950">
-              {getWorkOrderPriorityLabel(workOrder.priority)}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-[9px] text-slate-500">Inicio planeado</dt>
-            <dd className="mt-1 text-xs font-semibold text-slate-950">
-              {formatWorkOrderDate(workOrder.plannedStartDate)}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-[9px] text-slate-500">Fin planeado</dt>
-            <dd className="mt-1 text-xs font-semibold text-slate-950">
-              {formatWorkOrderDate(workOrder.plannedEndDate)}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-[9px] text-slate-500">Entrega comprometida</dt>
-            <dd className="mt-1 text-xs font-semibold text-slate-950">
-              {formatWorkOrderDate(workOrder.agreedDeliveryDate)}
-            </dd>
-          </div>
+        <dl className="grid gap-3 px-4 py-3.5 sm:grid-cols-2 lg:grid-cols-5">
+          <DataItem label="Cantidad planeada" value={workOrder.plannedQuantity ?? 'Sin definir'} />
+          <DataItem label="Prioridad" value={getWorkOrderPriorityLabel(workOrder.priority)} />
+          <DataItem label="Inicio planeado" value={formatWorkOrderDate(workOrder.plannedStartDate)} />
+          <DataItem label="Fin planeado" value={formatWorkOrderDate(workOrder.plannedEndDate)} />
+          <DataItem label="Entrega comprometida" value={formatWorkOrderDate(workOrder.agreedDeliveryDate)} />
         </dl>
       )}
     </section>
+  )
+}
+
+function DataItem({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div>
+      <dt className="text-[8px] font-medium text-slate-400">{label}</dt>
+      <dd className="mt-1 text-[10px] font-semibold text-slate-800">{value}</dd>
+    </div>
   )
 }
