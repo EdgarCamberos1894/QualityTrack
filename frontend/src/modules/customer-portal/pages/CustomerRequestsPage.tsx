@@ -96,7 +96,7 @@ export function CustomerRequestsPage() {
       />
 
       <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-30px_rgba(15,23,42,0.38)]">
-        <div className="border-b border-slate-300 bg-gradient-to-r from-[#e9eef4] via-[#edf1f6] to-[#e2e9f1] px-4 py-3.5 sm:px-5">
+        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/70 px-4 py-3.5 sm:px-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-blue-600">
