@@ -1,3 +1,4 @@
+export { useCustomerQuotations } from './hooks/useCustomerQuotations'
 export { useCreateQuotation } from './hooks/useQuotationMutations'
 export { CustomerQuotationDetailPage } from './pages/CustomerQuotationDetailPage'
 export { CustomerQuotationsPage } from './pages/CustomerQuotationsPage'
