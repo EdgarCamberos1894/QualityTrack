@@ -22,18 +22,16 @@ export function NonConformitySection({ data }: NonConformitySectionProps) {
   }
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-2.5">
       <div>
-        <p className="text-[9px] font-semibold uppercase tracking-wide text-red-700">
+        <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-red-600">
           No conformidades y retrabajo
         </p>
-        <h2 className="mt-1 text-sm font-semibold text-slate-950">
+        <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
           Resolución sin perder la historia original
         </h2>
-        <p className="mt-1 max-w-3xl text-[10px] leading-5 text-slate-600">
-          La inspección rechazada, la ruta de producción y sus ejecuciones se
-          preservan. Cada corrección crea su propia revisión REWORK y una nueva
-          reinspección.
+        <p className="mt-0.5 max-w-3xl text-[8px] leading-4 text-slate-500">
+          Cada corrección conserva la inspección y ejecución original y crea su propio ciclo trazable.
         </p>
       </div>
 
