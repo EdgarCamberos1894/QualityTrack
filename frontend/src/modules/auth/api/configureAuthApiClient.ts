@@ -26,7 +26,8 @@ let configured = false
 function isPublicApiRequest(url?: string): boolean {
   if (!url) return false
 
-  const path = url.split('?')[0]
+  const queryIndex = url.indexOf('?')
+  const path = queryIndex >= 0 ? url.slice(0, queryIndex) : url
   return PUBLIC_API_PATHS.has(path)
 }
 
