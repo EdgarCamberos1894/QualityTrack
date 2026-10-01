@@ -88,8 +88,8 @@ export function CustomerRequestsPage() {
       />
 
       <Card className="mb-5 p-4">
-        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <label className="block xl:w-[430px]">
+        <div className="flex flex-col gap-4 @4xl/page:flex-row @4xl/page:items-center @4xl/page:justify-between">
+          <label className="block @4xl/page:w-[430px]">
             <span className="sr-only">Buscar solicitudes</span>
             <input
               type="search"
