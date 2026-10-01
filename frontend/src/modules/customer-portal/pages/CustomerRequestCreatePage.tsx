@@ -188,6 +188,15 @@ export function CustomerRequestCreatePage() {
                     current.filter((_, itemIndex) => itemIndex !== index),
                   )
                 }
+                onUpdateFile={(index, patch) =>
+                  setDocuments((current) =>
+                    current.map((document, itemIndex) =>
+                      itemIndex === index
+                        ? { ...document, ...patch }
+                        : document,
+                    ),
+                  )
+                }
                 actions={
                   <CustomerRequestStepActions
                     step={step}
