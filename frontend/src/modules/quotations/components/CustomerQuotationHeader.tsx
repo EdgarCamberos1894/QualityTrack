@@ -57,7 +57,7 @@ export function CustomerQuotationHeader({
   const description = statusDescription(quotation, includesAdjustmentResponse)
 
   return (
-    <header className="mb-4 flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
+    <header className="mb-4 flex flex-col gap-5 @4xl/page:flex-row @4xl/page:items-start @4xl/page:justify-between">
       <div>
         <p className="text-[10px] text-slate-500">
           Cotizaciones / {quotation.quotationNumber}
@@ -70,8 +70,8 @@ export function CustomerQuotationHeader({
         </p>
       </div>
 
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
-        <div className="min-w-[150px] pt-1 lg:text-right">
+      <div className="flex flex-col gap-3 @3xl/page:flex-row @3xl/page:items-start">
+        <div className="min-w-[150px] pt-1 @3xl/page:text-right">
           <Badge
             tone={status.tone}
             className="px-4 py-1.5 text-[10px] uppercase"
