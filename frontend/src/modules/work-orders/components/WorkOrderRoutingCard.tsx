@@ -27,6 +27,7 @@ interface WorkOrderRoutingCardProps {
   routing?: RoutingSheetDto
   workOrderStatus: WorkOrderStatus
   pinnedDocumentCount: number
+  planningReady: boolean
   canDesign: boolean
   pending: PendingState
   error: unknown
@@ -58,6 +59,7 @@ export function WorkOrderRoutingCard({
   routing,
   workOrderStatus,
   pinnedDocumentCount,
+  planningReady,
   canDesign,
   pending,
   error,
@@ -145,7 +147,10 @@ export function WorkOrderRoutingCard({
   const canApprove =
     editable && routing.operations.length > 0 && pinnedDocumentCount > 0
   const canRelease =
-    routing.status === 'APPROVED' && canDesign && workOrderStatus === 'CREATED'
+    routing.status === 'APPROVED' &&
+    canDesign &&
+    workOrderStatus === 'CREATED' &&
+    planningReady
 
   return (
     <section
@@ -224,7 +229,9 @@ export function WorkOrderRoutingCard({
             <div>
               <p className="text-[9px] font-semibold text-blue-900">Ruta aprobada</p>
               <p className="mt-0.5 text-[8px] leading-4 text-blue-700">
-                Libérala para iniciar Producción o reábrela si requiere corrección.
+                {planningReady
+                  ? 'Libérala para iniciar Producción o reábrela si requiere corrección.'
+                  : 'Completa las fechas de planificación antes de liberar la ruta a Producción.'}
               </p>
             </div>
             {canDesign ? (
