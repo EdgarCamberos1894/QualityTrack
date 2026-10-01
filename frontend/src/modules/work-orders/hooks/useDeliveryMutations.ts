@@ -24,7 +24,9 @@ export function useDeliveryMutations() {
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: workOrderKeys.all }),
       queryClient.invalidateQueries({ queryKey: deliveryKeys.all }),
+      queryClient.invalidateQueries({ queryKey: ['job-cases'] }),
       queryClient.invalidateQueries({ queryKey: ['document-center'] }),
+      queryClient.invalidateQueries({ queryKey: ['internal-dashboard'] }),
     ])
   }
 
