@@ -14,11 +14,21 @@ interface TextFieldProps extends Omit<
   error?: string
   hint?: string
   endAdornment?: ReactNode
+  labelClassName?: string
 }
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
   function TextField(
-    { className, id, label, error, hint, endAdornment, ...inputProps },
+    {
+      className,
+      id,
+      label,
+      error,
+      hint,
+      endAdornment,
+      labelClassName,
+      ...inputProps
+    },
     ref,
   ) {
     const generatedId = useId()
@@ -33,7 +43,10 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       <div>
         <label
           htmlFor={inputId}
-          className="mb-2 block text-sm font-semibold text-slate-800"
+          className={cn(
+            'mb-2 block text-sm font-semibold text-slate-800',
+            labelClassName,
+          )}
         >
           {label}
         </label>
