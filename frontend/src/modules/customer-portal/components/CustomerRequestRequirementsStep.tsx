@@ -82,8 +82,8 @@ export function CustomerRequestRequirementsStep({
 
   return (
     <>
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.12fr)_minmax(340px,0.88fr)]">
-        <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+      <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
+        <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
           <div>
             <h2 className="text-base font-semibold text-slate-950">
               Requisitos técnicos
@@ -168,8 +168,8 @@ export function CustomerRequestRequirementsStep({
           </div>
         </Card>
 
-        <div className="space-y-3">
-          <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+        <div className="flex min-h-0 flex-col gap-3 lg:h-full">
+          <Card className="min-h-0 flex-1 p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)] lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-base font-semibold text-slate-950">
