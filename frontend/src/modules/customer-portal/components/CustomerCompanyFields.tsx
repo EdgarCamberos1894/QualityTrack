@@ -14,9 +14,9 @@ export function CustomerCompanyFields({
   disabled = false,
 }: CustomerCompanyFieldsProps) {
   return (
-    <div className="space-y-5">
+    <div className="space-y-3.5">
       <section>
-        <div className="mb-3">
+        <div className="mb-2">
           <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
             Identidad
           </p>
@@ -25,14 +25,15 @@ export function CustomerCompanyFields({
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-[minmax(0,1.3fr)_minmax(180px,0.7fr)]">
+        <div className="grid gap-3 sm:grid-cols-[minmax(0,1.3fr)_minmax(180px,0.7fr)]">
           <TextField
             label="Nombre de la empresa"
             placeholder="Ej. Maquinados del Pacífico"
             maxLength={200}
             disabled={disabled}
+            labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.name?.message}
-            className="h-10 text-[11px]"
+            className="h-9 rounded-lg px-2.5 text-[10px]"
             {...register('name')}
           />
           <TextField
@@ -40,15 +41,16 @@ export function CustomerCompanyFields({
             placeholder="Opcional"
             maxLength={50}
             disabled={disabled}
+            labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.rfc?.message}
-            className="h-10 text-[11px]"
+            className="h-9 rounded-lg px-2.5 text-[10px]"
             {...register('rfc')}
           />
         </div>
       </section>
 
-      <section className="border-t border-slate-100 pt-5">
-        <div className="mb-3">
+      <section className="border-t border-slate-100 pt-3.5">
+        <div className="mb-2">
           <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
             Contacto administrativo
           </p>
@@ -57,15 +59,16 @@ export function CustomerCompanyFields({
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <TextField
             label="Correo administrativo"
             type="email"
             placeholder="administracion@empresa.com"
             maxLength={254}
             disabled={disabled}
+            labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.administrativeEmail?.message}
-            className="h-10 text-[11px]"
+            className="h-9 rounded-lg px-2.5 text-[10px]"
             {...register('administrativeEmail')}
           />
           <TextField
@@ -73,15 +76,16 @@ export function CustomerCompanyFields({
             placeholder="Opcional"
             maxLength={30}
             disabled={disabled}
+            labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.phone?.message}
-            className="h-10 text-[11px]"
+            className="h-9 rounded-lg px-2.5 text-[10px]"
             {...register('phone')}
           />
         </div>
       </section>
 
-      <section className="border-t border-slate-100 pt-5">
-        <div className="mb-3">
+      <section className="border-t border-slate-100 pt-3.5">
+        <div className="mb-2">
           <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
             Ubicación y presencia
           </p>
@@ -90,14 +94,15 @@ export function CustomerCompanyFields({
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <TextField
             label="Ciudad"
             placeholder="Opcional"
             maxLength={120}
             disabled={disabled}
+            labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.city?.message}
-            className="h-10 text-[11px]"
+            className="h-9 rounded-lg px-2.5 text-[10px]"
             {...register('city')}
           />
           <TextField
@@ -105,18 +110,20 @@ export function CustomerCompanyFields({
             placeholder="Opcional"
             maxLength={120}
             disabled={disabled}
+            labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.state?.message}
-            className="h-10 text-[11px]"
+            className="h-9 rounded-lg px-2.5 text-[10px]"
             {...register('state')}
           />
-          <div className="sm:col-span-2">
+          <div className="sm:col-span-2 lg:col-span-1">
             <TextField
               label="Sitio web"
               placeholder="https://empresa.com"
               maxLength={255}
               disabled={disabled}
-              error={errors.website?.message}
-              className="h-10 text-[11px]"
+              labelClassName="!mb-1.5 !text-[10px] !font-semibold"
+            error={errors.website?.message}
+              className="h-9 rounded-lg px-2.5 text-[10px]"
               {...register('website')}
             />
           </div>
