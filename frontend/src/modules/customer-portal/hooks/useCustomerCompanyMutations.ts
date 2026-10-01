@@ -4,10 +4,12 @@ import {
   createCustomerInvitation,
   removeCustomerMember,
   updateCustomerCompany,
+  updateCustomerMemberRole,
 } from '../api/customerCompany.api'
 import type {
   CreateCustomerInvitationPayload,
   UpdateCustomerCompanyPayload,
+  UpdateCustomerMemberRolePayload,
 } from '../types/customerCompany.types'
 import { customerCompanyKeys } from './useCustomerCompany'
 
@@ -44,6 +46,21 @@ export function useCustomerCompanyMutations(customerId: number) {
     },
   })
 
+  const updateMemberRole = useMutation({
+    mutationFn: ({
+      userId,
+      payload,
+    }: {
+      userId: number
+      payload: UpdateCustomerMemberRolePayload
+    }) => updateCustomerMemberRole(customerId, userId, payload),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: customerCompanyKeys.members(customerId),
+      })
+    },
+  })
+
   const removeMember = useMutation({
     mutationFn: (userId: number) => removeCustomerMember(customerId, userId),
     onSuccess: async () => {
@@ -53,5 +70,5 @@ export function useCustomerCompanyMutations(customerId: number) {
     },
   })
 
-  return { updateCompany, invite, cancelInvitation, removeMember }
+  return { updateCompany, invite, cancelInvitation, updateMemberRole, removeMember }
 }
