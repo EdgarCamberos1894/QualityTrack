@@ -37,7 +37,7 @@ export function DashboardMetricGrid({
   ]
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 @4xl/page:grid-cols-4">
       {metrics.map((metric) => (
         <Link key={metric.label} to={metric.href} className="group">
           <Card className="h-full px-5 py-4 transition group-hover:border-blue-200 group-hover:shadow-md">
