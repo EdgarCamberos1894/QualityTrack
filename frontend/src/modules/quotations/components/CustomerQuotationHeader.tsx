@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { CompactBackButton } from '@/shared/components/navigation/CompactBackButton'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge } from '@/shared/components/ui/Badge'
 import { getCustomerQuotationStatusPresentation } from '../model/customerQuotationPresenter'
@@ -15,6 +16,7 @@ export function CustomerQuotationHeader({
   quotation,
   customerName,
 }: CustomerQuotationHeaderProps) {
+  const navigate = useNavigate()
   const status = getCustomerQuotationStatusPresentation(
     quotation.customerStatus,
   )
@@ -52,24 +54,10 @@ export function CustomerQuotationHeader({
         </div>
       </div>
 
-      <Link
-        to={`/portal/${customerId}/quotations`}
-        className="inline-flex h-6 shrink-0 items-center gap-1 rounded-md border border-slate-300 bg-white/85 px-2 text-[7px] font-medium leading-none text-slate-500 transition hover:border-slate-400 hover:bg-white hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-          className="h-3 w-3 shrink-0"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="m15 18-6-6 6-6" />
-        </svg>
-        <span>Volver a cotizaciones</span>
-      </Link>
+      <CompactBackButton
+        label="Volver a cotizaciones"
+        onClick={() => navigate(`/portal/${customerId}/quotations`)}
+      />
     </header>
   )
 }
