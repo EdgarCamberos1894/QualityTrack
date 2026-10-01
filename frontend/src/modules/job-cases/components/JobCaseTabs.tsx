@@ -28,7 +28,7 @@ export function JobCaseTabs({ activeTab, counts, onChange }: JobCaseTabsProps) {
   }
 
   return (
-    <div className="flex overflow-x-auto rounded-[10px] border border-[#d9e2ee] bg-white px-2">
+    <div className="flex overflow-x-auto rounded-xl border border-slate-200 bg-white p-1 shadow-[0_8px_24px_-24px_rgba(15,23,42,0.28)]">
       {tabs.map((tab) => {
         const active = tab.id === activeTab
         const count = getCount(tab.id)
@@ -39,16 +39,24 @@ export function JobCaseTabs({ activeTab, counts, onChange }: JobCaseTabsProps) {
             type="button"
             onClick={() => onChange(tab.id)}
             className={cn(
-              'relative h-11 shrink-0 px-4 text-[11px] font-medium text-slate-700',
-              active && 'font-semibold text-amber-700',
+              'inline-flex h-7 shrink-0 items-center gap-1 rounded-lg px-2.5 text-[8px] font-semibold transition',
+              active
+                ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-100'
+                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700',
             )}
           >
             {tab.label}
             {count !== null ? (
-              <span className="ml-1 text-[9px] text-slate-400">{count}</span>
-            ) : null}
-            {active ? (
-              <span className="absolute inset-x-3 bottom-0 h-[3px] rounded-t bg-amber-600" />
+              <span
+                className={cn(
+                  'rounded-full px-1.5 py-0.5 text-[7px]',
+                  active
+                    ? 'bg-white text-blue-700 ring-1 ring-blue-100'
+                    : 'bg-slate-100 text-slate-400',
+                )}
+              >
+                {count}
+              </span>
             ) : null}
           </button>
         )
