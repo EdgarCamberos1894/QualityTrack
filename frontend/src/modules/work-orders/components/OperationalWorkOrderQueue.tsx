@@ -48,7 +48,7 @@ export function OperationalWorkOrderQueue({
             return (
               <article
                 key={workOrder.id}
-                className="grid gap-4 px-5 py-4 transition hover:bg-slate-50 lg:grid-cols-[minmax(0,1.5fr)_minmax(180px,0.8fr)_140px_150px]"
+                className="grid gap-4 px-5 py-4 transition hover:bg-slate-50 @4xl/page:grid-cols-[minmax(0,1.5fr)_minmax(180px,0.8fr)_140px_150px]"
               >
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold text-slate-500">
@@ -85,7 +85,7 @@ export function OperationalWorkOrderQueue({
                   </p>
                 </div>
 
-                <div className="flex items-center justify-start lg:justify-end">
+                <div className="flex items-center justify-start @4xl/page:justify-end">
                   <Link
                     to={`/work-orders/${workOrder.id}?tab=${tab}`}
                     className="inline-flex h-10 min-w-32 items-center justify-center rounded-lg bg-blue-600 px-4 text-xs font-semibold text-white transition hover:bg-blue-700"
