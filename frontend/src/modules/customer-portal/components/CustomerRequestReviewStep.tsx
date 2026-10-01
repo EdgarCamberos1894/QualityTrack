@@ -142,7 +142,7 @@ export function CustomerRequestReviewStep({
   ]
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.12fr)_minmax(340px,0.88fr)]">
       <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
         <div className="flex items-center justify-between gap-4">
           <div>
