@@ -193,58 +193,63 @@ export function CustomerRequestCreatePage() {
             </p>
           ) : null}
 
-          <div className="mt-4 flex shrink-0 items-center justify-between border-t border-slate-200 px-1 pt-3 lg:mt-auto">
-            <div className="flex items-center gap-3">
+          <div className="mt-4 flex shrink-0 flex-col gap-3 border-t border-slate-200 pt-3 sm:flex-row sm:items-center sm:justify-between lg:mt-auto">
+            <div>
+              <p className="text-[9px] font-medium text-slate-400">
+                Paso {step + 1} de 3
+              </p>
+              <p className="mt-0.5 text-[9px] text-slate-500">
+                {step === 0
+                  ? 'Completa los detalles básicos para continuar.'
+                  : step === 1
+                    ? 'Revisa requisitos y documentos antes de confirmar.'
+                    : 'Confirma la información antes de enviar la solicitud.'}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 sm:justify-end">
               {step === 0 ? (
                 <Link
                   to={`/portal/${customer.customerId}/requests`}
-                  className="inline-flex h-8 items-center justify-center rounded-lg px-2 text-[10px] font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                  className="inline-flex h-10 min-w-32 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
                 >
                   Cancelar
                 </Link>
               ) : (
                 <Button
-                  size="sm"
                   variant="secondary"
                   onClick={() => setStep((current) => current - 1)}
                   disabled={mutation.isPending}
-                  className="min-w-24 text-[10px]"
+                  className="min-w-32"
                 >
                   Atrás
                 </Button>
               )}
 
-              <span className="hidden text-[9px] text-slate-400 sm:inline">
-                Paso {step + 1} de 3
-              </span>
+              {step === 0 ? (
+                <Button
+                  onClick={() => void goToRequirements()}
+                  className="min-w-40"
+                >
+                  Continuar
+                </Button>
+              ) : step === 1 ? (
+                <Button
+                  onClick={() => void goToReview()}
+                  className="min-w-44"
+                >
+                  Revisar solicitud
+                </Button>
+              ) : (
+                <Button
+                  type="submit"
+                  disabled={mutation.isPending}
+                  className="min-w-44"
+                >
+                  {mutation.isPending ? 'Enviando…' : 'Enviar solicitud'}
+                </Button>
+              )}
             </div>
-
-            {step === 0 ? (
-              <Button
-                size="sm"
-                onClick={() => void goToRequirements()}
-                className="min-w-32 text-[10px]"
-              >
-                Continuar
-              </Button>
-            ) : step === 1 ? (
-              <Button
-                size="sm"
-                onClick={() => void goToReview()}
-                className="min-w-36 text-[10px]"
-              >
-                Revisar solicitud
-              </Button>
-            ) : (
-              <Button
-                size="sm"
-                type="submit"
-                disabled={mutation.isPending}
-                className="min-w-36 text-[10px]"
-              >
-                {mutation.isPending ? 'Enviando…' : 'Enviar solicitud'}
-              </Button>
-            )}
           </div>
         </form>
       </div>
