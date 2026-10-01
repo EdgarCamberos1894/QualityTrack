@@ -15,6 +15,7 @@ export interface CustomerQuotationSummaryDto {
   id: number
   caseNumber: string
   requestNumber: string
+  requestTitle: string
   quotationNumber: string
   revision: number
   customerStatus: CustomerQuotationStatus
