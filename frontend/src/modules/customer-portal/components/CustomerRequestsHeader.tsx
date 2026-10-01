@@ -19,8 +19,8 @@ export function CustomerRequestsHeader({
   canCreate,
 }: CustomerRequestsHeaderProps) {
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/45 shadow-[0_12px_34px_-30px_rgba(15,23,42,0.35)]">
-      <div className="pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full bg-blue-100/55 blur-3xl" />
+    <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-white via-white to-slate-100/75 shadow-[0_12px_34px_-30px_rgba(15,23,42,0.35)]">
+      <div className="pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full bg-slate-200/50 blur-3xl" />
 
       <div className="relative px-5 py-4 lg:px-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
