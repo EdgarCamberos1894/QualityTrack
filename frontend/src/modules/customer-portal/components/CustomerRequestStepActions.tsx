@@ -19,12 +19,12 @@ export function CustomerRequestStepActions({
   onReview,
 }: CustomerRequestStepActionsProps) {
   return (
-    <div className="mt-3 flex flex-col gap-2.5 border-t border-slate-200 pt-3 sm:flex-row sm:items-center sm:justify-between">
-      <div>
+    <div className="rounded-xl border border-slate-200 bg-white p-3.5 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.24)]">
+      <div className="mb-3">
         <p className="text-[8px] font-semibold uppercase tracking-[0.08em] text-slate-400">
           Paso {step + 1} de 3
         </p>
-        <p className="mt-0.5 text-[8px] text-slate-500">
+        <p className="mt-1 text-[9px] leading-4 text-slate-500">
           {step === 0
             ? 'Completa la información básica para continuar.'
             : step === 1
@@ -33,11 +33,11 @@ export function CustomerRequestStepActions({
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+      <div className="grid grid-cols-2 gap-2">
         {step === 0 ? (
           <Link
             to={`/portal/${customerId}/requests`}
-            className="inline-flex h-9 min-w-28 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50"
+            className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-[10px] font-semibold text-slate-700 transition-colors hover:bg-slate-50"
           >
             Cancelar
           </Link>
@@ -47,7 +47,7 @@ export function CustomerRequestStepActions({
             variant="secondary"
             onClick={onBack}
             disabled={pending}
-            className="min-w-28 text-[10px]"
+            className="w-full text-[10px]"
           >
             Atrás
           </Button>
@@ -57,7 +57,7 @@ export function CustomerRequestStepActions({
           <Button
             size="sm"
             onClick={onContinue}
-            className="min-w-36 text-[10px]"
+            className="w-full text-[10px]"
           >
             Continuar
           </Button>
@@ -65,18 +65,18 @@ export function CustomerRequestStepActions({
           <Button
             size="sm"
             onClick={onReview}
-            className="min-w-40 text-[10px]"
+            className="w-full text-[10px]"
           >
-            Revisar solicitud
+            Revisar
           </Button>
         ) : (
           <Button
             size="sm"
             type="submit"
             disabled={pending}
-            className="min-w-40 text-[10px]"
+            className="w-full text-[10px]"
           >
-            {pending ? 'Enviando…' : 'Enviar solicitud'}
+            {pending ? 'Enviando…' : 'Enviar'}
           </Button>
         )}
       </div>
