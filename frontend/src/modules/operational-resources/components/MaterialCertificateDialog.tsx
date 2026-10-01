@@ -71,40 +71,40 @@ function MaterialCertificateDialogContent({
         role="dialog"
         aria-modal="true"
         aria-labelledby="material-certificate-title"
-        className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
       >
-        <div className="border-b border-slate-200 px-6 py-5">
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-amber-700">
-            Materiales / {material.code} / {lot.lotNumber}
+        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/60 px-4 py-3.5">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+            {material.code} · Lote {lot.lotNumber}
           </p>
           <h2
             id="material-certificate-title"
-            className="mt-1 text-lg font-semibold text-slate-950"
+            className="mt-0.5 text-[14px] font-semibold text-slate-950"
           >
             {lot.certificateDocumentVersionId
               ? 'Actualizar certificado'
               : 'Adjuntar certificado'}
           </h2>
-          <p className="mt-1 text-xs leading-5 text-slate-500">
-            El archivo pertenece al lote global. Si ya existe un certificado,
-            esta carga se guardará como una nueva versión del mismo documento.
+          <p className="mt-1 text-[9px] leading-4 text-slate-500">
+            La nueva carga quedará vinculada al lote y, si ya existe un
+            certificado, se conservará como una nueva versión.
           </p>
         </div>
 
-        <div className="space-y-4 px-6 py-5">
+        <div className="space-y-3 px-4 py-3.5">
           {lot.certificateFileName ? (
-            <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+            <div className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2.5">
+              <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
                 Versión vigente
               </p>
-              <p className="mt-1 truncate text-xs font-semibold text-slate-800">
+              <p className="mt-0.5 truncate text-[9px] font-semibold text-slate-800">
                 {lot.certificateFileName}
               </p>
             </div>
           ) : null}
 
           <label className="block">
-            <span className="mb-2 block text-sm font-semibold text-slate-800">
+            <span className="mb-1.5 block text-[10px] font-semibold text-slate-800">
               Archivo del certificado
             </span>
             <input
@@ -114,31 +114,40 @@ function MaterialCertificateDialogContent({
                 setFileError(null)
                 setFile(event.target.files?.[0] ?? null)
               }}
-              className="block w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-xs text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-slate-700"
+              className="block w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[9px] text-slate-700 file:mr-2 file:rounded-md file:border-0 file:bg-slate-100 file:px-2.5 file:py-1.5 file:text-[8px] file:font-semibold file:text-slate-700"
             />
-            <p className="mt-1.5 text-xs text-slate-500">
-              Máximo 25 MB. PDF, imagen u otro archivo técnico compatible.
+            <p className="mt-1 text-[8px] text-slate-400">
+              Máximo 25 MB.
             </p>
           </label>
 
           {fileError ? (
-            <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[8px] leading-4 text-amber-800">
               {fileError}
             </p>
           ) : null}
 
           {error ? (
-            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
               {getErrorMessage(error)}
             </p>
           ) : null}
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-6 py-4">
-          <Button variant="secondary" onClick={close} disabled={submitting}>
+        <div className="flex justify-end gap-1.5 border-t border-slate-100 bg-slate-50/60 px-4 py-2.5">
+          <Button
+            variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
+            onClick={close}
+            disabled={submitting}
+          >
             Cancelar
           </Button>
-          <Button onClick={() => void submit()} disabled={submitting}>
+          <Button
+            className="!h-7 !px-2.5 !text-[8px]"
+            onClick={() => void submit()}
+            disabled={submitting}
+          >
             {submitting ? 'Guardando…' : 'Guardar certificado'}
           </Button>
         </div>
