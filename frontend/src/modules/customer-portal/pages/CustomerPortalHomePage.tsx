@@ -1,4 +1,4 @@
-import { useCustomerQuotations } from '@/modules/quotations/hooks/useCustomerQuotations'
+import { useCustomerQuotations } from '@/modules/quotations'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
