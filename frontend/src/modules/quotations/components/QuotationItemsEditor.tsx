@@ -73,7 +73,7 @@ export function QuotationItemsEditor({
           return (
             <div
               key={field.id}
-              className="grid gap-3 rounded-lg border border-slate-200 bg-white p-3 lg:grid-cols-[minmax(260px,1fr)_120px_150px_140px_auto]"
+              className="grid gap-3 rounded-lg border border-slate-200 bg-white p-3 @4xl/page:grid-cols-[minmax(260px,1fr)_120px_150px_140px_auto]"
             >
               <div>
                 <label className="text-[9px] font-semibold uppercase tracking-wide text-slate-500">
