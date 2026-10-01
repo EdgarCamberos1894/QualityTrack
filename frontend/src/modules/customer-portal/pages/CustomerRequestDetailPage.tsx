@@ -152,6 +152,7 @@ export function CustomerRequestDetailPage() {
         customerId={customer.customerId}
         request={request}
         quotationId={relatedQuotation?.id}
+        quotationStatus={relatedQuotation?.customerStatus}
         deliveryProgress={deliveryProgress}
         canWrite={canWrite}
         canCancel={canCancel}
