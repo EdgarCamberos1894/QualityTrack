@@ -33,7 +33,7 @@ export function CustomerCompanyFields({
             disabled={disabled}
             labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.name?.message}
-            className="h-8 rounded-md px-2.5 !text-[10px] placeholder:!text-[9px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
             {...register('name')}
           />
           <TextField
@@ -43,7 +43,7 @@ export function CustomerCompanyFields({
             disabled={disabled}
             labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.rfc?.message}
-            className="h-8 rounded-md px-2.5 !text-[10px] placeholder:!text-[9px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
             {...register('rfc')}
           />
         </div>
@@ -68,7 +68,7 @@ export function CustomerCompanyFields({
             disabled={disabled}
             labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.administrativeEmail?.message}
-            className="h-8 rounded-md px-2.5 !text-[10px] placeholder:!text-[9px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
             {...register('administrativeEmail')}
           />
           <TextField
@@ -78,7 +78,7 @@ export function CustomerCompanyFields({
             disabled={disabled}
             labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.phone?.message}
-            className="h-8 rounded-md px-2.5 !text-[10px] placeholder:!text-[9px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
             {...register('phone')}
           />
         </div>
@@ -102,7 +102,7 @@ export function CustomerCompanyFields({
             disabled={disabled}
             labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.city?.message}
-            className="h-8 rounded-md px-2.5 !text-[10px] placeholder:!text-[9px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
             {...register('city')}
           />
           <TextField
@@ -112,7 +112,7 @@ export function CustomerCompanyFields({
             disabled={disabled}
             labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.state?.message}
-            className="h-8 rounded-md px-2.5 !text-[10px] placeholder:!text-[9px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
             {...register('state')}
           />
           <div className="sm:col-span-2 lg:col-span-1">
@@ -123,7 +123,7 @@ export function CustomerCompanyFields({
               disabled={disabled}
               labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.website?.message}
-              className="h-8 rounded-md px-2.5 !text-[10px] placeholder:!text-[9px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
               {...register('website')}
             />
           </div>
