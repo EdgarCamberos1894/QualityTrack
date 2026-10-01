@@ -10,7 +10,6 @@ import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
-import { Card } from '@/shared/components/ui/Card'
 import {
   formatResourceDate,
   getMachineStatusPresentation,
@@ -41,9 +40,7 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
     )
   }, [query.data, search])
 
-  if (query.isPending) {
-    return <LoadingState label="Cargando máquinas…" />
-  }
+  if (query.isPending) return <LoadingState label="Cargando máquinas…" />
 
   if (query.isError) {
     return (
@@ -91,35 +88,21 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
 
   return (
     <>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <Card className="px-5 py-4">
-          <p className="text-[10px] text-slate-500">Disponibles</p>
-          <p className="mt-1 text-xl font-bold text-emerald-700">{available}</p>
-        </Card>
-        <Card className="px-5 py-4">
-          <p className="text-[10px] text-slate-500">En uso</p>
-          <p className="mt-1 text-xl font-bold text-blue-700">{inUse}</p>
-        </Card>
-        <Card className="px-5 py-4">
-          <p className="text-[10px] text-slate-500">No disponibles</p>
-          <p className="mt-1 text-xl font-bold text-amber-700">{unavailable}</p>
-        </Card>
-      </div>
-
-      <Card className="mt-5 overflow-hidden">
-        <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
+        <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div>
-            <h2 className="text-sm font-semibold text-slate-950">
+            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
               Parque de máquinas
-            </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
-              {machines.length} registradas · {filtered.length} visibles
             </p>
+            <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
+              Disponibilidad operativa
+            </h2>
           </div>
 
           {canManage ? (
             <Button
               size="sm"
+              className="!h-7 !px-2.5 !text-[8px]"
               onClick={() => {
                 mutations.create.reset()
                 setCreateOpen(true)
@@ -130,21 +113,39 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
           ) : null}
         </div>
 
-        <div className="border-b border-slate-200 p-4">
-          <label>
+        <div className="grid border-b border-slate-100 sm:grid-cols-3 sm:divide-x sm:divide-slate-100">
+          <Metric label="Disponibles" value={available} valueClassName="text-emerald-700" />
+          <Metric label="En uso" value={inUse} valueClassName="text-blue-700" />
+          <Metric label="No disponibles" value={unavailable} valueClassName="text-amber-700" />
+        </div>
+
+        <div className="border-b border-slate-100 bg-slate-50/55 px-4 py-2.5 sm:px-5">
+          <label className="relative block">
             <span className="sr-only">Buscar máquina</span>
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
             <input
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Buscar código, nombre o tipo"
-              className="h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              placeholder="Buscar código, nombre o tipo…"
+              className="h-9 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[10px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
             />
           </label>
         </div>
 
         {filtered.length === 0 ? (
-          <div className="p-5">
+          <div className="p-4">
             <EmptyState
               title={
                 machines.length === 0
@@ -166,29 +167,31 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
               return (
                 <article
                   key={machine.id}
-                  className="grid gap-4 px-5 py-4 lg:grid-cols-[170px_minmax(220px,1fr)_190px_150px_120px] lg:items-center"
+                  className="grid gap-3 px-4 py-3 transition hover:bg-blue-50/25 sm:px-5 lg:grid-cols-[150px_minmax(220px,1fr)_150px_160px_100px] lg:items-center"
                 >
                   <div>
-                    <p className="text-xs font-semibold text-slate-950">
+                    <p className="text-[10px] font-semibold text-slate-950">
                       {machine.code}
                     </p>
-                    <p className="mt-1 text-[9px] text-slate-500">
+                    <p className="mt-0.5 text-[7px] text-slate-400">
                       Alta {formatResourceDate(machine.createdAt)}
                     </p>
                   </div>
 
-                  <div>
-                    <p className="text-xs font-semibold text-slate-950">
+                  <div className="min-w-0">
+                    <p className="truncate text-[10px] font-semibold text-slate-900">
                       {machine.name}
                     </p>
-                    <p className="mt-1 text-[10px] text-slate-500">
+                    <p className="mt-0.5 truncate text-[8px] text-slate-400">
                       {machine.type ?? 'Tipo no especificado'}
                     </p>
                   </div>
 
-                  <Badge tone={status.tone}>{status.label}</Badge>
+                  <Badge tone={status.tone} className="w-fit px-2 py-0.5 text-[7px]">
+                    {status.label}
+                  </Badge>
 
-                  <p className="text-[10px] text-slate-500">
+                  <p className="text-[8px] text-slate-400">
                     Actualizada {formatResourceDate(machine.updatedAt)}
                   </p>
 
@@ -197,6 +200,7 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
                       <Button
                         size="sm"
                         variant="secondary"
+                        className="!h-7 !px-2.5 !text-[8px]"
                         disabled={machine.status === 'IN_USE'}
                         title={
                           machine.status === 'IN_USE'
@@ -208,10 +212,10 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
                           setStatusTarget(machine)
                         }}
                       >
-                        {machine.status === 'IN_USE' ? 'En ejecución' : 'Estado'}
+                        {machine.status === 'IN_USE' ? 'En ejecución' : 'Cambiar'}
                       </Button>
                     ) : (
-                      <span className="text-[10px] text-slate-400">
+                      <span className="text-[7px] text-slate-400">
                         Solo lectura
                       </span>
                     )}
@@ -221,7 +225,7 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
             })}
           </div>
         )}
-      </Card>
+      </section>
 
       <CreateMachineDialog
         open={createOpen}
@@ -245,5 +249,24 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
         onSubmit={updateStatus}
       />
     </>
+  )
+}
+
+function Metric({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string
+  value: number
+  valueClassName: string
+}) {
+  return (
+    <div className="px-4 py-3">
+      <p className="text-[7px] font-medium text-slate-400">{label}</p>
+      <p className={`mt-0.5 text-[14px] font-bold ${valueClassName}`}>
+        {value}
+      </p>
+    </div>
   )
 }
