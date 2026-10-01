@@ -49,13 +49,13 @@ export function WorkOrderSummary({ data }: WorkOrderSummaryProps) {
     <div className="space-y-4">
       <WorkOrderOriginChain data={data} />
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+      <div className="grid gap-4 @4xl/page:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
         <Card className="p-5">
           <h2 className="text-sm font-semibold text-slate-950">
             Snapshot operativo
           </h2>
 
-          <dl className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+          <dl className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2 @3xl/page:grid-cols-3">
             <DataItem
               label="Cliente"
               value={data.workOrder.source.customerName}
@@ -109,7 +109,7 @@ export function WorkOrderSummary({ data }: WorkOrderSummaryProps) {
         </Card>
       </div>
 
-      <Card className="grid overflow-hidden sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-slate-200">
+      <Card className="grid overflow-hidden sm:grid-cols-2 @3xl/page:grid-cols-4 @3xl/page:divide-x @3xl/page:divide-slate-200">
         <Metric label="Documentos vigentes" value={data.documents.length} />
         <Metric label="Eventos registrados" value={data.timeline.length} />
         <Metric label="Inspecciones" value={data.qualityInspections.length} />
@@ -128,7 +128,7 @@ export function WorkOrderSummary({ data }: WorkOrderSummaryProps) {
         <h2 className="text-sm font-semibold text-slate-950">
           Resultado por etapa
         </h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 @4xl/page:grid-cols-5">
           {snapshot.stages.map((stage) => (
             <div
               key={stage.label}
