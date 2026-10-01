@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Button } from '@/shared/components/ui/Button'
 import { Card } from '@/shared/components/ui/Card'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -48,19 +49,29 @@ export function CustomerRequestDocuments({
 
   return (
     <>
-      <Card className="p-5">
-        <div className="flex flex-col gap-3 border-b border-slate-100 pb-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h2 className="text-sm font-semibold text-slate-950">Documentos</h2>
-            <p className="mt-1 text-[10px] leading-5 text-slate-500">
-              Consulta la versión vigente, descarga archivos y revisa su
-              historial.
-            </p>
+      <Card className="border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/25 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+        <div className="flex flex-col gap-3 border-b border-blue-100/70 pb-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <SidebarNavIcon name="documents" className="h-[17px] w-[17px]" />
+            </div>
+            <div>
+              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                Archivos del trabajo
+              </p>
+              <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
+                Documentos
+              </h2>
+              <p className="mt-0.5 text-[9px] leading-4 text-slate-500">
+                Consulta la versión vigente, descarga archivos y revisa su historial.
+              </p>
+            </div>
           </div>
 
           {canModify ? (
             <Button
               size="sm"
+              className="!h-7 !rounded-lg !px-2.5 !text-[9px]"
               onClick={() => {
                 onResetErrors()
                 files.clearError()
@@ -91,7 +102,7 @@ export function CustomerRequestDocuments({
               return (
                 <article
                   key={documentItem.id}
-                  className="rounded-xl border border-slate-200 bg-white p-4"
+                  className="rounded-xl border border-slate-200/90 bg-white/90 p-3.5 shadow-[0_8px_24px_-24px_rgba(37,99,235,0.45)]"
                 >
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                     <div className="min-w-0">
