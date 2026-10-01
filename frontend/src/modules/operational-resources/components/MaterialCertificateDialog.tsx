@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { MaterialDto, MaterialLotDto } from '@/modules/materials'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -14,25 +14,35 @@ interface MaterialCertificateDialogProps {
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024
 
-export function MaterialCertificateDialog({
+export function MaterialCertificateDialog(
+  props: MaterialCertificateDialogProps,
+) {
+  if (!props.lot) return null
+
+  return (
+    <MaterialCertificateDialogContent
+      key={props.lot.id}
+      {...props}
+      lot={props.lot}
+    />
+  )
+}
+
+interface MaterialCertificateDialogContentProps
+  extends Omit<MaterialCertificateDialogProps, 'lot'> {
+  lot: MaterialLotDto
+}
+
+function MaterialCertificateDialogContent({
   material,
   lot,
   submitting,
   error,
   onClose,
   onSubmit,
-}: MaterialCertificateDialogProps) {
+}: MaterialCertificateDialogContentProps) {
   const [file, setFile] = useState<File | null>(null)
   const [fileError, setFileError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!lot) {
-      setFile(null)
-      setFileError(null)
-    }
-  }, [lot])
-
-  if (!lot) return null
 
   const close = () => {
     setFile(null)
