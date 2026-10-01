@@ -84,35 +84,32 @@ export function DeliveryEvidenceDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="delivery-evidence-title"
-        className="w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
       >
-        <div className="border-b border-slate-200 px-6 py-5">
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-700">
+        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/60 px-4 py-3.5">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
             Entrega #{delivery.id}
           </p>
           <h2
             id="delivery-evidence-title"
-            className="mt-1 text-lg font-semibold text-slate-950"
+            className="mt-0.5 text-[14px] font-semibold text-slate-950"
           >
             {delivery.evidenceDocumentVersionId
               ? 'Actualizar evidencia'
               : 'Agregar evidencia de entrega'}
           </h2>
-          <p className="mt-1 text-xs leading-5 text-slate-500">
-            Puedes subir el archivo desde aquí. Si la entrega ya tiene
-            evidencia, la nueva carga se conserva como otra versión del mismo
-            documento.
+          <p className="mt-1 text-[9px] leading-4 text-slate-500">
+            Puedes subir un archivo nuevo o vincular una versión ya existente.
           </p>
         </div>
 
-        <div className="space-y-5 px-6 py-5">
-          <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
-            <p className="text-xs font-semibold text-slate-900">
+        <div className="space-y-3 px-4 py-3.5">
+          <div className="rounded-lg border border-blue-100 bg-blue-50/45 px-3 py-2.5">
+            <p className="text-[9px] font-semibold text-slate-900">
               Subir archivo
             </p>
-            <p className="mt-1 text-[10px] leading-5 text-slate-500">
-              El documento quedará como DELIVERY_EVIDENCE dentro del mismo
-              expediente y se vinculará automáticamente a esta entrega.
+            <p className="mt-0.5 text-[8px] leading-4 text-slate-500">
+              Se guardará como DELIVERY_EVIDENCE y quedará ligado a esta entrega.
             </p>
 
             <input
@@ -122,22 +119,23 @@ export function DeliveryEvidenceDialog({
                 setFileError(null)
                 setFile(event.target.files?.[0] ?? null)
               }}
-              className="mt-3 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-xs text-slate-700 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-slate-700"
+              className="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-2.5 py-2 text-[9px] text-slate-700 file:mr-2 file:rounded-md file:border-0 file:bg-slate-100 file:px-2.5 file:py-1.5 file:text-[8px] file:font-semibold file:text-slate-700"
             />
 
             {fileError ? (
-              <p className="mt-2 text-xs text-amber-700">{fileError}</p>
+              <p className="mt-1.5 text-[8px] text-amber-700">{fileError}</p>
             ) : null}
 
             {uploadError ? (
-              <p className="mt-2 text-xs text-red-700">
+              <p className="mt-1.5 text-[8px] text-red-700">
                 {getErrorMessage(uploadError)}
               </p>
             ) : null}
 
-            <div className="mt-3 flex justify-end">
+            <div className="mt-2 flex justify-end">
               <Button
                 size="sm"
+                className="!h-7 !px-2.5 !text-[8px]"
                 onClick={() => void upload()}
                 disabled={busy}
               >
@@ -148,26 +146,26 @@ export function DeliveryEvidenceDialog({
 
           {options.length > 0 ? (
             <form
-              className="rounded-xl border border-slate-200 p-4"
+              className="rounded-lg border border-slate-200 px-3 py-2.5"
               onSubmit={(event) => void submitExisting(event)}
             >
-              <p className="text-xs font-semibold text-slate-900">
-                Vincular una versión existente
+              <p className="text-[9px] font-semibold text-slate-900">
+                Vincular versión existente
               </p>
-              <p className="mt-1 text-[10px] leading-5 text-slate-500">
-                Úsalo si la evidencia ya fue cargada previamente al expediente.
+              <p className="mt-0.5 text-[8px] leading-4 text-slate-400">
+                Úsalo si la evidencia ya fue cargada al expediente.
               </p>
 
               <label
                 htmlFor="evidence-version"
-                className="mb-2 mt-3 block text-sm font-semibold text-slate-800"
+                className="mb-1.5 mt-2 block text-[10px] font-semibold text-slate-800"
               >
                 Documento
               </label>
               <select
                 id="evidence-version"
                 disabled={busy}
-                className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                className="h-8 w-full rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] text-slate-950 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
                 {...register('documentVersionId')}
               >
                 <option value="">Selecciona una evidencia</option>
@@ -179,22 +177,23 @@ export function DeliveryEvidenceDialog({
               </select>
 
               {errors.documentVersionId ? (
-                <p className="mt-1.5 text-xs text-red-600">
+                <p className="mt-1 text-[8px] text-red-600">
                   {errors.documentVersionId.message}
                 </p>
               ) : null}
 
               {error ? (
-                <p className="mt-2 text-xs text-red-700">
+                <p className="mt-1.5 text-[8px] text-red-700">
                   {getErrorMessage(error)}
                 </p>
               ) : null}
 
-              <div className="mt-3 flex justify-end">
+              <div className="mt-2 flex justify-end">
                 <Button
                   size="sm"
                   variant="secondary"
                   type="submit"
+                  className="!h-7 !px-2.5 !text-[8px]"
                   disabled={busy}
                 >
                   {submitting ? 'Vinculando…' : 'Vincular existente'}
@@ -202,15 +201,19 @@ export function DeliveryEvidenceDialog({
               </div>
             </form>
           ) : (
-            <p className="text-[10px] leading-5 text-slate-500">
-              No hay otras evidencias cargadas en el expediente. Puedes crear
-              la primera usando el archivo de arriba.
+            <p className="text-[8px] leading-4 text-slate-400">
+              No hay otras evidencias cargadas en el expediente.
             </p>
           )}
         </div>
 
-        <div className="flex justify-end border-t border-slate-200 bg-slate-50 px-6 py-4">
-          <Button variant="secondary" onClick={close} disabled={busy}>
+        <div className="flex justify-end border-t border-slate-100 bg-slate-50/60 px-4 py-2.5">
+          <Button
+            variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
+            onClick={close}
+            disabled={busy}
+          >
             Cerrar
           </Button>
         </div>
