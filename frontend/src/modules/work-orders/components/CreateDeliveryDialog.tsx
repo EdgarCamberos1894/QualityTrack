@@ -89,38 +89,41 @@ export function CreateDeliveryDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-delivery-title"
-        className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+        className="max-h-[92vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl"
         onSubmit={(event) => void submit(event)}
       >
-        <div className="border-b border-slate-200 px-6 py-5">
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-700">
-            Nueva entrega
+        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/60 px-4 py-3.5">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+            Entrega · Preparación
           </p>
           <h2
             id="create-delivery-title"
-            className="mt-1 text-lg font-semibold text-slate-950"
+            className="mt-0.5 text-[14px] font-semibold text-slate-950"
           >
             Preparar despacho
           </h2>
-          <p className="mt-1 text-xs text-slate-500">
-            {availableQuantity} piezas disponibles. Crear la entrega no cambia
-            todavía el estado de la OT.
+          <p className="mt-1 text-[9px] text-slate-500">
+            {availableQuantity} piezas disponibles para reservar.
           </p>
         </div>
 
-        <div className="space-y-5 px-6 py-5">
-          <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-3 px-4 py-3.5">
+          <div className="grid gap-3 sm:grid-cols-2">
             <TextField
               label="Cantidad"
               type="number"
               min="1"
               max={availableQuantity}
+              labelClassName="!mb-1.5 !text-[10px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
               error={errors.quantity?.message}
               {...register('quantity', { valueAsNumber: true })}
             />
             <TextField
               label="Método"
               maxLength={80}
+              labelClassName="!mb-1.5 !text-[10px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
               error={errors.deliveryMethod?.message}
               {...register('deliveryMethod')}
             />
@@ -129,6 +132,8 @@ export function CreateDeliveryDialog({
           <TextField
             label="Recibe"
             maxLength={160}
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
             error={errors.destinationRecipientName?.message}
             {...register('destinationRecipientName')}
           />
@@ -136,61 +141,53 @@ export function CreateDeliveryDialog({
           <TextareaField
             label="Dirección"
             maxLength={300}
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!min-h-16 !rounded-lg !px-3 !py-2 !text-[10px] !shadow-none"
             error={errors.destinationAddress?.message}
             {...register('destinationAddress')}
           />
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <TextField
-              label="Ciudad"
-              maxLength={120}
-              error={errors.destinationCity?.message}
-              {...register('destinationCity')}
-            />
-            <TextField
-              label="Estado"
-              maxLength={120}
-              error={errors.destinationState?.message}
-              {...register('destinationState')}
-            />
-            <TextField
-              label="Código postal"
-              maxLength={20}
-              error={errors.destinationPostalCode?.message}
-              {...register('destinationPostalCode')}
-            />
-            <TextField
-              label="País"
-              maxLength={100}
-              error={errors.destinationCountry?.message}
-              {...register('destinationCountry')}
-            />
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              ['Ciudad', 'destinationCity'],
+              ['Estado', 'destinationState'],
+              ['Código postal', 'destinationPostalCode'],
+              ['País', 'destinationCountry'],
+            ].map(([label, name]) => (
+              <TextField
+                key={name}
+                label={label}
+                maxLength={name === 'destinationPostalCode' ? 20 : 120}
+                labelClassName="!mb-1.5 !text-[10px]"
+                className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+                error={errors[name as keyof CreateDeliveryFormValues]?.message as string | undefined}
+                {...register(name as keyof CreateDeliveryFormValues)}
+              />
+            ))}
           </div>
 
-          <p className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-[10px] leading-5 text-blue-800">
-            El destino se guarda como snapshot en la entrega. Cambios
-            posteriores en los datos del cliente no alteran esta evidencia
-            histórica.
+          <p className="rounded-lg border border-blue-100 bg-blue-50/60 px-3 py-2 text-[8px] leading-4 text-blue-800">
+            El destino se conserva como snapshot histórico de esta entrega.
           </p>
 
           {quantityError ? (
-            <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[8px] leading-4 text-amber-800">
               {quantityError}
             </p>
           ) : null}
 
           {error ? (
-            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
               {getErrorMessage(error)}
             </p>
           ) : null}
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-6 py-4">
-          <Button variant="secondary" onClick={close} disabled={submitting}>
+        <div className="flex justify-end gap-1.5 border-t border-slate-100 bg-slate-50/60 px-4 py-2.5">
+          <Button variant="secondary" className="!h-7 !px-2.5 !text-[8px]" onClick={close} disabled={submitting}>
             Cancelar
           </Button>
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" className="!h-7 !px-2.5 !text-[8px]" disabled={submitting}>
             {submitting ? 'Creando…' : 'Crear entrega'}
           </Button>
         </div>
