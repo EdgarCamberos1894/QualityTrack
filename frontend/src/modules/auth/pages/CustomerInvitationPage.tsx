@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link, useLocation } from 'react-router-dom'
-import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { Button } from '@/shared/components/ui/Button'
 import { TextField } from '@/shared/components/ui/TextField'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -23,6 +22,61 @@ import {
   customerInvitationRegistrationSchema,
   type CustomerInvitationRegistrationFormValues,
 } from '../schemas/publicAuth.schemas'
+import type { CustomerInvitationPreviewDto } from '../types/publicAuth.types'
+
+function InvitationSummary({
+  invitation,
+}: {
+  invitation: CustomerInvitationPreviewDto
+}) {
+  return (
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_34px_-30px_rgba(15,23,42,0.38)]">
+      <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/70 px-3.5 py-3">
+        <div className="flex items-start gap-3">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 ring-1 ring-blue-100">
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M4 21V8l8-4 8 4v13" />
+              <path d="M8 21v-5h8v5" />
+            </svg>
+          </span>
+
+          <div className="min-w-0">
+            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+              Empresa que te invita
+            </p>
+            <h2 className="mt-0.5 truncate text-[13px] font-semibold text-slate-950">
+              {invitation.customerName}
+            </h2>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-3 px-3.5 py-3 sm:grid-cols-2">
+        <div>
+          <p className="text-[8px] font-medium text-slate-400">Tu rol</p>
+          <p className="mt-1 text-[10px] font-semibold text-slate-700">
+            {getCustomerInvitationRoleLabel(invitation.role)}
+          </p>
+        </div>
+        <div>
+          <p className="text-[8px] font-medium text-slate-400">Vigencia</p>
+          <p className="mt-1 text-[9px] font-medium text-slate-600">
+            Hasta {formatAccessDateTime(invitation.expiresAt)}
+          </p>
+        </div>
+      </div>
+    </section>
+  )
+}
 
 export function CustomerInvitationPage() {
   const location = useLocation()
@@ -51,17 +105,22 @@ export function CustomerInvitationPage() {
       <PublicAuthLayout
         eyebrow="Invitación"
         title="Enlace no válido"
-        description="La invitación no contiene el token necesario para continuar."
+        description="No encontramos la información necesaria para abrir esta invitación."
         footer={
-          <Link className="font-semibold text-blue-600" to="/login">
+          <Link
+            className="font-semibold text-blue-600 transition hover:text-blue-700"
+            to="/login"
+          >
             Ir al inicio de sesión
           </Link>
         }
+        immersive
       >
         <AuthResultPanel
+          compact
           tone="error"
           title="Invitación incompleta"
-          description="Abre nuevamente el enlace completo recibido por correo."
+          description="Abre nuevamente el enlace completo que recibiste por correo."
         />
       </PublicAuthLayout>
     )
@@ -72,9 +131,14 @@ export function CustomerInvitationPage() {
       <PublicAuthLayout
         eyebrow="Invitación"
         title="Revisando invitación"
-        description="Estamos comprobando que el enlace siga disponible."
+        description="Estamos comprobando que el acceso siga disponible."
+        immersive
       >
-        <LoadingState label="Validando invitación…" />
+        <AuthResultPanel
+          compact
+          title="Validando enlace"
+          description="Esto solo tomará un momento."
+        />
       </PublicAuthLayout>
     )
   }
@@ -84,14 +148,19 @@ export function CustomerInvitationPage() {
       <PublicAuthLayout
         eyebrow="Invitación"
         title="Invitación no disponible"
-        description="El enlace puede haber expirado, ya haberse utilizado o no ser válido."
+        description="El enlace puede haber expirado, sido cancelado o utilizado anteriormente."
         footer={
-          <Link className="font-semibold text-blue-600" to="/login">
+          <Link
+            className="font-semibold text-blue-600 transition hover:text-blue-700"
+            to="/login"
+          >
             Ir al inicio de sesión
           </Link>
         }
+        immersive
       >
         <AuthResultPanel
+          compact
           tone="error"
           title="No podemos abrir esta invitación"
           description={getErrorMessage(invitationQuery.error)}
@@ -106,19 +175,27 @@ export function CustomerInvitationPage() {
     return (
       <PublicAuthLayout
         eyebrow="Invitación aceptada"
-        title={`Ya formas parte de ${invitation.customerName}`}
-        description="La membresía quedó activada para el correo al que se envió esta invitación."
+        title="Tu acceso está listo"
+        description={`Ya formas parte de ${invitation.customerName} en QualityTrack.`}
         footer={
-          <Link className="font-semibold text-blue-600" to="/login">
-            Ir al inicio de sesión
+          <Link
+            className="font-semibold text-blue-600 transition hover:text-blue-700"
+            to="/login"
+          >
+            Iniciar sesión
           </Link>
         }
+        immersive
       >
-        <AuthResultPanel
-          tone="success"
-          title="Acceso habilitado"
-          description="Inicia sesión con la cuenta invitada. Si ya tienes una sesión abierta con esa misma cuenta, vuelve al portal para recargar tus empresas."
-        />
+        <div className="space-y-3">
+          <InvitationSummary invitation={invitation} />
+          <AuthResultPanel
+            compact
+            tone="success"
+            title="Membresía activada"
+            description="Inicia sesión con la cuenta asociada a esta invitación para abrir el portal de la empresa."
+          />
+        </div>
       </PublicAuthLayout>
     )
   }
@@ -153,30 +230,38 @@ export function CustomerInvitationPage() {
   return (
     <PublicAuthLayout
       eyebrow="Invitación de empresa"
-      title={`Únete a ${invitation.customerName}`}
-      description={`Te invitaron con acceso de ${getCustomerInvitationRoleLabel(invitation.role).toLocaleLowerCase('es-MX')}.`}
+      title={registrationRequired ? 'Completa tu cuenta' : 'Revisa tu invitación'}
+      description={
+        registrationRequired
+          ? 'Tu correo ya quedó validado por la invitación. Solo faltan tus datos de acceso.'
+          : `${invitation.customerName} te invitó a colaborar dentro de QualityTrack.`
+      }
       footer={
         <span>
           Invitación válida hasta {formatAccessDateTime(invitation.expiresAt)}.
         </span>
       }
       wide={registrationRequired}
+      immersive
     >
       {!registrationRequired ? (
-        <div className="space-y-5">
-          <AuthResultPanel
-            title="Tu acceso está preparado"
-            description="Al aceptar, QualityTrack comprobará si el correo invitado ya tiene una cuenta. Si todavía no existe, te pediremos únicamente los datos necesarios para crearla."
-          />
+        <div className="space-y-4">
+          <InvitationSummary invitation={invitation} />
+
+          <p className="text-[9px] leading-4 text-slate-500">
+            Al continuar comprobaremos si ya existe una cuenta con el acceso
+            invitado. Si eres nuevo, solo pediremos los datos necesarios para
+            terminar el registro.
+          </p>
 
           {acceptMutation.error ? (
-            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700">
               {getErrorMessage(acceptMutation.error)}
             </p>
           ) : null}
 
           <Button
-            className="w-full"
+            className="!h-9 w-full !rounded-lg !text-[10px] !font-semibold"
             disabled={acceptMutation.isPending}
             onClick={() => void accept()}
           >
@@ -185,25 +270,26 @@ export function CustomerInvitationPage() {
         </div>
       ) : (
         <form
-          className="space-y-5"
+          className="space-y-4"
           onSubmit={(event) => void complete(event)}
           noValidate
         >
-          <AuthResultPanel
-            title="Crea tu cuenta"
-            description="El correo ya está verificado por esta invitación. Completa tu nombre y establece una contraseña."
-          />
+          <InvitationSummary invitation={invitation} />
 
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
             <TextField
               label="Nombre"
               autoComplete="given-name"
+              labelClassName="!text-[10px] !font-semibold"
+              className="!h-9 !rounded-lg !px-3 !text-[10px] !shadow-sm placeholder:!text-[9px]"
               error={errors.firstName?.message}
               {...register('firstName')}
             />
             <TextField
               label="Apellido"
               autoComplete="family-name"
+              labelClassName="!text-[10px] !font-semibold"
+              className="!h-9 !rounded-lg !px-3 !text-[10px] !shadow-sm placeholder:!text-[9px]"
               error={errors.lastName?.message}
               {...register('lastName')}
             />
@@ -214,17 +300,18 @@ export function CustomerInvitationPage() {
             confirmRegistration={register('confirmPassword')}
             passwordError={errors.password?.message}
             confirmError={errors.confirmPassword?.message}
+            immersive
           />
 
           {completeMutation.error ? (
-            <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700">
               {getErrorMessage(completeMutation.error)}
             </p>
           ) : null}
 
           <Button
             type="submit"
-            className="w-full"
+            className="!h-9 w-full !rounded-lg !text-[10px] !font-semibold"
             disabled={completeMutation.isPending}
           >
             {completeMutation.isPending
