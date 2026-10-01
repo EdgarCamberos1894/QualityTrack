@@ -65,3 +65,43 @@ button:disabled {
   outline: 2px solid var(--qt-blue);
   outline-offset: 2px;
 }
+
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+
+  body.printing-customer-quotation {
+    background: #fff !important;
+  }
+
+  body.printing-customer-quotation * {
+    visibility: hidden !important;
+  }
+
+  body.printing-customer-quotation .customer-quotation-print-area,
+  body.printing-customer-quotation .customer-quotation-print-area * {
+    visibility: visible !important;
+  }
+
+  body.printing-customer-quotation .customer-quotation-print-area {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body.printing-customer-quotation .customer-quotation-print-hidden {
+    display: none !important;
+  }
+}
