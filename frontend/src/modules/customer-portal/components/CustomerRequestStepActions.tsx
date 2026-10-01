@@ -26,7 +26,7 @@ export function CustomerRequestStepActions({
       className={cn(
         embedded
           ? 'border-t border-slate-200 bg-slate-50/55 px-3.5 py-2.5'
-          : 'rounded-xl border border-slate-200 bg-white p-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.24)]',
+          : 'rounded-xl border border-slate-200 bg-gradient-to-r from-white via-white to-slate-50/80 p-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.28)]',
       )}
     >
       <div className="mb-2">
