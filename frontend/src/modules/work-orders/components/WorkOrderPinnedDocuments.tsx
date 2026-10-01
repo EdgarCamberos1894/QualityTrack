@@ -27,120 +27,115 @@ export function WorkOrderPinnedDocuments({
   const pinnedFor = (documentId: number) =>
     pinnedDocuments.find((item) => item.documentId === documentId)
 
-  if (documents.length === 0) {
-    return (
-      <section className="rounded-xl border border-slate-200 bg-white p-5">
-        <p className="text-[9px] font-semibold uppercase tracking-wide text-violet-700">
+  return (
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+      <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
+        <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
           02 · Documentos
         </p>
-        <div className="mt-4">
+        <div className="mt-0.5 flex items-center justify-between gap-3">
+          <h2 className="text-[11px] font-semibold text-slate-950">
+            Versiones fijadas para fabricación
+          </h2>
+          <span className="text-[8px] text-slate-400">
+            {pinnedDocuments.length} fijados
+          </span>
+        </div>
+      </div>
+
+      {documents.length === 0 ? (
+        <div className="p-4">
           <EmptyState
             title="No hay documentos disponibles"
             description="El expediente necesita documentos activos antes de preparar el paquete operativo."
           />
         </div>
-      </section>
-    )
-  }
+      ) : (
+        <>
+          {error ? (
+            <p className="mx-4 mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
+              {getErrorMessage(error)}
+            </p>
+          ) : null}
 
-  return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5">
-      <div>
-        <p className="text-[9px] font-semibold uppercase tracking-wide text-violet-700">
-          02 · Documentos
-        </p>
-        <h2 className="mt-1 text-sm font-semibold text-slate-950">
-          Versiones fijadas para fabricación
-        </h2>
-        <p className="mt-1 text-[10px] text-slate-500">
-          Cada vínculo conserva una versión exacta; cambiar la versión es un
-          evento auditable.
-        </p>
-      </div>
+          <div className="divide-y divide-slate-100">
+            {documents.map(({ document, versions }) => {
+              const pinned = pinnedFor(document.id)
+              const availableVersions =
+                versions.length > 0 ? versions : [document.currentVersion]
+              const selectedVersionId =
+                selection[document.id] ??
+                pinned?.documentVersionId ??
+                document.currentVersion.id
 
-      {error ? (
-        <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
-          {getErrorMessage(error)}
-        </p>
-      ) : null}
+              return (
+                <article key={document.id} className="px-4 py-3">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="min-w-0">
+                      <p className="text-[8px] font-bold uppercase tracking-wide text-blue-600">
+                        {document.documentType}
+                      </p>
+                      <p className="mt-0.5 truncate text-[10px] font-semibold text-slate-950">
+                        {document.name}
+                      </p>
+                      <p className="mt-0.5 text-[8px] text-slate-400">
+                        Vigente v{document.currentVersion.version}
+                        {pinned
+                          ? ` · Fijada v${pinned.version}`
+                          : ' · Sin versión fijada'}
+                      </p>
+                    </div>
 
-      <div className="mt-5 grid gap-3">
-        {documents.map(({ document, versions }) => {
-          const pinned = pinnedFor(document.id)
-          const availableVersions =
-            versions.length > 0 ? versions : [document.currentVersion]
-          const selectedVersionId =
-            selection[document.id] ??
-            pinned?.documentVersionId ??
-            document.currentVersion.id
+                    <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center">
+                      <select
+                        aria-label={`Versión de ${document.name}`}
+                        value={selectedVersionId}
+                        disabled={!canEdit || saving}
+                        onChange={(event) =>
+                          setSelection((current) => ({
+                            ...current,
+                            [document.id]: Number(event.target.value),
+                          }))
+                        }
+                        className="h-8 min-w-[185px] rounded-lg border border-slate-300 bg-white px-2.5 text-[9px] text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100"
+                      >
+                        {availableVersions.map((version) => (
+                          <option key={version.id} value={version.id}>
+                            v{version.version} · {version.fileName}
+                          </option>
+                        ))}
+                      </select>
 
-          return (
-            <article
-              key={document.id}
-              className="rounded-xl border border-slate-200 bg-slate-50/70 p-4"
-            >
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                <div className="min-w-0">
-                  <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-600">
-                    {document.documentType}
-                  </p>
-                  <p className="mt-1 truncate text-xs font-semibold text-slate-950">
-                    {document.name}
-                  </p>
-                  <p className="mt-1 text-[9px] text-slate-500">
-                    Vigente v{document.currentVersion.version}
-                    {pinned
-                      ? ` · Fijada v${pinned.version}`
-                      : ' · Sin versión fijada'}
-                  </p>
-                </div>
+                      {canEdit ? (
+                        <Button
+                          size="sm"
+                          variant={pinned ? 'secondary' : 'primary'}
+                          className="!h-7 !px-2.5 !text-[8px]"
+                          disabled={
+                            saving ||
+                            pinned?.documentVersionId === selectedVersionId
+                          }
+                          onClick={() =>
+                            void onPin(document.id, selectedVersionId)
+                          }
+                        >
+                          {pinned ? 'Actualizar versión' : 'Fijar versión'}
+                        </Button>
+                      ) : null}
+                    </div>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
 
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <select
-                    aria-label={`Versión de ${document.name}`}
-                    value={selectedVersionId}
-                    disabled={!canEdit || saving}
-                    onChange={(event) =>
-                      setSelection((current) => ({
-                        ...current,
-                        [document.id]: Number(event.target.value),
-                      }))
-                    }
-                    className="h-9 min-w-[190px] rounded-lg border border-slate-300 bg-white px-3 text-xs text-slate-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100"
-                  >
-                    {availableVersions.map((version) => (
-                      <option key={version.id} value={version.id}>
-                        v{version.version} · {version.fileName}
-                      </option>
-                    ))}
-                  </select>
-
-                  {canEdit ? (
-                    <Button
-                      size="sm"
-                      variant={pinned ? 'secondary' : 'primary'}
-                      disabled={
-                        saving ||
-                        pinned?.documentVersionId === selectedVersionId
-                      }
-                      onClick={() => void onPin(document.id, selectedVersionId)}
-                    >
-                      {pinned ? 'Actualizar versión' : 'Fijar versión'}
-                    </Button>
-                  ) : null}
-                </div>
-              </div>
-            </article>
-          )
-        })}
-      </div>
-
-      {!canEdit ? (
-        <p className="mt-4 text-[10px] leading-5 text-slate-500">
-          Las versiones quedan bloqueadas al aprobar la hoja de ruta o cuando la
-          orden sale de preparación.
-        </p>
-      ) : null}
+          {!canEdit ? (
+            <p className="border-t border-slate-100 bg-slate-50/60 px-4 py-2 text-[7px] leading-3 text-slate-400">
+              Las versiones quedan bloqueadas al aprobar la hoja de ruta o cuando la orden sale de preparación.
+            </p>
+          ) : null}
+        </>
+      )}
     </section>
   )
 }
