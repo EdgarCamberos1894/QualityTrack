@@ -20,7 +20,6 @@ const filters: Array<{ value: Filter; label: string }> = [
   { value: 'REJECTED', label: 'Rechazadas' },
   { value: 'EXPIRED', label: 'Vencidas' },
   { value: 'CANCELLED', label: 'Canceladas' },
-  { value: 'REPLACED', label: 'Reemplazadas' },
 ]
 
 export function CustomerQuotationsPage() {
