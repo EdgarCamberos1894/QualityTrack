@@ -4,6 +4,7 @@ import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { Badge, type BadgeProps } from '@/shared/components/ui/Badge'
+import { CancelCustomerInvitationDialog } from '../components/CancelCustomerInvitationDialog'
 import { CustomerMembersHeader } from '../components/CustomerMembersHeader'
 import { InviteCustomerMemberDialog } from '../components/InviteCustomerMemberDialog'
 import { RemoveCustomerMemberDialog } from '../components/RemoveCustomerMemberDialog'
@@ -69,6 +70,8 @@ export function CustomerMembersPage() {
   const [removeTarget, setRemoveTarget] = useState<CustomerMemberDto | null>(
     null,
   )
+  const [cancelInvitationTarget, setCancelInvitationTarget] =
+    useState<CustomerInvitationDto | null>(null)
 
   const normalizedSearch = search.trim().toLocaleLowerCase('es-MX')
 
@@ -146,6 +149,18 @@ export function CustomerMembersPage() {
     try {
       await mutations.removeMember.mutateAsync(removeTarget.userId)
       setRemoveTarget(null)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  const cancelInvitation = async () => {
+    if (!cancelInvitationTarget) return false
+
+    try {
+      await mutations.cancelInvitation.mutateAsync(cancelInvitationTarget.id)
+      setCancelInvitationTarget(null)
       return true
     } catch {
       return false
@@ -334,7 +349,7 @@ export function CustomerMembersPage() {
                             mutations.removeMember.reset()
                             setRemoveTarget(member)
                           }}
-                          className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[8px] font-medium text-slate-500 transition hover:bg-red-50 hover:text-red-600"
+                          className="inline-flex h-6 items-center justify-center rounded-md px-2 text-[7px] font-medium text-slate-400 transition hover:bg-red-50 hover:text-red-600"
                         >
                           Retirar
                         </button>
@@ -365,7 +380,7 @@ export function CustomerMembersPage() {
                   key={invitation.id}
                   className="rounded-xl border border-slate-200 bg-white px-3.5 py-3 shadow-[0_8px_24px_-22px_rgba(15,23,42,0.34)]"
                 >
-                  <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px_150px] md:items-center">
+                  <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px_130px_auto] md:items-center">
                     <div className="min-w-0">
                       <p className="truncate text-[11px] font-semibold text-slate-950">
                         {invitation.email}
@@ -394,6 +409,17 @@ export function CustomerMembersPage() {
                     >
                       {invitationStatusLabel(invitation)}
                     </Badge>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        mutations.cancelInvitation.reset()
+                        setCancelInvitationTarget(invitation)
+                      }}
+                      className="inline-flex h-6 items-center justify-center rounded-md px-2 text-[7px] font-medium text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                    >
+                      Cancelar
+                    </button>
                   </div>
                 </article>
               ))}
@@ -434,6 +460,17 @@ export function CustomerMembersPage() {
           setInviteOpen(false)
         }}
         onSubmit={invite}
+      />
+
+      <CancelCustomerInvitationDialog
+        invitation={cancelInvitationTarget}
+        submitting={mutations.cancelInvitation.isPending}
+        error={mutations.cancelInvitation.error}
+        onClose={() => {
+          mutations.cancelInvitation.reset()
+          setCancelInvitationTarget(null)
+        }}
+        onConfirm={cancelInvitation}
       />
 
       <RemoveCustomerMemberDialog
