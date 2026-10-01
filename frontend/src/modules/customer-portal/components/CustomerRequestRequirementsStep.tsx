@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type {
   FieldErrors,
   UseFormRegister,
@@ -20,6 +21,7 @@ interface CustomerRequestRequirementsStepProps {
   documentError: string | null
   onAddFiles: (files: FileList | null) => void
   onRemoveFile: (index: number) => void
+  actions: ReactNode
 }
 
 export function CustomerRequestRequirementsStep({
@@ -31,6 +33,7 @@ export function CustomerRequestRequirementsStep({
   documentError,
   onAddFiles,
   onRemoveFile,
+  actions,
 }: CustomerRequestRequirementsStepProps) {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.12fr)_minmax(340px,0.88fr)]">
@@ -116,6 +119,8 @@ export function CustomerRequestRequirementsStep({
             Ingeniería lo determinan durante la revisión.
           </p>
         </div>
+
+        {actions}
       </Card>
 
       <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
