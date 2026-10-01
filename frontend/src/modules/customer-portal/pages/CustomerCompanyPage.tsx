@@ -81,7 +81,7 @@ export function CustomerCompanyPage() {
       </div>
 
       <form
-        className="grid gap-5 xl:grid-cols-[minmax(0,720px)_360px]"
+        className="grid gap-5 @min-[1100px]/page:grid-cols-[minmax(0,720px)_360px]"
         onSubmit={(event) => void submit(event)}
       >
         <Card className="space-y-5 p-5">
