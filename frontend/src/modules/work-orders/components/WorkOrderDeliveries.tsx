@@ -216,7 +216,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
   return (
     <div className="space-y-5">
       <section className="rounded-xl border border-blue-200 bg-blue-50/60 p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex flex-col gap-4 @3xl/page:flex-row @3xl/page:items-start @3xl/page:justify-between">
           <div>
             <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-700">
               Logística
