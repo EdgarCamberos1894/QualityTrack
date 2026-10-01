@@ -18,7 +18,7 @@ export function CustomerRequestDetailsStep({
 }: CustomerRequestDetailsStepProps) {
   return (
     <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
-      <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
+      <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)] [&_label]:mb-1.5 [&_label]:text-[11px] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
         <div>
           <h2 className="text-[15px] font-semibold text-slate-950">
             Detalles del trabajo
