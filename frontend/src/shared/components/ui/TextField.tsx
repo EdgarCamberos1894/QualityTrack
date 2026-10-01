@@ -43,20 +43,30 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
 
     return (
       <div>
-        <div
-          className={cn(
-            'mb-2 flex items-center justify-between gap-3',
-            labelClassName,
-          )}
-        >
+        {labelAction ? (
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <label
+              htmlFor={inputId}
+              className={cn(
+                'block text-sm font-semibold text-slate-800',
+                labelClassName,
+              )}
+            >
+              {label}
+            </label>
+            <div className="shrink-0">{labelAction}</div>
+          </div>
+        ) : (
           <label
             htmlFor={inputId}
-            className="block text-sm font-semibold text-slate-800"
+            className={cn(
+              'mb-2 block text-sm font-semibold text-slate-800',
+              labelClassName,
+            )}
           >
             {label}
           </label>
-          {labelAction ? <div className="shrink-0">{labelAction}</div> : null}
-        </div>
+        )}
 
         <div className="relative">
           <input
