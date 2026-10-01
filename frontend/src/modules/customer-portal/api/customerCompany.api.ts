@@ -69,6 +69,15 @@ export async function getCustomerInvitations(
   return response.data.data
 }
 
+export async function cancelCustomerInvitation(
+  customerId: number,
+  invitationId: number,
+): Promise<void> {
+  await apiClient.delete(
+    `/customers/${customerId}/invitations/${invitationId}`,
+  )
+}
+
 export async function createCustomerInvitation(
   customerId: number,
   payload: CreateCustomerInvitationPayload,
