@@ -8,11 +8,13 @@ import {
 import { queryClient } from '@/app/query/queryClient'
 import { Sidebar } from '@/app/layout/Sidebar'
 import { Topbar } from '@/app/layout/Topbar'
+import { useDesktopCanvasStyle } from '@/shared/hooks/useDesktopCanvasStyle'
 
 export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
   const session = useSessionStore((state) => state.session)
+  const desktopCanvasStyle = useDesktopCanvasStyle()
 
   useSessionExpiry()
 
@@ -25,7 +27,10 @@ export function AppShell() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f7fb] shell:grid shell:grid-cols-[248px_minmax(0,1fr)]">
+    <div
+      className="min-h-screen bg-[#f5f7fb] shell:grid shell:grid-cols-[248px_minmax(0,1fr)]"
+      style={desktopCanvasStyle}
+    >
       <Sidebar
         open={sidebarOpen}
         user={session.user}
