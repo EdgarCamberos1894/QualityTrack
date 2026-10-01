@@ -68,7 +68,7 @@ export function CustomerPortalSidebar({
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col overflow-y-auto border-r border-slate-800 bg-slate-950 px-5 py-6 text-slate-200 transition-transform lg:static lg:translate-x-0',
+        'fixed inset-y-0 left-0 z-40 flex h-screen max-h-screen w-[248px] flex-col overflow-y-auto overscroll-contain border-r border-slate-800 bg-slate-950 px-5 py-6 text-slate-200 transition-transform lg:sticky lg:top-0 lg:self-start lg:translate-x-0',
         open ? 'translate-x-0' : '-translate-x-full',
       )}
     >
