@@ -136,8 +136,8 @@ export function CustomerRequestCreatePage() {
   })
 
   return (
-    <PageContainer>
-      <div className="lg:flex lg:min-h-[calc(100vh-112px)] lg:flex-col">
+    <PageContainer className="py-4 lg:py-3">
+      <div className="lg:flex lg:min-h-[calc(100vh-100px)] lg:flex-col">
         <div className="mb-3 shrink-0">
           <h1 className="text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
             {step === 2 ? 'Revisar y enviar' : 'Nueva solicitud'}
@@ -165,6 +165,7 @@ export function CustomerRequestCreatePage() {
                     step={step}
                     customerId={customer.customerId}
                     pending={mutation.isPending}
+                    embedded
                     onBack={() => setStep((current) => current - 1)}
                     onContinue={() => void goToRequirements()}
                     onReview={() => void goToReview()}
