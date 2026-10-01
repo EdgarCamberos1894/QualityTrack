@@ -22,64 +22,75 @@ export function DocumentCenterRow({
   onOpen,
   onHistory,
 }: DocumentCenterRowProps) {
+  const contextHref =
+    document.caseId && document.caseNumber
+      ? `/job-cases/${document.caseId}?tab=documents#document-${document.id}`
+      : '/resources?tab=materials'
+
   return (
-    <article className="grid gap-4 border-b border-slate-100 px-4 py-4 last:border-b-0 lg:grid-cols-[minmax(220px,1.4fr)_190px_minmax(170px,1fr)_90px_170px_150px] lg:items-center">
+    <article className="grid gap-3 border-b border-slate-100 px-4 py-3 transition last:border-b-0 hover:bg-blue-50/25 sm:px-5 lg:grid-cols-[minmax(230px,1.45fr)_150px_minmax(170px,0.9fr)_70px_155px_130px] lg:items-center">
       <div className="min-w-0">
-        <p className="truncate text-xs font-semibold text-slate-950">
+        <p className="truncate text-[10px] font-semibold text-slate-950">
           {document.name}
         </p>
-        <p className="mt-1 truncate text-[10px] text-slate-500">
+        <p className="mt-0.5 truncate text-[8px] text-slate-400">
           {document.currentVersion.fileName} ·{' '}
           {formatDocumentFileSize(document.currentVersion.fileSize)}
         </p>
-        <p className="mt-1 truncate text-[9px] text-slate-400">
+        <p className="mt-0.5 truncate text-[7px] text-slate-400">
           {getDocumentSourceLabel(document)}
         </p>
       </div>
 
       <div>
-        <Badge tone="neutral">{document.documentType}</Badge>
+        <Badge tone="neutral" className="px-2 py-0.5 text-[7px]">
+          {document.documentType}
+        </Badge>
       </div>
 
-      <div>
-        <p className="text-[10px] font-semibold text-slate-700">
+      <div className="min-w-0">
+        <p className="truncate text-[9px] font-semibold text-slate-700">
           {getDocumentContextSummary(document)}
         </p>
-        {document.caseId && document.caseNumber ? (
-          <Link
-            to={`/job-cases/${document.caseId}?tab=documents#document-${document.id}`}
-            className="mt-1 inline-flex text-[9px] font-semibold text-blue-600 hover:underline"
-          >
-            {document.caseNumber}
-          </Link>
-        ) : (
-          <Link
-            to="/resources?tab=materials"
-            className="mt-1 inline-flex text-[9px] font-semibold text-blue-600 hover:underline"
-          >
-            Recursos · Materiales
-          </Link>
-        )}
+        <Link
+          to={contextHref}
+          className="mt-0.5 inline-flex text-[7px] font-semibold text-blue-600 hover:underline"
+        >
+          {document.caseId && document.caseNumber
+            ? document.caseNumber
+            : 'Recursos · Materiales'}
+        </Link>
       </div>
 
-      <p className="text-[10px] font-semibold text-slate-700">
+      <p className="text-[9px] font-semibold text-slate-700">
         v{document.currentVersion.version}
       </p>
 
       <div>
-        <p className="text-[10px] text-slate-700">
+        <p className="text-[8px] text-slate-600">
           {formatDocumentDateTime(document.currentVersion.uploadedAt)}
         </p>
-        <p className="mt-1 truncate text-[9px] text-slate-400">
+        <p className="mt-0.5 truncate text-[7px] text-slate-400">
           {document.currentVersion.uploadedByName}
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2 lg:justify-end">
-        <Button size="sm" variant="secondary" disabled={busy} onClick={onOpen}>
-          Ver
+      <div className="flex flex-wrap gap-1.5 lg:justify-end">
+        <Button
+          size="sm"
+          variant="secondary"
+          className="!h-7 !px-2.5 !text-[8px]"
+          disabled={busy}
+          onClick={onOpen}
+        >
+          {busy ? 'Abriendo…' : 'Ver'}
         </Button>
-        <Button size="sm" variant="ghost" onClick={onHistory}>
+        <Button
+          size="sm"
+          variant="ghost"
+          className="!h-7 !px-2 !text-[8px]"
+          onClick={onHistory}
+        >
           Historial
         </Button>
       </div>
