@@ -289,7 +289,8 @@ export function CustomerRequestReviewStep({
       </Card>
 
       <div className="flex min-h-0 flex-col gap-2.5 lg:h-full">
-        <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)]">
+        <div className="min-h-0 flex-1 space-y-2.5 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
+          <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)]">
           <h2 className="text-sm font-semibold text-slate-950">
             Antes de enviar
           </h2>
@@ -366,8 +367,9 @@ export function CustomerRequestReviewStep({
             </div>
           </div>
         </Card>
+        </div>
 
-        {actions}
+        <div className="shrink-0">{actions}</div>
       </div>
     </div>
   )
