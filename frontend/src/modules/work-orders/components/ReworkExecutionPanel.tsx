@@ -149,40 +149,40 @@ export function ReworkExecutionPanel({
     operations.length > 0 && completedOperationIds.size === operations.length
 
   return (
-    <section className="mt-4 rounded-xl border border-orange-200 bg-orange-50/30 p-5">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <section className="mt-3 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_10px_28px_-28px_rgba(15,23,42,0.28)]">
+      <div className="flex flex-col gap-2.5 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-orange-700">
+          <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-blue-600">
             Ejecución de retrabajo
           </p>
-          <h3 className="mt-1 text-sm font-semibold text-slate-950">
+          <h3 className="mt-0.5 text-[10px] font-semibold text-slate-950">
             Rev {routing.revision} · {nonConformity.number}
           </h3>
-          <p className="mt-1 text-[10px] leading-5 text-slate-600">
+          <p className="mt-0.5 text-[8px] leading-4 text-slate-500">
             La primera operación cambia la OT a REWORK_IN_PROGRESS. Al completar
             toda la ruta, el backend crea una nueva inspección PENDING.
           </p>
         </div>
 
-        <span className="rounded-full bg-white px-3 py-1 text-[9px] font-semibold text-slate-600">
+        <span className="rounded-full bg-blue-50 px-2 py-1 text-[7px] font-semibold text-blue-700 ring-1 ring-blue-100">
           {completedOperationIds.size}/{operations.length} completadas
         </span>
       </div>
 
       {!canExecute ? (
-        <p className="mt-4 rounded-lg border border-slate-200 bg-white px-3 py-2 text-[10px] text-slate-600">
+        <p className="mx-3.5 mt-3 rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2 text-[8px] text-slate-500">
           Solo PRODUCTION o ADMIN pueden ejecutar las operaciones de retrabajo.
         </p>
       ) : null}
 
       {machinesQuery.isError ? (
-        <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] text-amber-800">
+        <p className="mx-3.5 mt-3 rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2 text-[8px] leading-4 text-amber-800">
           No pudimos cargar máquinas. El retrabajo puede iniciarse sin máquina
           si la operación lo permite.
         </p>
       ) : null}
 
-      <div className="mt-4 space-y-3">
+      <div className="space-y-2.5 px-3.5 py-3">
         {operations.map((operation, index) => {
           const operationExecutions = routingExecutions.filter(
             (execution) => execution.routingOperationId === operation.id,
@@ -219,7 +219,7 @@ export function ReworkExecutionPanel({
       </div>
 
       {routingCompleted && workOrderStatus === 'QUALITY_PENDING' ? (
-        <p className="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-3 py-3 text-[10px] leading-5 text-blue-800">
+        <p className="mx-3.5 mb-3 rounded-lg border border-blue-200 bg-blue-50/70 px-3 py-2.5 text-[8px] leading-4 text-blue-800">
           Retrabajo completado. Se creó una nueva reinspección PENDING ligada a{' '}
           {nonConformity.number}. Continúa en la sección de inspecciones.
         </p>
