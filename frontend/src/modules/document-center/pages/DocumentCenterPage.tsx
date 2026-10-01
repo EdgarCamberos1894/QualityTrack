@@ -83,7 +83,7 @@ export function DocumentCenterPage() {
           ) : null}
 
           <section className="mt-5 overflow-hidden rounded-xl border border-slate-200 bg-white">
-            <div className="hidden border-b border-slate-200 bg-slate-50 px-4 py-3 text-[9px] font-semibold uppercase tracking-wide text-slate-500 lg:grid lg:grid-cols-[minmax(220px,1.4fr)_190px_minmax(170px,1fr)_90px_170px_150px]">
+            <div className="hidden border-b border-slate-200 bg-slate-50 px-4 py-3 text-[9px] font-semibold uppercase tracking-wide text-slate-500 @4xl/page:grid @4xl/page:grid-cols-[minmax(220px,1.4fr)_190px_minmax(170px,1fr)_90px_170px_150px]">
               <span>Documento</span>
               <span>Tipo</span>
               <span>Contexto</span>
