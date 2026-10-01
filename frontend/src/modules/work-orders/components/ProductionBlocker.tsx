@@ -4,8 +4,9 @@ interface ProductionBlockerProps {
 
 export function ProductionBlocker({ text }: ProductionBlockerProps) {
   return (
-    <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
-      {text}
-    </p>
+    <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2.5">
+      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+      <p className="text-[8px] leading-4 text-amber-800">{text}</p>
+    </div>
   )
 }
