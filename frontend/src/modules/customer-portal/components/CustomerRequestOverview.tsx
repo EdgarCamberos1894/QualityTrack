@@ -161,14 +161,6 @@ function getNextStep(
           'El equipo continúa con la ejecución. El seguimiento avanzará cuando existan movimientos de entrega.',
         tone: 'info',
       }
-    case 'COMPLETED':
-    case 'CANCELLED':
-      return {
-        eyebrow: 'Estado',
-        title: 'Seguimiento actualizado',
-        description: 'Consulta la información registrada para este trabajo.',
-        tone: 'neutral',
-      }
   }
 }
 
