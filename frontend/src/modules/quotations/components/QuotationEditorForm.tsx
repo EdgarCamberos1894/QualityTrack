@@ -94,111 +94,127 @@ export function QuotationEditorForm({
 
   return (
     <form
-      className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]"
+      className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_260px]"
       onSubmit={(event) => event.preventDefault()}
     >
-      <section className="rounded-xl border border-slate-200 bg-white p-5">
-        <h2 className="text-[15px] font-semibold text-slate-950">
-          Información comercial
-        </h2>
-
-        <div className="mt-5 grid gap-4 md:grid-cols-3">
-          <TextField
-            label="Moneda"
-            maxLength={3}
-            disabled={!editable}
-            className="uppercase"
-            error={errors.currency?.message}
-            {...register('currency')}
-          />
-          <TextField
-            label="Válida hasta"
-            type="date"
-            disabled={!editable}
-            error={errors.validUntil?.message}
-            {...register('validUntil')}
-          />
-          <TextField
-            label="Entrega estimada"
-            type="date"
-            disabled={!editable}
-            error={errors.estimatedDeliveryDate?.message}
-            {...register('estimatedDeliveryDate')}
-          />
-        </div>
-
-        <div className="mt-4 max-w-[220px]">
-          <TextField
-            label="Impuesto (%)"
-            type="number"
-            min="0"
-            max="100"
-            step="0.0001"
-            disabled={!editable}
-            error={errors.taxRate?.message}
-            {...register('taxRate', { valueAsNumber: true })}
-          />
-        </div>
-
-        {quotation.adjustmentNotes ? (
-          <div className="mt-4">
-            <TextareaField
-              label="Respuesta al ajuste"
-              disabled={!editable}
-              hint={
-                editable
-                  ? 'Obligatoria para enviar esta nueva revisión.'
-                  : undefined
-              }
-              error={errors.adjustmentResponse?.message}
-              {...register('adjustmentResponse')}
-            />
+      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-30px_rgba(15,23,42,0.3)]">
+        <div className="flex items-center justify-between gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
+          <div>
+            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+              Documento comercial
+            </p>
+            <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
+              Información de la revisión
+            </h2>
           </div>
-        ) : null}
-
-        <div className="mt-5">
-          <QuotationItemsEditor
-            control={control}
-            register={register}
-            errors={errors}
-            editable={editable}
-            currency={currency}
-          />
-        </div>
-
-        {actionError ? (
-          <p
-            role="alert"
-            className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
-          >
-            {actionError}
-          </p>
-        ) : null}
-
-        <div className="mt-5 flex flex-wrap justify-end gap-2">
-          {editable ? (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => void save()}
-              disabled={saving || sending}
-            >
-              {saving ? 'Guardando…' : 'Guardar borrador'}
-            </Button>
-          ) : null}
 
           <Button
             size="sm"
             variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
             onClick={() => void preview()}
             disabled={saving || sending}
           >
             Vista previa
           </Button>
+        </div>
 
-          {editable ? (
+        <div className="p-3.5">
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <TextField
+              label="Moneda"
+              maxLength={3}
+              disabled={!editable}
+              labelClassName="!mb-1.5 !text-[10px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !uppercase !shadow-none"
+              error={errors.currency?.message}
+              {...register('currency')}
+            />
+            <TextField
+              label="Impuesto (%)"
+              type="number"
+              min="0"
+              max="100"
+              step="0.0001"
+              disabled={!editable}
+              labelClassName="!mb-1.5 !text-[10px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              error={errors.taxRate?.message}
+              {...register('taxRate', { valueAsNumber: true })}
+            />
+            <TextField
+              label="Válida hasta"
+              type="date"
+              disabled={!editable}
+              labelClassName="!mb-1.5 !text-[10px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              error={errors.validUntil?.message}
+              {...register('validUntil')}
+            />
+            <TextField
+              label="Entrega estimada"
+              type="date"
+              disabled={!editable}
+              labelClassName="!mb-1.5 !text-[10px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              error={errors.estimatedDeliveryDate?.message}
+              {...register('estimatedDeliveryDate')}
+            />
+          </div>
+
+          {quotation.adjustmentNotes ? (
+            <div className="mt-3">
+              <TextareaField
+                label="Respuesta al ajuste"
+                disabled={!editable}
+                labelClassName="!mb-1.5 !text-[10px]"
+                className="!min-h-20 !rounded-lg !px-3 !py-2 !text-[10px] !shadow-none placeholder:!text-[9px]"
+                hint={
+                  editable
+                    ? 'Obligatoria para enviar esta nueva revisión.'
+                    : undefined
+                }
+                error={errors.adjustmentResponse?.message}
+                {...register('adjustmentResponse')}
+              />
+            </div>
+          ) : null}
+
+          <div className="mt-3">
+            <QuotationItemsEditor
+              control={control}
+              register={register}
+              errors={errors}
+              editable={editable}
+              currency={currency}
+            />
+          </div>
+
+          {actionError ? (
+            <p
+              role="alert"
+              className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700"
+            >
+              {actionError}
+            </p>
+          ) : null}
+        </div>
+
+        {editable ? (
+          <div className="flex flex-wrap justify-end gap-1.5 border-t border-slate-100 bg-slate-50/60 px-3.5 py-2.5">
             <Button
               size="sm"
+              variant="secondary"
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={() => void save()}
+              disabled={saving || sending}
+            >
+              {saving ? 'Guardando…' : 'Guardar cambios'}
+            </Button>
+
+            <Button
+              size="sm"
+              className="!h-7 !px-2.5 !text-[8px]"
               onClick={() => void send()}
               disabled={saving || sending}
             >
@@ -208,8 +224,8 @@ export function QuotationEditorForm({
                   ? 'Enviar nueva revisión'
                   : 'Enviar al cliente'}
             </Button>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
       </section>
 
       <QuotationTotalsCard
