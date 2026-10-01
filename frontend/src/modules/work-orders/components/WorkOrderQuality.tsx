@@ -112,30 +112,31 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div className="space-y-3">
+      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+        <div className="flex flex-col gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-emerald-700">
+            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
               Calidad
             </p>
-            <h2 className="mt-1 text-base font-semibold text-slate-950">
-              Inspección formal, NC y corrección trazable
+            <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
+              Inspección, no conformidades y corrección trazable
             </h2>
-            <p className="mt-1 max-w-2xl text-[10px] leading-5 text-slate-600">
-              Las mediciones determinan PASS o FAIL en servidor. Una desviación
-              conserva su inspección original y se resuelve mediante una NC
-              trazable, sin reescribir producción.
+            <p className="mt-0.5 max-w-2xl text-[8px] leading-4 text-slate-400">
+              Las mediciones determinan PASS o FAIL y cada corrección conserva la historia original.
             </p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Badge tone="info">{inspections.length} inspecciones</Badge>
+          <div className="flex flex-wrap gap-1.5">
+            <Badge tone="info" className="px-2 py-0.5 text-[8px]">
+              {inspections.length} inspecciones
+            </Badge>
             <Badge
               tone={
                 data.nonConformities.some((nc) => nc.status === 'OPEN')
                   ? 'danger'
                   : 'neutral'
               }
+              className="px-2 py-0.5 text-[8px]"
             >
               {data.nonConformities.filter((nc) => nc.status === 'OPEN').length}{' '}
               NC abiertas
@@ -145,14 +146,14 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
       </section>
 
       {!canManageQuality ? (
-        <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[10px] leading-5 text-slate-600">
+        <p className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-[8px] leading-4 text-slate-500">
           Las inspecciones son de solo lectura para tu rol. Las acciones de NC,
           ingeniería y retrabajo aparecen únicamente cuando tu rol las permite.
         </p>
       ) : null}
 
       {actionError ? (
-        <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
           {getErrorMessage(actionError)}
         </p>
       ) : null}
@@ -161,14 +162,17 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
         <NonConformitySection data={data} />
       ) : null}
 
-      <section className="space-y-3">
-        <div>
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-emerald-700">
-            Inspecciones
-          </p>
-          <h2 className="mt-1 text-sm font-semibold text-slate-950">
-            Historial de Calidad
-          </h2>
+      <section className="space-y-2.5">
+        <div className="flex items-end justify-between gap-3">
+          <div>
+            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+              Inspecciones
+            </p>
+            <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
+              Historial de calidad
+            </h2>
+          </div>
+          <span className="text-[8px] text-slate-400">{inspections.length} registros</span>
         </div>
 
         {inspections.length === 0 ? (
@@ -177,7 +181,7 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
             description="La inspección aparece después de completar Producción y ejecutar explícitamente Enviar a Calidad."
           />
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-2.5">
             {inspections.map((inspection) => {
               const canEdit = canModifyInspection(inspection)
               const canStart =
