@@ -37,7 +37,7 @@ export function CustomerRequestRequirementsStep({
 }: CustomerRequestRequirementsStepProps) {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.12fr)_minmax(340px,0.88fr)]">
-      <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+      <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)] lg:[&_label]:mb-1 lg:[&_label]:text-xs lg:[&_textarea]:min-h-20 lg:[&_textarea]:text-xs lg:[&_textarea]:py-2">
         <div>
           <h2 className="text-base font-semibold text-slate-950">
             Requisitos técnicos
@@ -47,7 +47,7 @@ export function CustomerRequestRequirementsStep({
           </p>
         </div>
 
-        <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {[
             {
               value: 'SPECIFIED' as const,
@@ -99,7 +99,7 @@ export function CustomerRequestRequirementsStep({
           })}
         </div>
 
-        <div className="mt-4">
+        <div className="mt-3">
           <TextareaField
             label={
               materialRequirementType === 'SPECIFIED'
@@ -113,7 +113,7 @@ export function CustomerRequestRequirementsStep({
           />
         </div>
 
-        <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50/65 px-3.5 py-3">
+        <div className="mt-3 rounded-xl border border-blue-200 bg-blue-50/65 px-3 py-2.5">
           <p className="text-[10px] leading-5 text-slate-700">
             No necesitas elegir el proceso de fabricación. Comercial e
             Ingeniería lo determinan durante la revisión.
@@ -123,7 +123,7 @@ export function CustomerRequestRequirementsStep({
         {actions}
       </Card>
 
-      <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+      <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
         <div>
           <h2 className="text-base font-semibold text-slate-950">Documentos</h2>
           <p className="mt-1 text-[10px] leading-5 text-slate-500">
@@ -131,7 +131,7 @@ export function CustomerRequestRequirementsStep({
           </p>
         </div>
 
-        <label className="group mt-4 flex cursor-pointer flex-col items-center rounded-xl border border-dashed border-blue-300 bg-blue-50/35 px-4 py-4 text-center transition hover:border-blue-400 hover:bg-blue-50/60">
+        <label className="group mt-3 flex cursor-pointer flex-col items-center rounded-xl border border-dashed border-blue-300 bg-blue-50/35 px-4 py-3.5 text-center transition hover:border-blue-400 hover:bg-blue-50/60">
           <span className="text-2xl font-light leading-none text-blue-600">+</span>
           <span className="mt-2 text-[10px] font-semibold text-blue-700">
             Agregar archivos
