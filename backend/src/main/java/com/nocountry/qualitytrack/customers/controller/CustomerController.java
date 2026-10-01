@@ -9,6 +9,7 @@ import com.nocountry.qualitytrack.customers.documentation.ListMyCustomersApiDocs
 import com.nocountry.qualitytrack.customers.documentation.RemoveCustomerMemberApiDocs;
 import com.nocountry.qualitytrack.customers.documentation.UpdateCustomerApiDocs;
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerRequest;
+import com.nocountry.qualitytrack.customers.dto.request.UpdateCustomerMemberRoleRequest;
 import com.nocountry.qualitytrack.customers.dto.request.UpdateCustomerRequest;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerContextResponse;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
@@ -111,6 +112,17 @@ public class CustomerController {
                 "Miembros de la empresa consultados correctamente.",
                 response
         ));
+    }
+
+    @PatchMapping("/{customerId}/members/{userId}/role")
+    public ResponseEntity<Void> updateMemberRole(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long customerId,
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateCustomerMemberRoleRequest request
+    ) {
+        customerService.updateMemberRole(currentUserId, customerId, userId, request);
+        return ResponseEntity.noContent().build();
     }
 
     @RemoveCustomerMemberApiDocs
