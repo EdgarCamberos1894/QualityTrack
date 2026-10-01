@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import type {
   FieldErrors,
   UseFormRegister,
@@ -52,12 +52,14 @@ export function CustomerRequestRequirementsStep({
   const editingDocument =
     editingIndex === null ? null : documents[editingIndex] ?? null
 
-  useEffect(() => {
-    if (!editingDocument) return
+  const openEditor = (index: number) => {
+    const document = documents[index]
+    if (!document) return
 
-    setDraftName(editingDocument.name?.trim() || editingDocument.file.name)
-    setDraftDescription(editingDocument.description ?? '')
-  }, [editingDocument])
+    setDraftName(document.name?.trim() || document.file.name)
+    setDraftDescription(document.description ?? '')
+    setEditingIndex(index)
+  }
 
   const closeEditor = () => {
     setEditingIndex(null)
@@ -257,7 +259,7 @@ export function CustomerRequestRequirementsStep({
 
                   <button
                     type="button"
-                    onClick={() => setEditingIndex(index)}
+                    onClick={() => openEditor(index)}
                     aria-label={`Editar detalles de ${document.file.name}`}
                     title="Editar detalles"
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-blue-50 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100"
