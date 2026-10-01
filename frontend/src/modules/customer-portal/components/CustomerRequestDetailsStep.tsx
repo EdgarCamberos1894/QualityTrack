@@ -73,8 +73,8 @@ export function CustomerRequestDetailsStep({
         </div>
       </Card>
 
-      <Card className="overflow-hidden shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)] lg:flex lg:h-full lg:min-h-0 lg:flex-col">
-        <div className="px-4 pb-2.5 pt-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
+      <div className="flex min-h-0 flex-col gap-2.5 lg:h-full">
+        <Card className="min-h-0 flex-1 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)] lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
           <h2 className="text-sm font-semibold text-slate-950">
             Qué pasa después
           </h2>
@@ -96,9 +96,9 @@ export function CustomerRequestDetailsStep({
               </li>
             ))}
           </ol>
-        </div>
+        </Card>
 
-        <div className="border-t border-emerald-200 bg-emerald-50/75 px-4 py-3.5">
+        <Card className="shrink-0 border-emerald-200 bg-emerald-50/75 p-3.5 shadow-none">
           <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-emerald-700">
             No te preocupes por el proceso
           </p>
@@ -109,10 +109,10 @@ export function CustomerRequestDetailsStep({
             El equipo define proceso y material durante la revisión si hace
             falta.
           </p>
-        </div>
+        </Card>
 
-        <div className="lg:mt-auto">{actions}</div>
-      </Card>
+        <div className="shrink-0">{actions}</div>
+      </div>
     </div>
   )
 }
