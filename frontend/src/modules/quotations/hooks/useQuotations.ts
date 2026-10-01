@@ -10,9 +10,10 @@ export const quotationKeys = {
     [...quotationKeys.all, 'revisions', quotationId] as const,
 }
 
-export function useQuotations() {
+export function useQuotations(enabled = true) {
   return useQuery({
     queryKey: quotationKeys.list(),
     queryFn: getQuotations,
+    enabled,
   })
 }
