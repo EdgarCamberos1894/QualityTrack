@@ -94,6 +94,39 @@ class QuotationServiceTest {
     }
 
     @Test
+    void replacedSourceRevisionKeepsAdjustmentRequestAfterNextRevisionWasSent() {
+        Quotation current = mock(Quotation.class);
+        Quotation next = mock(Quotation.class);
+        JobCase jobCase = mock(JobCase.class);
+        CustomerRequest request = mock(CustomerRequest.class);
+        Customer customer = mock(Customer.class);
+
+        when(quotationRepository.findDetailById(1L)).thenReturn(Optional.of(current));
+        when(current.getJobCase()).thenReturn(jobCase);
+        when(jobCase.getCustomerRequest()).thenReturn(request);
+        when(request.getCustomer()).thenReturn(customer);
+        when(customer.getId()).thenReturn(20L);
+        when(current.getStatus()).thenReturn(QuotationStatus.SUPERSEDED);
+        when(current.getSentAt()).thenReturn(Instant.now());
+        when(current.getQuotationNumber()).thenReturn("QT-00000001");
+        when(current.getRevision()).thenReturn(1);
+        when(current.getItems()).thenReturn(List.of());
+
+        when(quotationRepository.findByQuotationNumberAndRevision(
+                "QT-00000001",
+                2
+        )).thenReturn(Optional.of(next));
+        when(next.getStatus()).thenReturn(QuotationStatus.SENT);
+        when(next.getAdjustmentNotes()).thenReturn("Reducir el plazo de entrega.");
+
+        var response = service.getForCustomer(42L, 20L, 1L);
+
+        assertEquals(CustomerQuotationStatus.REPLACED, response.customerStatus());
+        assertEquals("Reducir el plazo de entrega.", response.adjustment().notes());
+        assertNull(response.adjustment().response());
+    }
+
+    @Test
     void secondAdjustmentDoesNotExposePreviousAdjustmentResponse() {
         Quotation current = mock(Quotation.class);
         Quotation next = mock(Quotation.class);
