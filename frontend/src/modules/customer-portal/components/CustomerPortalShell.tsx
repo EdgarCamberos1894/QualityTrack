@@ -27,19 +27,23 @@ export function CustomerPortalShell() {
 
   if (contextsQuery.isPending) {
     return (
-      <main className="min-h-screen bg-[#f5f7fb] p-8">
-        <LoadingState label="Cargando empresa…" />
+      <main className="min-h-screen bg-[#f6f8fc] px-5 py-6 sm:px-8">
+        <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_16px_44px_-36px_rgba(15,23,42,0.3)]">
+          <LoadingState label="Cargando empresa…" />
+        </div>
       </main>
     )
   }
 
   if (contextsQuery.isError) {
     return (
-      <main className="min-h-screen bg-[#f5f7fb] p-8">
-        <ErrorState
-          error={contextsQuery.error}
-          title="No pudimos cargar tu empresa"
-        />
+      <main className="min-h-screen bg-[#f6f8fc] px-5 py-6 sm:px-8">
+        <div className="mx-auto max-w-6xl rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_16px_44px_-36px_rgba(15,23,42,0.3)]">
+          <ErrorState
+            error={contextsQuery.error}
+            title="No pudimos cargar tu empresa"
+          />
+        </div>
       </main>
     )
   }
@@ -63,7 +67,7 @@ export function CustomerPortalShell() {
     <CustomerPortalContextProvider
       value={{ customer, contexts: contextsQuery.data }}
     >
-      <div className="min-h-screen bg-[#f5f7fb] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
+      <div className="min-h-screen bg-[#f6f8fc] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
         <CustomerPortalSidebar
           customer={customer}
           hasMultipleCustomers={contextsQuery.data.length > 1}
