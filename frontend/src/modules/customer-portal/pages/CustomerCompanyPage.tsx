@@ -48,7 +48,7 @@ export function CustomerCompanyPage() {
 
   if (query.isPending) {
     return (
-      <PageContainer className="py-3 lg:flex lg:h-[calc(100dvh-100px)] lg:min-h-0 lg:flex-col lg:overflow-hidden lg:py-2">
+      <PageContainer className="py-3 lg:py-2">
         <LoadingState label="Cargando empresa…" />
       </PageContainer>
     )
@@ -79,7 +79,7 @@ export function CustomerCompanyPage() {
   })
 
   return (
-    <PageContainer className="py-3 lg:py-2">
+    <PageContainer className="py-3 lg:flex lg:h-[calc(100dvh-100px)] lg:min-h-0 lg:flex-col lg:overflow-hidden lg:py-2">
       <div className="shrink-0">
         <CustomerCompanyHeader
         name={company.name}
@@ -165,7 +165,7 @@ export function CustomerCompanyPage() {
           </div>
         </section>
 
-        <aside className="overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-3.5 shadow-[0_12px_35px_-28px_rgba(15,23,42,0.24)] lg:h-full">
+        <aside className="overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-3.5 shadow-[0_12px_35px_-28px_rgba(15,23,42,0.24)] lg:flex lg:h-full lg:min-h-0 lg:flex-col">
           <div className="flex items-start gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
               <SidebarNavIcon name="members" className="h-[17px] w-[17px]" />
