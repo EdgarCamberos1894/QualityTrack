@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   acceptCustomerInvitation,
   acceptInternalInvitation,
@@ -58,15 +58,24 @@ export function useCustomerInvitation(token: string | null) {
 }
 
 export function useAcceptCustomerInvitation(token: string | null) {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: () => {
       if (!token) throw new Error('La invitación no contiene un token válido.')
       return acceptCustomerInvitation(token)
     },
+    onSuccess: async (result) => {
+      if (result.outcome === 'ACCEPTED') {
+        await queryClient.invalidateQueries({ queryKey: ['customer-portal'] })
+      }
+    },
   })
 }
 
 export function useCompleteCustomerInvitation(token: string | null) {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: (values: {
       firstName: string
@@ -75,6 +84,9 @@ export function useCompleteCustomerInvitation(token: string | null) {
     }) => {
       if (!token) throw new Error('La invitación no contiene un token válido.')
       return completeCustomerInvitation({ token, ...values })
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['customer-portal'] })
     },
   })
 }
