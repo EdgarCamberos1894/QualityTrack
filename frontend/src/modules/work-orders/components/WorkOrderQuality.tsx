@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useSessionStore } from '@/modules/auth'
+import type { RecordMaterialConsumptionPayload } from '@/modules/materials'
 import { Badge } from '@/shared/components/ui/Badge'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -7,7 +8,9 @@ import { CompleteQualityInspectionDialog } from './CompleteQualityInspectionDial
 import { NonConformitySection } from './NonConformitySection'
 import { QualityInspectionCard } from './QualityInspectionCard'
 import { QualityMeasurementDialog } from './QualityMeasurementDialog'
+import { ProductionMaterialsCard } from './ProductionMaterialsCard'
 import { useQualityMutations } from '../hooks/useQualityMutations'
+import { useProductionMutations } from '../hooks/useProductionMutations'
 import type { QualityMeasurementFormValues } from '../schemas/quality.schemas'
 import type {
   QualityInspectionDto,
@@ -30,8 +33,12 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
   const currentUserId = Number(session?.user.id)
   const isAdmin = roles.includes('ADMIN')
   const isQuality = roles.includes('QUALITY')
+  const isProduction = roles.includes('PRODUCTION')
   const canManageQuality = isAdmin || isQuality
+  const canRecordReworkMaterial =
+    (isAdmin || isProduction) && data.workOrder.status === 'REWORK_IN_PROGRESS'
   const mutations = useQualityMutations(data.workOrder.id)
+  const productionMutations = useProductionMutations(data.workOrder.id)
   const [measurementTarget, setMeasurementTarget] =
     useState<MeasurementTarget | null>(null)
   const [completionTarget, setCompletionTarget] =
@@ -111,6 +118,17 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
     }
   }
 
+  const recordReworkMaterial = async (
+    payload: RecordMaterialConsumptionPayload,
+  ) => {
+    try {
+      await productionMutations.recordConsumption.mutateAsync(payload)
+      return true
+    } catch {
+      return false
+    }
+  }
+
   return (
     <div className="space-y-3">
       <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
@@ -160,6 +178,16 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
 
       {data.nonConformities.length > 0 ? (
         <NonConformitySection data={data} />
+      ) : null}
+
+      {data.workOrder.status === 'REWORK_IN_PROGRESS' ? (
+        <ProductionMaterialsCard
+          consumptions={data.materials}
+          canRecord={canRecordReworkMaterial}
+          submitting={productionMutations.recordConsumption.isPending}
+          error={productionMutations.recordConsumption.error}
+          onRecord={recordReworkMaterial}
+        />
       ) : null}
 
       <section className="space-y-2.5">
