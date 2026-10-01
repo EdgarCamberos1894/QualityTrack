@@ -124,6 +124,7 @@ export function CustomerRequestRequirementsStep({
                   onClick={() =>
                     setValue('materialRequirementType', option.value, {
                       shouldValidate: true,
+                      shouldDirty: true,
                     })
                   }
                   className={
