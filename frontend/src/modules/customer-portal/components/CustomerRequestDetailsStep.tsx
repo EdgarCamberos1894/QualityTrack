@@ -36,6 +36,7 @@ export function CustomerRequestDetailsStep({
             error={errors.title?.message}
             {...register('title')}
           />
+
           <TextareaField
             label="Descripción"
             maxLength={5000}
@@ -54,6 +55,7 @@ export function CustomerRequestDetailsStep({
             <TextField
               label="Fecha requerida"
               type="date"
+              hint="Fecha objetivo; se confirma en la cotización."
               error={errors.requestedDeliveryDate?.message}
               {...register('requestedDeliveryDate')}
             />
@@ -64,16 +66,7 @@ export function CustomerRequestDetailsStep({
               {...register('customerReference')}
             />
           </div>
-
-          <div className="rounded-xl border border-blue-200 bg-blue-50/65 px-3 py-2.5">
-            <p className="text-[10px] leading-5 text-slate-700">
-              La fecha requerida expresa tu objetivo. La fecha comprometida se
-              confirma más adelante en la cotización.
-            </p>
-          </div>
         </div>
-
-        {actions}
       </Card>
 
       <div className="space-y-3">
@@ -116,6 +109,8 @@ export function CustomerRequestDetailsStep({
             ayudarte a elegirlo.
           </p>
         </Card>
+
+        {actions}
       </div>
     </div>
   )
