@@ -69,26 +69,30 @@ class InternalDashboardServiceTest {
         when(actor.getAccountType()).thenReturn(AccountType.INTERNAL);
         when(actor.getStatus()).thenReturn(UserStatus.ACTIVE);
 
-        when(jobCaseRepository.countGroupedByStatus()).thenReturn(List.of(
+        List<JobCaseRepository.StatusCount> caseCounts = List.of(
                 caseCount(JobCaseStatus.SUBMITTED, 2L),
                 caseCount(JobCaseStatus.UNDER_REVIEW, 3L),
                 caseCount(JobCaseStatus.WAITING_CUSTOMER_INFO, 1L),
                 caseCount(JobCaseStatus.READY_FOR_QUOTATION, 4L),
                 caseCount(JobCaseStatus.IN_PRODUCTION, 5L),
                 caseCount(JobCaseStatus.COMPLETED, 7L)
-        ));
-        when(workOrderRepository.countGroupedByStatus()).thenReturn(List.of(
+        );
+        List<WorkOrderRepository.StatusCount> workOrderCounts = List.of(
                 workOrderCount(WorkOrderStatus.READY_FOR_PRODUCTION, 2L),
                 workOrderCount(WorkOrderStatus.IN_PRODUCTION, 3L),
                 workOrderCount(WorkOrderStatus.REWORK_IN_PROGRESS, 1L),
                 workOrderCount(WorkOrderStatus.QUALITY_PENDING, 2L),
                 workOrderCount(WorkOrderStatus.QUALITY_HOLD, 1L),
                 workOrderCount(WorkOrderStatus.READY_FOR_DELIVERY, 4L)
-        ));
-        when(quotationRepository.countGroupedByStatus()).thenReturn(List.of(
+        );
+        List<QuotationRepository.StatusCount> quotationCounts = List.of(
                 quotationCount(QuotationStatus.DRAFT, 2L),
                 quotationCount(QuotationStatus.SENT, 3L)
-        ));
+        );
+
+        when(jobCaseRepository.countGroupedByStatus()).thenReturn(caseCounts);
+        when(workOrderRepository.countGroupedByStatus()).thenReturn(workOrderCounts);
+        when(quotationRepository.countGroupedByStatus()).thenReturn(quotationCounts);
         when(nonConformityRepository.countByStatus(NonConformityStatus.OPEN))
                 .thenReturn(2L);
         when(deliveryRepository.countByStatus(DeliveryStatus.DISPATCHED))
