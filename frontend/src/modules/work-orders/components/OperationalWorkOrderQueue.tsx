@@ -48,7 +48,7 @@ export function OperationalWorkOrderQueue({
             return (
               <article
                 key={workOrder.id}
-                className="grid gap-4 px-5 py-4 transition hover:bg-slate-50 lg:grid-cols-[minmax(0,1.5fr)_minmax(180px,0.8fr)_140px_150px]"
+                className="grid gap-4 px-5 py-4 transition hover:bg-slate-50 @4xl/page:grid-cols-[minmax(0,1.5fr)_minmax(180px,0.8fr)_140px_150px]"
               >
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold text-slate-500">
