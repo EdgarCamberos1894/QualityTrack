@@ -49,7 +49,7 @@ export function WorkOrderSummary({ data }: WorkOrderSummaryProps) {
     <div className="space-y-4">
       <WorkOrderOriginChain data={data} />
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+      <div className="grid gap-4 @5xl/page:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
         <Card className="p-5">
           <h2 className="text-sm font-semibold text-slate-950">
             Snapshot operativo
@@ -128,7 +128,7 @@ export function WorkOrderSummary({ data }: WorkOrderSummaryProps) {
         <h2 className="text-sm font-semibold text-slate-950">
           Resultado por etapa
         </h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 @5xl/page:grid-cols-5">
           {snapshot.stages.map((stage) => (
             <div
               key={stage.label}
