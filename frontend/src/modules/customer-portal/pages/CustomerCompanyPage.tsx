@@ -48,7 +48,7 @@ export function CustomerCompanyPage() {
 
   if (query.isPending) {
     return (
-      <PageContainer className="py-3 lg:py-2">
+      <PageContainer className="py-3 lg:flex lg:h-[calc(100dvh-100px)] lg:min-h-0 lg:flex-col lg:overflow-hidden lg:py-2">
         <LoadingState label="Cargando empresa…" />
       </PageContainer>
     )
@@ -80,20 +80,22 @@ export function CustomerCompanyPage() {
 
   return (
     <PageContainer className="py-3 lg:py-2">
-      <CustomerCompanyHeader
+      <div className="shrink-0">
+        <CustomerCompanyHeader
         name={company.name}
         status={company.status}
         city={company.city}
         state={company.state}
         administrativeEmail={company.administrativeEmail}
-      />
+        />
+      </div>
 
       <form
-        className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)] lg:items-start"
+        className="mt-3 grid gap-3 lg:min-h-0 lg:flex-1 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)] lg:items-stretch lg:overflow-hidden"
         onSubmit={(event) => void submit(event)}
       >
-        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-28px_rgba(15,23,42,0.28)]">
-          <div className="flex flex-col gap-2.5 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/65 px-4 py-2.5 sm:flex-row sm:items-start sm:justify-between">
+        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-28px_rgba(15,23,42,0.28)] lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+          <div className="flex shrink-0 flex-col gap-2.5 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/65 px-4 py-2.5 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-start gap-3">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                 <SidebarNavIcon name="company" className="h-4 w-4" />
@@ -124,7 +126,7 @@ export function CustomerCompanyPage() {
             ) : null}
           </div>
 
-          <div className="p-3.5 sm:p-4">
+          <div className="p-3.5 sm:p-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
             <CustomerCompanyFields
               register={register}
               errors={errors}
@@ -163,7 +165,7 @@ export function CustomerCompanyPage() {
           </div>
         </section>
 
-        <aside className="overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-3.5 shadow-[0_12px_35px_-28px_rgba(15,23,42,0.24)]">
+        <aside className="overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-3.5 shadow-[0_12px_35px_-28px_rgba(15,23,42,0.24)] lg:h-full">
           <div className="flex items-start gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
               <SidebarNavIcon name="members" className="h-[17px] w-[17px]" />
