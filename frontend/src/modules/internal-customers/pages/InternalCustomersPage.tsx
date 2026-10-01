@@ -70,7 +70,7 @@ export function InternalCustomersPage() {
         description="Consulta las empresas registradas y su contexto operativo sin entrar al portal del cliente."
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 @4xl/page:grid-cols-4">
         <Card className="px-5 py-4">
           <p className="text-[10px] text-slate-500">Empresas</p>
           <p className="mt-1 text-xl font-bold text-slate-950">
