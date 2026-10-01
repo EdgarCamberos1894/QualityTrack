@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
+  cancelCustomerInvitation,
   createCustomerInvitation,
   removeCustomerMember,
   updateCustomerCompany,
@@ -33,6 +34,16 @@ export function useCustomerCompanyMutations(customerId: number) {
     },
   })
 
+  const cancelInvitation = useMutation({
+    mutationFn: (invitationId: number) =>
+      cancelCustomerInvitation(customerId, invitationId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: customerCompanyKeys.invitations(customerId),
+      })
+    },
+  })
+
   const removeMember = useMutation({
     mutationFn: (userId: number) => removeCustomerMember(customerId, userId),
     onSuccess: async () => {
@@ -42,5 +53,5 @@ export function useCustomerCompanyMutations(customerId: number) {
     },
   })
 
-  return { updateCompany, invite, removeMember }
+  return { updateCompany, invite, cancelInvitation, removeMember }
 }
