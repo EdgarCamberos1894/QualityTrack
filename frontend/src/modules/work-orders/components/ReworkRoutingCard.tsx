@@ -124,7 +124,7 @@ export function ReworkRoutingCard({
       id={`routing-sheet-${routing.id}`}
       className="scroll-mt-24 rounded-xl border border-amber-200 bg-amber-50/30 p-5 target:ring-2 target:ring-blue-300"
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-4 @3xl/page:flex-row @3xl/page:items-start @3xl/page:justify-between">
         <div>
           <p className="text-[9px] font-semibold uppercase tracking-wide text-amber-700">
             Ruta de retrabajo · Rev {routing.revision}
