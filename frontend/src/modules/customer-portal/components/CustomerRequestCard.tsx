@@ -33,7 +33,7 @@ export function CustomerRequestCard({
         }
       />
 
-      <div className="grid gap-5 p-5 pl-6 lg:grid-cols-[minmax(0,1fr)_190px_160px] lg:items-center">
+      <div className="grid gap-5 p-5 pl-6 @4xl/page:grid-cols-[minmax(0,1fr)_190px_160px] @4xl/page:items-center">
         <div className="min-w-0">
           <p className="text-[10px] font-semibold text-slate-500">
             {request.requestNumber}
@@ -61,7 +61,7 @@ export function CustomerRequestCard({
           </p>
         </div>
 
-        <div className="flex lg:justify-end">
+        <div className="flex @4xl/page:justify-end">
           <Link
             to={`/portal/${customerId}/requests/${request.id}`}
             className={
