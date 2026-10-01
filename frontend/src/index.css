@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+@theme {
+  --breakpoint-shell: 90rem;
+}
+
 :root {
   font-family:
     Inter,
