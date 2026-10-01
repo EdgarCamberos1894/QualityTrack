@@ -90,7 +90,7 @@ export function MaterialsPanel({
         </p>
       </Card>
 
-      <div className="grid gap-5 xl:grid-cols-[420px_minmax(0,1fr)]">
+      <div className="grid gap-5 @4xl/page:grid-cols-[420px_minmax(0,1fr)]">
         <Card className="h-fit overflow-hidden">
           <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
             <div>
