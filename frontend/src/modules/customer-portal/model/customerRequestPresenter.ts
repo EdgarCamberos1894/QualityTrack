@@ -49,9 +49,24 @@ const statuses: Record<CustomerRequestStatus, RequestStatusPresentation> = {
 }
 
 export function getCustomerRequestStatusPresentation(
-  status: CustomerRequestStatus,
+  status: CustomerRequestStatus | string | null | undefined,
 ): RequestStatusPresentation {
-  return statuses[status]
+  if (status && status in statuses) {
+    return statuses[status as CustomerRequestStatus]
+  }
+
+  const label = status
+    ? status
+        .toLocaleLowerCase('es-MX')
+        .replaceAll('_', ' ')
+        .replace(/^./, (value) => value.toLocaleUpperCase('es-MX'))
+    : 'Estado desconocido'
+
+  return {
+    label,
+    stage: 'Sin clasificar',
+    tone: 'neutral',
+  }
 }
 
 export function requestNeedsCustomerResponse(
