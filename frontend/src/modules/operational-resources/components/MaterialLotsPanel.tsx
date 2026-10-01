@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   useMaterialCertificateFileActions,
   useMaterialLots,
@@ -38,7 +38,7 @@ export function MaterialLotsPanel({
     null,
   )
 
-  const lots = lotsQuery.data ?? []
+  const lots = useMemo(() => lotsQuery.data ?? [], [lotsQuery.data])
 
   useEffect(() => {
     if (
