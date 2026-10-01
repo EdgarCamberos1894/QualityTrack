@@ -11,7 +11,8 @@ export function CustomerRequestWizardSteps({
   currentStep,
 }: CustomerRequestWizardStepsProps) {
   return (
-    <Card className="mb-3 px-4 py-2 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.28)]">
+    <Card className="relative mb-3 overflow-hidden border-slate-300 bg-gradient-to-r from-[#e9eef4] via-[#f7f9fb] to-[#e5ebf2] px-4 py-2 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.28)]">
+      <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400" />
       <div className="flex items-center">
         {steps.map((label, index) => {
           const completed = index < currentStep
@@ -25,8 +26,8 @@ export function CustomerRequestWizardSteps({
                     completed
                       ? 'flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-[8px] font-bold text-white'
                       : active
-                        ? 'flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-blue-600 text-[8px] font-bold text-white shadow-sm shadow-blue-200'
-                        : 'flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-[8px] font-semibold text-slate-500'
+                        ? 'flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-blue-600 text-[8px] font-bold text-white shadow-sm shadow-blue-200 ring-2 ring-white'
+                        : 'flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white/80 text-[8px] font-semibold text-slate-500'
                   }
                 >
                   {completed ? '✓' : index + 1}
