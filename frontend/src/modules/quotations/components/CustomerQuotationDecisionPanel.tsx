@@ -1,5 +1,6 @@
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { getCustomerQuotationStatusPresentation } from '../model/customerQuotationPresenter'
 import { formatQuotationDate } from '../model/quotationPresenter'
 import type {
@@ -65,12 +66,8 @@ export function CustomerQuotationDecisionPanel({
   return (
     <aside className="flex h-full flex-col rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
       <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-white shadow-sm">
-          <img
-            src="/brand/qualitytrack-mark.svg"
-            alt=""
-            className="h-7 w-7"
-          />
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100">
+          <SidebarNavIcon name="quality" className="h-[17px] w-[17px]" />
         </div>
         <div className="min-w-0">
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
@@ -148,31 +145,79 @@ export function CustomerQuotationDecisionPanel({
         </p>
 
         {quotation.adjustment?.notes || quotation.adjustment?.response ? (
-          <div
-            className={
-              quotation.customerStatus === 'ADJUSTMENT_REQUESTED'
-                ? 'mt-2 rounded-xl border border-amber-200 bg-amber-50/65 px-3 py-2.5'
-                : 'mt-2 rounded-xl border border-emerald-100 bg-emerald-50/55 px-3 py-2.5'
-            }
-          >
-            {quotation.adjustment?.notes ? (
-              <div>
-                <p className="text-[8px] font-semibold text-slate-500">
-                  Tu solicitud
-                </p>
-                <p className="mt-0.5 text-[9px] leading-4 text-slate-700">
-                  {quotation.adjustment.notes}
+          <div className="relative mt-3 space-y-3 pl-5">
+            <span
+              aria-hidden="true"
+              className="absolute bottom-4 left-[3px] top-4 w-px bg-slate-200"
+            />
+
+            <div className="relative">
+              <span
+                aria-hidden="true"
+                className="absolute -left-5 top-3 h-2 w-2 rounded-full bg-blue-500 ring-4 ring-blue-50"
+              />
+              <div className="rounded-xl border border-blue-100 bg-blue-50/55 px-3 py-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-blue-700">
+                    Tu solicitud de ajuste
+                  </p>
+                  <span className="rounded-full bg-white/80 px-1.5 py-0.5 text-[7px] font-semibold text-blue-600 ring-1 ring-blue-100">
+                    Enviada
+                  </span>
+                </div>
+                <p className="mt-1.5 text-[9px] leading-4 text-slate-700">
+                  {quotation.adjustment?.notes ?? 'Sin detalle registrado.'}
                 </p>
               </div>
-            ) : null}
+            </div>
 
-            <div className={quotation.adjustment?.notes ? 'mt-2' : undefined}>
-              <p className="text-[8px] font-semibold text-slate-500">
-                Respuesta comercial
-              </p>
-              <p className="mt-0.5 text-[9px] leading-4 text-slate-700">
-                {quotation.adjustment?.response ?? 'Pendiente.'}
-              </p>
+            <div className="relative">
+              <span
+                aria-hidden="true"
+                className={
+                  quotation.adjustment?.response
+                    ? 'absolute -left-5 top-3 h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-50'
+                    : 'absolute -left-5 top-3 h-2 w-2 rounded-full bg-amber-400 ring-4 ring-amber-50'
+                }
+              />
+              <div
+                className={
+                  quotation.adjustment?.response
+                    ? 'rounded-xl border border-emerald-100 bg-emerald-50/55 px-3 py-2.5'
+                    : 'rounded-xl border border-dashed border-amber-200 bg-amber-50/55 px-3 py-2.5'
+                }
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p
+                    className={
+                      quotation.adjustment?.response
+                        ? 'text-[8px] font-bold uppercase tracking-[0.08em] text-emerald-700'
+                        : 'text-[8px] font-bold uppercase tracking-[0.08em] text-amber-700'
+                    }
+                  >
+                    Respuesta de Comercial
+                  </p>
+                  <span
+                    className={
+                      quotation.adjustment?.response
+                        ? 'rounded-full bg-white/80 px-1.5 py-0.5 text-[7px] font-semibold text-emerald-700 ring-1 ring-emerald-100'
+                        : 'rounded-full bg-white/80 px-1.5 py-0.5 text-[7px] font-semibold text-amber-700 ring-1 ring-amber-100'
+                    }
+                  >
+                    {quotation.adjustment?.response ? 'Respondida' : 'Pendiente'}
+                  </span>
+                </div>
+                <p
+                  className={
+                    quotation.adjustment?.response
+                      ? 'mt-1.5 text-[9px] leading-4 text-slate-700'
+                      : 'mt-1.5 text-[9px] italic leading-4 text-slate-500'
+                  }
+                >
+                  {quotation.adjustment?.response ??
+                    'Comercial todavía no ha respondido esta solicitud.'}
+                </p>
+              </div>
             </div>
           </div>
         ) : (
