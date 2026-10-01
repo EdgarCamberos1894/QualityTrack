@@ -96,7 +96,7 @@ export function CustomerRequestsPage() {
       />
 
       <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-30px_rgba(15,23,42,0.38)]">
-        <div className="border-b border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/35 px-4 py-3.5 sm:px-5">
+        <div className="border-b border-slate-200 bg-gradient-to-r from-slate-50 via-slate-50 to-blue-50/70 px-4 py-3.5 sm:px-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-blue-600">
@@ -131,7 +131,7 @@ export function CustomerRequestsPage() {
             </label>
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-1">
+          <div className="mt-3 grid grid-cols-2 gap-1.5 sm:grid-cols-4 lg:grid-cols-7">
             {filters.map((item) => {
               const active = filter === item.value
               const count = filterCount(item.value)
@@ -143,8 +143,8 @@ export function CustomerRequestsPage() {
                   onClick={() => setFilter(item.value)}
                   className={
                     active
-                      ? 'inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[8px] font-semibold text-blue-700 shadow-sm'
-                      : 'inline-flex items-center gap-1 rounded-full border border-slate-200/70 bg-white px-2 py-0.5 text-[8px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50'
+                      ? 'inline-flex w-full items-center justify-center gap-1 rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[8px] font-semibold text-blue-700 shadow-sm'
+                      : 'inline-flex w-full items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white px-2 py-1 text-[8px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50'
                   }
                 >
                   {item.label}
