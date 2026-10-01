@@ -119,7 +119,7 @@ export function CustomerRequestDocuments({
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5 [&_button]:!h-7 [&_button]:!px-2.5 [&_button]:!text-[9px]">
                       <Button
                         size="sm"
                         variant="secondary"
