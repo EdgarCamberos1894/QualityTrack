@@ -25,13 +25,13 @@ export function AppShell() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f7fb] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
+    <div className="min-h-screen bg-[#f5f7fb] shell:grid shell:grid-cols-[248px_minmax(0,1fr)]">
       <Sidebar open={sidebarOpen} onNavigate={() => setSidebarOpen(false)} />
 
       {sidebarOpen ? (
         <button
           type="button"
-          className="fixed inset-0 z-30 bg-slate-950/50 lg:hidden"
+          className="fixed inset-0 z-30 bg-slate-950/50 shell:hidden"
           onClick={() => setSidebarOpen(false)}
           aria-label="Cerrar navegación"
         />
