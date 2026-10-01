@@ -15,6 +15,7 @@ interface TextFieldProps extends Omit<
   hint?: string
   endAdornment?: ReactNode
   labelClassName?: string
+  labelAction?: ReactNode
 }
 
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
@@ -27,6 +28,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
       hint,
       endAdornment,
       labelClassName,
+      labelAction,
       ...inputProps
     },
     ref,
@@ -41,15 +43,20 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
 
     return (
       <div>
-        <label
-          htmlFor={inputId}
+        <div
           className={cn(
-            'mb-2 block text-sm font-semibold text-slate-800',
+            'mb-2 flex items-center justify-between gap-3',
             labelClassName,
           )}
         >
-          {label}
-        </label>
+          <label
+            htmlFor={inputId}
+            className="block text-sm font-semibold text-slate-800"
+          >
+            {label}
+          </label>
+          {labelAction ? <div className="shrink-0">{labelAction}</div> : null}
+        </div>
 
         <div className="relative">
           <input
