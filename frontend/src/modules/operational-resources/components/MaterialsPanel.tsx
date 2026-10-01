@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useMaterialMutations, useMaterials } from '@/modules/materials'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
@@ -27,39 +27,20 @@ export function MaterialsPanel({
   const query = useMaterials()
   const mutations = useMaterialMutations()
   const [search, setSearch] = useState('')
-  const [selectedId, setSelectedId] = useState<number | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
 
-  const materials = query.data ?? []
+  const materials = useMemo(() => query.data ?? [], [query.data])
 
-  useEffect(() => {
-    const [firstMaterial] = materials
-
-    if (!firstMaterial) {
-      setSelectedId(null)
-      return
+  const selectedMaterial = useMemo(() => {
+    if (requestedMaterialId) {
+      const requested = materials.find(
+        (material) => material.id === requestedMaterialId,
+      )
+      if (requested) return requested
     }
 
-    if (
-      requestedMaterialId &&
-      materials.some((material) => material.id === requestedMaterialId)
-    ) {
-      if (selectedId !== requestedMaterialId) {
-        setSelectedId(requestedMaterialId)
-      }
-      return
-    }
-
-    if (
-      !selectedId ||
-      !materials.some((material) => material.id === selectedId)
-    ) {
-      setSelectedId(firstMaterial.id)
-    }
-  }, [materials, requestedMaterialId, selectedId])
-
-  const selectedMaterial =
-    materials.find((material) => material.id === selectedId) ?? null
+    return materials[0] ?? null
+  }, [materials, requestedMaterialId])
 
   const filtered = useMemo(() => {
     const term = search.trim().toLocaleLowerCase()
@@ -93,7 +74,6 @@ export function MaterialsPanel({
         specification: values.specification.trim() || undefined,
         unit: values.unit.trim(),
       })
-      setSelectedId(created.id)
       onSelectMaterial(created.id)
       return true
     } catch {
@@ -168,13 +148,10 @@ export function MaterialsPanel({
                 <button
                   key={material.id}
                   type="button"
-                  onClick={() => {
-                    setSelectedId(material.id)
-                    onSelectMaterial(material.id)
-                  }}
+                  onClick={() => onSelectMaterial(material.id)}
                   className={cn(
                     'w-full px-5 py-4 text-left transition',
-                    selectedId === material.id
+                    selectedMaterial?.id === material.id
                       ? 'bg-blue-50'
                       : 'hover:bg-slate-50',
                   )}
