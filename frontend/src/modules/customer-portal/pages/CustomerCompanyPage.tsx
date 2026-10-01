@@ -48,7 +48,7 @@ export function CustomerCompanyPage() {
 
   if (query.isPending) {
     return (
-      <PageContainer className="py-4 lg:py-3">
+      <PageContainer className="py-3 lg:py-2">
         <LoadingState label="Cargando empresa…" />
       </PageContainer>
     )
@@ -56,7 +56,7 @@ export function CustomerCompanyPage() {
 
   if (query.isError) {
     return (
-      <PageContainer className="py-4 lg:py-3">
+      <PageContainer className="py-3 lg:py-2">
         <ErrorState error={query.error} title="No pudimos cargar la empresa" />
       </PageContainer>
     )
@@ -79,7 +79,7 @@ export function CustomerCompanyPage() {
   })
 
   return (
-    <PageContainer className="py-4 lg:py-3">
+    <PageContainer className="py-3 lg:py-2">
       <CustomerCompanyHeader
         name={company.name}
         status={company.status}
@@ -89,14 +89,14 @@ export function CustomerCompanyPage() {
       />
 
       <form
-        className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)] lg:items-start"
+        className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)] lg:items-start"
         onSubmit={(event) => void submit(event)}
       >
         <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-28px_rgba(15,23,42,0.28)]">
-          <div className="flex flex-col gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/65 px-4 py-3.5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex flex-col gap-2.5 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/65 px-4 py-2.5 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                <SidebarNavIcon name="company" className="h-[17px] w-[17px]" />
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                <SidebarNavIcon name="company" className="h-4 w-4" />
               </div>
               <div>
                 <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
@@ -124,7 +124,7 @@ export function CustomerCompanyPage() {
             ) : null}
           </div>
 
-          <div className="p-4 sm:p-5">
+          <div className="p-3.5 sm:p-4">
             <CustomerCompanyFields
               register={register}
               errors={errors}
@@ -132,26 +132,26 @@ export function CustomerCompanyPage() {
             />
 
             {mutations.updateCompany.error ? (
-              <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-[9px] leading-4 text-red-700">
+              <p className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-[9px] leading-4 text-red-700">
                 {getErrorMessage(mutations.updateCompany.error)}
               </p>
             ) : null}
 
             {mutations.updateCompany.isSuccess && !isDirty ? (
-              <p className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/65 px-3 py-2.5 text-[9px] leading-4 text-emerald-700">
+              <p className="mt-3 rounded-xl border border-emerald-100 bg-emerald-50/65 px-3 py-2.5 text-[9px] leading-4 text-emerald-700">
                 Información actualizada correctamente.
               </p>
             ) : null}
 
             {isAdmin ? (
-              <div className="mt-5 flex items-center justify-between gap-4 border-t border-slate-100 pt-4">
+              <div className="mt-3.5 flex items-center justify-between gap-4 border-t border-slate-100 pt-3">
                 <p className="text-[8px] leading-4 text-slate-400">
                   Los cambios afectan la información compartida por toda la empresa.
                 </p>
                 <Button
                   type="submit"
                   size="sm"
-                  className="!h-8 !px-3.5 !text-[9px]"
+                  className="!h-7 !px-3 !text-[8px]"
                   disabled={!isDirty || mutations.updateCompany.isPending}
                 >
                   {mutations.updateCompany.isPending
@@ -163,9 +163,9 @@ export function CustomerCompanyPage() {
           </div>
         </section>
 
-        <aside className="overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-28px_rgba(15,23,42,0.24)]">
+        <aside className="overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-3.5 shadow-[0_12px_35px_-28px_rgba(15,23,42,0.24)]">
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
               <SidebarNavIcon name="members" className="h-[17px] w-[17px]" />
             </div>
             <div className="min-w-0">
@@ -183,7 +183,7 @@ export function CustomerCompanyPage() {
             </div>
           </div>
 
-          <div className="mt-4 rounded-xl border border-slate-200 bg-white/80 px-3 py-3">
+          <div className="mt-3 rounded-xl border border-slate-200 bg-white/80 px-3 py-3">
             <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-slate-400">
               Permisos sobre la empresa
             </p>
@@ -196,14 +196,14 @@ export function CustomerCompanyPage() {
             </p>
           </div>
 
-          <dl className="mt-3 divide-y divide-slate-100 border-y border-slate-100">
-            <div className="flex items-center justify-between gap-4 py-2.5">
+          <dl className="mt-2.5 divide-y divide-slate-100 border-y border-slate-100">
+            <div className="flex items-center justify-between gap-4 py-2">
               <dt className="text-[8px] text-slate-500">Estado</dt>
               <dd className="text-[9px] font-semibold text-emerald-700">
                 {company.status === 'ACTIVE' ? 'Activa' : company.status}
               </dd>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2.5">
+            <div className="flex items-center justify-between gap-4 py-2">
               <dt className="text-[8px] text-slate-500">Empresa desde</dt>
               <dd className="text-right text-[8px] font-medium text-slate-700">
                 {formatCustomerCompanyDate(company.createdAt)}
@@ -211,7 +211,7 @@ export function CustomerCompanyPage() {
             </div>
           </dl>
 
-          <div className="mt-4 border-t border-slate-100 pt-4">
+          <div className="mt-3 border-t border-slate-100 pt-3">
             <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
               Accesos de la empresa
             </p>
@@ -221,7 +221,7 @@ export function CustomerCompanyPage() {
 
             <Link
               to={`/portal/${customer.customerId}/members`}
-              className="mt-3 inline-flex h-7 items-center rounded-lg border border-slate-200 bg-white px-3 text-[8px] font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+              className="mt-2.5 inline-flex h-7 items-center rounded-lg border border-slate-200 bg-white px-2.5 text-[8px] font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
             >
               {isAdmin ? 'Gestionar miembros' : 'Ver miembros'}
             </Link>
