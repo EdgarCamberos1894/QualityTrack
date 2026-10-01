@@ -7,7 +7,6 @@ import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { ApproveQuotationDialog } from '../components/ApproveQuotationDialog'
 import { CustomerQuotationDocument } from '../components/CustomerQuotationDocument'
 import { CustomerQuotationHeader } from '../components/CustomerQuotationHeader'
-import { CustomerQuotationPreview } from '../components/CustomerQuotationPreview'
 import { CustomerQuotationRevisionHistory } from '../components/CustomerQuotationRevisionHistory'
 import { CustomerQuotationSourceCard } from '../components/CustomerQuotationSourceCard'
 import { QuotationFlowSteps } from '../components/QuotationFlowSteps'
@@ -160,11 +159,6 @@ export function CustomerQuotationDetailPage() {
           requestNumber={quotation.requestNumber}
         />
 
-        <CustomerQuotationPreview
-          quotation={quotation}
-          customerName={customer.customerName}
-        />
-
         {customer.role === 'VIEWER' && quotation.customerStatus === 'SENT' ? (
           <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
             Tu rol es de consulta. Un administrador o solicitante de la empresa
@@ -179,7 +173,10 @@ export function CustomerQuotationDetailPage() {
           </p>
         ) : null}
 
-        <CustomerQuotationDocument quotation={quotation} />
+        <CustomerQuotationDocument
+          quotation={quotation}
+          customerName={customer.customerName}
+        />
 
         {revisionsQuery.isPending ? (
           <LoadingState label="Cargando revisiones…" />
