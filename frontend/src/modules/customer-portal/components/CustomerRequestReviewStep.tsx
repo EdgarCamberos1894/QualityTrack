@@ -20,7 +20,7 @@ export function CustomerRequestReviewStep({
 }: CustomerRequestReviewStepProps) {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
-      <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+      <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-base font-semibold text-slate-950">
             Resumen de la solicitud
@@ -34,14 +34,14 @@ export function CustomerRequestReviewStep({
           </button>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-3">
           <p className="text-sm font-semibold text-slate-950">{values.title}</p>
           <p className="mt-1.5 whitespace-pre-wrap text-[10px] leading-5 text-slate-600">
             {values.description}
           </p>
         </div>
 
-        <div className="mt-4 grid gap-2.5 sm:grid-cols-3">
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
           <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3">
             <p className="text-[8px] font-medium text-slate-500">Cantidad</p>
             <p className="mt-1 text-[10px] font-semibold text-slate-950">
@@ -66,7 +66,7 @@ export function CustomerRequestReviewStep({
           </div>
         </div>
 
-        <div className="mt-4 border-t border-slate-200 pt-4">
+        <div className="mt-3 border-t border-slate-200 pt-3">
           <div className="flex items-center justify-between gap-4">
             <h3 className="text-[11px] font-semibold text-slate-950">
               Requisitos técnicos
@@ -80,7 +80,7 @@ export function CustomerRequestReviewStep({
             </button>
           </div>
 
-          <div className="mt-2.5 grid gap-4 sm:grid-cols-2">
+          <div className="mt-2 grid gap-3 sm:grid-cols-2">
             <div>
               <p className="text-[8px] font-medium text-slate-500">
                 Definición
@@ -102,12 +102,12 @@ export function CustomerRequestReviewStep({
           </div>
         </div>
 
-        <div className="mt-4">
+        <div className="mt-3">
           <p className="text-[11px] font-semibold text-slate-950">
             Documentos · {documents.length}
           </p>
 
-          <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
             {documents.length > 0 ? (
               documents.map((document, index) => (
                 <div
@@ -130,20 +130,20 @@ export function CustomerRequestReviewStep({
           </div>
         </div>
 
-        <p className="mt-3 text-[8px] text-slate-400">
+        <p className="mt-2.5 text-[8px] text-slate-400">
           Los archivos se registrarán como versiones iniciales al enviar.
         </p>
 
         {actions}
       </Card>
 
-      <div className="space-y-3">
-        <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)]">
+      <div className="space-y-2.5">
+        <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)]">
           <h2 className="text-sm font-semibold text-slate-950">
             Antes de enviar
           </h2>
 
-          <div className="mt-3 space-y-3">
+          <div className="mt-2.5 space-y-2.5">
             {[
               {
                 title: 'La solicitud quedará registrada',
@@ -175,7 +175,7 @@ export function CustomerRequestReviewStep({
           </div>
         </Card>
 
-        <Card className="border-amber-300 bg-amber-50/70 p-4 shadow-none">
+        <Card className="border-amber-300 bg-amber-50/70 p-3.5 shadow-none">
           <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-amber-700">
             Si necesitas corregir algo
           </p>
