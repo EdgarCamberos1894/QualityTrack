@@ -214,45 +214,47 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
   }
 
   return (
-    <div className="space-y-5">
-      <section className="rounded-xl border border-blue-200 bg-blue-50/60 p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="space-y-2.5">
+      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+        <div className="flex flex-col gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-700">
+            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
               Logística
             </p>
-            <h2 className="mt-1 text-base font-semibold text-slate-950">
+            <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
               Entregas parciales y cierre de la OT
             </h2>
-            <p className="mt-1 max-w-2xl text-[10px] leading-5 text-slate-600">
-              Preparar una entrega reserva cantidad. La OT solo pasa a DELIVERED
-              cuando el acumulado efectivamente recibido cubre planned_quantity.
+            <p className="mt-0.5 max-w-2xl text-[8px] leading-4 text-slate-400">
+              La OT se cierra cuando la cantidad recibida acumulada cubre la cantidad planificada.
             </p>
           </div>
 
           {canCreate ? (
-            <Button onClick={() => setCreateOpen(true)}>
+            <Button
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={() => setCreateOpen(true)}
+            >
               Preparar entrega
             </Button>
           ) : null}
         </div>
 
-        <div className="mt-4 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg bg-white px-3 py-3">
-            <p className="text-[9px] text-slate-500">Disponibles</p>
-            <p className="mt-1 text-sm font-bold text-slate-950">
+        <div className="grid divide-y divide-slate-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+          <div className="px-4 py-3">
+            <p className="text-[7px] text-slate-400">Disponibles</p>
+            <p className="mt-0.5 text-[13px] font-bold text-slate-950">
               {availableQuantity} / {plannedQuantity ?? 0}
             </p>
           </div>
-          <div className="rounded-lg bg-white px-3 py-3">
-            <p className="text-[9px] text-slate-500">Reservadas activas</p>
-            <p className="mt-1 text-sm font-bold text-slate-950">
+          <div className="px-4 py-3">
+            <p className="text-[7px] text-slate-400">Reservadas activas</p>
+            <p className="mt-0.5 text-[13px] font-bold text-slate-950">
               {reservedQuantity}
             </p>
           </div>
-          <div className="rounded-lg bg-white px-3 py-3">
-            <p className="text-[9px] text-slate-500">Recibidas acumuladas</p>
-            <p className="mt-1 text-sm font-bold text-emerald-700">
+          <div className="px-4 py-3">
+            <p className="text-[7px] text-slate-400">Recibidas acumuladas</p>
+            <p className="mt-0.5 text-[13px] font-bold text-emerald-700">
               {deliveredQuantity} / {plannedQuantity ?? 0}
             </p>
           </div>
@@ -260,7 +262,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
       </section>
 
       {!canManage ? (
-        <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[10px] text-slate-600">
+        <p className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-[8px] leading-4 text-slate-500">
           Las entregas son de solo lectura para tu rol. Solo LOGISTICS o ADMIN
           pueden prepararlas, despacharlas, cancelarlas y registrar recepción.
         </p>
@@ -268,13 +270,13 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
 
       {data.workOrder.status !== 'READY_FOR_DELIVERY' &&
       data.workOrder.status !== 'DELIVERED' ? (
-        <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-[10px] leading-5 text-amber-800">
+        <p className="rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2.5 text-[8px] leading-4 text-amber-800">
           La OT debe estar READY_FOR_DELIVERY para gestionar entregas.
         </p>
       ) : null}
 
       {actionError ? (
-        <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
           {getErrorMessage(actionError)}
         </p>
       ) : null}
@@ -301,7 +303,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
       )}
 
       {data.workOrder.status === 'DELIVERED' ? (
-        <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-[10px] font-semibold text-emerald-800">
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 py-2.5 text-[8px] font-semibold text-emerald-800">
           <Badge tone="success">DELIVERED</Badge>
           La cantidad recibida acumulada cubrió la cantidad planificada y la OT
           quedó cerrada.
