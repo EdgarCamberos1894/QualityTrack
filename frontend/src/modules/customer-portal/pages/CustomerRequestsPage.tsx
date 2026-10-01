@@ -96,7 +96,7 @@ export function CustomerRequestsPage() {
       />
 
       <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-30px_rgba(15,23,42,0.38)]">
-        <div className="border-b border-slate-300 bg-gradient-to-r from-[#e7edf5] via-[#e9eff7] to-[#dde8f5] px-4 py-3.5 sm:px-5">
+        <div className="border-b border-slate-300 bg-gradient-to-r from-[#e9eef4] via-[#edf1f6] to-[#e2e9f1] px-4 py-3.5 sm:px-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-blue-600">
@@ -143,7 +143,7 @@ export function CustomerRequestsPage() {
                   onClick={() => setFilter(item.value)}
                   className={
                     active
-                      ? 'inline-flex shrink-0 items-center justify-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[8px] font-semibold text-blue-700 shadow-sm'
+                      ? 'inline-flex shrink-0 items-center justify-center gap-1 rounded-full border border-blue-300 bg-white px-2 py-0.5 text-[8px] font-semibold text-blue-700 shadow-[0_1px_4px_rgba(37,99,235,0.14)] ring-2 ring-blue-100'
                       : 'inline-flex shrink-0 items-center justify-center gap-1 rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[8px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50'
                   }
                 >
@@ -151,7 +151,7 @@ export function CustomerRequestsPage() {
                   <span
                     className={
                       active
-                        ? 'rounded-full bg-blue-100 px-1 py-0.5 text-[8px] text-blue-700'
+                        ? 'rounded-full bg-blue-50 px-1 py-0.5 text-[8px] text-blue-700 ring-1 ring-blue-100'
                         : 'rounded-full bg-slate-100 px-1 py-0.5 text-[8px] text-slate-500'
                     }
                   >
