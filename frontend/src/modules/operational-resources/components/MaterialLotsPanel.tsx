@@ -11,7 +11,6 @@ import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
-import { Card } from '@/shared/components/ui/Card'
 import { cn } from '@/shared/lib/cn'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { formatResourceDate } from '../model/resourcePresenter'
@@ -59,14 +58,12 @@ export function MaterialLotsPanel({
 
   if (!material) {
     return (
-      <Card className="overflow-hidden">
-        <div className="p-5">
-          <EmptyState
-            title="Selecciona un material"
-            description="Aquí verás sus lotes, proveedor, fecha de recepción y cantidad recibida."
-          />
-        </div>
-      </Card>
+      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
+        <EmptyState
+          title="Selecciona un material"
+          description="Aquí verás sus lotes, proveedor, fecha de recepción, cantidad y certificado."
+        />
+      </section>
     )
   }
 
@@ -106,32 +103,24 @@ export function MaterialLotsPanel({
   }
 
   return (
-    <Card className="overflow-hidden">
-      <div className="flex flex-col gap-3 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-amber-700">
-            {material.code}
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
+      <div className="flex flex-col gap-2.5 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+            {material.code} · {material.unit}
           </p>
-          <h2 className="mt-1 text-base font-semibold text-slate-950">
+          <h2 className="mt-0.5 truncate text-[12px] font-semibold text-slate-950">
             {material.name}
           </h2>
-          <p className="mt-1 text-[10px] leading-5 text-slate-500">
-            Unidad: {material.unit}
-            {material.specification
-              ? ' · ' + material.specification
-              : ''}
+          <p className="mt-0.5 line-clamp-2 text-[8px] leading-4 text-slate-400">
+            {material.specification ?? 'Sin especificación adicional'}
           </p>
-          {!lotsQuery.isPending && !lotsQuery.isError ? (
-            <p className="mt-2 text-[9px] font-semibold text-slate-400">
-              {lots.length}{' '}
-              {lots.length === 1 ? 'lote registrado' : 'lotes registrados'}
-            </p>
-          ) : null}
         </div>
 
         {canManage ? (
           <Button
             size="sm"
+            className="!h-7 !px-2.5 !text-[8px]"
             onClick={() => {
               mutations.createLot.reset()
               setCreateOpen(true)
@@ -142,27 +131,35 @@ export function MaterialLotsPanel({
         ) : null}
       </div>
 
+      {!lotsQuery.isPending && !lotsQuery.isError ? (
+        <div className="border-b border-slate-100 bg-slate-50/45 px-4 py-2">
+          <p className="text-[7px] font-medium text-slate-400">
+            {lots.length} {lots.length === 1 ? 'lote registrado' : 'lotes registrados'}
+          </p>
+        </div>
+      ) : null}
+
       {certificateFile.error ? (
-        <div className="px-5 pt-4">
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        <div className="px-4 pt-3">
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
             {getErrorMessage(certificateFile.error)}
           </p>
         </div>
       ) : null}
 
       {lotsQuery.isPending ? (
-        <div className="p-5">
+        <div className="p-4">
           <LoadingState label="Cargando lotes…" />
         </div>
       ) : lotsQuery.isError ? (
-        <div className="p-5">
+        <div className="p-4">
           <ErrorState
             error={lotsQuery.error}
             title="No pudimos cargar los lotes"
           />
         </div>
       ) : lots.length === 0 ? (
-        <div className="p-5">
+        <div className="p-4">
           <EmptyState
             title="Sin lotes registrados"
             description="Registra una recepción para que el material pueda utilizarse con trazabilidad en producción."
@@ -175,46 +172,49 @@ export function MaterialLotsPanel({
               id={`material-lot-${lot.id}`}
               key={lot.id}
               className={cn(
-                'scroll-mt-24 grid gap-4 px-5 py-4 transition md:grid-cols-[minmax(160px,1fr)_minmax(160px,1fr)_150px_minmax(210px,auto)] md:items-center',
+                'scroll-mt-24 grid gap-3 px-4 py-3 transition md:grid-cols-[minmax(150px,1fr)_minmax(130px,0.8fr)_130px_minmax(190px,auto)] md:items-center',
                 highlightedLotId === lot.id &&
-                  'bg-amber-50/70 ring-2 ring-inset ring-amber-200',
+                  'bg-blue-50/60 ring-2 ring-inset ring-blue-100',
               )}
             >
-              <div>
-                <p className="text-xs font-semibold text-slate-950">
+              <div className="min-w-0">
+                <p className="truncate text-[10px] font-semibold text-slate-950">
                   {lot.lotNumber}
                 </p>
-                <p className="mt-1 text-[10px] text-slate-500">
+                <p className="mt-0.5 truncate text-[8px] text-slate-400">
                   {lot.supplier ?? 'Proveedor no especificado'}
                 </p>
               </div>
 
               <div>
-                <p className="text-[9px] uppercase tracking-wide text-slate-400">
+                <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
                   Recepción
                 </p>
-                <p className="mt-1 text-[10px] text-slate-700">
+                <p className="mt-1 text-[9px] text-slate-700">
                   {formatResourceDate(lot.receivedAt)}
                 </p>
               </div>
 
               <div>
-                <p className="text-[9px] uppercase tracking-wide text-slate-400">
-                  Cantidad recibida
+                <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
+                  Cantidad
                 </p>
-                <p className="mt-1 text-xs font-semibold text-slate-950">
+                <p className="mt-1 text-[9px] font-semibold text-slate-900">
                   {lot.quantityReceived} {material.unit}
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2 md:justify-end">
+              <div className="flex flex-wrap items-center gap-1.5 md:justify-end">
                 {lot.certificateDocumentVersionId ? (
                   <>
-                    <Badge tone="success">Certificado</Badge>
+                    <Badge tone="success" className="px-2 py-0.5 text-[7px]">
+                      Certificado
+                    </Badge>
                     {lot.certificateDocumentId ? (
                       <Button
                         size="sm"
                         variant="secondary"
+                        className="!h-7 !px-2 !text-[8px]"
                         disabled={certificateFile.busyLotId === lot.id}
                         onClick={() =>
                           void certificateFile.open(
@@ -231,13 +231,18 @@ export function MaterialLotsPanel({
                     ) : null}
                   </>
                 ) : (
-                  <Badge tone="neutral">Sin certificado</Badge>
+                  <Badge tone="neutral" className="px-2 py-0.5 text-[7px]">
+                    Sin certificado
+                  </Badge>
                 )}
 
                 {canManage ? (
                   <Button
                     size="sm"
-                    variant={lot.certificateDocumentVersionId ? 'ghost' : 'secondary'}
+                    variant={
+                      lot.certificateDocumentVersionId ? 'ghost' : 'secondary'
+                    }
+                    className="!h-7 !px-2 !text-[8px]"
                     onClick={() => {
                       mutations.uploadCertificate.reset()
                       setCertificateLot(lot)
@@ -276,6 +281,6 @@ export function MaterialLotsPanel({
         }}
         onSubmit={uploadCertificate}
       />
-    </Card>
+    </section>
   )
 }
