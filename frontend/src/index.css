@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 @theme {
-  --breakpoint-shell: 90rem;
+  --breakpoint-shell: 76.5rem;
 }
 
 :root {
