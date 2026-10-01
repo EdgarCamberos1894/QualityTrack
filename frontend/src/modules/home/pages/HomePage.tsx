@@ -49,7 +49,7 @@ export function HomePage() {
         />
       </div>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
+      <div className="mt-5 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
         <DashboardAttention items={dashboard.attention} />
         <DashboardRecentActivity activity={dashboard.recentActivity} />
       </div>
