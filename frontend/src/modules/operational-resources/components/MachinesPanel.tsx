@@ -166,7 +166,7 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
               return (
                 <article
                   key={machine.id}
-                  className="grid gap-4 px-5 py-4 lg:grid-cols-[170px_minmax(220px,1fr)_190px_150px_120px] lg:items-center"
+                  className="grid gap-4 px-5 py-4 @5xl/page:grid-cols-[170px_minmax(220px,1fr)_190px_150px_120px] @5xl/page:items-center"
                 >
                   <div>
                     <p className="text-xs font-semibold text-slate-950">
@@ -192,7 +192,7 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
                     Actualizada {formatResourceDate(machine.updatedAt)}
                   </p>
 
-                  <div className="lg:text-right">
+                  <div className="@5xl/page:text-right">
                     {canManage ? (
                       <Button
                         size="sm"
