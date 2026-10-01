@@ -62,7 +62,7 @@ export function CustomerPortalTopbar({
     <header className="sticky top-0 z-30 flex h-[72px] items-center border-b border-slate-200/90 bg-white/95 px-5 shadow-[0_1px_0_rgba(15,23,42,0.02)] backdrop-blur sm:px-7">
       <button
         type="button"
-        className="mr-3 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 lg:hidden"
+        className="mr-3 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 shell:hidden"
         onClick={onOpenMenu}
         aria-label="Abrir navegación"
       >
