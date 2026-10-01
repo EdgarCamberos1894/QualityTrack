@@ -1,34 +1,22 @@
-import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/Button'
-import { cn } from '@/shared/lib/cn'
 
 interface CustomerRequestStepActionsProps {
   step: number
-  customerId: number
   pending: boolean
   onBack: () => void
   onContinue: () => void
   onReview: () => void
-  embedded?: boolean
 }
 
 export function CustomerRequestStepActions({
   step,
-  customerId,
   pending,
   onBack,
   onContinue,
   onReview,
-  embedded = false,
 }: CustomerRequestStepActionsProps) {
   return (
-    <div
-      className={cn(
-        embedded
-          ? 'border-t border-slate-200 bg-slate-50/55 px-3.5 py-2.5'
-          : 'rounded-xl border border-slate-200 bg-gradient-to-r from-white via-white to-slate-50/80 p-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.28)]',
-      )}
-    >
+    <div className="rounded-xl border border-slate-200 bg-gradient-to-r from-white via-white to-slate-50/80 p-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.28)]">
       <div className="mb-2">
         <p className="text-[8px] font-semibold uppercase tracking-[0.08em] text-slate-400">
           Paso {step + 1} de 3
@@ -42,15 +30,8 @@ export function CustomerRequestStepActions({
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        {step === 0 ? (
-          <Link
-            to={`/portal/${customerId}/requests`}
-            className="inline-flex h-8 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-[10px] font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-          >
-            Cancelar
-          </Link>
-        ) : (
+      <div className={step === 0 ? 'grid grid-cols-1' : 'grid grid-cols-2 gap-2'}>
+        {step > 0 ? (
           <Button
             size="sm"
             variant="secondary"
@@ -60,7 +41,7 @@ export function CustomerRequestStepActions({
           >
             Atrás
           </Button>
-        )}
+        ) : null}
 
         {step === 0 ? (
           <Button
