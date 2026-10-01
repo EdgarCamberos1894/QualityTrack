@@ -165,7 +165,6 @@ export function CustomerRequestCreatePage() {
                     step={step}
                     customerId={customer.customerId}
                     pending={mutation.isPending}
-                    embedded
                     onBack={() => setStep((current) => current - 1)}
                     onContinue={() => void goToRequirements()}
                     onReview={() => void goToReview()}
