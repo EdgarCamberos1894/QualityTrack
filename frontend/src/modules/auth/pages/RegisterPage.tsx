@@ -56,11 +56,15 @@ export function RegisterPage() {
         footer={
           <>
             ¿Ya verificaste tu correo?{' '}
-            <Link className="font-semibold text-blue-600" to="/login">
+            <Link
+              className="font-semibold text-blue-600 transition hover:text-blue-700"
+              to="/login"
+            >
               Inicia sesión
             </Link>
           </>
         }
+        immersive
       >
         <AuthResultPanel
           tone="success"
@@ -69,7 +73,7 @@ export function RegisterPage() {
         >
           <Button
             variant="secondary"
-            className="w-full"
+            className="!h-10 w-full !rounded-lg !text-[10px]"
             disabled={resendMutation.isPending || resendMutation.isSuccess}
             onClick={() => resendMutation.mutate(registeredEmail)}
           >
@@ -103,26 +107,27 @@ export function RegisterPage() {
         </>
       }
       wide
+      immersive
     >
       <form
-        className="space-y-4"
+        className="space-y-5"
         onSubmit={(event) => void submit(event)}
         noValidate
       >
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <TextField
             label="Nombre"
             autoComplete="given-name"
-            labelClassName="!mb-1.5 !text-[10px]"
-            className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
+            labelClassName="!text-[12px] !font-semibold"
+            className="!h-11 !rounded-lg !px-3.5 !text-[12px] !shadow-sm placeholder:!text-[11px]"
             error={errors.firstName?.message}
             {...register('firstName')}
           />
           <TextField
             label="Apellido"
             autoComplete="family-name"
-            labelClassName="!mb-1.5 !text-[10px]"
-            className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
+            labelClassName="!text-[12px] !font-semibold"
+            className="!h-11 !rounded-lg !px-3.5 !text-[12px] !shadow-sm placeholder:!text-[11px]"
             error={errors.lastName?.message}
             {...register('lastName')}
           />
@@ -132,8 +137,8 @@ export function RegisterPage() {
           label="Correo electrónico"
           type="email"
           autoComplete="email"
-          labelClassName="!mb-1.5 !text-[10px]"
-          className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
+          labelClassName="!text-[12px] !font-semibold"
+          className="!h-11 !rounded-lg !px-3.5 !text-[12px] !shadow-sm placeholder:!text-[11px]"
           error={errors.email?.message}
           {...register('email')}
         />
@@ -143,17 +148,18 @@ export function RegisterPage() {
           confirmRegistration={register('confirmPassword')}
           passwordError={errors.password?.message}
           confirmError={errors.confirmPassword?.message}
+          immersive
         />
 
         {registerMutation.error ? (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700">
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-[10px] leading-4 text-red-700">
             {getErrorMessage(registerMutation.error)}
           </p>
         ) : null}
 
         <Button
           type="submit"
-          className="!h-9 w-full !text-[10px]"
+          className="!h-11 w-full !rounded-lg !text-[12px] !font-semibold"
           disabled={registerMutation.isPending}
         >
           {registerMutation.isPending ? 'Creando cuenta…' : 'Crear cuenta'}
