@@ -181,16 +181,19 @@ export function CustomerRequestRequirementsStep({
           ))}
         </div>
 
-        <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3.5 py-3">
-          <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-emerald-700">
-            Trazabilidad de documentos
-          </p>
-          <p className="mt-1.5 text-[9px] leading-4 text-emerald-800/80">
-            Los archivos enviados quedan vinculados a la solicitud y sus
-            versiones posteriores mantienen el historial.
-          </p>
-        </div>
-      </Card>
+          <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50/70 px-3.5 py-3">
+            <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-emerald-700">
+              Trazabilidad de documentos
+            </p>
+            <p className="mt-1.5 text-[9px] leading-4 text-emerald-800/80">
+              Los archivos enviados quedan vinculados a la solicitud y sus
+              versiones posteriores mantienen el historial.
+            </p>
+          </div>
+        </Card>
+
+        {actions}
+      </div>
     </div>
   )
 }
