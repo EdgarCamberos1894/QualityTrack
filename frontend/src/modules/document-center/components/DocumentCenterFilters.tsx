@@ -55,7 +55,7 @@ export function DocumentCenterFilters({
 
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-4">
-      <div className="grid gap-3 xl:grid-cols-[minmax(280px,1fr)_190px_190px_220px]">
+      <div className="grid gap-3 @5xl/page:grid-cols-[minmax(280px,1fr)_190px_190px_220px]">
         <label>
           <span className="sr-only">Buscar documentos</span>
           <input
