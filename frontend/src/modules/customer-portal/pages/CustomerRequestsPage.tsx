@@ -94,27 +94,24 @@ export function CustomerRequestsPage() {
         canCreate={canCreate}
       />
 
-      <section className="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_16px_45px_-30px_rgba(15,23,42,0.4)]">
-        <div className="border-b border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/40 px-5 py-4">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-30px_rgba(15,23,42,0.38)]">
+        <div className="border-b border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/35 px-4 py-3.5 sm:px-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-blue-600">
                 Solicitudes registradas
               </p>
-              <h2 className="mt-1 text-sm font-semibold text-slate-950">
+              <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
                 Seguimiento de trabajos
               </h2>
-              <p className="mt-1 text-[10px] text-slate-500">
-                Busca, filtra y abre cualquier solicitud desde un mismo lugar.
-              </p>
             </div>
 
-            <label className="relative block lg:w-[420px]">
+            <label className="relative block lg:w-[390px]">
               <span className="sr-only">Buscar solicitudes</span>
               <svg
                 viewBox="0 0 24 24"
                 aria-hidden="true"
-                className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.8"
@@ -128,12 +125,12 @@ export function CustomerRequestsPage() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Buscar por folio, referencia o proyecto…"
-                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50/80 pl-10 pr-3 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                className="h-9 w-full rounded-xl border border-slate-200 bg-slate-50/80 pl-9 pr-3 text-[11px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
               />
             </label>
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-1.5">
             {filters.map((item) => {
               const active = filter === item.value
               const count = filterCount(item.value)
@@ -145,16 +142,16 @@ export function CustomerRequestsPage() {
                   onClick={() => setFilter(item.value)}
                   className={
                     active
-                      ? 'inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-[10px] font-semibold text-blue-700 shadow-sm'
-                      : 'inline-flex items-center gap-2 rounded-full border border-slate-200/70 bg-white px-3 py-1.5 text-[10px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50'
+                      ? 'inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[9px] font-semibold text-blue-700 shadow-sm'
+                      : 'inline-flex items-center gap-1.5 rounded-full border border-slate-200/70 bg-white px-2.5 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50'
                   }
                 >
                   {item.label}
                   <span
                     className={
                       active
-                        ? 'rounded-full bg-blue-100 px-1.5 py-0.5 text-[9px] text-blue-700'
-                        : 'rounded-full bg-slate-100 px-1.5 py-0.5 text-[9px] text-slate-500'
+                        ? 'rounded-full bg-blue-100 px-1.5 py-0.5 text-[8px] text-blue-700'
+                        : 'rounded-full bg-slate-100 px-1.5 py-0.5 text-[8px] text-slate-500'
                     }
                   >
                     {count}
@@ -165,10 +162,10 @@ export function CustomerRequestsPage() {
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/70 px-5 py-3">
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/65 px-4 py-2.5 sm:px-5">
           <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-blue-500" />
-            <p className="text-[10px] font-semibold text-slate-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+            <p className="text-[9px] font-semibold text-slate-700">
               {visibleRequests.length}{' '}
               {visibleRequests.length === 1
                 ? 'solicitud visible'
@@ -183,16 +180,16 @@ export function CustomerRequestsPage() {
                 setFilter('ALL')
                 setSearch('')
               }}
-              className="text-[10px] font-semibold text-blue-600 transition hover:text-blue-700"
+              className="text-[9px] font-semibold text-blue-600 transition hover:text-blue-700"
             >
               Limpiar filtros
             </button>
           ) : null}
         </div>
 
-        <div className="bg-slate-50/45 p-4 sm:p-5">
+        <div className="bg-slate-50/40 p-3.5 sm:p-4">
           {visibleRequests.length > 0 ? (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {visibleRequests.map((request) => (
                 <CustomerRequestCard
                   key={request.id}
@@ -202,7 +199,7 @@ export function CustomerRequestsPage() {
               ))}
             </div>
           ) : (
-            <Card className="overflow-hidden p-5 shadow-none">
+            <Card className="overflow-hidden p-4 shadow-none">
               <EmptyState
                 title={
                   query.data.length === 0
