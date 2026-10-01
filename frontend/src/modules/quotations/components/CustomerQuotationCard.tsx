@@ -85,10 +85,13 @@ export function CustomerQuotationCard({
                 ) : null}
               </div>
 
-              <h2 className="mt-1.5 text-sm font-semibold text-slate-950">
-                {quotation.requestNumber}
+              <p className="mt-1.5 text-[8px] font-bold uppercase tracking-[0.08em] text-blue-600">
+                Solicitud de origen · {quotation.requestNumber}
+              </p>
+              <h2 className="mt-1 line-clamp-2 text-sm font-semibold leading-5 text-slate-950">
+                {quotation.requestTitle}
               </h2>
-              <p className="mt-1 text-[10px] text-slate-500">
+              <p className="mt-1 text-[9px] text-slate-500">
                 Expediente {quotation.caseNumber}
               </p>
 
@@ -147,8 +150,8 @@ export function CustomerQuotationCard({
         </div>
 
         <div className="mt-3 flex items-center justify-between gap-4 border-t border-slate-100 pt-3">
-          <p className="text-[8px] font-medium text-slate-400">
-            Solicitud {quotation.requestNumber}
+          <p className="truncate text-[8px] font-medium text-slate-400">
+            {quotation.requestTitle}
           </p>
           <p className="text-[8px] font-medium text-slate-400">
             {quotation.currency}
