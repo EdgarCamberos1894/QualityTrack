@@ -14,8 +14,8 @@ export function CustomerRequestDetailsStep({
   errors,
 }: CustomerRequestDetailsStepProps) {
   return (
-    <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
-      <Card className="p-5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
+      <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
         <div>
           <h2 className="text-base font-semibold text-slate-950">
             Detalles del trabajo
@@ -26,7 +26,7 @@ export function CustomerRequestDetailsStep({
           </p>
         </div>
 
-        <div className="mt-5 space-y-4">
+        <div className="mt-4 space-y-3.5">
           <TextField
             label="Nombre del trabajo"
             maxLength={200}
