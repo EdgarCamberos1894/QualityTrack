@@ -18,6 +18,7 @@ import { CustomerRequestsBackButton } from './CustomerRequestsBackButton'
 interface CustomerRequestOverviewProps {
   customerId: number
   request: CustomerRequestDetailDto
+  quotationId?: number
   deliveryProgress?: 'IN_TRANSIT' | 'PARTIAL' | 'DELIVERED'
   canWrite: boolean
   canCancel: boolean
@@ -37,7 +38,7 @@ interface NextStepPresentation {
   title: string
   description: string
   tone: 'neutral' | 'info' | 'warning' | 'success' | 'danger'
-  action?: 'respond' | 'quotations'
+  action?: 'respond' | 'quotation'
 }
 
 const nextStepToneClasses: Record<NextStepPresentation['tone'], string> = {
@@ -79,6 +80,7 @@ function getNextStep(
   request: CustomerRequestDetailDto,
   deliveryProgress: 'IN_TRANSIT' | 'PARTIAL' | 'DELIVERED' | undefined,
   openInformationRequest: CustomerInformationRequestDto | null,
+  quotationId?: number,
 ): NextStepPresentation {
   if (request.jobCase.status === 'CANCELLED') {
     return {
@@ -146,14 +148,22 @@ function getNextStep(
         tone: 'warning',
       }
     case 'READY_FOR_QUOTATION':
-      return {
-        eyebrow: 'Siguiente etapa',
-        title: 'La revisión técnica terminó',
-        description:
-          'El equipo está preparando la propuesta comercial. Cuando se envíe, aparecerá en Cotizaciones.',
-        tone: 'info',
-        action: 'quotations',
-      }
+      return quotationId
+        ? {
+            eyebrow: 'Propuesta disponible',
+            title: 'Tu cotización ya está lista',
+            description:
+              'Comercial ya envió una propuesta para esta solicitud. Puedes revisarla directamente desde aquí.',
+            tone: 'info',
+            action: 'quotation',
+          }
+        : {
+            eyebrow: 'Siguiente etapa',
+            title: 'La revisión técnica terminó',
+            description:
+              'El equipo está preparando la propuesta comercial. Te avisaremos cuando esté disponible.',
+            tone: 'info',
+          }
     case 'IN_PRODUCTION':
       return {
         eyebrow: 'Producción activa',
@@ -168,6 +178,7 @@ function getNextStep(
 export function CustomerRequestOverview({
   customerId,
   request,
+  quotationId,
   deliveryProgress,
   canWrite,
   canCancel,
@@ -182,6 +193,7 @@ export function CustomerRequestOverview({
     request,
     deliveryProgress,
     openInformationRequest,
+    quotationId,
   )
 
   return (
@@ -348,12 +360,12 @@ export function CustomerRequestOverview({
               )
             ) : null}
 
-            {nextStep.action === 'quotations' ? (
+            {nextStep.action === 'quotation' && quotationId ? (
               <Link
-                to={`/portal/${customerId}/quotations`}
+                to={`/portal/${customerId}/quotations/${quotationId}`}
                 className="mt-3 inline-flex h-7 items-center rounded-lg border border-blue-200 bg-white px-3 text-[8px] font-semibold text-blue-700 transition hover:bg-blue-50"
               >
-                Ver cotizaciones
+                Ver cotización
               </Link>
             ) : null}
           </div>
