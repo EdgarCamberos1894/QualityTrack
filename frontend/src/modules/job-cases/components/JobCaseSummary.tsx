@@ -19,7 +19,7 @@ function DataItem({ label, value }: { label: string; value: string | number }) {
 
 export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
   return (
-    <div className="grid gap-4 xl:grid-cols-2">
+    <div className="grid gap-4 @4xl/page:grid-cols-2">
       <Card className="p-5">
         <h2 className="text-sm font-semibold text-slate-950">
           Solicitud de origen
