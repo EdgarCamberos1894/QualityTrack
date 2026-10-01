@@ -110,7 +110,7 @@ export function WorkOrderDetailPage() {
 
   if (validId === null) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <ErrorState
           error={new Error('El identificador de la orden no es válido.')}
           title="No pudimos abrir la orden de trabajo"
@@ -121,7 +121,7 @@ export function WorkOrderDetailPage() {
 
   if (query.isPending) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <LoadingState label="Cargando expediente 360…" />
       </PageContainer>
     )
@@ -129,7 +129,7 @@ export function WorkOrderDetailPage() {
 
   if (query.isError) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <ErrorState
           error={query.error}
           title="No pudimos cargar el expediente 360"
@@ -144,35 +144,41 @@ export function WorkOrderDetailPage() {
     (roles.includes('ADMIN') || roles.includes('PRODUCTION'))
 
   return (
-    <PageContainer>
+    <PageContainer className="py-4 lg:py-3">
       <WorkOrderDetailHeader workOrder={query.data.workOrder} />
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {query.data.workOrder.status === 'CANCELLED' ? (
-          <section className="rounded-xl border border-red-200 bg-red-50 px-4 py-4">
-            <p className="text-xs font-semibold text-red-900">
-              Orden de trabajo cancelada
-            </p>
-            <p className="mt-1 text-[10px] leading-5 text-red-800">
-              {query.data.workOrder.cancellationReason?.trim()
-                ? query.data.workOrder.cancellationReason
-                : 'No se registró un motivo de cancelación.'}
-            </p>
+          <section className="flex items-start gap-2 rounded-xl border border-red-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_-26px_rgba(185,28,28,0.2)]">
+            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+            <div>
+              <p className="text-[9px] font-semibold text-red-900">
+                Orden de trabajo cancelada
+              </p>
+              <p className="mt-0.5 text-[8px] leading-4 text-slate-600">
+                {query.data.workOrder.cancellationReason?.trim()
+                  ? query.data.workOrder.cancellationReason
+                  : 'No se registró un motivo de cancelación.'}
+              </p>
+            </div>
           </section>
         ) : canCancel ? (
-          <section className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+          <section className="flex flex-col gap-2.5 rounded-xl border border-slate-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_-26px_rgba(15,23,42,0.2)] sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-xs font-semibold text-slate-900">
-                Cancelar orden en preparación
+              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                Control de orden
               </p>
-              <p className="mt-1 text-[10px] leading-5 text-slate-500">
-                También se cancelará el expediente asociado. La acción deja de
-                estar disponible cuando la orden es liberada a producción.
+              <p className="mt-0.5 text-[10px] font-semibold text-slate-900">
+                Orden todavía en preparación
+              </p>
+              <p className="mt-1 text-[8px] leading-4 text-slate-500">
+                Puedes cancelarla antes de liberar la hoja de ruta a producción.
               </p>
             </div>
             <Button
               size="sm"
               variant="danger"
+              className="!h-7 !px-2.5 !text-[8px]"
               onClick={() => {
                 cancelMutation.reset()
                 setCancelOpen(true)
