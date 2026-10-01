@@ -184,65 +184,61 @@ export function CustomerRequestOverview({
 
   return (
     <>
-      <section className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-white shadow-[0_22px_60px_-34px_rgba(15,23,42,0.72)]">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blue-500/18 blur-3xl" />
-          <div className="absolute bottom-[-110px] left-[30%] h-56 w-56 rounded-full bg-cyan-400/8 blur-3xl" />
-          <div className="absolute inset-y-0 right-0 w-[38%] bg-[radial-gradient(circle_at_30%_20%,rgba(59,130,246,0.16),transparent_38%)]" />
-        </div>
-
-        <div className="relative px-5 py-5 lg:px-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0">
-              <Link
-                to={`/portal/${customerId}/requests`}
-                className="inline-flex items-center gap-1.5 text-[8px] font-medium text-slate-400 transition hover:text-white"
-              >
-                <span aria-hidden="true">←</span>
-                Volver a solicitudes
-              </Link>
-
-              <div className="mt-3 flex flex-wrap items-center gap-2">
-                <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-blue-300">
-                  {request.requestNumber}
-                </p>
-                <Badge
-                  tone={status.tone}
-                  className="px-2 py-0.5 text-[8px] ring-1 ring-white/10"
-                >
-                  {status.label}
-                </Badge>
-              </div>
-
-              <h1 className="mt-1.5 max-w-3xl text-xl font-bold tracking-tight text-white lg:text-[24px]">
-                {request.title}
-              </h1>
-              <p className="mt-2 max-w-3xl text-[10px] leading-5 text-slate-400">
-                Seguimiento completo del trabajo desde la solicitud hasta la
-                entrega.
-              </p>
-            </div>
-
-            {canCancel ? (
-              <button
-                type="button"
-                onClick={onCancel}
-                className="inline-flex h-7 shrink-0 items-center self-start rounded-lg border border-white/10 bg-white/[0.045] px-2.5 text-[8px] font-medium text-slate-300 transition hover:border-red-400/30 hover:bg-red-400/10 hover:text-red-200"
-              >
-                Cancelar solicitud
-              </button>
-            ) : null}
+      <div className="mb-3 flex items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200/70">
+            <SidebarNavIcon name="requests" className="h-4 w-4" />
           </div>
 
-          <CustomerRequestFlowSteps
-            status={request.jobCase.status}
-            deliveryProgress={deliveryProgress}
-            variant="dark"
-          />
-        </div>
-      </section>
+          <div className="min-w-0">
+            <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-600">
+              Gestión de trabajos
+            </p>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
+            <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
+              <h1 className="max-w-3xl truncate text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
+                {request.title}
+              </h1>
+              <Badge tone={status.tone} className="px-2 py-0.5 text-[8px]">
+                {status.label}
+              </Badge>
+              <span className="text-[8px] font-semibold text-slate-400">
+                {request.requestNumber}
+              </span>
+            </div>
+
+            <p className="mt-0.5 truncate text-[10px] text-slate-500">
+              Seguimiento del trabajo desde la solicitud hasta la entrega.
+            </p>
+          </div>
+        </div>
+
+        <Link
+          to={`/portal/${customerId}/requests`}
+          className="inline-flex h-6 shrink-0 items-center gap-1 rounded-md border border-slate-300 bg-white/85 px-2 text-[7px] font-medium text-slate-500 transition hover:border-slate-400 hover:bg-white hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className="h-3 w-3"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          Volver a solicitudes
+        </Link>
+      </div>
+
+      <CustomerRequestFlowSteps
+        status={request.jobCase.status}
+        deliveryProgress={deliveryProgress}
+      />
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
         <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.3)]">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -250,10 +246,10 @@ export function CustomerRequestOverview({
             </div>
             <div>
               <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-                Información del trabajo
+                Información base
               </p>
               <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
-                Lo que solicitaste
+                Detalles del trabajo
               </h2>
             </div>
           </div>
@@ -322,7 +318,7 @@ export function CustomerRequestOverview({
             </div>
             <div>
               <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-slate-400">
-                Estado del trabajo
+                Seguimiento
               </p>
               <div className="mt-0.5 flex flex-wrap items-center gap-2">
                 <h2 className="text-sm font-semibold text-slate-950">
@@ -415,6 +411,16 @@ export function CustomerRequestOverview({
               </dd>
             </div>
           </dl>
+
+          {canCancel ? (
+            <button
+              type="button"
+              onClick={onCancel}
+              className="mt-3 inline-flex h-7 items-center rounded-lg border border-red-200 bg-white px-3 text-[8px] font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50"
+            >
+              Cancelar solicitud
+            </button>
+          ) : null}
         </Card>
       </div>
     </>
