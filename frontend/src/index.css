@@ -89,9 +89,13 @@ button:disabled {
   body.printing-customer-quotation .customer-quotation-print-area {
     position: absolute !important;
     inset: 0 auto auto 0 !important;
+    display: flex !important;
+    min-height: 273mm !important;
     width: 100% !important;
     max-width: none !important;
+    flex-direction: column !important;
     margin: 0 !important;
+    padding: 10mm 11mm 8mm !important;
     border: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
@@ -99,6 +103,34 @@ button:disabled {
     overflow: visible !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  body.printing-customer-quotation .quotation-sheet-header {
+    padding-bottom: 6mm !important;
+  }
+
+  body.printing-customer-quotation .quotation-sheet-meta {
+    margin-top: 9mm !important;
+    padding: 5mm !important;
+  }
+
+  body.printing-customer-quotation .quotation-sheet-scope {
+    margin-top: 11mm !important;
+  }
+
+  body.printing-customer-quotation .quotation-sheet-scope > div:last-child {
+    break-inside: avoid;
+  }
+
+  body.printing-customer-quotation .quotation-sheet-bottom {
+    margin-top: auto !important;
+    padding-top: 14mm !important;
+    break-inside: avoid;
+  }
+
+  body.printing-customer-quotation .quotation-sheet-note {
+    margin-top: 10mm !important;
+    padding-top: 4mm !important;
   }
 
   body.printing-customer-quotation .customer-quotation-print-hidden {
