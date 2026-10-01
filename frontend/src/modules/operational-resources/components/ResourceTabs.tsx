@@ -22,7 +22,7 @@ const tabs: Array<{ value: ResourceTab; label: string; description: string }> = 
 
 export function ResourceTabs({ value, onChange }: ResourceTabsProps) {
   return (
-    <div className="mb-5 grid gap-3 sm:grid-cols-2">
+    <div className="flex overflow-x-auto rounded-xl border border-slate-200 bg-white p-1 shadow-[0_8px_24px_-24px_rgba(15,23,42,0.28)]">
       {tabs.map((tab) => {
         const active = tab.value === value
 
@@ -32,23 +32,18 @@ export function ResourceTabs({ value, onChange }: ResourceTabsProps) {
             type="button"
             onClick={() => onChange(tab.value)}
             className={cn(
-              'rounded-xl border p-4 text-left transition',
+              'min-w-[180px] rounded-lg px-3 py-2 text-left transition',
               active
-                ? 'border-blue-300 bg-blue-50 shadow-sm'
-                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50',
+                ? 'bg-blue-50 text-blue-700 ring-1 ring-blue-100'
+                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700',
             )}
           >
-            <p
-              className={cn(
-                'text-sm font-semibold',
-                active ? 'text-blue-800' : 'text-slate-950',
-              )}
-            >
+            <span className="block text-[9px] font-semibold">
               {tab.label}
-            </p>
-            <p className="mt-1 text-[10px] leading-5 text-slate-500">
+            </span>
+            <span className="mt-0.5 block text-[7px] leading-3 opacity-75">
               {tab.description}
-            </p>
+            </span>
           </button>
         )
       })}
