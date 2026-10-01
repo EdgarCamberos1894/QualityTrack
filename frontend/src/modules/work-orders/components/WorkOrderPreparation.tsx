@@ -164,23 +164,22 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
   const routingReady = productionRouting?.status === 'RELEASED'
 
   return (
-    <div className="space-y-4">
-      <section className="rounded-xl border border-violet-200 bg-violet-50/60 p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="space-y-3">
+      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+        <div className="flex flex-col gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/55 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-violet-700">
+            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
               Preparación operativa
             </p>
-            <h2 className="mt-1 text-base font-semibold text-slate-950">
+            <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
               De compromiso aprobado a paquete ejecutable
             </h2>
-            <p className="mt-1 max-w-2xl text-[10px] leading-5 text-slate-600">
-              Completa planificación, fija las versiones documentales y libera
-              la hoja de ruta. Cada transición queda registrada por separado.
+            <p className="mt-1 max-w-2xl text-[8px] leading-4 text-slate-500">
+              Completa planificación, fija las versiones documentales y libera la hoja de ruta.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="grid grid-cols-3 gap-1.5 text-center">
             <PreparationStep label="Plan" complete={planningReady} />
             <PreparationStep label="Docs" complete={documentsReady} />
             <PreparationStep label="Ruta" complete={routingReady} />
@@ -189,7 +188,7 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
       </section>
 
       {!session ? (
-        <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+        <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700">
           {getErrorMessage(new Error('No hay una sesión interna disponible.'))}
         </p>
       ) : null}
@@ -252,15 +251,15 @@ function PreparationStep({
     <div
       className={
         complete
-          ? 'rounded-lg border border-emerald-200 bg-white px-3 py-2'
-          : 'rounded-lg border border-violet-200 bg-white/70 px-3 py-2'
+          ? 'rounded-lg border border-emerald-200 bg-emerald-50/70 px-2.5 py-1.5'
+          : 'rounded-lg border border-slate-200 bg-white px-2.5 py-1.5'
       }
     >
       <p
         className={
           complete
-            ? 'text-[9px] font-semibold text-emerald-700'
-            : 'text-[9px] font-semibold text-slate-500'
+            ? 'text-[8px] font-semibold text-emerald-700'
+            : 'text-[8px] font-semibold text-slate-400'
         }
       >
         {complete ? '✓ ' : ''}
