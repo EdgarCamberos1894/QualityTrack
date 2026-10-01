@@ -144,8 +144,7 @@ export function CustomerRequestReviewStep({
 
   return (
     <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
-      <Card className="relative overflow-hidden p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
-        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-blue-500 to-indigo-400" />
+      <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -297,8 +296,7 @@ export function CustomerRequestReviewStep({
 
       <div className="flex min-h-0 flex-col gap-2.5 lg:h-full">
         <div className="min-h-0 flex-1 space-y-2.5 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
-          <Card className="relative overflow-hidden p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
-            <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-emerald-500 to-teal-400" />
+          <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
           <div className="flex items-center gap-2.5">
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
               <SidebarNavIcon name="quality" className="h-4 w-4" />
