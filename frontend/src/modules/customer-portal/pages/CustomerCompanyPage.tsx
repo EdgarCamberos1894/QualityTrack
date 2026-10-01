@@ -1,15 +1,22 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
+import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
-import { Card } from '@/shared/components/ui/Card'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { CustomerCompanyFields } from '../components/CustomerCompanyFields'
+import { CustomerCompanyHeader } from '../components/CustomerCompanyHeader'
 import { useCustomerCompany } from '../hooks/useCustomerCompany'
 import { useCustomerCompanyMutations } from '../hooks/useCustomerCompanyMutations'
 import { useCustomerPortalContext } from '../hooks/useCustomerPortalContext'
+import {
+  formatCustomerCompanyDate,
+  getCustomerRoleLabel,
+} from '../model/customerCompanyPresenter'
 import {
   customerCompanySchema,
   type CustomerCompanyFormValues,
@@ -41,7 +48,7 @@ export function CustomerCompanyPage() {
 
   if (query.isPending) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <LoadingState label="Cargando empresa…" />
       </PageContainer>
     )
@@ -49,7 +56,7 @@ export function CustomerCompanyPage() {
 
   if (query.isError) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <ErrorState error={query.error} title="No pudimos cargar la empresa" />
       </PageContainer>
     )
@@ -72,75 +79,154 @@ export function CustomerCompanyPage() {
   })
 
   return (
-    <PageContainer>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-950">Empresa</h1>
-        <p className="mt-2 text-sm text-slate-600">
-          Información administrativa visible dentro de QualityTrack.
-        </p>
-      </div>
+    <PageContainer className="py-4 lg:py-3">
+      <CustomerCompanyHeader
+        name={company.name}
+        status={company.status}
+        city={company.city}
+        state={company.state}
+        administrativeEmail={company.administrativeEmail}
+      />
 
       <form
-        className="grid gap-5 xl:grid-cols-[minmax(0,720px)_360px]"
+        className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)] lg:items-start"
         onSubmit={(event) => void submit(event)}
       >
-        <Card className="space-y-5 p-5">
-          <div>
-            <h2 className="text-base font-semibold text-slate-950">
-              Información general
-            </h2>
-            <p className="mt-1 text-[10px] text-slate-500">
-              Solo un administrador puede modificar estos datos.
+        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-28px_rgba(15,23,42,0.28)]">
+          <div className="flex flex-col gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/65 px-4 py-3.5 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                <SidebarNavIcon name="company" className="h-[17px] w-[17px]" />
+              </div>
+              <div>
+                <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                  Información administrativa
+                </p>
+                <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
+                  Datos de la empresa
+                </h2>
+                <p className="mt-0.5 text-[9px] leading-4 text-slate-500">
+                  {isAdmin
+                    ? 'Mantén actualizados los datos generales de la empresa.'
+                    : 'Puedes consultar estos datos, pero solo un administrador puede modificarlos.'}
+                </p>
+              </div>
+            </div>
+
+            {!isAdmin ? (
+              <Badge tone="neutral" className="self-start px-2 py-0.5 text-[8px]">
+                Solo consulta
+              </Badge>
+            ) : isDirty ? (
+              <span className="self-start rounded-full bg-amber-50 px-2 py-1 text-[8px] font-semibold text-amber-700 ring-1 ring-amber-100">
+                Cambios sin guardar
+              </span>
+            ) : null}
+          </div>
+
+          <div className="p-4 sm:p-5">
+            <CustomerCompanyFields
+              register={register}
+              errors={errors}
+              disabled={!isAdmin}
+            />
+
+            {mutations.updateCompany.error ? (
+              <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-[9px] leading-4 text-red-700">
+                {getErrorMessage(mutations.updateCompany.error)}
+              </p>
+            ) : null}
+
+            {mutations.updateCompany.isSuccess && !isDirty ? (
+              <p className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/65 px-3 py-2.5 text-[9px] leading-4 text-emerald-700">
+                Información actualizada correctamente.
+              </p>
+            ) : null}
+
+            {isAdmin ? (
+              <div className="mt-5 flex items-center justify-between gap-4 border-t border-slate-100 pt-4">
+                <p className="text-[8px] leading-4 text-slate-400">
+                  Los cambios afectan la información compartida por toda la empresa.
+                </p>
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="!h-8 !px-3.5 !text-[9px]"
+                  disabled={!isDirty || mutations.updateCompany.isPending}
+                >
+                  {mutations.updateCompany.isPending
+                    ? 'Guardando…'
+                    : 'Guardar cambios'}
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </section>
+
+        <aside className="overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-28px_rgba(15,23,42,0.24)]">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+              <SidebarNavIcon name="members" className="h-[17px] w-[17px]" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-slate-400">
+                Tu acceso
+              </p>
+              <h2 className="mt-0.5 truncate text-sm font-semibold text-slate-950">
+                {customer.customerName}
+              </h2>
+              <div className="mt-1.5">
+                <Badge tone={isAdmin ? 'info' : 'neutral'} className="text-[8px]">
+                  {getCustomerRoleLabel(customer.role)}
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-xl border border-slate-200 bg-white/80 px-3 py-3">
+            <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-slate-400">
+              Permisos sobre la empresa
+            </p>
+            <p className="mt-1.5 text-[9px] leading-4 text-slate-600">
+              {isAdmin
+                ? 'Puedes modificar la información administrativa y gestionar el acceso de otros miembros.'
+                : customer.role === 'REQUESTER'
+                  ? 'Puedes crear y dar seguimiento a solicitudes, pero no modificar la información administrativa.'
+                  : 'Tu acceso es de consulta. Puedes revisar la información y el avance de los trabajos.'}
             </p>
           </div>
 
-          <CustomerCompanyFields
-            register={register}
-            errors={errors}
-            disabled={!isAdmin}
-          />
-
-          {mutations.updateCompany.error ? (
-            <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
-              {getErrorMessage(mutations.updateCompany.error)}
-            </p>
-          ) : null}
-
-          {mutations.updateCompany.isSuccess ? (
-            <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
-              Información actualizada correctamente.
-            </p>
-          ) : null}
-
-          {isAdmin ? (
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={!isDirty || mutations.updateCompany.isPending}
-              >
-                {mutations.updateCompany.isPending
-                  ? 'Guardando…'
-                  : 'Guardar cambios'}
-              </Button>
+          <dl className="mt-3 divide-y divide-slate-100 border-y border-slate-100">
+            <div className="flex items-center justify-between gap-4 py-2.5">
+              <dt className="text-[8px] text-slate-500">Estado</dt>
+              <dd className="text-[9px] font-semibold text-emerald-700">
+                {company.status === 'ACTIVE' ? 'Activa' : company.status}
+              </dd>
             </div>
-          ) : null}
-        </Card>
+            <div className="flex items-center justify-between gap-4 py-2.5">
+              <dt className="text-[8px] text-slate-500">Empresa desde</dt>
+              <dd className="text-right text-[8px] font-medium text-slate-700">
+                {formatCustomerCompanyDate(company.createdAt)}
+              </dd>
+            </div>
+          </dl>
 
-        <Card className="h-fit p-5">
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500">
-            Acceso actual
-          </p>
-          <p className="mt-2 text-sm font-semibold text-slate-950">
-            {customer.customerName}
-          </p>
-          <p className="mt-2 text-[10px] leading-5 text-slate-600">
-            Tu rol en esta empresa es <strong>{customer.role}</strong>.
-          </p>
-          <p className="mt-4 text-[10px] leading-5 text-slate-500">
-            QualityTrack conserva los cambios administrativos separados del
-            flujo operativo de solicitudes, cotizaciones y órdenes.
-          </p>
-        </Card>
+          <div className="mt-4 border-t border-slate-100 pt-4">
+            <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
+              Accesos de la empresa
+            </p>
+            <p className="mt-1 text-[9px] leading-4 text-slate-500">
+              Consulta quién puede entrar al portal y qué rol tiene cada persona.
+            </p>
+
+            <Link
+              to={`/portal/${customer.customerId}/members`}
+              className="mt-3 inline-flex h-7 items-center rounded-lg border border-slate-200 bg-white px-3 text-[8px] font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+            >
+              {isAdmin ? 'Gestionar miembros' : 'Ver miembros'}
+            </Link>
+          </div>
+        </aside>
       </form>
     </PageContainer>
   )
