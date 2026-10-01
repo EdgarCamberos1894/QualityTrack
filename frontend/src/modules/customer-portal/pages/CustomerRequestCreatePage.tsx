@@ -4,6 +4,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { CustomerRequestDetailsStep } from '../components/CustomerRequestDetailsStep'
 import { CustomerRequestRequirementsStep } from '../components/CustomerRequestRequirementsStep'
@@ -138,15 +139,25 @@ export function CustomerRequestCreatePage() {
   return (
     <PageContainer className="py-4 lg:py-3">
       <div className="lg:flex lg:h-[calc(100dvh-100px)] lg:min-h-0 lg:flex-col lg:overflow-hidden">
-        <div className="mb-3 shrink-0">
-          <h1 className="text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
-            {step === 2 ? 'Revisar y enviar' : 'Nueva solicitud'}
-          </h1>
-          <p className="mt-1 text-[10px] leading-4 text-slate-500">
-            {step === 2
-              ? 'Confirma que la información representa lo que necesitas. El equipo validará la viabilidad después.'
-              : 'Agrega lo que ya sabes y adjunta la documentación que ayudará a revisar el trabajo.'}
-          </p>
+        <div className="mb-3 flex shrink-0 items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200/70">
+            <SidebarNavIcon name="requests" className="h-4 w-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-600">
+              Gestión de trabajos
+            </p>
+            <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
+              <h1 className="text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
+                {step === 2 ? 'Revisar y enviar' : 'Nueva solicitud'}
+              </h1>
+              <p className="truncate text-[10px] text-slate-500">
+                {step === 2
+                  ? 'Confirma la información antes de enviarla.'
+                  : 'Completa la información necesaria para iniciar el trabajo.'}
+              </p>
+            </div>
+          </div>
         </div>
 
         <CustomerRequestWizardSteps currentStep={step} />
