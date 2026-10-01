@@ -247,7 +247,7 @@ export function CustomerRequestDetailPage() {
         </section>
       ) : null}
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,690px)_minmax(300px,1fr)]">
+      <div className="mt-5 grid gap-5 @5xl/page:grid-cols-[minmax(0,690px)_minmax(300px,1fr)]">
         <Card className="p-5">
           <h2 className="text-sm font-semibold text-slate-950">
             Resumen de la solicitud
