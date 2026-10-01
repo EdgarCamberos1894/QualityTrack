@@ -84,8 +84,7 @@ export function CustomerRequestRequirementsStep({
   return (
     <>
       <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
-        <Card className="relative overflow-hidden p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
-          <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-indigo-500 to-violet-400" />
+        <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
               <SidebarNavIcon name="materials" className="h-[17px] w-[17px]" />
@@ -179,8 +178,7 @@ export function CustomerRequestRequirementsStep({
         </Card>
 
         <div className="flex min-h-0 flex-col gap-3 lg:h-full">
-          <Card className="relative min-h-0 flex-1 overflow-hidden p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.3)] lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
-            <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-blue-500 to-cyan-400" />
+          <Card className="min-h-0 flex-1 p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.3)] lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
             <div className="flex items-start justify-between gap-3">
               <div className="flex min-w-0 items-start gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
