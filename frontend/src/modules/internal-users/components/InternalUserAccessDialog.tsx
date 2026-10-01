@@ -59,10 +59,9 @@ function InternalUserAccessDialogContent({
   )
 
   const rolesChanged = useMemo(() => {
-    if (!user) return false
     if (user.roles.length !== selectedRoles.length) return true
     return user.roles.some((role) => !selectedRoles.includes(role))
-  }, [selectedRoles, user])
+  }, [selectedRoles, user.roles])
 
   const status = getInternalUserStatusPresentation(user.status)
   const pending =
@@ -91,85 +90,43 @@ function InternalUserAccessDialogContent({
         role="dialog"
         aria-modal="true"
         aria-labelledby="internal-user-access-title"
-        className="max-h-[92vh] w-full max-w-3xl overflow-y-auto rounded-2xl bg-white shadow-2xl"
+        className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl"
       >
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
-          <div>
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-700">
-              Administración / Acceso interno
+        <div className="flex items-start justify-between gap-4 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/60 px-4 py-3.5">
+          <div className="min-w-0">
+            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+              Administración · Acceso interno
             </p>
             <h2
               id="internal-user-access-title"
-              className="mt-1 text-lg font-semibold text-slate-950"
+              className="mt-0.5 truncate text-[14px] font-semibold text-slate-950"
             >
               {user.firstName} {user.lastName}
             </h2>
-            <p className="mt-1 text-xs text-slate-500">{user.email}</p>
+            <p className="mt-0.5 truncate text-[9px] text-slate-500">
+              {user.email}
+            </p>
           </div>
-          <Badge tone={status.tone}>{status.label}</Badge>
+          <Badge tone={status.tone} className="px-2 py-0.5 text-[8px]">
+            {status.label}
+          </Badge>
         </div>
 
-        <div className="space-y-6 px-6 py-5">
+        <div className="space-y-4 px-4 py-3.5">
           <section>
-            <h3 className="text-sm font-semibold text-slate-950">
-              Roles internos
-            </h3>
-            <p className="mt-1 text-[10px] leading-5 text-slate-500">
-              Selecciona las funciones que esta persona puede realizar. Debe
-              conservar al menos un rol.
-            </p>
+            <div className="flex items-end justify-between gap-3">
+              <div>
+                <h3 className="text-[10px] font-semibold text-slate-950">
+                  Roles internos
+                </h3>
+                <p className="mt-0.5 text-[8px] leading-4 text-slate-400">
+                  Debe conservar al menos un rol.
+                </p>
+              </div>
 
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              {internalRoles.map((role) => {
-                const selected = selectedRoles.includes(role)
-
-                return (
-                  <label
-                    key={role}
-                    className={
-                      selected
-                        ? 'flex cursor-pointer gap-3 rounded-xl border border-blue-500 bg-blue-50 p-3'
-                        : 'flex cursor-pointer gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 hover:bg-slate-100'
-                    }
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selected}
-                      disabled={rolesSubmitting || statusSubmitting}
-                      onChange={() => toggleRole(role)}
-                      className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600"
-                    />
-                    <span>
-                      <span className="block text-xs font-semibold text-slate-950">
-                        {getInternalRoleLabel(role)}
-                      </span>
-                      <span className="mt-1 block text-[9px] leading-4 text-slate-500">
-                        {getInternalRoleDescription(role)}
-                      </span>
-                    </span>
-                  </label>
-                )
-              })}
-            </div>
-
-            {selectedRoles.length === 0 ? (
-              <p className="mt-2 text-xs text-red-600">
-                El usuario debe conservar al menos un rol.
-              </p>
-            ) : null}
-
-            {rolesError ? (
-              <p
-                role="alert"
-                className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
-              >
-                {getErrorMessage(rolesError)}
-              </p>
-            ) : null}
-
-            <div className="mt-4 flex justify-end">
               <Button
                 size="sm"
+                className="!h-7 !px-2.5 !text-[8px]"
                 disabled={
                   !rolesChanged ||
                   selectedRoles.length === 0 ||
@@ -181,33 +138,82 @@ function InternalUserAccessDialogContent({
                 {rolesSubmitting ? 'Guardando…' : 'Guardar roles'}
               </Button>
             </div>
+
+            <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
+              {internalRoles.map((role) => {
+                const selected = selectedRoles.includes(role)
+
+                return (
+                  <label
+                    key={role}
+                    className={
+                      selected
+                        ? 'flex cursor-pointer gap-2.5 rounded-lg border border-blue-300 bg-blue-50/70 px-3 py-2.5'
+                        : 'flex cursor-pointer gap-2.5 rounded-lg border border-slate-200 bg-white px-3 py-2.5 transition hover:bg-slate-50'
+                    }
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      disabled={rolesSubmitting || statusSubmitting}
+                      onChange={() => toggleRole(role)}
+                      className="mt-0.5 h-3.5 w-3.5 rounded border-slate-300 text-blue-600"
+                    />
+                    <span>
+                      <span className="block text-[9px] font-semibold text-slate-900">
+                        {getInternalRoleLabel(role)}
+                      </span>
+                      <span className="mt-0.5 block text-[7px] leading-3 text-slate-400">
+                        {getInternalRoleDescription(role)}
+                      </span>
+                    </span>
+                  </label>
+                )
+              })}
+            </div>
+
+            {selectedRoles.length === 0 ? (
+              <p className="mt-2 text-[8px] text-red-600">
+                El usuario debe conservar al menos un rol.
+              </p>
+            ) : null}
+
+            {rolesError ? (
+              <p
+                role="alert"
+                className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700"
+              >
+                {getErrorMessage(rolesError)}
+              </p>
+            ) : null}
           </section>
 
-          <section className="border-t border-slate-200 pt-5">
-            <h3 className="text-sm font-semibold text-slate-950">
+          <section className="border-t border-slate-100 pt-3">
+            <h3 className="text-[10px] font-semibold text-slate-950">
               Estado de acceso
             </h3>
 
             {pending ? (
-              <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
-                <p className="text-xs font-semibold text-amber-900">
-                  Activación pendiente
-                </p>
-                <p className="mt-1 text-[10px] leading-5 text-amber-800">
-                  Esta cuenta se activará únicamente cuando la persona complete
-                  la invitación y establezca su contraseña. No puede activarse
-                  manualmente desde administración.
-                </p>
+              <div className="mt-2 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2.5">
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+                <div>
+                  <p className="text-[9px] font-semibold text-amber-900">
+                    Activación pendiente
+                  </p>
+                  <p className="mt-0.5 text-[8px] leading-4 text-amber-700">
+                    La cuenta se activará cuando la persona complete la invitación y establezca su contraseña.
+                  </p>
+                </div>
               </div>
             ) : (
-              <div className="mt-3 flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="mt-2 flex flex-col gap-2.5 rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-xs font-semibold text-slate-900">
+                  <p className="text-[9px] font-semibold text-slate-900">
                     {user.status === 'SUSPENDED'
                       ? 'Acceso suspendido'
                       : 'Acceso habilitado'}
                   </p>
-                  <p className="mt-1 max-w-xl text-[10px] leading-5 text-slate-500">
+                  <p className="mt-0.5 max-w-xl text-[8px] leading-4 text-slate-500">
                     {user.status === 'SUSPENDED'
                       ? 'Reactivar permite que la cuenta vuelva a autenticarse con sus roles actuales.'
                       : 'Suspender bloquea nuevos inicios de sesión. El backend protege al último administrador activo.'}
@@ -217,6 +223,7 @@ function InternalUserAccessDialogContent({
                 <Button
                   size="sm"
                   variant={user.status === 'SUSPENDED' ? 'primary' : 'danger'}
+                  className="!h-7 shrink-0 !px-2.5 !text-[8px]"
                   disabled={rolesSubmitting || statusSubmitting}
                   onClick={() => void onChangeStatus(nextStatus)}
                 >
@@ -232,7 +239,7 @@ function InternalUserAccessDialogContent({
             {statusError ? (
               <p
                 role="alert"
-                className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700"
+                className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700"
               >
                 {getErrorMessage(statusError)}
               </p>
@@ -240,9 +247,10 @@ function InternalUserAccessDialogContent({
           </section>
         </div>
 
-        <div className="flex justify-end border-t border-slate-200 bg-slate-50 px-6 py-4">
+        <div className="flex justify-end border-t border-slate-100 bg-slate-50/60 px-4 py-2.5">
           <Button
             variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
             onClick={onClose}
             disabled={rolesSubmitting || statusSubmitting}
           >
