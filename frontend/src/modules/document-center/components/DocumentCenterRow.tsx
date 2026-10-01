@@ -23,7 +23,7 @@ export function DocumentCenterRow({
   onHistory,
 }: DocumentCenterRowProps) {
   return (
-    <article className="grid gap-4 border-b border-slate-100 px-4 py-4 last:border-b-0 lg:grid-cols-[minmax(220px,1.4fr)_190px_minmax(170px,1fr)_90px_170px_150px] lg:items-center">
+    <article className="grid gap-4 border-b border-slate-100 px-4 py-4 last:border-b-0 @5xl/page:grid-cols-[minmax(220px,1.4fr)_190px_minmax(170px,1fr)_90px_170px_150px] @5xl/page:items-center">
       <div className="min-w-0">
         <p className="truncate text-xs font-semibold text-slate-950">
           {document.name}
@@ -75,7 +75,7 @@ export function DocumentCenterRow({
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2 lg:justify-end">
+      <div className="flex flex-wrap gap-2 @5xl/page:justify-end">
         <Button size="sm" variant="secondary" disabled={busy} onClick={onOpen}>
           Ver
         </Button>
