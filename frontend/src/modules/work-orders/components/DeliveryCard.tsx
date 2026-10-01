@@ -31,54 +31,56 @@ export function DeliveryCard({
   return (
     <article
       id={`delivery-${delivery.id}`}
-      className="scroll-mt-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm target:ring-2 target:ring-blue-300"
+      className="scroll-mt-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_10px_28px_-28px_rgba(15,23,42,0.28)] target:ring-2 target:ring-blue-200"
     >
-      <div className="border-b border-slate-100 px-5 py-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-700">
-              Entrega #{delivery.id}
-            </p>
-            <h3 className="mt-1 text-sm font-semibold text-slate-950">
-              {delivery.quantity} piezas · {delivery.deliveryMethod}
-            </h3>
-            <p className="mt-1 text-[10px] text-slate-500">
-              Creada {formatDeliveryDateTime(delivery.createdAt)}
-            </p>
-          </div>
+      <div className="flex flex-col gap-2.5 border-b border-slate-100 px-3.5 py-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-blue-600">
+            Entrega #{delivery.id}
+          </p>
+          <h3 className="mt-0.5 text-[10px] font-semibold text-slate-950">
+            {delivery.quantity} piezas · {delivery.deliveryMethod}
+          </h3>
+          <p className="mt-0.5 text-[8px] text-slate-400">
+            Creada {formatDeliveryDateTime(delivery.createdAt)}
+          </p>
+        </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge tone={status.tone}>{status.label}</Badge>
-            {delivery.evidenceDocumentVersionId ? (
-              <Badge tone="success">Evidencia vinculada</Badge>
-            ) : null}
-          </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <Badge tone={status.tone} className="px-2 py-0.5 text-[7px]">
+            {status.label}
+          </Badge>
+          {delivery.evidenceDocumentVersionId ? (
+            <Badge tone="success" className="px-2 py-0.5 text-[7px]">
+              Evidencia vinculada
+            </Badge>
+          ) : null}
         </div>
       </div>
 
-      <div className="space-y-4 p-5">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg bg-slate-50 px-3 py-3">
-            <p className="text-[9px] text-slate-500">Destinatario</p>
-            <p className="mt-1 text-xs font-semibold text-slate-950">
+      <div className="space-y-2.5 px-3.5 py-3">
+        <div className="grid gap-2 sm:grid-cols-3">
+          <div className="rounded-lg bg-slate-50/70 px-3 py-2.5">
+            <p className="text-[7px] text-slate-400">Destinatario</p>
+            <p className="mt-0.5 text-[9px] font-semibold text-slate-900">
               {delivery.destinationRecipientName}
             </p>
           </div>
-          <div className="rounded-lg bg-slate-50 px-3 py-3 sm:col-span-2">
-            <p className="text-[9px] text-slate-500">Destino snapshot</p>
-            <p className="mt-1 text-xs font-semibold text-slate-950">
+          <div className="rounded-lg bg-slate-50/70 px-3 py-2.5 sm:col-span-2">
+            <p className="text-[7px] text-slate-400">Destino snapshot</p>
+            <p className="mt-0.5 text-[9px] font-semibold text-slate-900">
               {getDeliveryAddress(delivery)}
             </p>
           </div>
         </div>
 
         {delivery.status !== 'PENDING' ? (
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-2 border-t border-slate-100 pt-2.5 sm:grid-cols-2">
             <div>
-              <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+              <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
                 Despacho
               </p>
-              <p className="mt-1 text-[10px] leading-5 text-slate-700">
+              <p className="mt-0.5 text-[8px] leading-4 text-slate-600">
                 {formatDeliveryDateTime(delivery.dispatchedAt)}
                 {delivery.carrier ? ` · ${delivery.carrier}` : ''}
                 {delivery.trackingNumber
@@ -87,10 +89,10 @@ export function DeliveryCard({
               </p>
             </div>
             <div>
-              <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+              <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
                 Recepción
               </p>
-              <p className="mt-1 text-[10px] leading-5 text-slate-700">
+              <p className="mt-0.5 text-[8px] leading-4 text-slate-600">
                 {delivery.status === 'DELIVERED'
                   ? `${formatDeliveryDateTime(delivery.deliveredAt)} · ${delivery.receivedByName ?? 'Sin receptor'}`
                   : 'Pendiente de recepción'}
@@ -98,37 +100,54 @@ export function DeliveryCard({
             </div>
           </div>
         ) : (
-          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[10px] text-amber-800">
-            Preparada y lista para salir de planta. La OT todavía permanece
-            READY_FOR_DELIVERY.
+          <p className="rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2 text-[8px] leading-4 text-amber-800">
+            Preparada y lista para salir de planta. La OT permanece lista para entrega.
           </p>
         )}
 
         {delivery.status === 'CANCELLED' ? (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-3 text-[10px] leading-5 text-red-800">
+          <p className="rounded-lg border border-red-200 bg-red-50/70 px-3 py-2 text-[8px] leading-4 text-red-800">
             Cancelada {formatDeliveryDateTime(delivery.cancelledAt)} ·{' '}
             {delivery.cancellationReason ?? 'Sin motivo registrado'}
           </p>
         ) : null}
 
         {canManage && mutable ? (
-          <div className="flex flex-wrap justify-end gap-2 border-t border-slate-100 pt-4">
-            <Button size="sm" variant="secondary" onClick={onEvidence}>
+          <div className="flex flex-wrap justify-end gap-1.5 border-t border-slate-100 pt-2.5">
+            <Button
+              size="sm"
+              variant="secondary"
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={onEvidence}
+            >
               {delivery.evidenceDocumentVersionId
                 ? 'Actualizar evidencia'
                 : 'Agregar evidencia'}
             </Button>
 
-            <Button size="sm" variant="danger" onClick={onCancel}>
+            <Button
+              size="sm"
+              variant="danger"
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={onCancel}
+            >
               Cancelar
             </Button>
 
             {delivery.status === 'PENDING' ? (
-              <Button size="sm" onClick={onDispatch}>
+              <Button
+                size="sm"
+                className="!h-7 !px-2.5 !text-[8px]"
+                onClick={onDispatch}
+              >
                 Despachar
               </Button>
             ) : (
-              <Button size="sm" onClick={onComplete}>
+              <Button
+                size="sm"
+                className="!h-7 !px-2.5 !text-[8px]"
+                onClick={onComplete}
+              >
                 Registrar entrega
               </Button>
             )}
