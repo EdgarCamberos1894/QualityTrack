@@ -60,7 +60,7 @@ export function CustomerPortalTopbar({
     <header className="flex h-[76px] items-center border-b border-slate-200 bg-white px-5 sm:px-8">
       <button
         type="button"
-        className="mr-4 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 lg:hidden"
+        className="mr-4 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 shell:hidden"
         onClick={onOpenMenu}
         aria-label="Abrir navegación"
       >
