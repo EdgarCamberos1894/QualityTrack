@@ -94,7 +94,7 @@ export function CustomerCompanyFields({
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <TextField
             label="Ciudad"
             placeholder="Opcional"
@@ -115,18 +115,19 @@ export function CustomerCompanyFields({
             className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
             {...register('state')}
           />
-          <div className="sm:col-span-2 lg:col-span-1">
-            <TextField
-              label="Sitio web"
-              placeholder="https://empresa.com"
-              maxLength={255}
-              disabled={disabled}
-              labelClassName="!mb-1.5 !text-[10px] !font-semibold"
+        </div>
+
+        <div className="mt-3">
+          <TextField
+            label="Sitio web"
+            placeholder="https://empresa.com"
+            maxLength={255}
+            disabled={disabled}
+            labelClassName="!mb-1.5 !text-[10px] !font-semibold"
             error={errors.website?.message}
-              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
-              {...register('website')}
-            />
-          </div>
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
+            {...register('website')}
+          />
         </div>
       </section>
     </div>
