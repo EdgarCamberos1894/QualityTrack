@@ -33,15 +33,15 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
   }
 
   return (
-    <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
+    <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
       <TextField
         label="Correo electrónico"
         type="email"
         inputMode="email"
         autoComplete="email"
         placeholder="tucorreo@empresa.com"
-        labelClassName="!text-[12px] !font-semibold"
-        className="!h-11 !rounded-lg !px-3.5 !text-[12px] !shadow-sm placeholder:!text-[11px]"
+        labelClassName="!text-[10px] !font-semibold"
+        className="!h-9 !rounded-lg !px-3 !text-[10px] !shadow-sm placeholder:!text-[9px]"
         error={errors.email?.message}
         {...register('email')}
       />
@@ -51,16 +51,16 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
         type={showPassword ? 'text' : 'password'}
         autoComplete="current-password"
         placeholder="Ingresa tu contraseña"
-        labelClassName="!text-[12px] !font-semibold"
+        labelClassName="!text-[10px] !font-semibold"
         labelAction={
           <Link
             to="/forgot-password"
-            className="text-[10px] font-medium text-blue-600 transition hover:text-blue-700"
+            className="text-[9px] font-medium text-blue-600 transition hover:text-blue-700"
           >
             ¿Olvidaste tu contraseña?
           </Link>
         }
-        className="!h-11 !rounded-lg !px-3.5 !pr-11 !text-[12px] !shadow-sm placeholder:!text-[11px]"
+        className="!h-9 !rounded-lg !px-3 !pr-10 !text-[10px] !shadow-sm placeholder:!text-[9px]"
         error={errors.password?.message}
         endAdornment={
           <button
@@ -74,7 +74,7 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
             <svg
               viewBox="0 0 24 24"
               aria-hidden="true"
-              className="h-4 w-4"
+              className="h-3.5 w-3.5"
               fill="none"
               stroke="currentColor"
               strokeWidth="1.7"
@@ -103,7 +103,7 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
       {loginMutation.isError ? (
         <div
           role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-[10px] leading-4 text-red-700"
+          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700"
         >
           {getErrorMessage(loginMutation.error)}
         </div>
@@ -111,7 +111,7 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
 
       <Button
         type="submit"
-        className="!h-11 w-full !rounded-lg !text-[12px] !font-semibold"
+        className="!h-9 w-full !rounded-lg !text-[10px] !font-semibold"
         disabled={loginMutation.isPending}
       >
         {loginMutation.isPending ? 'Ingresando…' : 'Entrar'}
