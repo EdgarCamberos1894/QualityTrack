@@ -27,31 +27,25 @@ export function LoginPage() {
 
   return (
     <PublicAuthLayout
-      eyebrow="Acceso seguro"
+      eyebrow="Acceso"
       title="Inicia sesión"
-      description="Usa las credenciales asociadas a tu cuenta de QualityTrack."
+      description="Accede a tu espacio de gestión y seguimiento en QualityTrack."
       footer={
-        <span>El acceso es común para clientes y usuarios internos.</span>
+        <span>
+          ¿No tienes cuenta?{' '}
+          <Link
+            className="font-semibold text-blue-600 transition hover:text-blue-700"
+            to="/register"
+          >
+            Regístrate
+          </Link>
+        </span>
       }
+      immersive
     >
       <LoginForm
         onAuthenticated={() => navigate(destination, { replace: true })}
       />
-
-      <div className="mt-4 flex flex-col gap-2.5 border-t border-slate-100 pt-4 text-center text-[9px] sm:flex-row sm:items-center sm:justify-between">
-        <Link
-          className="font-semibold text-blue-600 hover:text-blue-700"
-          to="/forgot-password"
-        >
-          ¿Olvidaste tu contraseña?
-        </Link>
-        <Link
-          className="font-semibold text-blue-600 hover:text-blue-700"
-          to="/register"
-        >
-          Crear cuenta de cliente
-        </Link>
-      </div>
     </PublicAuthLayout>
   )
 }
