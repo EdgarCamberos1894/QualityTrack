@@ -139,7 +139,7 @@ export function JobCaseDetailPage() {
 
   if (validId === null || !session) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <ErrorState
           error={new Error('No fue posible abrir este expediente.')}
           title="Expediente no disponible"
@@ -150,7 +150,7 @@ export function JobCaseDetailPage() {
 
   if (detailQuery.isPending) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <LoadingState label="Cargando expediente…" />
       </PageContainer>
     )
@@ -158,7 +158,7 @@ export function JobCaseDetailPage() {
 
   if (detailQuery.isError) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <ErrorState
           error={detailQuery.error}
           title="No pudimos cargar el expediente"
@@ -189,10 +189,10 @@ export function JobCaseDetailPage() {
   const timelineCount = timelineQuery.data?.length ?? 0
 
   return (
-    <PageContainer>
+    <PageContainer className="py-4 lg:py-3">
       <JobCaseDetailHeader jobCase={detailQuery.data} />
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <JobCaseActionBar
           jobCase={detailQuery.data}
           user={session.user}
@@ -209,7 +209,7 @@ export function JobCaseDetailPage() {
         {mutationError ? (
           <div
             role="alert"
-            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700"
           >
             {getErrorMessage(mutationError)}
           </div>
