@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { SystemRole } from '@/modules/auth'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
@@ -25,7 +25,26 @@ interface InternalUserAccessDialogProps {
   onChangeStatus: (status: InternalUserAccessStatus) => Promise<boolean>
 }
 
-export function InternalUserAccessDialog({
+export function InternalUserAccessDialog(
+  props: InternalUserAccessDialogProps,
+) {
+  if (!props.user) return null
+
+  return (
+    <InternalUserAccessDialogContent
+      key={props.user.id}
+      {...props}
+      user={props.user}
+    />
+  )
+}
+
+interface InternalUserAccessDialogContentProps
+  extends Omit<InternalUserAccessDialogProps, 'user'> {
+  user: InternalUserDto
+}
+
+function InternalUserAccessDialogContent({
   user,
   rolesSubmitting,
   statusSubmitting,
@@ -34,20 +53,16 @@ export function InternalUserAccessDialog({
   onClose,
   onSaveRoles,
   onChangeStatus,
-}: InternalUserAccessDialogProps) {
-  const [selectedRoles, setSelectedRoles] = useState<SystemRole[]>([])
-
-  useEffect(() => {
-    setSelectedRoles(user?.roles ?? [])
-  }, [user])
+}: InternalUserAccessDialogContentProps) {
+  const [selectedRoles, setSelectedRoles] = useState<SystemRole[]>(
+    () => user.roles,
+  )
 
   const rolesChanged = useMemo(() => {
     if (!user) return false
     if (user.roles.length !== selectedRoles.length) return true
     return user.roles.some((role) => !selectedRoles.includes(role))
   }, [selectedRoles, user])
-
-  if (!user) return null
 
   const status = getInternalUserStatusPresentation(user.status)
   const pending =
