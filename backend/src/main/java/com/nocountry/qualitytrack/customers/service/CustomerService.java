@@ -1,6 +1,7 @@
 package com.nocountry.qualitytrack.customers.service;
 
 import com.nocountry.qualitytrack.customers.dto.request.CreateCustomerRequest;
+import com.nocountry.qualitytrack.customers.dto.request.UpdateCustomerMemberRoleRequest;
 import com.nocountry.qualitytrack.customers.dto.request.UpdateCustomerRequest;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerContextResponse;
 import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
@@ -120,6 +121,56 @@ public class CustomerService {
                 .stream()
                 .map(CustomerMemberResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public void updateMemberRole(
+            Long currentUserId,
+            Long customerId,
+            Long userId,
+            UpdateCustomerMemberRoleRequest request
+    ) {
+        customerRepository.findByIdForUpdate(customerId)
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.RESOURCE_NOT_FOUND,
+                        "No se encontró la empresa."
+                ));
+
+        requireActiveAdmin(currentUserId, customerId);
+        CustomerMembership targetMembership = membershipRepository
+                .findByCustomer_IdAndUser_IdAndStatus(
+                        customerId,
+                        userId,
+                        CustomerMembershipStatus.ACTIVE
+                )
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.RESOURCE_NOT_FOUND,
+                        "No se encontró una membresía activa para ese usuario."
+                ));
+
+        CustomerMembershipRole newRole = request.role();
+        if (targetMembership.getRole() == newRole) {
+            return;
+        }
+
+        if (targetMembership.getRole() == CustomerMembershipRole.ADMIN
+                && newRole != CustomerMembershipRole.ADMIN) {
+            long activeAdmins = membershipRepository.countByCustomer_IdAndRoleAndStatus(
+                    customerId,
+                    CustomerMembershipRole.ADMIN,
+                    CustomerMembershipStatus.ACTIVE
+            );
+
+            if (activeAdmins <= 1) {
+                throw new BusinessException(
+                        ApiErrorCode.DATA_CONFLICT,
+                        "No se puede cambiar el rol del último administrador activo de la empresa."
+                );
+            }
+        }
+
+        targetMembership.changeRole(newRole);
+        membershipRepository.save(targetMembership);
     }
 
     @Transactional
