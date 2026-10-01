@@ -46,7 +46,7 @@ export function DashboardPipeline({
         </div>
       </div>
 
-      <div className="grid gap-px bg-slate-200 sm:grid-cols-2 xl:grid-cols-6">
+      <div className="grid gap-px bg-slate-200 sm:grid-cols-2 lg:grid-cols-6">
         {stages.map((stage, index) => (
           <div key={stage.label} className="bg-white px-4 py-5">
             <div className="flex items-center justify-between">
