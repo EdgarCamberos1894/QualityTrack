@@ -1,3 +1,4 @@
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { formatQuotationDate } from '../model/quotationPresenter'
 import type { CustomerQuotationSourceDto } from '../types/customerQuotation.types'
 
@@ -9,9 +10,11 @@ interface CustomerQuotationSourceCardProps {
 
 function Item({ label, value }: { label: string; value: string | number }) {
   return (
-    <div>
-      <dt className="text-[9px] font-medium text-slate-500">{label}</dt>
-      <dd className="mt-1 text-[11px] font-semibold text-slate-950">{value}</dd>
+    <div className="min-w-0">
+      <dt className="text-[8px] font-medium text-slate-500">{label}</dt>
+      <dd className="mt-0.5 truncate text-[10px] font-semibold text-slate-900">
+        {value}
+      </dd>
     </div>
   )
 }
@@ -28,11 +31,22 @@ export function CustomerQuotationSourceCard({
     technicalMaterial || source.materialRequirement || 'Sin especificar'
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-4">
-      <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-600">
-        Origen · {caseNumber} / {requestNumber}
-      </p>
-      <dl className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <section className="rounded-xl border border-blue-100/80 bg-gradient-to-r from-white via-white to-blue-50/30 px-4 py-3">
+      <div className="flex items-center gap-3">
+        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+          <SidebarNavIcon name="requests" className="h-4 w-4" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-blue-600">
+            Solicitud de origen
+          </p>
+          <p className="mt-0.5 text-[9px] font-medium text-slate-500">
+            {caseNumber} · {requestNumber}
+          </p>
+        </div>
+      </div>
+
+      <dl className="mt-3 grid gap-x-4 gap-y-2.5 border-t border-blue-100/70 pt-3 sm:grid-cols-2 xl:grid-cols-4">
         <Item label="Trabajo" value={source.title} />
         <Item label="Cantidad" value={`${source.quantity} piezas`} />
         <Item label="Material" value={material} />
