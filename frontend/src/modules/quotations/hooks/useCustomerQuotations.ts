@@ -16,9 +16,13 @@ export const customerQuotationKeys = {
     ] as const,
 }
 
-export function useCustomerQuotations(customerId: number) {
+export function useCustomerQuotations(
+  customerId: number,
+  enabled = true,
+) {
   return useQuery({
     queryKey: customerQuotationKeys.list(customerId),
     queryFn: () => getCustomerQuotations(customerId),
+    enabled,
   })
 }
