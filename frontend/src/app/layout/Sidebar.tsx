@@ -45,7 +45,7 @@ export function Sidebar({ open, onNavigate }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col overflow-y-auto bg-slate-950 px-6 py-6 text-slate-200 transition-transform lg:static lg:translate-x-0',
+        'fixed inset-y-0 left-0 z-40 flex w-[248px] flex-col overflow-y-auto bg-slate-950 px-6 py-6 text-slate-200 transition-transform shell:static shell:translate-x-0',
         open ? 'translate-x-0' : '-translate-x-full',
       )}
     >
