@@ -132,7 +132,8 @@ export function CustomerRequestCreatePage() {
 
   return (
     <PageContainer>
-      <div className="mb-6">
+      <div className="lg:flex lg:h-[calc(100vh-140px)] lg:min-h-0 lg:flex-col">
+        <div className="mb-4 shrink-0">
         <h1 className="text-2xl font-bold tracking-tight text-slate-950">
           {step === 2 ? 'Revisar y enviar' : 'Nueva solicitud'}
         </h1>
@@ -143,15 +144,19 @@ export function CustomerRequestCreatePage() {
         </p>
       </div>
 
-      <CustomerRequestWizardSteps currentStep={step} />
+        <CustomerRequestWizardSteps currentStep={step} />
 
-      <form onSubmit={(event) => void submit(event)}>
-        {step === 0 ? (
-          <CustomerRequestDetailsStep register={register} errors={errors} />
-        ) : null}
+        <form
+          onSubmit={(event) => void submit(event)}
+          className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col"
+        >
+          <div className="lg:min-h-0">
+            {step === 0 ? (
+              <CustomerRequestDetailsStep register={register} errors={errors} />
+            ) : null}
 
-        {step === 1 ? (
-          <CustomerRequestRequirementsStep
+            {step === 1 ? (
+              <CustomerRequestRequirementsStep
             register={register}
             errors={errors}
             materialRequirementType={materialRequirementType}
@@ -164,34 +169,36 @@ export function CustomerRequestCreatePage() {
                 current.filter((_, itemIndex) => itemIndex !== index),
               )
             }
-          />
-        ) : null}
+              />
+            ) : null}
 
-        {step === 2 ? (
-          <CustomerRequestReviewStep
-            values={getValues()}
-            documents={documents}
-            onEditDetails={() => setStep(0)}
-            onEditRequirements={() => setStep(1)}
-          />
-        ) : null}
+            {step === 2 ? (
+              <CustomerRequestReviewStep
+                values={getValues()}
+                documents={documents}
+                onEditDetails={() => setStep(0)}
+                onEditRequirements={() => setStep(1)}
+              />
+            ) : null}
+          </div>
 
-        {mutation.error ? (
+          {mutation.error ? (
           <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[10px] text-red-700">
             {getErrorMessage(mutation.error)}
           </p>
         ) : null}
 
-        <div className="mt-5 flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.24)]">
+          <div className="mt-4 flex shrink-0 items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-2.5 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.24)] lg:mt-auto">
           {step === 0 ? (
             <Link
               to={`/portal/${customer.customerId}/requests`}
-              className="inline-flex h-9 min-w-28 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
+              className="inline-flex h-8 min-w-28 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
             >
               Cancelar
             </Link>
           ) : (
             <Button
+              size="sm"
               variant="secondary"
               onClick={() => setStep((current) => current - 1)}
               disabled={mutation.isPending}
@@ -203,6 +210,7 @@ export function CustomerRequestCreatePage() {
 
           {step === 0 ? (
             <Button
+              size="sm"
               onClick={() => void goToRequirements()}
               className="min-w-36 text-[10px]"
             >
@@ -210,6 +218,7 @@ export function CustomerRequestCreatePage() {
             </Button>
           ) : step === 1 ? (
             <Button
+              size="sm"
               onClick={() => void goToReview()}
               className="min-w-40 text-[10px]"
             >
@@ -217,6 +226,7 @@ export function CustomerRequestCreatePage() {
             </Button>
           ) : (
             <Button
+              size="sm"
               type="submit"
               disabled={mutation.isPending}
               className="min-w-40 text-[10px]"
@@ -224,8 +234,9 @@ export function CustomerRequestCreatePage() {
               {mutation.isPending ? 'Enviando…' : 'Enviar solicitud'}
             </Button>
           )}
-        </div>
-      </form>
+          </div>
+        </form>
+      </div>
     </PageContainer>
   )
 }
