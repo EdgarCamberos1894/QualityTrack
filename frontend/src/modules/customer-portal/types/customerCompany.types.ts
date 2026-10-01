@@ -55,6 +55,10 @@ export interface UpdateCustomerCompanyPayload {
   website?: string
 }
 
+export interface UpdateCustomerMemberRolePayload {
+  role: CustomerMembershipRole
+}
+
 export interface CreateCustomerInvitationPayload {
   email: string
   role: CustomerMembershipRole
