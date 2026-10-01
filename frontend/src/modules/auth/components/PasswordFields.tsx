@@ -22,13 +22,13 @@ export function PasswordFields({
   const [show, setShow] = useState(false)
 
   const labelClassName = immersive
-    ? '!text-[12px] !font-semibold'
+    ? '!text-[10px] !font-semibold'
     : '!mb-1.5 !text-[10px]'
   const passwordClassName = immersive
-    ? '!h-11 !rounded-lg !px-3.5 !pr-11 !text-[12px] !shadow-sm placeholder:!text-[11px]'
+    ? '!h-9 !rounded-lg !px-3 !pr-10 !text-[10px] !shadow-sm placeholder:!text-[9px]'
     : '!h-9 !rounded-lg !px-2.5 !pr-16 !text-[10px] !shadow-none placeholder:!text-[9px]'
   const confirmClassName = immersive
-    ? '!h-11 !rounded-lg !px-3.5 !text-[12px] !shadow-sm placeholder:!text-[11px]'
+    ? '!h-9 !rounded-lg !px-3 !text-[10px] !shadow-sm placeholder:!text-[9px]'
     : '!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]'
 
   return (
@@ -52,7 +52,7 @@ export function PasswordFields({
               <svg
                 viewBox="0 0 24 24"
                 aria-hidden="true"
-                className="h-4 w-4"
+                className="h-3.5 w-3.5"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="1.7"
