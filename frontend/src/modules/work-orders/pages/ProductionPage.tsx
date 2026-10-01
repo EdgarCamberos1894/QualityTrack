@@ -2,8 +2,7 @@ import { useMemo } from 'react'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
-import { PageHeader } from '@/shared/components/layout/PageHeader'
-import { Card } from '@/shared/components/ui/Card'
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { OperationalWorkOrderQueue } from '../components/OperationalWorkOrderQueue'
 import { useWorkOrders } from '../hooks/useWorkOrders'
 import type { WorkOrderDto, WorkOrderPriority } from '../types/workOrder.types'
@@ -27,29 +26,6 @@ function sortProductionQueue(workOrders: WorkOrderDto[]): WorkOrderDto[] {
   })
 }
 
-function Metric({
-  label,
-  value,
-  tone,
-}: {
-  label: string
-  value: number
-  tone: 'blue' | 'teal' | 'amber'
-}) {
-  const valueClass = {
-    blue: 'text-blue-600',
-    teal: 'text-teal-700',
-    amber: 'text-amber-700',
-  }[tone]
-
-  return (
-    <div className="px-5 py-4">
-      <p className="text-[10px] font-medium text-slate-500">{label}</p>
-      <p className={`mt-1 text-xl font-bold ${valueClass}`}>{value}</p>
-    </div>
-  )
-}
-
 export function ProductionPage() {
   const query = useWorkOrders()
 
@@ -67,7 +43,7 @@ export function ProductionPage() {
 
   if (query.isPending) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <LoadingState label="Cargando cola de producción…" />
       </PageContainer>
     )
@@ -75,7 +51,7 @@ export function ProductionPage() {
 
   if (query.isError) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <ErrorState error={query.error} title="No pudimos cargar Producción" />
       </PageContainer>
     )
@@ -87,32 +63,86 @@ export function ProductionPage() {
   const inProduction = queue.filter(
     (workOrder) => workOrder.status === 'IN_PRODUCTION',
   ).length
+  const urgent = queue.filter(
+    (workOrder) => workOrder.priority === 'URGENT',
+  ).length
 
   return (
-    <PageContainer>
-      <PageHeader
-        eyebrow="Operación"
-        title="Producción"
-        description="Órdenes liberadas y trabajo actualmente en ejecución."
-      />
+    <PageContainer className="py-4 lg:py-3">
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/70 shadow-[0_16px_44px_-36px_rgba(15,23,42,0.34)]">
+        <div className="px-5 py-4 sm:px-6">
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200/70">
+              <SidebarNavIcon name="production" className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-600">
+                Operación
+              </p>
+              <h1 className="mt-0.5 text-[20px] font-bold tracking-tight text-slate-950">
+                Producción
+              </h1>
+              <p className="mt-1 max-w-2xl text-[10px] leading-4 text-slate-500">
+                Prioriza órdenes liberadas, continúa operaciones activas y entra
+                al Expediente 360 para registrar la ejecución real de planta.
+              </p>
+            </div>
+          </div>
 
-      <Card className="grid overflow-hidden sm:grid-cols-3 sm:divide-x sm:divide-slate-200">
-        <Metric label="Listas para iniciar" value={ready} tone="blue" />
-        <Metric label="En producción" value={inProduction} tone="teal" />
-        <Metric label="Total en cola" value={queue.length} tone="amber" />
-      </Card>
+          <div className="mt-4 grid border-t border-slate-200/80 pt-3 sm:grid-cols-4">
+            <div className="py-1 sm:pr-4">
+              <p className="text-[8px] font-medium text-slate-400">En cola</p>
+              <p className="mt-0.5 text-[16px] font-bold text-slate-950">
+                {queue.length}
+              </p>
+            </div>
+            <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1">
+              <p className="text-[8px] font-medium text-slate-400">
+                Listas para iniciar
+              </p>
+              <p className="mt-0.5 text-[16px] font-bold text-blue-700">
+                {ready}
+              </p>
+            </div>
+            <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1">
+              <p className="text-[8px] font-medium text-slate-400">
+                En ejecución
+              </p>
+              <p className="mt-0.5 text-[16px] font-bold text-amber-700">
+                {inProduction}
+              </p>
+            </div>
+            <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:pl-4 sm:py-1">
+              <p className="text-[8px] font-medium text-slate-400">
+                Prioridad urgente
+              </p>
+              <p
+                className={
+                  urgent > 0
+                    ? 'mt-0.5 text-[16px] font-bold text-red-600'
+                    : 'mt-0.5 text-[16px] font-bold text-slate-950'
+                }
+              >
+                {urgent}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <OperationalWorkOrderQueue
-        title="Cola de producción"
-        description="Prioridad, estado y cantidad visibles. La ejecución detallada se gestiona dentro de cada orden."
-        workOrders={queue}
-        tab="production"
-        emptyTitle="Sin trabajo pendiente de producción"
-        emptyDescription="Las órdenes aparecerán aquí cuando su routing de producción sea liberado."
-        getActionLabel={(workOrder) =>
-          workOrder.status === 'IN_PRODUCTION' ? 'Continuar' : 'Iniciar'
-        }
-      />
+      <div className="mt-4">
+        <OperationalWorkOrderQueue
+          title="Cola de producción"
+          description="Las órdenes en ejecución aparecen primero y, dentro de cada estado, se priorizan por urgencia."
+          workOrders={queue}
+          tab="production"
+          emptyTitle="Sin trabajo pendiente de producción"
+          emptyDescription="Las órdenes aparecerán aquí cuando su routing de producción sea liberado."
+          getActionLabel={(workOrder) =>
+            workOrder.status === 'IN_PRODUCTION' ? 'Continuar' : 'Iniciar'
+          }
+        />
+      </div>
     </PageContainer>
   )
 }
