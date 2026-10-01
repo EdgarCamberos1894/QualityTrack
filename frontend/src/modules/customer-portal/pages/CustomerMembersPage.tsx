@@ -5,6 +5,7 @@ import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { Badge, type BadgeProps } from '@/shared/components/ui/Badge'
 import { CancelCustomerInvitationDialog } from '../components/CancelCustomerInvitationDialog'
+import { ChangeCustomerMemberRoleDialog } from '../components/ChangeCustomerMemberRoleDialog'
 import { CustomerMembersHeader } from '../components/CustomerMembersHeader'
 import { InviteCustomerMemberDialog } from '../components/InviteCustomerMemberDialog'
 import { RemoveCustomerMemberDialog } from '../components/RemoveCustomerMemberDialog'
@@ -70,6 +71,7 @@ export function CustomerMembersPage() {
   const [removeTarget, setRemoveTarget] = useState<CustomerMemberDto | null>(
     null,
   )
+  const [roleTarget, setRoleTarget] = useState<CustomerMemberDto | null>(null)
   const [cancelInvitationTarget, setCancelInvitationTarget] =
     useState<CustomerInvitationDto | null>(null)
 
@@ -137,6 +139,21 @@ export function CustomerMembersPage() {
         email: values.email.trim(),
         role: values.role,
       })
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  const changeMemberRole = async (role: CustomerMembershipRole) => {
+    if (!roleTarget) return false
+
+    try {
+      await mutations.updateMemberRole.mutateAsync({
+        userId: roleTarget.userId,
+        payload: { role },
+      })
+      setRoleTarget(null)
       return true
     } catch {
       return false
@@ -343,16 +360,28 @@ export function CustomerMembersPage() {
                       </div>
 
                       {isAdmin ? (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            mutations.removeMember.reset()
-                            setRemoveTarget(member)
-                          }}
-                          className="inline-flex h-6 items-center justify-center rounded-md px-2 text-[7px] font-medium text-slate-400 transition hover:bg-red-50 hover:text-red-600"
-                        >
-                          Retirar
-                        </button>
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              mutations.updateMemberRole.reset()
+                              setRoleTarget(member)
+                            }}
+                            className="inline-flex h-6 items-center justify-center rounded-md border border-slate-200 bg-white px-2 text-[7px] font-medium text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                          >
+                            Cambiar rol
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              mutations.removeMember.reset()
+                              setRemoveTarget(member)
+                            }}
+                            className="inline-flex h-6 items-center justify-center rounded-md px-2 text-[7px] font-medium text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                          >
+                            Retirar
+                          </button>
+                        </div>
                       ) : null}
                     </div>
                   </article>
@@ -460,6 +489,17 @@ export function CustomerMembersPage() {
           setInviteOpen(false)
         }}
         onSubmit={invite}
+      />
+
+      <ChangeCustomerMemberRoleDialog
+        member={roleTarget}
+        submitting={mutations.updateMemberRole.isPending}
+        error={mutations.updateMemberRole.error}
+        onClose={() => {
+          mutations.updateMemberRole.reset()
+          setRoleTarget(null)
+        }}
+        onSubmit={changeMemberRole}
       />
 
       <CancelCustomerInvitationDialog
