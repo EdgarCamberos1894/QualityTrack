@@ -1,6 +1,5 @@
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
-import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { getCustomerQuotationStatusPresentation } from '../model/customerQuotationPresenter'
 import { formatQuotationDate } from '../model/quotationPresenter'
 import type {
@@ -64,10 +63,14 @@ export function CustomerQuotationDecisionPanel({
   )
 
   return (
-    <aside className="rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+    <aside className="flex h-full flex-col rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
       <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-          <SidebarNavIcon name="quality" className="h-[17px] w-[17px]" />
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-blue-100 bg-white shadow-sm">
+          <img
+            src="/brand/qualitytrack-mark.svg"
+            alt=""
+            className="h-7 w-7"
+          />
         </div>
         <div className="min-w-0">
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
@@ -184,7 +187,7 @@ export function CustomerQuotationDecisionPanel({
         )}
       </div>
 
-      <div className="mt-4 border-t border-slate-100 pt-4">
+      <div className="mt-4 border-t border-slate-100 pt-4 lg:mt-auto lg:pt-4">
         {revisionsPending ? (
           <p className="text-[8px] text-slate-500">Cargando revisiones…</p>
         ) : revisionsError ? (
