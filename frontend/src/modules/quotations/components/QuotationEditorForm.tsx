@@ -94,7 +94,7 @@ export function QuotationEditorForm({
 
   return (
     <form
-      className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]"
+      className="grid gap-4 @4xl/page:grid-cols-[minmax(0,1fr)_300px]"
       onSubmit={(event) => event.preventDefault()}
     >
       <section className="rounded-xl border border-slate-200 bg-white p-5">
