@@ -7,6 +7,7 @@ import type {
   CustomerInvitationDto,
   CustomerMemberDto,
   UpdateCustomerCompanyPayload,
+  UpdateCustomerMemberRolePayload,
 } from '../types/customerCompany.types'
 
 export async function createCustomerCompany(
@@ -50,6 +51,17 @@ export async function getCustomerMembers(
   )
 
   return response.data.data
+}
+
+export async function updateCustomerMemberRole(
+  customerId: number,
+  userId: number,
+  payload: UpdateCustomerMemberRolePayload,
+): Promise<void> {
+  await apiClient.patch(
+    `/customers/${customerId}/members/${userId}/role`,
+    payload,
+  )
 }
 
 export async function removeCustomerMember(
