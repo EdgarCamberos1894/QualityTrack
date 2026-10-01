@@ -8,13 +8,11 @@ import {
 import { queryClient } from '@/app/query/queryClient'
 import { Sidebar } from '@/app/layout/Sidebar'
 import { Topbar } from '@/app/layout/Topbar'
-import { useDesktopCanvasStyle } from '@/shared/hooks/useDesktopCanvasStyle'
 
 export function AppShell() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
   const session = useSessionStore((state) => state.session)
-  const desktopCanvasStyle = useDesktopCanvasStyle()
 
   useSessionExpiry()
 
@@ -27,10 +25,7 @@ export function AppShell() {
   }
 
   return (
-    <div
-      className="min-h-screen bg-[#f5f7fb] shell:grid shell:grid-cols-[248px_minmax(0,1fr)]"
-      style={desktopCanvasStyle}
-    >
+    <div className="min-h-screen bg-[#f5f7fb] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       <Sidebar
         open={sidebarOpen}
         user={session.user}
@@ -40,7 +35,7 @@ export function AppShell() {
       {sidebarOpen ? (
         <button
           type="button"
-          className="fixed inset-0 z-30 bg-slate-950/50 shell:hidden"
+          className="fixed inset-0 z-30 bg-slate-950/50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
           aria-label="Cerrar navegación"
         />
