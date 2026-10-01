@@ -148,14 +148,14 @@ export function NonConformityCard({
       id={`non-conformity-${nonConformity.id}`}
       className="scroll-mt-24 overflow-hidden rounded-xl border border-red-200 bg-white shadow-sm target:ring-2 target:ring-blue-300"
     >
-      <div className="border-b border-red-100 bg-red-50/60 px-5 py-4">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="border-b border-red-100 bg-red-50/55 px-3.5 py-3">
+        <div className="flex flex-col gap-2.5 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-red-700">
+            <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-red-600">
               No conformidad
             </p>
             <div className="mt-1 flex flex-wrap items-center gap-2">
-              <h3 className="text-base font-semibold text-slate-950">
+              <h3 className="text-[11px] font-semibold text-slate-950">
                 {nonConformity.number}
               </h3>
               <Badge tone={open ? 'danger' : 'success'}>
@@ -165,7 +165,7 @@ export function NonConformityCard({
                 <Badge tone="warning">{nonConformity.severity}</Badge>
               ) : null}
             </div>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-0.5 text-[8px] text-slate-400">
               Originada por inspección #{nonConformity.originalInspectionId} ·{' '}
               {formatNonConformityDateTime(nonConformity.openedAt)}
             </p>
@@ -175,6 +175,7 @@ export function NonConformityCard({
             {open && nonConformity.disposition === null && canEditDetails ? (
               <Button
                 size="sm"
+                className="!h-7 !px-2.5 !text-[8px]"
                 variant="secondary"
                 onClick={() => setEditOpen(true)}
               >
@@ -183,7 +184,7 @@ export function NonConformityCard({
             ) : null}
 
             {open && detailsComplete && nonConformity.disposition === null ? (
-              <Button size="sm" onClick={() => setDispositionOpen(true)}>
+              <Button size="sm" className="!h-7 !px-2.5 !text-[8px]" onClick={() => setDispositionOpen(true)}>
                 Definir disposición
               </Button>
             ) : null}
@@ -191,6 +192,7 @@ export function NonConformityCard({
             {canCreateAnotherRework && latestRework ? (
               <Button
                 size="sm"
+                className="!h-7 !px-2.5 !text-[8px]"
                 onClick={() => void chooseRework()}
                 disabled={mutations.createRework.isPending}
               >
@@ -203,23 +205,23 @@ export function NonConformityCard({
         </div>
       </div>
 
-      <div className="space-y-4 p-5">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="rounded-lg bg-slate-50 px-3 py-3">
-            <p className="text-[9px] text-slate-500">Cantidad afectada</p>
-            <p className="mt-1 text-xs font-semibold text-slate-950">
+      <div className="space-y-3 px-3.5 py-3">
+        <div className="grid gap-2 sm:grid-cols-3">
+          <div className="rounded-lg bg-slate-50/70 px-3 py-2.5">
+            <p className="text-[7px] text-slate-400">Cantidad afectada</p>
+            <p className="mt-0.5 text-[9px] font-semibold text-slate-900">
               {nonConformity.affectedQuantity ?? 'Pendiente'}
             </p>
           </div>
-          <div className="rounded-lg bg-slate-50 px-3 py-3">
-            <p className="text-[9px] text-slate-500">Disposición</p>
-            <p className="mt-1 text-xs font-semibold text-slate-950">
+          <div className="rounded-lg bg-slate-50/70 px-3 py-2.5">
+            <p className="text-[7px] text-slate-400">Disposición</p>
+            <p className="mt-0.5 text-[9px] font-semibold text-slate-900">
               {getDispositionLabel(nonConformity.disposition)}
             </p>
           </div>
-          <div className="rounded-lg bg-slate-50 px-3 py-3">
-            <p className="text-[9px] text-slate-500">Estado de la OT</p>
-            <p className="mt-1 text-xs font-semibold text-slate-950">
+          <div className="rounded-lg bg-slate-50/70 px-3 py-2.5">
+            <p className="text-[7px] text-slate-400">Estado de la OT</p>
+            <p className="mt-0.5 text-[9px] font-semibold text-slate-900">
               {workOrderStatus}
             </p>
           </div>
@@ -227,22 +229,22 @@ export function NonConformityCard({
 
         {nonConformity.description ? (
           <div>
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500">
+            <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
               Descripción
             </p>
-            <p className="mt-1 text-[10px] leading-5 text-slate-700">
+            <p className="mt-0.5 text-[8px] leading-4 text-slate-600">
               {nonConformity.description}
             </p>
           </div>
         ) : (
-          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-[10px] leading-5 text-amber-800">
+          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-[8px] leading-4 text-amber-800">
             La NC necesita cantidad afectada, severidad y descripción antes de
             elegir una disposición.
           </p>
         )}
 
         {mutationError ? (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
             {getErrorMessage(mutationError)}
           </p>
         ) : null}
@@ -255,16 +257,16 @@ export function NonConformityCard({
                 : 'rounded-xl border border-amber-200 bg-amber-50 p-4'
             }
           >
-            <p className="text-xs font-semibold text-slate-950">
+            <p className="text-[9px] font-semibold text-slate-900">
               Resultado del descarte
             </p>
-            <p className="mt-2 text-[10px] leading-5 text-slate-700">
+            <p className="mt-1.5 text-[8px] leading-4 text-slate-600">
               Aceptadas antes: {scrapResult.acceptedQuantityBeforeScrap} ·
               descartadas: {scrapResult.affectedQuantity} · disponibles:{' '}
               {scrapResult.remainingAcceptedQuantity} /{' '}
               {scrapResult.plannedQuantity}.
             </p>
-            <p className="mt-1 text-[10px] font-semibold text-slate-800">
+            <p className="mt-1 text-[8px] font-semibold text-slate-700">
               {scrapResult.readyForDelivery
                 ? 'La cantidad comprometida sigue cubierta: NC cerrada y OT lista para entrega.'
                 : 'Queda cantidad faltante: la NC y la OT permanecen bloqueadas hasta una resolución posterior.'}
@@ -273,7 +275,7 @@ export function NonConformityCard({
         ) : null}
 
         {nonConformity.disposition === 'SCRAP' && open && !scrapResult ? (
-          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-3 text-[10px] leading-5 text-amber-800">
+          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-[8px] leading-4 text-amber-800">
             SCRAP ya fue registrado, pero el backend mantuvo la NC OPEN. Esto
             significa que la cantidad restante no cubre la cantidad planificada;
             no se libera la OT de forma artificial.
@@ -281,7 +283,7 @@ export function NonConformityCard({
         ) : null}
 
         {nonConformity.resolutionNotes ? (
-          <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-3 text-[10px] leading-5 text-emerald-800">
+          <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5 text-[8px] leading-4 text-emerald-800">
             Resolución: {nonConformity.resolutionNotes}
             {nonConformity.resolvedByName
               ? ` · ${nonConformity.resolvedByName}`
@@ -293,7 +295,7 @@ export function NonConformityCard({
         ) : null}
 
         {nonConformity.disposition === 'REWORK' && reworkRoutings.length > 0 ? (
-          <div className="space-y-4 border-t border-slate-200 pt-4">
+          <div className="space-y-3 border-t border-slate-100 pt-3">
             {reworkRoutings.map((routing) => (
               <div key={routing.id}>
                 <ReworkRoutingCard
@@ -321,6 +323,7 @@ export function NonConformityCard({
         !latestRework &&
         canRework ? (
           <Button
+            className="!h-7 !px-2.5 !text-[8px]"
             onClick={() => void chooseRework()}
             disabled={mutations.createRework.isPending}
           >
