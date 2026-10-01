@@ -28,7 +28,7 @@ export function InternalUsersTable({
         return (
           <article
             key={user.id}
-            className="grid gap-4 px-5 py-4 lg:grid-cols-[minmax(220px,1.2fr)_minmax(260px,1fr)_150px_130px_120px] lg:items-center"
+            className="grid gap-4 px-5 py-4 @4xl/page:grid-cols-[minmax(220px,1.2fr)_minmax(260px,1fr)_150px_130px_120px] @4xl/page:items-center"
           >
             <div className="flex min-w-0 items-center gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-[10px] font-semibold text-teal-700">
@@ -65,7 +65,7 @@ export function InternalUsersTable({
               {formatInternalUserDate(user.createdAt)}
             </p>
 
-            <div className="lg:text-right">
+            <div className="@4xl/page:text-right">
               <Button
                 size="sm"
                 variant="secondary"
