@@ -403,6 +403,19 @@ export function CustomerRequestOverview({
                 {request.customerReference ?? 'Sin referencia'}
               </dd>
             </div>
+            {quotationId ? (
+              <div className="flex items-center justify-between gap-4 py-2.5">
+                <dt className="text-[8px] text-slate-500">Cotización</dt>
+                <dd>
+                  <Link
+                    to={`/portal/${customerId}/quotations/${quotationId}`}
+                    className="text-[8px] font-semibold text-blue-600 transition hover:text-blue-700 hover:underline"
+                  >
+                    Ver propuesta
+                  </Link>
+                </dd>
+              </div>
+            ) : null}
             <div className="flex items-center justify-between gap-4 py-2.5">
               <dt className="text-[8px] text-slate-500">Última actualización</dt>
               <dd className="text-right text-[8px] font-medium text-slate-700">
