@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Card } from '@/shared/components/ui/Card'
 import {
   formatCustomerRequestDate,
@@ -143,15 +144,21 @@ export function CustomerRequestReviewStep({
 
   return (
     <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
-      <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
+      <Card className="relative overflow-hidden p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
+        <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-blue-500 to-indigo-400" />
         <div className="flex items-center justify-between gap-4">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-blue-600">
-              Confirmación
-            </p>
-            <h2 className="mt-0.5 text-base font-semibold text-slate-950">
-              Resumen de la solicitud
-            </h2>
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <SidebarNavIcon name="requests" className="h-[17px] w-[17px]" />
+            </div>
+            <div>
+              <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-blue-600">
+                Confirmación
+              </p>
+              <h2 className="mt-0.5 text-base font-semibold text-slate-950">
+                Resumen de la solicitud
+              </h2>
+            </div>
           </div>
 
           <button
@@ -290,10 +297,21 @@ export function CustomerRequestReviewStep({
 
       <div className="flex min-h-0 flex-col gap-2.5 lg:h-full">
         <div className="min-h-0 flex-1 space-y-2.5 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
-          <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)]">
-          <h2 className="text-sm font-semibold text-slate-950">
-            Antes de enviar
-          </h2>
+          <Card className="relative overflow-hidden p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+            <div className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-emerald-500 to-teal-400" />
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+              <SidebarNavIcon name="quality" className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-emerald-700">
+                Validación final
+              </p>
+              <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
+                Antes de enviar
+              </h2>
+            </div>
+          </div>
 
           <div className="mt-2.5 space-y-2.5">
             {[
@@ -338,7 +356,7 @@ export function CustomerRequestReviewStep({
           </div>
         </Card>
 
-        <Card className="border-amber-300 bg-amber-50/70 p-3.5 shadow-none">
+        <Card className="border-amber-300 bg-gradient-to-r from-amber-50/90 via-white to-amber-50/65 p-3.5 shadow-none">
           <div className="flex items-start gap-2.5">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">
               <svg
