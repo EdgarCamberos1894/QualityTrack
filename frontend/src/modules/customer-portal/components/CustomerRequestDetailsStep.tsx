@@ -17,8 +17,8 @@ export function CustomerRequestDetailsStep({
   actions,
 }: CustomerRequestDetailsStepProps) {
   return (
-    <div className="grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
-      <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+    <div className="grid gap-3 lg:h-full lg:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
+      <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)] lg:h-full">
         <div>
           <h2 className="text-[15px] font-semibold text-slate-950">
             Detalles del trabajo
@@ -29,10 +29,10 @@ export function CustomerRequestDetailsStep({
           </p>
         </div>
 
-        <div className="mt-3 space-y-2.5">
+        <div className="mt-4 space-y-3">
           <TextField
             label="Nombre del trabajo"
-            className="!h-9 !text-xs"
+            className="!h-10 !text-xs"
             maxLength={200}
             error={errors.title?.message}
             {...register('title')}
@@ -40,13 +40,13 @@ export function CustomerRequestDetailsStep({
 
           <TextareaField
             label="Descripción"
-            className="!min-h-20 !py-2 !text-xs"
+            className="!min-h-24 !py-2.5 !text-xs"
             maxLength={5000}
             error={errors.description?.message}
             {...register('description')}
           />
 
-          <div className="grid gap-2.5 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-3">
             <TextField
               label="Cantidad"
               className="!h-9 !text-xs"
@@ -73,8 +73,8 @@ export function CustomerRequestDetailsStep({
         </div>
       </Card>
 
-      <Card className="overflow-hidden shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)]">
-        <div className="px-3.5 pb-2 pt-3.5">
+      <Card className="overflow-hidden shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)] lg:flex lg:h-full lg:flex-col">
+        <div className="px-4 pb-2.5 pt-4 lg:flex-1">
           <h2 className="text-sm font-semibold text-slate-950">
             Qué pasa después
           </h2>
@@ -98,7 +98,7 @@ export function CustomerRequestDetailsStep({
           </ol>
         </div>
 
-        <div className="border-t border-emerald-200 bg-emerald-50/75 px-3.5 py-3">
+        <div className="border-t border-emerald-200 bg-emerald-50/75 px-4 py-3.5">
           <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-emerald-700">
             No te preocupes por el proceso
           </p>
@@ -111,7 +111,7 @@ export function CustomerRequestDetailsStep({
           </p>
         </div>
 
-        {actions}
+        <div className="lg:mt-auto">{actions}</div>
       </Card>
     </div>
   )
