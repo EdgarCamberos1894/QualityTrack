@@ -360,27 +360,56 @@ export function CustomerMembersPage() {
                       </div>
 
                       {isAdmin ? (
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              mutations.updateMemberRole.reset()
-                              setRoleTarget(member)
-                            }}
-                            className="inline-flex h-6 items-center justify-center rounded-md border border-slate-200 bg-white px-2 text-[7px] font-medium text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                          >
-                            Cambiar rol
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              mutations.removeMember.reset()
-                              setRemoveTarget(member)
-                            }}
-                            className="inline-flex h-6 items-center justify-center rounded-md px-2 text-[7px] font-medium text-slate-400 transition hover:bg-red-50 hover:text-red-600"
-                          >
-                            Retirar
-                          </button>
+                        <div className="flex justify-end">
+                          <details className="group relative">
+                            <summary className="inline-flex h-7 cursor-pointer list-none items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-[8px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 [&::-webkit-details-marker]:hidden">
+                              Gestionar
+                              <svg
+                                viewBox="0 0 20 20"
+                                aria-hidden="true"
+                                className="h-3 w-3 text-slate-400 transition group-open:rotate-180"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1.7"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="m6.5 8 3.5 3.5L13.5 8" />
+                              </svg>
+                            </summary>
+
+                            <div className="absolute right-0 top-[calc(100%+6px)] z-20 w-36 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-[0_16px_38px_-20px_rgba(15,23,42,0.35)]">
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  mutations.updateMemberRole.reset()
+                                  setRoleTarget(member)
+                                  event.currentTarget
+                                    .closest('details')
+                                    ?.removeAttribute('open')
+                                }}
+                                className="flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[8px] font-medium text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
+                              >
+                                Cambiar rol
+                              </button>
+
+                              <div className="my-1 border-t border-slate-100" />
+
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  mutations.removeMember.reset()
+                                  setRemoveTarget(member)
+                                  event.currentTarget
+                                    .closest('details')
+                                    ?.removeAttribute('open')
+                                }}
+                                className="flex h-8 w-full items-center rounded-lg px-2.5 text-left text-[8px] font-medium text-red-600 transition hover:bg-red-50 hover:text-red-700"
+                              >
+                                Retirar acceso
+                              </button>
+                            </div>
+                          </details>
                         </div>
                       ) : null}
                     </div>
