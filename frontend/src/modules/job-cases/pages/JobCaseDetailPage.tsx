@@ -6,7 +6,7 @@ import {
   useSearchParams,
 } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
-import { useCreateQuotation } from '@/modules/quotations'
+import { useCreateQuotation, useQuotations } from '@/modules/quotations'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
@@ -58,6 +58,10 @@ export function JobCaseDetailPage() {
   const validId =
     Number.isInteger(numericId) && numericId > 0 ? numericId : null
   const detailQuery = useJobCaseDetail(validId)
+  const canReadQuotationFlow =
+    session?.user.roles.includes('ADMIN') === true ||
+    session?.user.roles.includes('COMMERCIAL') === true
+  const quotationsQuery = useQuotations(canReadQuotationFlow)
   const timelineQuery = useJobCaseTimeline(validId)
   const takeMutation = useTakeJobCase(validId ?? 0)
   const infoMutation = useRequestJobCaseInformation(validId ?? 0)
@@ -187,6 +191,12 @@ export function JobCaseDetailPage() {
   }
 
   const timelineCount = timelineQuery.data?.length ?? 0
+  const currentQuotation =
+    quotationsQuery.data?.find((quotation) => quotation.caseId === validId) ??
+    null
+  const quotationLookupReady =
+    !canReadQuotationFlow ||
+    (!quotationsQuery.isPending && !quotationsQuery.isError)
 
   return (
     <PageContainer className="py-4 lg:py-3">
@@ -199,11 +209,18 @@ export function JobCaseDetailPage() {
           taking={takeMutation.isPending}
           completing={completeMutation.isPending}
           creatingQuotation={createQuotationMutation.isPending}
+          quotationId={currentQuotation?.id ?? null}
+          quotationLookupReady={quotationLookupReady}
           onTake={() => takeMutation.mutate()}
           onRequestInformation={() => setActionPanel('information')}
           onDefineMaterial={() => setActionPanel('material')}
           onComplete={() => completeMutation.mutate()}
           onCreateQuotation={() => void createQuotation()}
+          onOpenQuotation={() => {
+            if (currentQuotation) {
+              navigate(`/quotations/${currentQuotation.id}`)
+            }
+          }}
         />
 
         {mutationError ? (
@@ -212,6 +229,16 @@ export function JobCaseDetailPage() {
             className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700"
           >
             {getErrorMessage(mutationError)}
+          </div>
+        ) : null}
+
+        {canReadQuotationFlow &&
+        detailQuery.data.status === 'READY_FOR_QUOTATION' &&
+        quotationsQuery.isError ? (
+          <div className="rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2 text-[8px] leading-4 text-amber-800">
+            No pudimos verificar si este expediente ya tiene una cotización.
+            Vuelve a intentarlo antes de iniciar un flujo comercial para evitar
+            duplicados.
           </div>
         ) : null}
 
