@@ -120,10 +120,10 @@ export function CustomerRequestRequirementsStep({
           </p>
         </div>
 
-        {actions}
       </Card>
 
-      <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+      <div className="space-y-3">
+        <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
         <div>
           <h2 className="text-base font-semibold text-slate-950">Documentos</h2>
           <p className="mt-1 text-[10px] leading-5 text-slate-500">
