@@ -62,6 +62,12 @@ export function CustomerQuotationDecisionPanel({
   const status = getCustomerQuotationStatusPresentation(
     quotation.customerStatus,
   )
+  const hasAdjustmentRequest = Boolean(quotation.adjustment?.notes)
+  const hasAdjustmentResponse = Boolean(quotation.adjustment?.response)
+  const adjustmentMovedForward =
+    quotation.customerStatus === 'REPLACED' &&
+    hasAdjustmentRequest &&
+    !hasAdjustmentResponse
 
   return (
     <aside className="flex h-full flex-col rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
@@ -175,47 +181,66 @@ export function CustomerQuotationDecisionPanel({
               <span
                 aria-hidden="true"
                 className={
-                  quotation.adjustment?.response
+                  hasAdjustmentResponse
                     ? 'absolute -left-5 top-3 h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-50'
-                    : 'absolute -left-5 top-3 h-2 w-2 rounded-full bg-amber-400 ring-4 ring-amber-50'
+                    : adjustmentMovedForward
+                      ? 'absolute -left-5 top-3 h-2 w-2 rounded-full bg-blue-400 ring-4 ring-blue-50'
+                      : 'absolute -left-5 top-3 h-2 w-2 rounded-full bg-amber-400 ring-4 ring-amber-50'
                 }
               />
               <div
                 className={
-                  quotation.adjustment?.response
+                  hasAdjustmentResponse
                     ? 'rounded-xl border border-emerald-100 bg-emerald-50/55 px-3 py-2.5'
-                    : 'rounded-xl border border-dashed border-amber-200 bg-amber-50/55 px-3 py-2.5'
+                    : adjustmentMovedForward
+                      ? 'rounded-xl border border-blue-100 bg-blue-50/35 px-3 py-2.5'
+                      : 'rounded-xl border border-dashed border-amber-200 bg-amber-50/55 px-3 py-2.5'
                 }
               >
                 <div className="flex items-center justify-between gap-3">
                   <p
                     className={
-                      quotation.adjustment?.response
+                      hasAdjustmentResponse
                         ? 'text-[8px] font-bold uppercase tracking-[0.08em] text-emerald-700'
-                        : 'text-[8px] font-bold uppercase tracking-[0.08em] text-amber-700'
+                        : adjustmentMovedForward
+                          ? 'text-[8px] font-bold uppercase tracking-[0.08em] text-blue-700'
+                          : 'text-[8px] font-bold uppercase tracking-[0.08em] text-amber-700'
                     }
                   >
-                    Respuesta de Comercial
+                    {adjustmentMovedForward
+                      ? 'Continuación del ajuste'
+                      : 'Respuesta de Comercial'}
                   </p>
                   <span
                     className={
-                      quotation.adjustment?.response
+                      hasAdjustmentResponse
                         ? 'rounded-full bg-white/80 px-1.5 py-0.5 text-[7px] font-semibold text-emerald-700 ring-1 ring-emerald-100'
-                        : 'rounded-full bg-white/80 px-1.5 py-0.5 text-[7px] font-semibold text-amber-700 ring-1 ring-amber-100'
+                        : adjustmentMovedForward
+                          ? 'rounded-full bg-white/80 px-1.5 py-0.5 text-[7px] font-semibold text-blue-700 ring-1 ring-blue-100'
+                          : 'rounded-full bg-white/80 px-1.5 py-0.5 text-[7px] font-semibold text-amber-700 ring-1 ring-amber-100'
                     }
                   >
-                    {quotation.adjustment?.response ? 'Respondida' : 'Pendiente'}
+                    {hasAdjustmentResponse
+                      ? 'Respondida'
+                      : adjustmentMovedForward
+                        ? 'Rev. siguiente'
+                        : 'Pendiente'}
                   </span>
                 </div>
                 <p
                   className={
-                    quotation.adjustment?.response
+                    hasAdjustmentResponse
                       ? 'mt-1.5 text-[9px] leading-4 text-slate-700'
-                      : 'mt-1.5 text-[9px] italic leading-4 text-slate-500'
+                      : adjustmentMovedForward
+                        ? 'mt-1.5 text-[9px] leading-4 text-slate-600'
+                        : 'mt-1.5 text-[9px] italic leading-4 text-slate-500'
                   }
                 >
-                  {quotation.adjustment?.response ??
-                    'Comercial todavía no ha respondido esta solicitud.'}
+                  {hasAdjustmentResponse
+                    ? quotation.adjustment?.response
+                    : adjustmentMovedForward
+                      ? 'Esta solicitud originó una nueva revisión. La respuesta de Comercial se refleja en la revisión posterior.'
+                      : 'Comercial todavía no ha respondido esta solicitud.'}
                 </p>
               </div>
             </div>
@@ -223,10 +248,10 @@ export function CustomerQuotationDecisionPanel({
         ) : (
           <div className="mt-2 rounded-xl border border-slate-200 bg-white/80 px-3 py-2.5">
             <p className="text-[9px] font-medium text-slate-700">
-              Sin ajustes pendientes
+              Sin solicitudes de ajuste
             </p>
             <p className="mt-0.5 text-[8px] leading-4 text-slate-500">
-              Esta revisión no tiene solicitudes de cambio abiertas.
+              No se ha solicitado ningún cambio sobre esta revisión.
             </p>
           </div>
         )}
