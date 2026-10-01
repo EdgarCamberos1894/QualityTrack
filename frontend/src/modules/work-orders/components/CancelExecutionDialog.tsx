@@ -58,45 +58,56 @@ export function CancelExecutionDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="cancel-execution-title"
-        className="w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
         onSubmit={(event) => void submit(event)}
       >
-        <div className="border-b border-slate-200 px-6 py-5">
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-red-700">
-            Cancelar intento
+        <div className="border-b border-red-100 bg-gradient-to-r from-white via-white to-red-50/60 px-4 py-3.5">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-red-600">
+            Producción · Cancelar intento
           </p>
           <h2
             id="cancel-execution-title"
-            className="mt-1 text-lg font-semibold text-slate-950"
+            className="mt-0.5 text-[14px] font-semibold text-slate-950"
           >
             {execution.operationCode} · intento #{execution.attemptNumber}
           </h2>
-          <p className="mt-1 text-xs text-slate-500">
-            El intento quedará histórico y la operación podrá iniciarse de
-            nuevo.
+          <p className="mt-1 text-[9px] leading-4 text-slate-500">
+            El intento quedará histórico y la operación podrá iniciarse nuevamente.
           </p>
         </div>
 
-        <div className="px-6 py-5">
+        <div className="px-4 py-3.5">
           <TextareaField
             label="Motivo de cancelación"
             maxLength={1000}
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!min-h-20 !rounded-lg !px-3 !py-2 !text-[10px] !shadow-none placeholder:!text-[9px]"
             error={errors.cancellationReason?.message}
             {...register('cancellationReason')}
           />
 
           {error ? (
-            <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+            <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
               {getErrorMessage(error)}
             </p>
           ) : null}
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-slate-200 bg-slate-50 px-6 py-4">
-          <Button variant="secondary" onClick={close} disabled={submitting}>
+        <div className="flex justify-end gap-1.5 border-t border-slate-100 bg-slate-50/60 px-4 py-2.5">
+          <Button
+            variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
+            onClick={close}
+            disabled={submitting}
+          >
             Volver
           </Button>
-          <Button type="submit" variant="danger" disabled={submitting}>
+          <Button
+            type="submit"
+            variant="danger"
+            className="!h-7 !px-2.5 !text-[8px]"
+            disabled={submitting}
+          >
             {submitting ? 'Cancelando…' : 'Cancelar intento'}
           </Button>
         </div>
