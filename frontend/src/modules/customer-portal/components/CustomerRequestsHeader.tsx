@@ -19,26 +19,30 @@ export function CustomerRequestsHeader({
   canCreate,
 }: CustomerRequestsHeaderProps) {
   return (
-    <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/55 shadow-[0_16px_42px_-34px_rgba(15,23,42,0.4)]">
-      <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-blue-100/60 blur-3xl" />
+    <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/45 shadow-[0_12px_34px_-30px_rgba(15,23,42,0.35)]">
+      <div className="pointer-events-none absolute -right-16 -top-20 h-44 w-44 rounded-full bg-blue-100/55 blur-3xl" />
 
-      <div className="relative px-5 py-5 lg:px-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 items-start gap-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-200/60">
-              <SidebarNavIcon name="requests" className="h-[18px] w-[18px]" />
+      <div className="relative px-5 py-4 lg:px-6">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex min-w-0 items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200/60">
+              <SidebarNavIcon name="requests" className="h-4 w-4" />
             </div>
 
             <div className="min-w-0">
               <p className="text-[9px] font-bold uppercase tracking-[0.14em] text-blue-600">
                 Gestión de trabajos
               </p>
-              <h1 className="mt-1 text-xl font-bold tracking-tight text-slate-950">
-                Solicitudes
-              </h1>
-              <p className="mt-1.5 max-w-2xl text-[12px] leading-5 text-slate-600">
-                Consulta el avance de los trabajos solicitados por{' '}
-                {customerName} y responde cuando el equipo necesite
+              <div className="mt-0.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h1 className="text-xl font-bold tracking-tight text-slate-950">
+                  Solicitudes
+                </h1>
+                <p className="text-[10px] text-slate-500">
+                  {customerName}
+                </p>
+              </div>
+              <p className="mt-1 max-w-2xl text-[11px] leading-5 text-slate-600">
+                Consulta el avance y responde cuando el equipo necesite
                 información.
               </p>
             </div>
@@ -47,9 +51,9 @@ export function CustomerRequestsHeader({
           {canCreate ? (
             <Link
               to={`/portal/${customerId}/requests/new`}
-              className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-xs font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100"
+              className="inline-flex h-9 shrink-0 items-center justify-center gap-2 self-start rounded-xl bg-blue-600 px-4 text-[11px] font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 lg:self-center"
             >
-              <span className="flex h-5 w-5 items-center justify-center rounded-md bg-white/15 text-sm leading-none">
+              <span className="flex h-4 w-4 items-center justify-center rounded bg-white/15 text-xs leading-none">
                 +
               </span>
               Nueva solicitud
@@ -57,47 +61,36 @@ export function CustomerRequestsHeader({
           ) : null}
         </div>
 
-        <div className="mt-4 grid gap-2 sm:grid-cols-3">
-          <div className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white/85 px-3.5 py-2.5">
-            <div className="min-w-0">
-              <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-slate-400">
-                Solicitudes
-              </p>
-              <p className="mt-0.5 text-[9px] leading-4 text-slate-500">
-                Registradas
-              </p>
-            </div>
-            <p className="shrink-0 text-lg font-bold tracking-tight text-slate-950">
-              {total}
-            </p>
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-slate-200/80 pt-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-slate-950">{total}</span>
+            <span className="text-[9px] font-medium text-slate-500">
+              registradas
+            </span>
           </div>
 
-          <div className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-amber-100 bg-amber-50/65 px-3.5 py-2.5">
-            <div className="min-w-0">
-              <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-amber-700">
-                Por responder
-              </p>
-              <p className="mt-0.5 text-[9px] leading-4 text-amber-700/75">
-                Requieren atención
-              </p>
-            </div>
-            <p className="shrink-0 text-lg font-bold tracking-tight text-amber-700">
+          <span className="hidden h-4 w-px bg-slate-200 sm:block" />
+
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+            <span className="text-sm font-bold text-amber-700">
               {waitingResponse}
-            </p>
+            </span>
+            <span className="text-[9px] font-medium text-slate-500">
+              por responder
+            </span>
           </div>
 
-          <div className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-indigo-100 bg-indigo-50/65 px-3.5 py-2.5">
-            <div className="min-w-0">
-              <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-indigo-700">
-                Producción
-              </p>
-              <p className="mt-0.5 text-[9px] leading-4 text-indigo-700/75">
-                En fabricación
-              </p>
-            </div>
-            <p className="shrink-0 text-lg font-bold tracking-tight text-indigo-700">
+          <span className="hidden h-4 w-px bg-slate-200 sm:block" />
+
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+            <span className="text-sm font-bold text-indigo-700">
               {inProduction}
-            </p>
+            </span>
+            <span className="text-[9px] font-medium text-slate-500">
+              en producción
+            </span>
           </div>
         </div>
       </div>
