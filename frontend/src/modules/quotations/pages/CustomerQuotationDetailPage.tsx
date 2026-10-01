@@ -154,7 +154,7 @@ export function CustomerQuotationDetailPage() {
           requestNumber={quotation.requestNumber}
         />
 
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-start">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-stretch">
           <CustomerQuotationDocument
             quotation={quotation}
             customerName={customer.customerName}
