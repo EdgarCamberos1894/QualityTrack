@@ -9,9 +9,12 @@ export function useCreateWorkOrder(caseId: number) {
   return useMutation({
     mutationFn: (payload: CreateWorkOrderPayload) =>
       createWorkOrder(caseId, payload),
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: workOrderKeys.list(),
-      }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: workOrderKeys.all }),
+        queryClient.invalidateQueries({ queryKey: ['job-cases'] }),
+        queryClient.invalidateQueries({ queryKey: ['internal-dashboard'] }),
+      ])
+    },
   })
 }
