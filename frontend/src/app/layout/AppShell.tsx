@@ -25,7 +25,7 @@ export function AppShell() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f7fb] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
+    <div className="min-h-screen bg-[#f6f8fc] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
       <Sidebar
         open={sidebarOpen}
         user={session.user}
