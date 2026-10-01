@@ -23,7 +23,7 @@ export function HomePage() {
         description="QualityTrack conecta el flujo comercial, productivo y de calidad en un expediente trazable de principio a fin."
       />
 
-      <div className="grid gap-6 xl:grid-cols-[1.4fr_0.6fr]">
+      <div className="grid gap-6 @5xl/page:grid-cols-[1.4fr_0.6fr]">
         <Card className="p-6">
           <div className="mb-5 flex flex-wrap items-center gap-3">
             <h2 className="text-base font-semibold text-slate-950">
