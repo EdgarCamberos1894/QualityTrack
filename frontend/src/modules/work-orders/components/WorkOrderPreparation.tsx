@@ -216,6 +216,7 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
         routing={productionRouting}
         workOrderStatus={data.workOrder.status}
         pinnedDocumentCount={data.workOrder.pinnedDocuments.length}
+        planningReady={planningReady}
         canDesign={canDesign}
         pending={{
           create: mutations.createRouting.isPending,
