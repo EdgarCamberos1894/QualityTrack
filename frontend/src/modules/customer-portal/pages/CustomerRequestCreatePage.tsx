@@ -1,10 +1,9 @@
 import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
-import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { CustomerRequestDetailsStep } from '../components/CustomerRequestDetailsStep'
 import { CustomerRequestRequirementsStep } from '../components/CustomerRequestRequirementsStep'
@@ -226,7 +225,6 @@ export function CustomerRequestCreatePage() {
               {getErrorMessage(mutation.error)}
             </p>
           ) : null}
-
         </form>
       </div>
     </PageContainer>
