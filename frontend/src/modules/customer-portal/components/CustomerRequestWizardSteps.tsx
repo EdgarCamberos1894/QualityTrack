@@ -11,7 +11,7 @@ export function CustomerRequestWizardSteps({
   currentStep,
 }: CustomerRequestWizardStepsProps) {
   return (
-    <Card className="relative mb-3 overflow-hidden border-slate-300 bg-gradient-to-r from-[#e9eef4] via-[#f7f9fb] to-[#e5ebf2] px-4 py-2 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.28)]">
+    <Card className="relative mb-3 overflow-hidden border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/75 px-4 py-2 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.28)]">
       <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-blue-500 via-blue-400 to-cyan-400" />
       <div className="flex items-center">
         {steps.map((label, index) => {
