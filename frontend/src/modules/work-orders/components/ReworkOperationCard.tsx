@@ -61,7 +61,7 @@ export function ReworkOperationCard({
             : 'rounded-xl border border-slate-200 bg-white p-4'
       }
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex flex-col gap-4 @3xl/page:flex-row @3xl/page:items-start @3xl/page:justify-between">
         <div className="flex min-w-0 gap-3">
           <span
             className={
