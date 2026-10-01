@@ -71,6 +71,9 @@ function getDisplayStatus(
   if (deliveryProgress === 'IN_TRANSIT') {
     return { label: 'En camino', tone: 'info' }
   }
+  if (deliveryProgress === 'PARTIAL') {
+    return { label: 'Entrega parcial', tone: 'warning' }
+  }
   if (deliveryProgress === 'DELIVERED') {
     return { label: 'Entregada', tone: 'success' }
   }
