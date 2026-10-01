@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge, type BadgeProps } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
@@ -13,6 +13,7 @@ import type {
   CustomerRequestDetailDto,
 } from '../types/customerRequest.types'
 import { CustomerRequestFlowSteps } from './CustomerRequestFlowSteps'
+import { CustomerRequestsBackButton } from './CustomerRequestsBackButton'
 
 interface CustomerRequestOverviewProps {
   customerId: number
@@ -175,6 +176,7 @@ export function CustomerRequestOverview({
   onRespond,
   onCancel,
 }: CustomerRequestOverviewProps) {
+  const navigate = useNavigate()
   const status = getDisplayStatus(request, deliveryProgress)
   const nextStep = getNextStep(
     request,
@@ -213,24 +215,9 @@ export function CustomerRequestOverview({
           </div>
         </div>
 
-        <Link
-          to={`/portal/${customerId}/requests`}
-          className="inline-flex h-6 shrink-0 items-center gap-1 rounded-md border border-slate-300 bg-white/85 px-2 text-[7px] font-medium text-slate-500 transition hover:border-slate-400 hover:bg-white hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            className="h-3 w-3"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="m15 18-6-6 6-6" />
-          </svg>
-          Volver a solicitudes
-        </Link>
+        <CustomerRequestsBackButton
+          onClick={() => navigate(`/portal/${customerId}/requests`)}
+        />
       </div>
 
       <CustomerRequestFlowSteps
