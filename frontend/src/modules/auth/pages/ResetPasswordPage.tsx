@@ -31,16 +31,21 @@ export function ResetPasswordPage() {
       <PublicAuthLayout
         eyebrow="Recuperación"
         title="Enlace no válido"
-        description="Este enlace no contiene la información necesaria para restablecer la contraseña."
+        description="No encontramos la información necesaria para restablecer tu contraseña."
         footer={
-          <Link className="font-semibold text-blue-600" to="/forgot-password">
+          <Link
+            className="font-semibold text-blue-600 transition hover:text-blue-700"
+            to="/forgot-password"
+          >
             Solicitar otro enlace
           </Link>
         }
+        immersive
       >
         <AuthResultPanel
+          compact
           tone="error"
-          title="No encontramos el token"
+          title="Falta información"
           description="Abre nuevamente el enlace completo que recibiste por correo."
         />
       </PublicAuthLayout>
@@ -52,17 +57,22 @@ export function ResetPasswordPage() {
       <PublicAuthLayout
         eyebrow="Recuperación"
         title="Contraseña actualizada"
-        description="Ya puedes entrar a QualityTrack con tu nueva contraseña."
+        description="Tu acceso ya está listo con la nueva contraseña."
         footer={
-          <Link className="font-semibold text-blue-600" to="/login">
+          <Link
+            className="font-semibold text-blue-600 transition hover:text-blue-700"
+            to="/login"
+          >
             Ir al inicio de sesión
           </Link>
         }
+        immersive
       >
         <AuthResultPanel
+          compact
           tone="success"
           title="Cambio completado"
-          description="El enlace de recuperación ya fue consumido y no puede reutilizarse."
+          description="El enlace de recuperación ya fue consumido y no puede volver a utilizarse."
         />
       </PublicAuthLayout>
     )
@@ -74,15 +84,19 @@ export function ResetPasswordPage() {
     <PublicAuthLayout
       eyebrow="Recuperación"
       title="Define una nueva contraseña"
-      description="Elige una contraseña nueva para tu cuenta."
+      description="Elige una contraseña nueva para recuperar el acceso a tu cuenta."
       footer={
-        <Link className="font-semibold text-blue-600" to="/login">
+        <Link
+          className="font-semibold text-blue-600 transition hover:text-blue-700"
+          to="/login"
+        >
           Volver al inicio de sesión
         </Link>
       }
+      immersive
     >
       <form
-        className="space-y-5"
+        className="space-y-4"
         onSubmit={(event) => void submit(event)}
         noValidate
       >
@@ -92,15 +106,20 @@ export function ResetPasswordPage() {
           passwordError={errors.password?.message}
           confirmError={errors.confirmPassword?.message}
           passwordLabel="Nueva contraseña"
+          immersive
         />
 
         {mutation.error ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700">
             {getErrorMessage(mutation.error)}
           </p>
         ) : null}
 
-        <Button type="submit" className="w-full" disabled={mutation.isPending}>
+        <Button
+          type="submit"
+          className="!h-9 w-full !rounded-lg !text-[10px] !font-semibold"
+          disabled={mutation.isPending}
+        >
           {mutation.isPending ? 'Actualizando…' : 'Guardar contraseña'}
         </Button>
       </form>
