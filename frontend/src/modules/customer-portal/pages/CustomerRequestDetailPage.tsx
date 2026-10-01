@@ -212,7 +212,13 @@ export function CustomerRequestDetailPage() {
       </div>
 
       {request.informationRequests.length > 0 ? (
-        <Card className="mt-5 p-5">
+        <Card
+          className={
+            openInformationRequest
+              ? 'mt-5 border-amber-100 bg-gradient-to-br from-white via-white to-amber-50/35 p-4'
+              : 'mt-5 border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 p-4'
+          }
+        >
           <h2 className="text-sm font-semibold text-slate-950">
             Preguntas y respuestas
           </h2>
