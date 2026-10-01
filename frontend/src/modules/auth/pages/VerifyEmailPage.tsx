@@ -98,6 +98,7 @@ export function VerifyEmailPage() {
       eyebrow="Verificación"
       title="Verificando tu correo"
       description="Estamos validando el enlace seguro recibido por correo."
+      immersive
     >
       <AuthResultPanel
         compact
