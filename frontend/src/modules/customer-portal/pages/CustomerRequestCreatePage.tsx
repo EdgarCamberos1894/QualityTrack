@@ -55,7 +55,7 @@ export function CustomerRequestCreatePage() {
 
   if (!canCreate) {
     return (
-      <PageContainer>
+      <PageContainer className="py-5 lg:py-4">
         <ErrorState
           error={
             new Error('Tu rol dentro de la empresa es únicamente de consulta.')
@@ -137,12 +137,12 @@ export function CustomerRequestCreatePage() {
 
   return (
     <PageContainer>
-      <div className="lg:flex lg:min-h-[calc(100vh-140px)] lg:flex-col">
-        <div className="mb-4 shrink-0">
-          <h1 className="text-2xl font-bold tracking-tight text-slate-950">
+      <div className="lg:flex lg:min-h-[calc(100vh-112px)] lg:flex-col">
+        <div className="mb-3 shrink-0">
+          <h1 className="text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
             {step === 2 ? 'Revisar y enviar' : 'Nueva solicitud'}
           </h1>
-          <p className="mt-1.5 text-[11px] leading-5 text-slate-500">
+          <p className="mt-1 text-[10px] leading-4 text-slate-500">
             {step === 2
               ? 'Confirma que la información representa lo que necesitas. El equipo validará la viabilidad después.'
               : 'Agrega lo que ya sabes y adjunta la documentación que ayudará a revisar el trabajo.'}
