@@ -8,7 +8,6 @@ import {
 } from '@/modules/auth'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
-import { useDesktopCanvasStyle } from '@/shared/hooks/useDesktopCanvasStyle'
 import { CustomerPortalContextProvider } from '../context/CustomerPortalContext'
 import { useCustomerContexts } from '../hooks/useCustomerContexts'
 import { CustomerPortalSidebar } from './CustomerPortalSidebar'
@@ -21,7 +20,6 @@ export function CustomerPortalShell() {
   const queryClient = useQueryClient()
   const session = useSessionStore((state) => state.session)
   const contextsQuery = useCustomerContexts()
-  const desktopCanvasStyle = useDesktopCanvasStyle()
 
   useSessionExpiry()
 
@@ -65,10 +63,7 @@ export function CustomerPortalShell() {
     <CustomerPortalContextProvider
       value={{ customer, contexts: contextsQuery.data }}
     >
-      <div
-        className="min-h-screen bg-[#f5f7fb] shell:grid shell:grid-cols-[248px_minmax(0,1fr)]"
-        style={desktopCanvasStyle}
-      >
+      <div className="min-h-screen bg-[#f5f7fb] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
         <CustomerPortalSidebar
           customer={customer}
           hasMultipleCustomers={contextsQuery.data.length > 1}
@@ -79,7 +74,7 @@ export function CustomerPortalShell() {
         {sidebarOpen ? (
           <button
             type="button"
-            className="fixed inset-0 z-30 bg-slate-950/50 shell:hidden"
+            className="fixed inset-0 z-30 bg-slate-950/50 lg:hidden"
             onClick={() => setSidebarOpen(false)}
             aria-label="Cerrar navegación"
           />
