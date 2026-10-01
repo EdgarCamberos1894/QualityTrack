@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Card } from '@/shared/components/ui/Card'
 import type { CustomerRequestFormValues } from '../schemas/customerRequest.schemas'
 import type { RequestDocumentUpload } from '../types/customerRequest.types'
@@ -7,6 +8,7 @@ interface CustomerRequestReviewStepProps {
   documents: RequestDocumentUpload[]
   onEditDetails: () => void
   onEditRequirements: () => void
+  actions: ReactNode
 }
 
 export function CustomerRequestReviewStep({
@@ -14,6 +16,7 @@ export function CustomerRequestReviewStep({
   documents,
   onEditDetails,
   onEditRequirements,
+  actions,
 }: CustomerRequestReviewStepProps) {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
@@ -130,6 +133,8 @@ export function CustomerRequestReviewStep({
         <p className="mt-3 text-[8px] text-slate-400">
           Los archivos se registrarán como versiones iniciales al enviar.
         </p>
+
+        {actions}
       </Card>
 
       <div className="space-y-3">
