@@ -5,13 +5,14 @@ interface TextareaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaElement>
   label: string
   error?: string
   hint?: string
+  labelClassName?: string
 }
 
 export const TextareaField = forwardRef<
   HTMLTextAreaElement,
   TextareaFieldProps
 >(function TextareaField(
-  { className, id, label, error, hint, ...textareaProps },
+  { className, id, label, error, hint, labelClassName, ...textareaProps },
   ref,
 ) {
   const generatedId = useId()
@@ -26,7 +27,10 @@ export const TextareaField = forwardRef<
     <div>
       <label
         htmlFor={textareaId}
-        className="mb-2 block text-sm font-semibold text-slate-800"
+        className={cn(
+          'mb-2 block text-sm font-semibold text-slate-800',
+          labelClassName,
+        )}
       >
         {label}
       </label>
