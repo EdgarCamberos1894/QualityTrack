@@ -167,7 +167,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <ProductionProgressHeader
         production={data.production}
         routing={productionRouting}
@@ -181,21 +181,21 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
       ) : null}
 
       {!canExecute ? (
-        <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[10px] leading-5 text-slate-600">
+        <p className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-[8px] leading-4 text-slate-500">
           La ejecución es de solo lectura para tu rol. Solo PRODUCTION o ADMIN
           pueden iniciar, finalizar o cancelar intentos y registrar consumos.
         </p>
       ) : null}
 
       {machinesQuery.isError ? (
-        <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-800">
+        <p className="rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2.5 text-[8px] leading-4 text-amber-800">
           No pudimos cargar el catálogo de máquinas. Las operaciones todavía
           pueden iniciarse sin máquina asignada.
         </p>
       ) : null}
 
       {operations.length > 0 ? (
-        <section className="space-y-3">
+        <section className="space-y-2.5">
           {operations.map((operation, index) => {
             const executions = productionExecutions.filter(
               (execution) => execution.routingOperationId === operation.id,
