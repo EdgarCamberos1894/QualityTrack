@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'
 import { Card } from '@/shared/components/ui/Card'
 import { TextareaField } from '@/shared/components/ui/TextareaField'
@@ -7,11 +8,13 @@ import type { CustomerRequestFormValues } from '../schemas/customerRequest.schem
 interface CustomerRequestDetailsStepProps {
   register: UseFormRegister<CustomerRequestFormValues>
   errors: FieldErrors<CustomerRequestFormValues>
+  actions: ReactNode
 }
 
 export function CustomerRequestDetailsStep({
   register,
   errors,
+  actions,
 }: CustomerRequestDetailsStepProps) {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(300px,0.65fr)]">
@@ -69,33 +72,51 @@ export function CustomerRequestDetailsStep({
             </p>
           </div>
         </div>
+
+        {actions}
       </Card>
 
-      <Card className="h-fit overflow-hidden shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)]">
-        <div className="px-4 pt-4">
-          <h2 className="text-sm font-semibold text-slate-950">
-            Qué pasa después
-          </h2>
-        </div>
+      <div className="space-y-4">
+        <Card className="overflow-hidden shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)]">
+          <div className="px-4 pt-4">
+            <h2 className="text-sm font-semibold text-slate-950">
+              Qué pasa después
+            </h2>
+          </div>
 
-        <ol className="px-4 pb-3 pt-2">
-          {[
-            'El equipo revisa el alcance y la documentación.',
-            'Puede pedirte información técnica adicional.',
-            'Cuando esté listo, recibirás una cotización.',
-          ].map((item, index) => (
-            <li
-              key={item}
-              className="flex gap-3 border-b border-slate-100 py-3 last:border-b-0"
-            >
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[9px] font-bold text-blue-600">
-                {index + 1}
-              </span>
-              <p className="text-[10px] leading-5 text-slate-600">{item}</p>
-            </li>
-          ))}
-        </ol>
-      </Card>
+          <ol className="px-4 pb-3 pt-2">
+            {[
+              'El equipo revisa el alcance y la documentación.',
+              'Puede pedirte información técnica adicional.',
+              'Cuando esté listo, recibirás una cotización.',
+            ].map((item, index) => (
+              <li
+                key={item}
+                className="flex gap-3 border-b border-slate-100 py-3 last:border-b-0"
+              >
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[9px] font-bold text-blue-600">
+                  {index + 1}
+                </span>
+                <p className="text-[10px] leading-5 text-slate-600">{item}</p>
+              </li>
+            ))}
+          </ol>
+        </Card>
+
+        <Card className="border-emerald-200 bg-emerald-50/75 p-4 shadow-none">
+          <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-emerald-700">
+            No te preocupes por el proceso
+          </p>
+          <h3 className="mt-2 text-sm font-semibold text-slate-950">
+            Describe el resultado que necesitas.
+          </h3>
+          <p className="mt-2 text-[9px] leading-4 text-slate-600">
+            Torno, fresado, tratamientos y demás decisiones internas se definen
+            durante la revisión. Si no conoces el material, también podemos
+            ayudarte a elegirlo.
+          </p>
+        </Card>
+      </div>
     </div>
   )
 }
