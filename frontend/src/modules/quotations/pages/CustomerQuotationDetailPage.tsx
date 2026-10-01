@@ -66,7 +66,7 @@ export function CustomerQuotationDetailPage() {
 
   if (detailQuery.isPending) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <LoadingState label="Cargando cotización…" />
       </PageContainer>
     )
@@ -74,7 +74,7 @@ export function CustomerQuotationDetailPage() {
 
   if (detailQuery.isError) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <ErrorState
           error={detailQuery.error}
           title="No pudimos cargar la cotización"
@@ -139,7 +139,7 @@ export function CustomerQuotationDetailPage() {
   }
 
   return (
-    <PageContainer>
+    <PageContainer className="py-4 lg:py-3">
       <CustomerQuotationHeader
         customerId={customer.customerId}
         quotation={quotation}
