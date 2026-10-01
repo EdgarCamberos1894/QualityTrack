@@ -36,7 +36,15 @@ function DeliveryCard({
   const status = getCustomerDeliveryStatusPresentation(delivery.status)
 
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-5">
+    <article
+      className={
+        delivery.status === 'DELIVERED'
+          ? 'rounded-xl border border-emerald-100 bg-gradient-to-br from-white via-white to-emerald-50/35 p-4'
+          : delivery.status === 'CANCELLED'
+            ? 'rounded-xl border border-red-100 bg-gradient-to-br from-white via-white to-red-50/25 p-4'
+            : 'rounded-xl border border-blue-100 bg-gradient-to-br from-white via-white to-blue-50/30 p-4'
+      }
+    >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500">
@@ -50,13 +58,13 @@ function DeliveryCard({
       </div>
 
       <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+        <div className="rounded-lg border border-slate-200/80 bg-white/75 p-3">
           <dt className="text-[9px] text-slate-500">Método</dt>
           <dd className="mt-1 text-[11px] font-semibold text-slate-900">
             {delivery.deliveryMethod}
           </dd>
         </div>
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+        <div className="rounded-lg border border-slate-200/80 bg-white/75 p-3">
           <dt className="text-[9px] text-slate-500">Destinatario</dt>
           <dd className="mt-1 text-[11px] font-semibold text-slate-900">
             {delivery.destinationRecipientName}
