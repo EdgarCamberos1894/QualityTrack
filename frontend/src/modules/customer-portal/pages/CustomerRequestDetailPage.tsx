@@ -138,7 +138,7 @@ export function CustomerRequestDetailPage() {
   }
 
   return (
-    <PageContainer>
+    <PageContainer className="py-4 lg:py-3">
       <CustomerRequestOverview
         customerId={customer.customerId}
         request={request}
