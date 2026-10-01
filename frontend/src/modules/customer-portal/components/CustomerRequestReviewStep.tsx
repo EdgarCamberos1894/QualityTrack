@@ -134,7 +134,6 @@ export function CustomerRequestReviewStep({
           Los archivos se registrarán como versiones iniciales al enviar.
         </p>
 
-        {actions}
       </Card>
 
       <div className="space-y-2.5">
