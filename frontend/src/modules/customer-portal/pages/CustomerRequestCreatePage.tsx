@@ -74,6 +74,7 @@ export function CustomerRequestCreatePage() {
       'requestedDeliveryDate',
       'customerReference',
     ])
+
     if (valid) setStep(1)
   }
 
@@ -82,6 +83,7 @@ export function CustomerRequestCreatePage() {
       'materialRequirementType',
       'materialRequirement',
     ])
+
     if (valid) setStep(2)
   }
 
@@ -89,12 +91,14 @@ export function CustomerRequestCreatePage() {
     if (!files) return
 
     const nextFiles = Array.from(files)
+
     if (documents.length + nextFiles.length > 5) {
       setDocumentError('Puedes adjuntar hasta 5 archivos por solicitud.')
       return
     }
 
     const oversized = nextFiles.find((file) => file.size > 25 * 1024 * 1024)
+
     if (oversized) {
       setDocumentError(
         `${oversized.name} supera el límite de 25 MB por archivo.`,
@@ -122,6 +126,7 @@ export function CustomerRequestCreatePage() {
           formValues.requestedDeliveryDate.trim() || undefined,
         documents,
       })
+
       navigate(`/portal/${customer.customerId}/requests/${request.id}`, {
         replace: true,
       })
@@ -132,43 +137,43 @@ export function CustomerRequestCreatePage() {
 
   return (
     <PageContainer>
-      <div className="lg:flex lg:h-[calc(100vh-140px)] lg:min-h-0 lg:flex-col">
+      <div className="lg:flex lg:min-h-[calc(100vh-140px)] lg:flex-col">
         <div className="mb-4 shrink-0">
-        <h1 className="text-2xl font-bold tracking-tight text-slate-950">
-          {step === 2 ? 'Revisar y enviar' : 'Nueva solicitud'}
-        </h1>
-        <p className="mt-1.5 text-[11px] leading-5 text-slate-500">
-          {step === 2
-            ? 'Confirma que la información representa lo que necesitas. El equipo validará la viabilidad después.'
-            : 'Agrega lo que ya sabes y adjunta la documentación que ayudará a revisar el trabajo.'}
-        </p>
-      </div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-950">
+            {step === 2 ? 'Revisar y enviar' : 'Nueva solicitud'}
+          </h1>
+          <p className="mt-1.5 text-[11px] leading-5 text-slate-500">
+            {step === 2
+              ? 'Confirma que la información representa lo que necesitas. El equipo validará la viabilidad después.'
+              : 'Agrega lo que ya sabes y adjunta la documentación que ayudará a revisar el trabajo.'}
+          </p>
+        </div>
 
         <CustomerRequestWizardSteps currentStep={step} />
 
         <form
           onSubmit={(event) => void submit(event)}
-          className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col"
+          className="lg:flex lg:flex-1 lg:flex-col"
         >
-          <div className="lg:min-h-0">
+          <div>
             {step === 0 ? (
               <CustomerRequestDetailsStep register={register} errors={errors} />
             ) : null}
 
             {step === 1 ? (
               <CustomerRequestRequirementsStep
-            register={register}
-            errors={errors}
-            materialRequirementType={materialRequirementType}
-            setValue={setValue}
-            documents={documents}
-            documentError={documentError}
-            onAddFiles={addFiles}
-            onRemoveFile={(index) =>
-              setDocuments((current) =>
-                current.filter((_, itemIndex) => itemIndex !== index),
-              )
-            }
+                register={register}
+                errors={errors}
+                materialRequirementType={materialRequirementType}
+                setValue={setValue}
+                documents={documents}
+                documentError={documentError}
+                onAddFiles={addFiles}
+                onRemoveFile={(index) =>
+                  setDocuments((current) =>
+                    current.filter((_, itemIndex) => itemIndex !== index),
+                  )
+                }
               />
             ) : null}
 
@@ -183,57 +188,63 @@ export function CustomerRequestCreatePage() {
           </div>
 
           {mutation.error ? (
-          <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[10px] text-red-700">
-            {getErrorMessage(mutation.error)}
-          </p>
-        ) : null}
+            <p className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[10px] text-red-700">
+              {getErrorMessage(mutation.error)}
+            </p>
+          ) : null}
 
-          <div className="mt-4 flex shrink-0 items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-2.5 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.24)] lg:mt-auto">
-          {step === 0 ? (
-            <Link
-              to={`/portal/${customer.customerId}/requests`}
-              className="inline-flex h-8 min-w-28 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-[10px] font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
-            >
-              Cancelar
-            </Link>
-          ) : (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => setStep((current) => current - 1)}
-              disabled={mutation.isPending}
-              className="min-w-28 text-[10px]"
-            >
-              Atrás
-            </Button>
-          )}
+          <div className="mt-4 flex shrink-0 items-center justify-between border-t border-slate-200 px-1 pt-3 lg:mt-auto">
+            <div className="flex items-center gap-3">
+              {step === 0 ? (
+                <Link
+                  to={`/portal/${customer.customerId}/requests`}
+                  className="inline-flex h-8 items-center justify-center rounded-lg px-2 text-[10px] font-semibold text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                >
+                  Cancelar
+                </Link>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setStep((current) => current - 1)}
+                  disabled={mutation.isPending}
+                  className="min-w-24 text-[10px]"
+                >
+                  Atrás
+                </Button>
+              )}
 
-          {step === 0 ? (
-            <Button
-              size="sm"
-              onClick={() => void goToRequirements()}
-              className="min-w-36 text-[10px]"
-            >
-              Continuar
-            </Button>
-          ) : step === 1 ? (
-            <Button
-              size="sm"
-              onClick={() => void goToReview()}
-              className="min-w-40 text-[10px]"
-            >
-              Revisar solicitud
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              type="submit"
-              disabled={mutation.isPending}
-              className="min-w-40 text-[10px]"
-            >
-              {mutation.isPending ? 'Enviando…' : 'Enviar solicitud'}
-            </Button>
-          )}
+              <span className="hidden text-[9px] text-slate-400 sm:inline">
+                Paso {step + 1} de 3
+              </span>
+            </div>
+
+            {step === 0 ? (
+              <Button
+                size="sm"
+                onClick={() => void goToRequirements()}
+                className="min-w-32 text-[10px]"
+              >
+                Continuar
+              </Button>
+            ) : step === 1 ? (
+              <Button
+                size="sm"
+                onClick={() => void goToReview()}
+                className="min-w-36 text-[10px]"
+              >
+                Revisar solicitud
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                type="submit"
+                disabled={mutation.isPending}
+                className="min-w-36 text-[10px]"
+              >
+                {mutation.isPending ? 'Enviando…' : 'Enviar solicitud'}
+              </Button>
+            )}
           </div>
         </form>
       </div>
