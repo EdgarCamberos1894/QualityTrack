@@ -30,7 +30,7 @@ export function InternalUserFilters({
   ) => onChange({ ...value, [key]: nextValue })
 
   return (
-    <div className="grid gap-3 border-b border-slate-200 p-4 lg:grid-cols-[minmax(280px,1fr)_210px_210px]">
+    <div className="grid gap-3 border-b border-slate-200 p-4 @3xl/page:grid-cols-[minmax(280px,1fr)_210px_210px]">
       <label>
         <span className="sr-only">Buscar usuarios internos</span>
         <input
