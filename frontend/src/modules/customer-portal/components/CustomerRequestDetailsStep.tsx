@@ -17,8 +17,8 @@ export function CustomerRequestDetailsStep({
   actions,
 }: CustomerRequestDetailsStepProps) {
   return (
-    <div className="grid gap-4 lg:h-full lg:grid-cols-[minmax(0,1.12fr)_minmax(340px,0.88fr)]">
-      <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)] lg:h-full">
+    <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
+      <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
         <div>
           <h2 className="text-[15px] font-semibold text-slate-950">
             Detalles del trabajo
@@ -73,8 +73,8 @@ export function CustomerRequestDetailsStep({
         </div>
       </Card>
 
-      <Card className="overflow-hidden shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)] lg:flex lg:h-full lg:flex-col">
-        <div className="px-4 pb-2.5 pt-4 lg:flex-1">
+      <Card className="overflow-hidden shadow-[0_12px_35px_-26px_rgba(15,23,42,0.22)] lg:flex lg:h-full lg:min-h-0 lg:flex-col">
+        <div className="px-4 pb-2.5 pt-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
           <h2 className="text-sm font-semibold text-slate-950">
             Qué pasa después
           </h2>
