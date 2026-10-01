@@ -105,20 +105,24 @@ export function RegisterPage() {
       wide
     >
       <form
-        className="space-y-5"
+        className="space-y-4"
         onSubmit={(event) => void submit(event)}
         noValidate
       >
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <TextField
             label="Nombre"
             autoComplete="given-name"
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
             error={errors.firstName?.message}
             {...register('firstName')}
           />
           <TextField
             label="Apellido"
             autoComplete="family-name"
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
             error={errors.lastName?.message}
             {...register('lastName')}
           />
@@ -128,6 +132,8 @@ export function RegisterPage() {
           label="Correo electrónico"
           type="email"
           autoComplete="email"
+          labelClassName="!mb-1.5 !text-[10px]"
+          className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
           error={errors.email?.message}
           {...register('email')}
         />
@@ -140,14 +146,14 @@ export function RegisterPage() {
         />
 
         {registerMutation.error ? (
-          <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700">
             {getErrorMessage(registerMutation.error)}
           </p>
         ) : null}
 
         <Button
           type="submit"
-          className="w-full"
+          className="!h-9 w-full !text-[10px]"
           disabled={registerMutation.isPending}
         >
           {registerMutation.isPending ? 'Creando cuenta…' : 'Crear cuenta'}
