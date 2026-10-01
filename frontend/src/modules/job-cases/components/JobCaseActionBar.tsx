@@ -9,11 +9,14 @@ interface JobCaseActionBarProps {
   taking: boolean
   completing: boolean
   creatingQuotation: boolean
+  quotationId: number | null
+  quotationLookupReady: boolean
   onTake: () => void
   onRequestInformation: () => void
   onDefineMaterial: () => void
   onComplete: () => void
   onCreateQuotation: () => void
+  onOpenQuotation: () => void
 }
 
 export function JobCaseActionBar({
@@ -22,19 +25,28 @@ export function JobCaseActionBar({
   taking,
   completing,
   creatingQuotation,
+  quotationId,
+  quotationLookupReady,
   onTake,
   onRequestInformation,
   onDefineMaterial,
   onComplete,
   onCreateQuotation,
+  onOpenQuotation,
 }: JobCaseActionBarProps) {
   const capabilities = getJobCaseCapabilities(jobCase, user)
+  const canOpenQuotation = quotationId !== null
+  const canCreateQuotation =
+    capabilities.canCreateQuotation &&
+    quotationLookupReady &&
+    quotationId === null
   const hasActions =
     capabilities.canTake ||
     capabilities.canRequestInformation ||
     capabilities.canDefineMaterial ||
     capabilities.canAttemptComplete ||
-    capabilities.canCreateQuotation
+    canCreateQuotation ||
+    canOpenQuotation
 
   if (!hasActions) return null
 
@@ -98,7 +110,15 @@ export function JobCaseActionBar({
             </Button>
           ) : null}
 
-          {capabilities.canCreateQuotation ? (
+          {canOpenQuotation ? (
+            <Button
+              size="sm"
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={onOpenQuotation}
+            >
+              Abrir cotización
+            </Button>
+          ) : canCreateQuotation ? (
             <Button
               size="sm"
               className="!h-7 !px-2.5 !text-[8px]"
