@@ -36,7 +36,7 @@ export function CustomerQuotationDocument({
     .join(' / ')
 
   return (
-    <div className="rounded-xl border border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/25 p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+    <div className="flex h-full flex-col rounded-xl border border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/25 p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
       <div className="customer-quotation-print-hidden mb-3 flex items-start justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -79,15 +79,22 @@ export function CustomerQuotationDocument({
         </button>
       </div>
 
-      <article className="customer-quotation-print-area rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-[0_12px_30px_-28px_rgba(15,23,42,0.45)] sm:px-5 sm:py-5">
-        <header className="flex items-start justify-between gap-4 border-b border-slate-200 pb-3.5">
+      <article className="customer-quotation-print-area flex flex-1 flex-col rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-[0_12px_30px_-28px_rgba(15,23,42,0.45)] sm:px-5 sm:py-5">
+        <header className="quotation-sheet-header flex items-start justify-between gap-4 border-b border-slate-200 pb-3.5">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-950 text-[7px] font-bold tracking-[0.08em] text-white">
-              QT
+            <img
+              src="/brand/qualitytrack-mark.svg"
+              alt="QualityTrack"
+              className="h-10 w-10 shrink-0"
+            />
+            <div>
+              <p className="text-[12px] font-bold tracking-tight text-slate-950">
+                Quality<span className="text-blue-600">Track</span>
+              </p>
+              <p className="mt-0.5 text-[6.5px] uppercase tracking-[0.08em] text-slate-400">
+                Gestión de calidad
+              </p>
             </div>
-            <p className="text-[12px] font-bold tracking-tight text-slate-950">
-              QualityTrack
-            </p>
           </div>
 
           <div className="text-right">
@@ -100,7 +107,7 @@ export function CustomerQuotationDocument({
           </div>
         </header>
 
-        <div className="mt-3.5 grid gap-3 sm:grid-cols-[1.5fr_0.72fr_0.72fr]">
+        <div className="quotation-sheet-meta mt-4 grid gap-3 rounded-xl border border-slate-100 bg-slate-50/55 px-3.5 py-3 sm:grid-cols-[1.5fr_0.72fr_0.72fr]">
           <div>
             <p className="text-[6px] font-bold uppercase tracking-[0.08em] text-slate-400">
               Cliente
@@ -132,18 +139,23 @@ export function CustomerQuotationDocument({
           </div>
         </div>
 
-        <section className="mt-5">
-          <h3 className="text-[10px] font-semibold text-slate-950">
-            Alcance comercial
-          </h3>
+        <section className="quotation-sheet-scope mt-5">
+          <div className="flex items-center justify-between gap-4">
+            <h3 className="text-[10px] font-semibold text-slate-950">
+              Alcance comercial
+            </h3>
+            <span className="text-[6.5px] font-medium text-slate-400">
+              {quotation.items.length} concepto{quotation.items.length === 1 ? '' : 's'}
+            </span>
+          </div>
 
-          <div className="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-slate-50/70">
+          <div className="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white">
             {quotation.items.map((item, index) => (
               <div
                 key={item.id}
                 className={
                   index === 0
-                    ? 'grid gap-2.5 px-3 py-3 sm:grid-cols-[minmax(0,1fr)_92px_98px]'
+                    ? 'grid gap-2.5 bg-slate-50/70 px-3 py-3 sm:grid-cols-[minmax(0,1fr)_92px_98px]'
                     : 'grid gap-2.5 border-t border-slate-200 px-3 py-3 sm:grid-cols-[minmax(0,1fr)_92px_98px]'
                 }
               >
@@ -173,12 +185,12 @@ export function CustomerQuotationDocument({
           </div>
         </section>
 
-        <div className="mt-5 grid gap-4 sm:grid-cols-[1fr_0.72fr]">
+        <div className="quotation-sheet-bottom mt-auto grid gap-4 pt-6 sm:grid-cols-[1fr_0.72fr]">
           <section>
-            <h3 className="text-[8px] font-semibold text-slate-950">
-              Condiciones
-            </h3>
-            <ul className="mt-1.5 space-y-0.5 text-[6.5px] leading-3.5 text-slate-600">
+            <p className="text-[6px] font-bold uppercase tracking-[0.08em] text-slate-400">
+              Condiciones comerciales
+            </p>
+            <ul className="mt-2 space-y-1 text-[6.5px] leading-3.5 text-slate-600">
               <li>• Precios expresados en {quotation.currency}.</li>
               <li>
                 • Vigencia hasta el {formatQuotationDate(quotation.validUntil)}.
@@ -193,7 +205,7 @@ export function CustomerQuotationDocument({
             </ul>
           </section>
 
-          <dl className="rounded-xl border border-slate-200 bg-slate-50/75 px-3 py-2.5">
+          <dl className="rounded-xl border border-blue-100 bg-blue-50/45 px-3 py-2.5">
             <div className="flex items-center justify-between gap-4">
               <dt className="text-[6.5px] text-slate-500">Subtotal</dt>
               <dd className="text-[8px] font-semibold text-slate-900">
@@ -208,8 +220,8 @@ export function CustomerQuotationDocument({
                 {formatQuotationMoney(quotation.tax, quotation.currency)}
               </dd>
             </div>
-            <div className="mt-2.5 flex items-end justify-between gap-4 border-t border-slate-200 pt-2.5">
-              <dt className="text-[6.5px] font-bold uppercase tracking-[0.06em] text-slate-700">
+            <div className="mt-2.5 flex items-end justify-between gap-4 border-t border-blue-100 pt-2.5">
+              <dt className="text-[6.5px] font-bold uppercase tracking-[0.06em] text-blue-700">
                 Total
               </dt>
               <dd className="text-[12px] font-bold tracking-tight text-slate-950">
@@ -219,11 +231,16 @@ export function CustomerQuotationDocument({
           </dl>
         </div>
 
-        <div className="mt-5 rounded-lg border border-blue-100 bg-blue-50/55 px-3 py-2">
-          <p className="text-[6.5px] leading-3.5 text-slate-500">
-            Vista representativa de esta revisión. Al imprimir puedes enviarla a una impresora o guardarla como PDF.
-          </p>
-        </div>
+        <footer className="quotation-sheet-note mt-5 border-t border-slate-100 pt-3">
+          <div className="flex items-center justify-between gap-4">
+            <p className="text-[6.5px] leading-3.5 text-slate-400">
+              Documento representativo de la revisión vigente.
+            </p>
+            <p className="text-[6.5px] font-medium text-slate-400">
+              QualityTrack · {quotation.quotationNumber}
+            </p>
+          </div>
+        </footer>
       </article>
     </div>
   )
