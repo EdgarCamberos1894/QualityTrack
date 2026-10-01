@@ -25,9 +25,9 @@ export function PublicAuthLayout({
       <main className="min-h-screen bg-[#f7f9fc] lg:grid lg:grid-cols-2">
         <AuthBrandPanel immersive />
 
-        <section className="flex min-h-screen items-center justify-center px-6 py-8 sm:px-10 lg:px-12 xl:px-16">
-          <div className={wide ? 'w-full max-w-[560px]' : 'w-full max-w-[520px]'}>
-            <div className="mb-8 flex items-center gap-2.5 lg:hidden">
+        <section className="flex min-h-screen items-center justify-center px-6 py-5 sm:px-10 lg:px-12 xl:px-16">
+          <div className={wide ? 'w-full max-w-[520px]' : 'w-full max-w-[480px]'}>
+            <div className="mb-6 flex items-center gap-2.5 lg:hidden">
               <img
                 src="/brand/qualitytrack-mark.svg"
                 alt=""
@@ -38,11 +38,11 @@ export function PublicAuthLayout({
               </span>
             </div>
 
-            <div className="mb-8">
-              <h1 className="text-[28px] font-bold tracking-tight text-slate-950 sm:text-[30px]">
+            <div className="mb-6">
+              <h1 className="text-[24px] font-bold tracking-tight text-slate-950 sm:text-[26px]">
                 {title}
               </h1>
-              <p className="mt-2 text-[13px] leading-5 text-slate-500">
+              <p className="mt-1.5 text-[11px] leading-5 text-slate-500">
                 {description}
               </p>
             </div>
@@ -50,7 +50,7 @@ export function PublicAuthLayout({
             {children}
 
             {footer ? (
-              <div className="mt-8 text-center text-[12px] text-slate-500">
+              <div className="mt-6 text-center text-[10px] text-slate-500">
                 {footer}
               </div>
             ) : null}
