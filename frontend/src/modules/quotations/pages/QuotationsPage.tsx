@@ -3,7 +3,7 @@ import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
-import { PageHeader } from '@/shared/components/layout/PageHeader'
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Card } from '@/shared/components/ui/Card'
 import { QuotationFilters } from '../components/QuotationFilters'
 import { QuotationTable } from '../components/QuotationTable'
@@ -32,7 +32,7 @@ export function QuotationsPage() {
 
   if (query.isPending) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <LoadingState label="Cargando cotizaciones…" />
       </PageContainer>
     )
@@ -40,7 +40,7 @@ export function QuotationsPage() {
 
   if (query.isError) {
     return (
-      <PageContainer>
+      <PageContainer className="py-4 lg:py-3">
         <ErrorState
           error={query.error}
           title="No pudimos cargar las cotizaciones"
@@ -49,37 +49,112 @@ export function QuotationsPage() {
     )
   }
 
-  return (
-    <PageContainer>
-      <PageHeader
-        eyebrow="Comercial"
-        title="Cotizaciones"
-        description="Consulta la revisión vigente de cada flujo comercial y su estado frente al cliente."
-      />
+  const quotations = query.data
+  const drafts = quotations.filter((quotation) => quotation.status === 'DRAFT').length
+  const sent = quotations.filter((quotation) => quotation.status === 'SENT').length
+  const approved = quotations.filter(
+    (quotation) => quotation.status === 'APPROVED',
+  ).length
+  const hasFilters = filters.search.length > 0 || filters.status !== 'ALL'
 
-      <Card className="overflow-hidden">
-        <div className="px-4 py-4">
-          <h2 className="text-sm font-semibold text-slate-950">
-            Bandeja comercial
-          </h2>
-          <p className="mt-1 text-[11px] text-slate-500">
-            {query.data.length} flujos · {visibleQuotations.length} visibles
+  return (
+    <PageContainer className="py-4 lg:py-3">
+      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/70 shadow-[0_16px_44px_-36px_rgba(15,23,42,0.34)]">
+        <div className="px-5 py-4 sm:px-6">
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200/70">
+              <SidebarNavIcon name="quotations" className="h-4 w-4" />
+            </span>
+            <div>
+              <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-600">
+                Comercial
+              </p>
+              <h1 className="mt-0.5 text-[20px] font-bold tracking-tight text-slate-950">
+                Cotizaciones
+              </h1>
+              <p className="mt-1 max-w-2xl text-[10px] leading-4 text-slate-500">
+                Controla borradores, revisiones enviadas y decisiones del cliente
+                sin perder el vínculo con su expediente de origen.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid border-t border-slate-200/80 pt-3 sm:grid-cols-4">
+            <div className="py-1 sm:pr-4">
+              <p className="text-[8px] font-medium text-slate-400">Flujos</p>
+              <p className="mt-0.5 text-[16px] font-bold text-slate-950">
+                {quotations.length}
+              </p>
+            </div>
+            <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1">
+              <p className="text-[8px] font-medium text-slate-400">Borradores</p>
+              <p className="mt-0.5 text-[16px] font-bold text-slate-950">
+                {drafts}
+              </p>
+            </div>
+            <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1">
+              <p className="text-[8px] font-medium text-slate-400">
+                Esperando cliente
+              </p>
+              <p className="mt-0.5 text-[16px] font-bold text-blue-700">
+                {sent}
+              </p>
+            </div>
+            <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:pl-4 sm:py-1">
+              <p className="text-[8px] font-medium text-slate-400">Aprobadas</p>
+              <p className="mt-0.5 text-[16px] font-bold text-emerald-700">
+                {approved}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
+        <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/55 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div>
+            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+              Bandeja comercial
+            </p>
+            <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
+              Revisiones vigentes
+            </h2>
+          </div>
+          <p className="text-[8px] font-medium text-slate-400">
+            {visibleQuotations.length} de {quotations.length} visibles
           </p>
         </div>
 
         <QuotationFilters value={filters} onChange={setFilters} />
 
+        {hasFilters ? (
+          <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-white px-4 py-2 sm:px-5">
+            <p className="text-[8px] text-slate-400">
+              Filtros aplicados a la bandeja
+            </p>
+            <button
+              type="button"
+              onClick={() => setFilters(initialFilters)}
+              className="text-[8px] font-semibold text-blue-600 transition hover:text-blue-700"
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        ) : null}
+
         {visibleQuotations.length > 0 ? (
           <QuotationTable quotations={visibleQuotations} />
         ) : (
-          <div className="p-5">
-            <EmptyState
-              title="No hay cotizaciones que coincidan"
-              description="Ajusta la búsqueda o el estado para consultar otros flujos."
-            />
+          <div className="bg-slate-50/35 p-4">
+            <Card className="p-4 shadow-none">
+              <EmptyState
+                title="No hay cotizaciones que coincidan"
+                description="Ajusta la búsqueda o el estado para consultar otros flujos."
+              />
+            </Card>
           </div>
         )}
-      </Card>
+      </section>
     </PageContainer>
   )
 }
