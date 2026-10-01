@@ -7,22 +7,30 @@ interface CustomerQuotationRevisionHistoryProps {
   customerId: number
   currentId: number
   revisions: CustomerQuotationSummaryDto[]
+  embedded?: boolean
 }
 
 export function CustomerQuotationRevisionHistory({
   customerId,
   currentId,
   revisions,
+  embedded = false,
 }: CustomerQuotationRevisionHistoryProps) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white/90 px-4 py-3.5">
+    <section
+      className={
+        embedded
+          ? ''
+          : 'rounded-xl border border-slate-200 bg-white/90 px-4 py-3.5'
+      }
+    >
       <div className="flex items-center justify-between gap-4">
         <div>
           <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
             Historial comercial
           </p>
           <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
-            Revisiones de la cotización
+            Revisiones
           </h2>
         </div>
         <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[8px] font-semibold text-slate-500">
@@ -30,7 +38,7 @@ export function CustomerQuotationRevisionHistory({
         </span>
       </div>
 
-      <div className="mt-3 divide-y divide-slate-100 border-t border-slate-100">
+      <div className="mt-2.5 divide-y divide-slate-100 border-t border-slate-100">
         {revisions.map((revision) => {
           const status = getCustomerQuotationStatusPresentation(
             revision.customerStatus,
@@ -43,7 +51,7 @@ export function CustomerQuotationRevisionHistory({
               to={`/portal/${customerId}/quotations/${revision.id}`}
               className={
                 current
-                  ? 'flex items-center justify-between gap-3 bg-blue-50/45 px-2.5 py-2.5 transition first:rounded-t-lg last:rounded-b-lg'
+                  ? 'flex items-center justify-between gap-3 rounded-lg bg-blue-50/55 px-2.5 py-2.5 transition'
                   : 'flex items-center justify-between gap-3 px-2.5 py-2.5 transition hover:bg-slate-50'
               }
             >
