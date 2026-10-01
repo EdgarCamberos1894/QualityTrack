@@ -11,34 +11,34 @@ interface CustomerPortalTopbarProps {
 
 function breadcrumb(pathname: string): string {
   if (pathname.endsWith('/members')) {
-    return 'Mi empresa / Miembros'
+    return 'Empresa / Miembros'
   }
 
   if (pathname.endsWith('/company')) {
-    return 'Mi empresa / Empresa'
+    return 'Empresa / Datos de empresa'
   }
 
   if (pathname.includes('/requests/new')) {
-    return 'Mi empresa / Solicitudes / Nueva solicitud'
+    return 'Gestión / Solicitudes / Nueva solicitud'
   }
 
   if (pathname.includes('/requests/')) {
-    return 'Mi empresa / Solicitudes / Detalle'
+    return 'Gestión / Solicitudes / Detalle'
   }
 
   if (pathname.endsWith('/requests')) {
-    return 'Mi empresa / Solicitudes'
+    return 'Gestión / Solicitudes'
   }
 
   if (pathname.includes('/quotations/')) {
-    return 'Mi empresa / Cotizaciones / Detalle'
+    return 'Gestión / Cotizaciones / Detalle'
   }
 
   if (pathname.endsWith('/quotations')) {
-    return 'Mi empresa / Cotizaciones'
+    return 'Gestión / Cotizaciones'
   }
 
-  return 'Mi empresa / Inicio'
+  return 'Principal / Panel'
 }
 
 function initials(email: string): string {
