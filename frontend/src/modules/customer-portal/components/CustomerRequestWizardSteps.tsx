@@ -11,7 +11,7 @@ export function CustomerRequestWizardSteps({
   currentStep,
 }: CustomerRequestWizardStepsProps) {
   return (
-    <Card className="mb-4 px-5 py-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.28)]">
+    <Card className="mb-3 px-4 py-2.5 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.28)]">
       <div className="flex items-center">
         {steps.map((label, index) => {
           const completed = index < currentStep
@@ -19,14 +19,14 @@ export function CustomerRequestWizardSteps({
 
           return (
             <Fragment key={label}>
-              <div className="flex min-w-0 items-center gap-2.5">
+              <div className="flex min-w-0 items-center gap-2">
                 <span
                   className={
                     completed
-                      ? 'flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-[9px] font-bold text-white'
+                      ? 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-[8px] font-bold text-white'
                       : active
-                        ? 'flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-600 text-[9px] font-bold text-white shadow-sm shadow-blue-200'
-                        : 'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-[9px] font-semibold text-slate-500'
+                        ? 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-600 text-[8px] font-bold text-white shadow-sm shadow-blue-200'
+                        : 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-[8px] font-semibold text-slate-500'
                   }
                 >
                   {completed ? '✓' : index + 1}
@@ -35,10 +35,10 @@ export function CustomerRequestWizardSteps({
                 <span
                   className={
                     active
-                      ? 'truncate text-[10px] font-semibold text-blue-700'
+                      ? 'truncate text-[9px] font-semibold text-blue-700'
                       : completed
-                        ? 'truncate text-[10px] font-medium text-slate-700'
-                        : 'truncate text-[10px] font-medium text-slate-500'
+                        ? 'truncate text-[9px] font-medium text-slate-700'
+                        : 'truncate text-[9px] font-medium text-slate-500'
                   }
                 >
                   {label}
@@ -49,8 +49,8 @@ export function CustomerRequestWizardSteps({
                 <div
                   className={
                     index < currentStep
-                      ? 'mx-4 h-px min-w-8 flex-1 bg-emerald-600'
-                      : 'mx-4 h-px min-w-8 flex-1 bg-slate-200'
+                      ? 'mx-3 h-px min-w-8 flex-1 bg-emerald-600'
+                      : 'mx-3 h-px min-w-8 flex-1 bg-slate-200'
                   }
                 />
               ) : null}
