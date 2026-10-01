@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
-import { Badge } from '@/shared/components/ui/Badge'
-import { Button } from '@/shared/components/ui/Button'
-import { Card } from '@/shared/components/ui/Card'
+import { Badge, type BadgeProps } from '@/shared/components/ui/Badge'
+import { CustomerMembersHeader } from '../components/CustomerMembersHeader'
 import { InviteCustomerMemberDialog } from '../components/InviteCustomerMemberDialog'
 import { RemoveCustomerMemberDialog } from '../components/RemoveCustomerMemberDialog'
 import { useCustomerPortalContext } from '../hooks/useCustomerPortalContext'
@@ -19,9 +19,43 @@ import {
   getCustomerRoleLabel,
 } from '../model/customerCompanyPresenter'
 import type { CustomerInvitationFormValues } from '../schemas/customerCompany.schemas'
-import type { CustomerMemberDto } from '../types/customerCompany.types'
+import type {
+  CustomerInvitationDto,
+  CustomerMemberDto,
+} from '../types/customerCompany.types'
+import type { CustomerMembershipRole } from '../types/customerPortal.types'
 
 type View = 'members' | 'invitations'
+
+const roleDescriptions: Record<CustomerMembershipRole, string> = {
+  ADMIN: 'Gestiona empresa, miembros y solicitudes.',
+  REQUESTER: 'Crea solicitudes y responde información.',
+  VIEWER: 'Consulta el portal sin realizar cambios.',
+}
+
+const roleTones: Record<CustomerMembershipRole, BadgeProps['tone']> = {
+  ADMIN: 'info',
+  REQUESTER: 'success',
+  VIEWER: 'neutral',
+}
+
+function memberStatusLabel(status: string): string {
+  if (status === 'ACTIVE') return 'Activo'
+
+  return status
+    .toLocaleLowerCase('es-MX')
+    .replaceAll('_', ' ')
+    .replace(/^./, (value) => value.toLocaleUpperCase('es-MX'))
+}
+
+function invitationStatusLabel(invitation: CustomerInvitationDto): string {
+  if (invitation.status === 'PENDING') return 'Pendiente'
+
+  return invitation.status
+    .toLocaleLowerCase('es-MX')
+    .replaceAll('_', ' ')
+    .replace(/^./, (value) => value.toLocaleUpperCase('es-MX'))
+}
 
 export function CustomerMembersPage() {
   const { customer } = useCustomerPortalContext()
@@ -30,14 +64,50 @@ export function CustomerMembersPage() {
   const invitationsQuery = useCustomerInvitations(customer.customerId, isAdmin)
   const mutations = useCustomerCompanyMutations(customer.customerId)
   const [view, setView] = useState<View>('members')
+  const [search, setSearch] = useState('')
   const [inviteOpen, setInviteOpen] = useState(false)
   const [removeTarget, setRemoveTarget] = useState<CustomerMemberDto | null>(
     null,
   )
 
+  const normalizedSearch = search.trim().toLocaleLowerCase('es-MX')
+
+  const visibleMembers = useMemo(
+    () =>
+      (membersQuery.data ?? []).filter((member) => {
+        if (!normalizedSearch) return true
+
+        return [
+          member.firstName,
+          member.lastName,
+          `${member.firstName} ${member.lastName}`,
+          member.email,
+          getCustomerRoleLabel(member.role),
+        ].some((value) =>
+          value.toLocaleLowerCase('es-MX').includes(normalizedSearch),
+        )
+      }),
+    [membersQuery.data, normalizedSearch],
+  )
+
+  const visibleInvitations = useMemo(
+    () =>
+      (invitationsQuery.data ?? []).filter((invitation) => {
+        if (!normalizedSearch) return true
+
+        return [
+          invitation.email,
+          getCustomerRoleLabel(invitation.role),
+        ].some((value) =>
+          value.toLocaleLowerCase('es-MX').includes(normalizedSearch),
+        )
+      }),
+    [invitationsQuery.data, normalizedSearch],
+  )
+
   if (membersQuery.isPending) {
     return (
-      <PageContainer>
+      <PageContainer className="py-3 lg:py-2">
         <LoadingState label="Cargando miembros…" />
       </PageContainer>
     )
@@ -45,7 +115,7 @@ export function CustomerMembersPage() {
 
   if (membersQuery.isError) {
     return (
-      <PageContainer>
+      <PageContainer className="py-3 lg:py-2">
         <ErrorState
           error={membersQuery.error}
           title="No pudimos cargar los miembros"
@@ -82,169 +152,278 @@ export function CustomerMembersPage() {
     }
   }
 
+  const changeView = (nextView: View) => {
+    setView(nextView)
+    setSearch('')
+  }
+
   return (
-    <PageContainer>
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-950">Miembros</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Personas con acceso a {customer.customerName}.
-          </p>
-        </div>
-        {isAdmin ? (
-          <Button
-            onClick={() => {
-              mutations.invite.reset()
-              setInviteOpen(true)
-            }}
-          >
-            Invitar miembro
-          </Button>
-        ) : null}
+    <PageContainer className="py-3 lg:flex lg:h-[calc(100dvh-100px)] lg:min-h-0 lg:flex-col lg:overflow-hidden lg:py-2">
+      <div className="shrink-0">
+        <CustomerMembersHeader
+          customerName={customer.customerName}
+          total={members.length}
+          admins={adminCount}
+          pendingInvitations={
+            isAdmin && !invitationsQuery.isPending ? invitations.length : null
+          }
+          isAdmin={isAdmin}
+          onInvite={() => {
+            mutations.invite.reset()
+            setInviteOpen(true)
+          }}
+        />
       </div>
 
-      <Card className="grid overflow-hidden sm:grid-cols-3 sm:divide-x sm:divide-slate-200">
-        <div className="px-5 py-4">
-          <p className="text-[10px] text-slate-500">Miembros activos</p>
-          <p className="mt-1 text-xl font-bold text-slate-950">
-            {members.length}
-          </p>
-        </div>
-        <button
-          type="button"
-          disabled={!isAdmin}
-          onClick={() => setView('invitations')}
-          className="px-5 py-4 text-left disabled:cursor-default"
-        >
-          <p className="text-[10px] text-slate-500">Invitaciones pendientes</p>
-          <p className="mt-1 text-xl font-bold text-slate-950">
-            {isAdmin && !invitationsQuery.isPending ? invitations.length : '—'}
-          </p>
-        </button>
-        <div className="px-5 py-4">
-          <p className="text-[10px] text-slate-500">Administradores</p>
-          <p className="mt-1 text-xl font-bold text-slate-950">{adminCount}</p>
-        </div>
-      </Card>
+      <section className="mt-3 flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-30px_rgba(15,23,42,0.38)]">
+        <div className="shrink-0 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/70 px-4 py-3 sm:px-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                Gestión de accesos
+              </p>
+              <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
+                {view === 'members' ? 'Miembros de la empresa' : 'Invitaciones pendientes'}
+              </h2>
+            </div>
 
-      <div className="mt-5 flex gap-2">
-        <Button
-          size="sm"
-          variant={view === 'members' ? 'primary' : 'secondary'}
-          onClick={() => setView('members')}
-        >
-          Miembros
-        </Button>
-        {isAdmin ? (
-          <Button
-            size="sm"
-            variant={view === 'invitations' ? 'primary' : 'secondary'}
-            onClick={() => setView('invitations')}
-          >
-            Invitaciones pendientes
-          </Button>
-        ) : null}
-      </div>
-
-      {view === 'members' ? (
-        <Card className="mt-4 overflow-hidden">
-          <div className="border-b border-slate-200 px-5 py-4">
-            <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500">
-              Miembro · Acceso · Estado
-            </p>
-          </div>
-          <div className="divide-y divide-slate-100">
-            {members.map((member) => (
-              <article
-                key={member.membershipId}
-                className="grid gap-4 px-5 py-4 md:grid-cols-[minmax(0,1fr)_190px_120px_auto] md:items-center"
+            <label className="relative block lg:w-[340px]">
+              <span className="sr-only">
+                {view === 'members' ? 'Buscar miembros' : 'Buscar invitaciones'}
+              </span>
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
               >
-                <div className="flex min-w-0 items-center gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-[10px] font-semibold text-teal-700">
-                    {getCustomerMemberInitials(
-                      member.firstName,
-                      member.lastName,
-                    )}
-                  </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-xs font-semibold text-slate-950">
-                      {member.firstName} {member.lastName}
-                    </p>
-                    <p className="mt-1 truncate text-[10px] text-slate-500">
-                      {member.email}
-                    </p>
-                  </div>
-                </div>
-
-                <Badge tone="info">{getCustomerRoleLabel(member.role)}</Badge>
-                <Badge tone="success">Activo</Badge>
-
-                {isAdmin ? (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      mutations.removeMember.reset()
-                      setRemoveTarget(member)
-                    }}
-                  >
-                    Retirar
-                  </Button>
-                ) : null}
-              </article>
-            ))}
-          </div>
-        </Card>
-      ) : (
-        <Card className="mt-4 overflow-hidden">
-          {invitationsQuery.isPending ? (
-            <div className="p-5">
-              <LoadingState label="Cargando invitaciones…" />
-            </div>
-          ) : invitationsQuery.isError ? (
-            <div className="p-5">
-              <ErrorState
-                error={invitationsQuery.error}
-                title="No pudimos cargar las invitaciones"
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder={
+                  view === 'members'
+                    ? 'Buscar por nombre, correo o rol…'
+                    : 'Buscar por correo o rol…'
+                }
+                className="h-8 w-full rounded-lg border border-slate-300 bg-white pl-9 pr-3 text-[10px] text-slate-900 outline-none transition placeholder:text-[9px] placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
               />
-            </div>
-          ) : invitations.length === 0 ? (
-            <p className="px-5 py-10 text-center text-sm text-slate-500">
-              No hay invitaciones pendientes.
+            </label>
+          </div>
+
+          <div className="mt-3 flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => changeView('members')}
+              className={
+                view === 'members'
+                  ? 'inline-flex h-7 items-center gap-1.5 rounded-lg border border-blue-200 bg-white px-2.5 text-[8px] font-semibold text-blue-700 shadow-sm ring-2 ring-blue-100'
+                  : 'inline-flex h-7 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-[8px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50'
+              }
+            >
+              Miembros
+              <span className="rounded-full bg-slate-100 px-1.5 py-0.5 text-[7px] text-slate-500">
+                {members.length}
+              </span>
+            </button>
+
+            {isAdmin ? (
+              <button
+                type="button"
+                onClick={() => changeView('invitations')}
+                className={
+                  view === 'invitations'
+                    ? 'inline-flex h-7 items-center gap-1.5 rounded-lg border border-blue-200 bg-white px-2.5 text-[8px] font-semibold text-blue-700 shadow-sm ring-2 ring-blue-100'
+                    : 'inline-flex h-7 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-[8px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50'
+                }
+              >
+                Invitaciones
+                <span className="rounded-full bg-amber-50 px-1.5 py-0.5 text-[7px] text-amber-700">
+                  {invitationsQuery.isPending ? '…' : invitations.length}
+                </span>
+              </button>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/65 px-4 py-2 sm:px-5">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+            <p className="text-[9px] font-semibold text-slate-700">
+              {view === 'members'
+                ? `${visibleMembers.length} ${visibleMembers.length === 1 ? 'miembro visible' : 'miembros visibles'}`
+                : `${visibleInvitations.length} ${visibleInvitations.length === 1 ? 'invitación visible' : 'invitaciones visibles'}`}
             </p>
-          ) : (
-            <div className="divide-y divide-slate-100">
-              {invitations.map((invitation) => (
+          </div>
+
+          {search ? (
+            <button
+              type="button"
+              onClick={() => setSearch('')}
+              className="text-[8px] font-semibold text-blue-600 transition hover:text-blue-700"
+            >
+              Limpiar búsqueda
+            </button>
+          ) : null}
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-y-auto bg-slate-50/35 p-3.5 sm:p-4">
+          {view === 'members' ? (
+            visibleMembers.length > 0 ? (
+              <div className="space-y-2.5">
+                {visibleMembers.map((member) => (
+                  <article
+                    key={member.membershipId}
+                    className="rounded-xl border border-slate-200 bg-white px-3.5 py-3 shadow-[0_8px_24px_-22px_rgba(15,23,42,0.34)] transition hover:border-slate-300"
+                  >
+                    <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(210px,0.55fr)_150px_auto] md:items-center">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[9px] font-bold text-blue-700 ring-1 ring-blue-100">
+                          {getCustomerMemberInitials(
+                            member.firstName,
+                            member.lastName,
+                          )}
+                        </span>
+
+                        <div className="min-w-0">
+                          <p className="truncate text-[11px] font-semibold text-slate-950">
+                            {member.firstName} {member.lastName}
+                          </p>
+                          <p className="mt-0.5 truncate text-[9px] text-slate-500">
+                            {member.email}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="min-w-0">
+                        <Badge
+                          tone={roleTones[member.role]}
+                          className="px-2 py-0.5 text-[8px]"
+                        >
+                          {getCustomerRoleLabel(member.role)}
+                        </Badge>
+                        <p className="mt-1 text-[8px] leading-4 text-slate-500">
+                          {roleDescriptions[member.role]}
+                        </p>
+                      </div>
+
+                      <div>
+                        <Badge
+                          tone={member.status === 'ACTIVE' ? 'success' : 'neutral'}
+                          className="px-2 py-0.5 text-[8px]"
+                        >
+                          {memberStatusLabel(member.status)}
+                        </Badge>
+                        <p className="mt-1 text-[8px] text-slate-400">
+                          {member.joinedAt
+                            ? `Desde ${formatCustomerCompanyDate(member.joinedAt)}`
+                            : 'Sin fecha de acceso'}
+                        </p>
+                      </div>
+
+                      {isAdmin ? (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            mutations.removeMember.reset()
+                            setRemoveTarget(member)
+                          }}
+                          className="inline-flex h-7 items-center justify-center rounded-lg px-2.5 text-[8px] font-medium text-slate-500 transition hover:bg-red-50 hover:text-red-600"
+                        >
+                          Retirar
+                        </button>
+                      ) : null}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-slate-200 bg-white p-4">
+                <EmptyState
+                  title="No hay miembros que coincidan"
+                  description="Prueba con otro nombre, correo o rol."
+                />
+              </div>
+            )
+          ) : invitationsQuery.isPending ? (
+            <LoadingState label="Cargando invitaciones…" />
+          ) : invitationsQuery.isError ? (
+            <ErrorState
+              error={invitationsQuery.error}
+              title="No pudimos cargar las invitaciones"
+            />
+          ) : visibleInvitations.length > 0 ? (
+            <div className="space-y-2.5">
+              {visibleInvitations.map((invitation) => (
                 <article
                   key={invitation.id}
-                  className="grid gap-4 px-5 py-4 md:grid-cols-[minmax(0,1fr)_190px_140px] md:items-center"
+                  className="rounded-xl border border-slate-200 bg-white px-3.5 py-3 shadow-[0_8px_24px_-22px_rgba(15,23,42,0.34)]"
                 >
-                  <div>
-                    <p className="text-xs font-semibold text-slate-950">
-                      {invitation.email}
-                    </p>
-                    <p className="mt-1 text-[10px] text-slate-500">
-                      Enviada {formatCustomerCompanyDate(invitation.createdAt)}{' '}
-                      · vence {formatCustomerCompanyDate(invitation.expiresAt)}
-                    </p>
+                  <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_220px_150px] md:items-center">
+                    <div className="min-w-0">
+                      <p className="truncate text-[11px] font-semibold text-slate-950">
+                        {invitation.email}
+                      </p>
+                      <p className="mt-1 text-[8px] leading-4 text-slate-500">
+                        Enviada {formatCustomerCompanyDate(invitation.createdAt)}
+                        {' · '}vence {formatCustomerCompanyDate(invitation.expiresAt)}
+                      </p>
+                    </div>
+
+                    <div>
+                      <Badge
+                        tone={roleTones[invitation.role]}
+                        className="px-2 py-0.5 text-[8px]"
+                      >
+                        {getCustomerRoleLabel(invitation.role)}
+                      </Badge>
+                      <p className="mt-1 text-[8px] leading-4 text-slate-500">
+                        {roleDescriptions[invitation.role]}
+                      </p>
+                    </div>
+
+                    <Badge
+                      tone={invitation.status === 'PENDING' ? 'warning' : 'neutral'}
+                      className="w-fit px-2 py-0.5 text-[8px]"
+                    >
+                      {invitationStatusLabel(invitation)}
+                    </Badge>
                   </div>
-                  <Badge tone="info">
-                    {getCustomerRoleLabel(invitation.role)}
-                  </Badge>
-                  <Badge tone="warning">Pendiente</Badge>
                 </article>
               ))}
             </div>
+          ) : (
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <EmptyState
+                title={
+                  invitations.length === 0
+                    ? 'No hay invitaciones pendientes'
+                    : 'No hay invitaciones que coincidan'
+                }
+                description={
+                  invitations.length === 0
+                    ? 'Las nuevas invitaciones aparecerán aquí mientras esperan ser aceptadas.'
+                    : 'Prueba con otro correo o rol.'
+                }
+              />
+            </div>
           )}
-        </Card>
-      )}
+        </div>
 
-      {!isAdmin ? (
-        <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[10px] text-slate-600">
-          Tu rol puede consultar los miembros, pero solo un administrador puede
-          invitar o retirar accesos.
-        </p>
-      ) : null}
+        {!isAdmin ? (
+          <div className="shrink-0 border-t border-slate-200 bg-white px-4 py-2.5 sm:px-5">
+            <p className="text-[8px] leading-4 text-slate-500">
+              Tu rol puede consultar los miembros. Solo un administrador puede invitar o retirar accesos.
+            </p>
+          </div>
+        ) : null}
+      </section>
 
       <InviteCustomerMemberDialog
         open={inviteOpen}
