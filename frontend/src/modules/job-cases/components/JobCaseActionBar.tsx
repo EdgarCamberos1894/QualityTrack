@@ -39,54 +39,85 @@ export function JobCaseActionBar({
   if (!hasActions) return null
 
   return (
-    <section className="rounded-xl border border-amber-200 bg-amber-50/60 p-4">
-      <div className="flex flex-wrap items-center gap-2">
-        {capabilities.canTake ? (
-          <Button size="sm" onClick={onTake} disabled={taking}>
-            {taking ? 'Tomando…' : 'Tomar expediente'}
-          </Button>
-        ) : null}
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+      <div className="flex flex-col gap-2.5 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/55 px-3.5 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+            Acciones del expediente
+          </p>
+          <p className="mt-0.5 text-[9px] text-slate-500">
+            Solo se muestran las acciones disponibles para tu rol y el estado actual.
+          </p>
+        </div>
 
-        {capabilities.canRequestInformation ? (
-          <Button size="sm" variant="secondary" onClick={onRequestInformation}>
-            Solicitar aclaración
-          </Button>
-        ) : null}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {capabilities.canTake ? (
+            <Button
+              size="sm"
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={onTake}
+              disabled={taking}
+            >
+              {taking ? 'Tomando…' : 'Tomar expediente'}
+            </Button>
+          ) : null}
 
-        {capabilities.canDefineMaterial ? (
-          <Button size="sm" variant="secondary" onClick={onDefineMaterial}>
-            {jobCase.materialSpecification
-              ? 'Actualizar material'
-              : 'Definir material'}
-          </Button>
-        ) : null}
+          {capabilities.canRequestInformation ? (
+            <Button
+              size="sm"
+              variant="secondary"
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={onRequestInformation}
+            >
+              Solicitar aclaración
+            </Button>
+          ) : null}
 
-        {capabilities.canAttemptComplete ? (
-          <Button
-            size="sm"
-            onClick={onComplete}
-            disabled={completing || !capabilities.canCompleteReview}
-            title={capabilities.completeBlockReason ?? undefined}
-          >
-            {completing ? 'Completando…' : 'Completar revisión'}
-          </Button>
-        ) : null}
+          {capabilities.canDefineMaterial ? (
+            <Button
+              size="sm"
+              variant="secondary"
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={onDefineMaterial}
+            >
+              {jobCase.materialSpecification
+                ? 'Actualizar material'
+                : 'Definir material'}
+            </Button>
+          ) : null}
 
-        {capabilities.canCreateQuotation ? (
-          <Button
-            size="sm"
-            onClick={onCreateQuotation}
-            disabled={creatingQuotation}
-          >
-            {creatingQuotation ? 'Creando…' : 'Crear cotización'}
-          </Button>
-        ) : null}
+          {capabilities.canAttemptComplete ? (
+            <Button
+              size="sm"
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={onComplete}
+              disabled={completing || !capabilities.canCompleteReview}
+              title={capabilities.completeBlockReason ?? undefined}
+            >
+              {completing ? 'Completando…' : 'Completar revisión'}
+            </Button>
+          ) : null}
+
+          {capabilities.canCreateQuotation ? (
+            <Button
+              size="sm"
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={onCreateQuotation}
+              disabled={creatingQuotation}
+            >
+              {creatingQuotation ? 'Creando…' : 'Crear cotización'}
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       {capabilities.completeBlockReason ? (
-        <p className="mt-3 text-[10px] text-amber-800">
-          {capabilities.completeBlockReason}
-        </p>
+        <div className="flex items-start gap-2 bg-amber-50/70 px-3.5 py-2">
+          <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
+          <p className="text-[8px] leading-4 text-amber-800">
+            {capabilities.completeBlockReason}
+          </p>
+        </div>
       ) : null}
     </section>
   )
