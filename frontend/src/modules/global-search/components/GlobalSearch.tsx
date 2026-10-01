@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { TopbarActionIcon } from '@/shared/components/navigation/TopbarActionIcon'
 import { useGlobalSearch } from '../hooks/useGlobalSearch'
 import type { GlobalSearchResultDto } from '../types/globalSearch.types'
 import { GlobalSearchResults } from './GlobalSearchResults'
@@ -74,15 +75,13 @@ export function GlobalSearch() {
     <>
       <div
         ref={containerRef}
-        className="relative hidden w-full max-w-[360px] md:block"
+        className="relative hidden w-full max-w-[420px] md:block"
       >
         <div className="relative">
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400"
-          >
-            ⌕
-          </span>
+          <TopbarActionIcon
+            name="search"
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+          />
           <input
             ref={desktopInputRef}
             type="search"
@@ -105,9 +104,9 @@ export function GlobalSearch() {
             }}
             placeholder="Buscar folio, cliente, material…"
             aria-label="Búsqueda global"
-            className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-14 text-xs text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50"
+            className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50/80 pl-10 pr-16 text-xs font-medium text-slate-900 outline-none transition placeholder:font-normal placeholder:text-slate-400 hover:border-slate-300 hover:bg-slate-50 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50"
           />
-          <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md border border-slate-200 bg-white px-1.5 py-1 text-[8px] font-semibold text-slate-400">
+          <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md border border-slate-200 bg-white px-2 py-1 text-[8px] font-semibold tracking-wide text-slate-400 shadow-sm">
             Ctrl K
           </span>
         </div>
@@ -127,13 +126,11 @@ export function GlobalSearch() {
 
       <button
         type="button"
-        className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:bg-slate-50 md:hidden"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 md:hidden"
         onClick={() => setMobileOpen(true)}
         aria-label="Abrir búsqueda global"
       >
-        <span aria-hidden="true" className="text-base">
-          ⌕
-        </span>
+        <TopbarActionIcon name="search" />
       </button>
 
       {mobileOpen ? (
