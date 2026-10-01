@@ -3,7 +3,7 @@ import {
   navigationGroups,
   type NavigationItem,
 } from '@/app/layout/navigation'
-import type { AuthenticatedUser } from '@/modules/auth'
+import { getSystemRoleLabel, type AuthenticatedUser } from '@/modules/auth'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { cn } from '@/shared/lib/cn'
 
@@ -61,6 +61,10 @@ function isNavigationItemActive(
 
 export function Sidebar({ open, user, onNavigate }: SidebarProps) {
   const location = useLocation()
+  const primaryRole = user.roles[0]
+    ? getSystemRoleLabel(user.roles[0])
+    : 'Usuario interno'
+  const additionalRoles = Math.max(user.roles.length - 1, 0)
   const visibleGroups = navigationGroups
     .map((group) => ({
       ...group,
@@ -92,15 +96,16 @@ export function Sidebar({ open, user, onNavigate }: SidebarProps) {
       </div>
 
       <div className="mt-6 flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/80 px-3.5 py-3.5">
-        <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px] bg-teal-700 text-[11px] font-bold text-white">
-          QT
+        <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px] bg-blue-500/15 text-blue-300 ring-1 ring-blue-400/15">
+          <SidebarNavIcon name="users" className="h-[18px] w-[18px]" />
         </div>
         <div className="min-w-0">
           <p className="truncate text-xs font-semibold text-white">
-            Planta Tepic
+            Equipo interno
           </p>
-          <p className="mt-1 truncate text-[10px] text-teal-200">
-            Operación interna
+          <p className="mt-1 truncate text-[9px] text-slate-400">
+            {primaryRole}
+            {additionalRoles > 0 ? ` · +${additionalRoles}` : ''}
           </p>
         </div>
       </div>
