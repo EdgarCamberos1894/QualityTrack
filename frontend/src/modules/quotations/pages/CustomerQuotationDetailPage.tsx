@@ -7,6 +7,7 @@ import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { ApproveQuotationDialog } from '../components/ApproveQuotationDialog'
 import { CustomerQuotationDocument } from '../components/CustomerQuotationDocument'
 import { CustomerQuotationHeader } from '../components/CustomerQuotationHeader'
+import { CustomerQuotationPreview } from '../components/CustomerQuotationPreview'
 import { CustomerQuotationRevisionHistory } from '../components/CustomerQuotationRevisionHistory'
 import { CustomerQuotationSourceCard } from '../components/CustomerQuotationSourceCard'
 import { QuotationFlowSteps } from '../components/QuotationFlowSteps'
@@ -157,6 +158,11 @@ export function CustomerQuotationDetailPage() {
           source={quotation.source}
           caseNumber={quotation.caseNumber}
           requestNumber={quotation.requestNumber}
+        />
+
+        <CustomerQuotationPreview
+          quotation={quotation}
+          customerName={customer.customerName}
         />
 
         {customer.role === 'VIEWER' && quotation.customerStatus === 'SENT' ? (
