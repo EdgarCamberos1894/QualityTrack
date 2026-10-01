@@ -26,11 +26,13 @@ export function PasswordFields({
         type={show ? 'text' : 'password'}
         autoComplete="new-password"
         hint="Mínimo 8 caracteres."
+        labelClassName="!mb-1.5 !text-[10px]"
+        className="!h-9 !rounded-lg !px-2.5 !pr-16 !text-[10px] !shadow-none placeholder:!text-[9px]"
         error={passwordError}
         endAdornment={
           <button
             type="button"
-            className="text-xs font-semibold text-slate-500 hover:text-slate-900"
+            className="text-[8px] font-semibold text-slate-500 hover:text-slate-900"
             onClick={() => setShow((current) => !current)}
           >
             {show ? 'Ocultar' : 'Mostrar'}
@@ -42,6 +44,8 @@ export function PasswordFields({
         label="Confirmar contraseña"
         type={show ? 'text' : 'password'}
         autoComplete="new-password"
+        labelClassName="!mb-1.5 !text-[10px]"
+        className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
         error={confirmError}
         {...confirmRegistration}
       />
