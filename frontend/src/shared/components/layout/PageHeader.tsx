@@ -14,7 +14,7 @@ export function PageHeader({
   actions,
 }: PageHeaderProps) {
   return (
-    <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <header className="mb-8 flex flex-col gap-4 @2xl/page:flex-row @2xl/page:items-start @2xl/page:justify-between">
       <div className="min-w-0">
         {eyebrow ? (
           <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-blue-600">
