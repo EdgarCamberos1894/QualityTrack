@@ -144,7 +144,7 @@ export function WorkOrderTimeline({ data }: WorkOrderTimelineProps) {
                   )}
                 />
 
-                <div className="grid gap-3 lg:grid-cols-[126px_minmax(180px,0.8fr)_minmax(160px,0.7fr)_minmax(0,1.5fr)] lg:items-start">
+                <div className="grid gap-3 @3xl/page:grid-cols-[126px_minmax(180px,0.8fr)_minmax(160px,0.7fr)_minmax(0,1.5fr)] @3xl/page:items-start">
                   <time className="text-[9px] font-medium text-slate-500">
                     {formatTimelineDate(event.occurredAt)}
                   </time>
