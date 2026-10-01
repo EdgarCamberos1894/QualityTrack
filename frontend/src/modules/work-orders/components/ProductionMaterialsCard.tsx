@@ -75,7 +75,7 @@ export function ProductionMaterialsCard({
 
       {canRecord ? (
         <form
-          className="mt-5 grid gap-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4 lg:grid-cols-[1fr_1fr_180px_auto]"
+          className="mt-5 grid gap-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4 @4xl/page:grid-cols-[1fr_1fr_180px_auto]"
           onSubmit={(event) => void submit(event)}
         >
           <div>
