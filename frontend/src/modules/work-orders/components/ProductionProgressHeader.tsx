@@ -23,19 +23,15 @@ export function ProductionProgressHeader({
       : 0
 
   return (
-    <section className="rounded-xl border border-amber-200 bg-amber-50/60 p-5">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+      <div className="flex flex-col gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-amber-700">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
             Producción
           </p>
-          <h2 className="mt-1 text-base font-semibold text-slate-950">
+          <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
             Ejecución real de planta
           </h2>
-          <p className="mt-1 max-w-2xl text-[10px] leading-5 text-slate-600">
-            Registra quién ejecutó cada operación, cuándo ocurrió, qué máquina
-            se utilizó y cuál fue el resultado real.
-          </p>
         </div>
 
         <Badge
@@ -46,7 +42,7 @@ export function ProductionProgressHeader({
                 ? 'warning'
                 : 'neutral'
           }
-          className="px-4 py-1.5"
+          className="px-2 py-0.5 text-[8px]"
         >
           {production.productionCompleted
             ? 'Producción completada'
@@ -56,32 +52,32 @@ export function ProductionProgressHeader({
         </Badge>
       </div>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-[1fr_180px_180px]">
+      <div className="grid gap-3 px-4 py-3.5 md:grid-cols-[1fr_150px_150px]">
         <div>
-          <div className="flex items-center justify-between text-[10px] text-slate-600">
+          <div className="flex items-center justify-between text-[8px] text-slate-500">
             <span>Progreso de operaciones</span>
-            <span className="font-semibold text-slate-900">
+            <span className="font-semibold text-slate-800">
               {completedOperations}/{totalOperations} · {progress}%
             </span>
           </div>
-          <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
             <div
-              className="h-full rounded-full bg-amber-500 transition-all"
+              className="h-full rounded-full bg-blue-500 transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
 
         <div>
-          <p className="text-[9px] text-slate-500">Inicio real</p>
-          <p className="mt-1 text-[10px] font-semibold text-slate-900">
+          <p className="text-[8px] text-slate-400">Inicio real</p>
+          <p className="mt-1 text-[9px] font-semibold text-slate-800">
             {formatProductionDateTime(production.actualStartAt)}
           </p>
         </div>
 
         <div>
-          <p className="text-[9px] text-slate-500">Fin real</p>
-          <p className="mt-1 text-[10px] font-semibold text-slate-900">
+          <p className="text-[8px] text-slate-400">Fin real</p>
+          <p className="mt-1 text-[9px] font-semibold text-slate-800">
             {formatProductionDateTime(production.actualEndAt)}
           </p>
         </div>
