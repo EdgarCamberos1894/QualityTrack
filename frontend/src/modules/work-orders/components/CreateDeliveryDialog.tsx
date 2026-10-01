@@ -148,22 +148,38 @@ export function CreateDeliveryDialog({
           />
 
           <div className="grid gap-3 sm:grid-cols-2">
-            {[
-              ['Ciudad', 'destinationCity'],
-              ['Estado', 'destinationState'],
-              ['Código postal', 'destinationPostalCode'],
-              ['País', 'destinationCountry'],
-            ].map(([label, name]) => (
-              <TextField
-                key={name}
-                label={label}
-                maxLength={name === 'destinationPostalCode' ? 20 : 120}
-                labelClassName="!mb-1.5 !text-[10px]"
-                className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
-                error={errors[name as keyof CreateDeliveryFormValues]?.message as string | undefined}
-                {...register(name as keyof CreateDeliveryFormValues)}
-              />
-            ))}
+            <TextField
+              label="Ciudad"
+              maxLength={120}
+              labelClassName="!mb-1.5 !text-[10px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              error={errors.destinationCity?.message}
+              {...register('destinationCity')}
+            />
+            <TextField
+              label="Estado"
+              maxLength={120}
+              labelClassName="!mb-1.5 !text-[10px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              error={errors.destinationState?.message}
+              {...register('destinationState')}
+            />
+            <TextField
+              label="Código postal"
+              maxLength={20}
+              labelClassName="!mb-1.5 !text-[10px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              error={errors.destinationPostalCode?.message}
+              {...register('destinationPostalCode')}
+            />
+            <TextField
+              label="País"
+              maxLength={100}
+              labelClassName="!mb-1.5 !text-[10px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              error={errors.destinationCountry?.message}
+              {...register('destinationCountry')}
+            />
           </div>
 
           <p className="rounded-lg border border-blue-100 bg-blue-50/60 px-3 py-2 text-[8px] leading-4 text-blue-800">
