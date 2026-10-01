@@ -5,9 +5,9 @@ import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { ApproveQuotationDialog } from '../components/ApproveQuotationDialog'
+import { CustomerQuotationDecisionPanel } from '../components/CustomerQuotationDecisionPanel'
 import { CustomerQuotationDocument } from '../components/CustomerQuotationDocument'
 import { CustomerQuotationHeader } from '../components/CustomerQuotationHeader'
-import { CustomerQuotationRevisionHistory } from '../components/CustomerQuotationRevisionHistory'
 import { CustomerQuotationSourceCard } from '../components/CustomerQuotationSourceCard'
 import { QuotationFlowSteps } from '../components/QuotationFlowSteps'
 import { RejectQuotationDialog } from '../components/RejectQuotationDialog'
@@ -144,11 +144,6 @@ export function CustomerQuotationDetailPage() {
         customerId={customer.customerId}
         quotation={quotation}
         customerName={customer.customerName}
-        canDecide={canDecide}
-        submitting={mutationPending}
-        onRequestAdjustment={() => openDialog('adjust')}
-        onReject={() => openDialog('reject')}
-        onApprove={() => openDialog('approve')}
       />
 
       <div className="space-y-4">
@@ -159,38 +154,28 @@ export function CustomerQuotationDetailPage() {
           requestNumber={quotation.requestNumber}
         />
 
-        {customer.role === 'VIEWER' && quotation.customerStatus === 'SENT' ? (
-          <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
-            Tu rol es de consulta. Un administrador o solicitante de la empresa
-            debe responder esta cotización.
-          </p>
-        ) : null}
-
-        {quotation.customerStatus === 'REJECTED' &&
-        quotation.rejectionReason ? (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-xs text-red-700">
-            Motivo de rechazo: {quotation.rejectionReason}
-          </p>
-        ) : null}
-
-        <CustomerQuotationDocument
-          quotation={quotation}
-          customerName={customer.customerName}
-        />
-
-        {revisionsQuery.isPending ? (
-          <LoadingState label="Cargando revisiones…" />
-        ) : revisionsQuery.isError ? (
-          <p className="text-xs text-amber-700">
-            No fue posible cargar el historial de revisiones.
-          </p>
-        ) : (
-          <CustomerQuotationRevisionHistory
-            customerId={customer.customerId}
-            currentId={quotation.id}
-            revisions={revisionsQuery.data}
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-start">
+          <CustomerQuotationDocument
+            quotation={quotation}
+            customerName={customer.customerName}
           />
-        )}
+
+          <CustomerQuotationDecisionPanel
+            customerId={customer.customerId}
+            quotation={quotation}
+            canDecide={canDecide}
+            viewerReadOnly={
+              customer.role === 'VIEWER' && quotation.customerStatus === 'SENT'
+            }
+            submitting={mutationPending}
+            revisions={revisionsQuery.data}
+            revisionsPending={revisionsQuery.isPending}
+            revisionsError={revisionsQuery.isError}
+            onRequestAdjustment={() => openDialog('adjust')}
+            onReject={() => openDialog('reject')}
+            onApprove={() => openDialog('approve')}
+          />
+        </div>
       </div>
 
       <ApproveQuotationDialog
