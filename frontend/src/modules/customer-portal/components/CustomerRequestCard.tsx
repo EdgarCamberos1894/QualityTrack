@@ -1,16 +1,52 @@
 import { Link } from 'react-router-dom'
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge } from '@/shared/components/ui/Badge'
 import {
   formatCustomerRequestDate,
   getCustomerRequestStatusPresentation,
   requestNeedsCustomerResponse,
 } from '../model/customerRequestPresenter'
-import type { CustomerRequestSummaryDto } from '../types/customerRequest.types'
+import type {
+  CustomerRequestStatus,
+  CustomerRequestSummaryDto,
+} from '../types/customerRequest.types'
 
 interface CustomerRequestCardProps {
   customerId: number
   request: CustomerRequestSummaryDto
 }
+
+const statusAccent: Record<CustomerRequestStatus, string> = {
+  SUBMITTED: 'from-amber-500 to-orange-400',
+  UNDER_REVIEW: 'from-amber-500 to-orange-400',
+  WAITING_CUSTOMER_INFO: 'from-amber-500 to-orange-400',
+  READY_FOR_QUOTATION: 'from-blue-500 to-cyan-400',
+  IN_PRODUCTION: 'from-indigo-500 to-violet-400',
+  COMPLETED: 'from-emerald-500 to-teal-400',
+  CANCELLED: 'from-red-500 to-rose-400',
+}
+
+const statusSurface: Record<CustomerRequestStatus, string> = {
+  SUBMITTED: 'bg-amber-50 text-amber-600',
+  UNDER_REVIEW: 'bg-amber-50 text-amber-600',
+  WAITING_CUSTOMER_INFO: 'bg-amber-50 text-amber-600',
+  READY_FOR_QUOTATION: 'bg-blue-50 text-blue-600',
+  IN_PRODUCTION: 'bg-indigo-50 text-indigo-600',
+  COMPLETED: 'bg-emerald-50 text-emerald-600',
+  CANCELLED: 'bg-red-50 text-red-600',
+}
+
+const stageIndex: Record<CustomerRequestStatus, number> = {
+  SUBMITTED: 0,
+  UNDER_REVIEW: 0,
+  WAITING_CUSTOMER_INFO: 0,
+  READY_FOR_QUOTATION: 1,
+  IN_PRODUCTION: 2,
+  COMPLETED: 3,
+  CANCELLED: -1,
+}
+
+const stages = ['Revisión', 'Cotización', 'Producción', 'Finalizada']
 
 export function CustomerRequestCard({
   customerId,
@@ -18,60 +54,153 @@ export function CustomerRequestCard({
 }: CustomerRequestCardProps) {
   const status = getCustomerRequestStatusPresentation(request.jobCase.status)
   const needsResponse = requestNeedsCustomerResponse(request)
+  const currentStage = stageIndex[request.jobCase.status]
 
   return (
-    <article className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <span
-        className={
-          needsResponse
-            ? 'absolute inset-y-0 left-0 w-1 bg-amber-600'
-            : request.jobCase.status === 'CANCELLED'
-              ? 'absolute inset-y-0 left-0 w-1 bg-red-600'
-              : request.jobCase.status === 'COMPLETED'
-                ? 'absolute inset-y-0 left-0 w-1 bg-emerald-600'
-                : 'absolute inset-y-0 left-0 w-1 bg-blue-600'
-        }
+    <article className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_12px_35px_-26px_rgba(15,23,42,0.35)] transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-lg">
+      <div
+        className={`absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r ${statusAccent[request.jobCase.status]}`}
       />
 
-      <div className="grid gap-5 p-5 pl-6 lg:grid-cols-[minmax(0,1fr)_190px_160px] lg:items-center">
-        <div className="min-w-0">
-          <p className="text-[10px] font-semibold text-slate-500">
-            {request.requestNumber}
-            {request.customerReference
-              ? ` · Ref. ${request.customerReference}`
-              : ''}
-          </p>
-          <h2 className="mt-1 truncate text-base font-semibold text-slate-950">
-            {request.title}
-          </h2>
-          <p className="mt-2 text-[11px] text-slate-600">
-            {request.quantity} pieza{request.quantity === 1 ? '' : 's'} ·{' '}
-            {request.materialRequirementType === 'SPECIFIED'
-              ? request.materialRequirement
-              : 'Asesoría técnica requerida'}{' '}
-            · Requerida{' '}
-            {formatCustomerRequestDate(request.requestedDeliveryDate)}
-          </p>
+      <div className="p-5 lg:p-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex min-w-0 gap-4">
+            <div
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${statusSurface[request.jobCase.status]}`}
+            >
+              <SidebarNavIcon name="requests" className="h-[19px] w-[19px]" />
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="text-[10px] font-bold uppercase tracking-[0.08em] text-slate-400">
+                  {request.requestNumber}
+                </p>
+                {request.customerReference ? (
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-semibold text-slate-500">
+                    Ref. {request.customerReference}
+                  </span>
+                ) : null}
+                {needsResponse ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2 py-0.5 text-[9px] font-semibold text-amber-700">
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+                    Requiere tu atención
+                  </span>
+                ) : null}
+              </div>
+
+              <h2 className="mt-2 truncate text-base font-semibold text-slate-950">
+                {request.title}
+              </h2>
+
+              <p className="mt-1.5 line-clamp-2 max-w-3xl text-[11px] leading-5 text-slate-500">
+                {request.description}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-3">
+            <Badge tone={status.tone} className="px-3 py-1 text-[10px]">
+              {status.label}
+            </Badge>
+            <Link
+              to={`/portal/${customerId}/requests/${request.id}`}
+              className={
+                needsResponse
+                  ? 'inline-flex h-10 min-w-32 items-center justify-center rounded-xl bg-blue-600 px-4 text-xs font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700'
+                  : 'inline-flex h-10 min-w-32 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700'
+              }
+            >
+              {needsResponse ? 'Responder' : 'Ver detalle'}
+            </Link>
+          </div>
         </div>
 
-        <div>
-          <Badge tone={status.tone}>{status.label}</Badge>
-          <p className="mt-2 text-[10px] text-slate-500">
-            Etapa · {status.stage}
-          </p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-xl border border-slate-100 bg-slate-50/70 px-3.5 py-3">
+            <p className="text-[9px] font-bold uppercase tracking-wide text-slate-400">
+              Cantidad
+            </p>
+            <p className="mt-1.5 text-xs font-semibold text-slate-900">
+              {request.quantity} pieza{request.quantity === 1 ? '' : 's'}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-slate-100 bg-slate-50/70 px-3.5 py-3">
+            <p className="text-[9px] font-bold uppercase tracking-wide text-slate-400">
+              Material
+            </p>
+            <p className="mt-1.5 truncate text-xs font-semibold text-slate-900">
+              {request.materialRequirementType === 'SPECIFIED'
+                ? request.materialRequirement
+                : 'Asesoría técnica requerida'}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-slate-100 bg-slate-50/70 px-3.5 py-3">
+            <p className="text-[9px] font-bold uppercase tracking-wide text-slate-400">
+              Fecha requerida
+            </p>
+            <p className="mt-1.5 text-xs font-semibold text-slate-900">
+              {formatCustomerRequestDate(request.requestedDeliveryDate)}
+            </p>
+          </div>
         </div>
 
-        <div className="flex lg:justify-end">
-          <Link
-            to={`/portal/${customerId}/requests/${request.id}`}
-            className={
-              needsResponse
-                ? 'inline-flex h-10 min-w-36 items-center justify-center rounded-lg bg-blue-600 px-4 text-xs font-semibold text-white transition hover:bg-blue-700'
-                : 'inline-flex h-10 min-w-36 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-xs font-semibold text-slate-700 transition hover:bg-slate-50'
-            }
-          >
-            {needsResponse ? 'Responder' : 'Ver detalle'}
-          </Link>
+        <div className="mt-5 border-t border-slate-100 pt-4">
+          {request.jobCase.status === 'CANCELLED' ? (
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[10px] font-semibold text-red-600">
+                Solicitud cancelada
+              </p>
+              <p className="text-[9px] text-slate-400">
+                {request.jobCase.caseNumber}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <div className="mb-2 flex items-center justify-between gap-4">
+                <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-slate-400">
+                  Avance del trabajo
+                </p>
+                <p className="text-[9px] font-semibold text-slate-500">
+                  Etapa · {status.stage}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-4 gap-2">
+                {stages.map((stage, index) => {
+                  const reached = index <= currentStage
+                  const current = index === currentStage
+
+                  return (
+                    <div key={stage} className="min-w-0">
+                      <div
+                        className={
+                          reached
+                            ? current
+                              ? 'h-1.5 rounded-full bg-blue-600'
+                              : 'h-1.5 rounded-full bg-blue-300'
+                            : 'h-1.5 rounded-full bg-slate-100'
+                        }
+                      />
+                      <p
+                        className={
+                          current
+                            ? 'mt-1.5 truncate text-[8px] font-semibold text-blue-700'
+                            : reached
+                              ? 'mt-1.5 truncate text-[8px] font-medium text-slate-600'
+                              : 'mt-1.5 truncate text-[8px] font-medium text-slate-400'
+                        }
+                      >
+                        {stage}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </article>
