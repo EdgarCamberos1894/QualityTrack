@@ -8,6 +8,7 @@ interface PublicAuthLayoutProps {
   children: ReactNode
   footer?: ReactNode
   wide?: boolean
+  immersive?: boolean
 }
 
 export function PublicAuthLayout({
@@ -17,7 +18,48 @@ export function PublicAuthLayout({
   children,
   footer,
   wide = false,
+  immersive = false,
 }: PublicAuthLayoutProps) {
+  if (immersive) {
+    return (
+      <main className="min-h-screen bg-[#f7f9fc] lg:grid lg:grid-cols-2">
+        <AuthBrandPanel immersive />
+
+        <section className="flex min-h-screen items-center justify-center px-6 py-8 sm:px-10 lg:px-12 xl:px-16">
+          <div className={wide ? 'w-full max-w-[560px]' : 'w-full max-w-[520px]'}>
+            <div className="mb-8 flex items-center gap-2.5 lg:hidden">
+              <img
+                src="/brand/qualitytrack-mark.svg"
+                alt=""
+                className="h-9 w-9"
+              />
+              <span className="text-lg font-bold tracking-tight text-slate-950">
+                Quality<span className="text-blue-600">Track</span>
+              </span>
+            </div>
+
+            <div className="mb-8">
+              <h1 className="text-[28px] font-bold tracking-tight text-slate-950 sm:text-[30px]">
+                {title}
+              </h1>
+              <p className="mt-2 text-[13px] leading-5 text-slate-500">
+                {description}
+              </p>
+            </div>
+
+            {children}
+
+            {footer ? (
+              <div className="mt-8 text-center text-[12px] text-slate-500">
+                {footer}
+              </div>
+            ) : null}
+          </div>
+        </section>
+      </main>
+    )
+  }
+
   return (
     <main className="min-h-screen bg-[#f6f8fc] lg:grid lg:grid-cols-[minmax(340px,0.78fr)_minmax(520px,1.22fr)]">
       <AuthBrandPanel />
