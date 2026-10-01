@@ -41,6 +41,7 @@ export function CustomerQuotationsPage() {
           quotation.quotationNumber,
           quotation.caseNumber,
           quotation.requestNumber,
+          quotation.requestTitle,
         ].some((value) =>
           value.toLocaleLowerCase('es-MX').includes(normalized),
         )
@@ -127,7 +128,7 @@ export function CustomerQuotationsPage() {
                 type="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Buscar por cotización, solicitud o expediente…"
+                placeholder="Buscar por cotización, solicitud, proyecto o expediente…"
                 className="h-9 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[11px] text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.06)] outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
               />
             </label>
