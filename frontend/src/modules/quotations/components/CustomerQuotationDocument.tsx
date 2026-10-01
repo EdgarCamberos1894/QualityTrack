@@ -58,7 +58,7 @@ export function CustomerQuotationDocument({
   quotation,
 }: CustomerQuotationDocumentProps) {
   return (
-    <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_332px]">
+    <section className="grid gap-5 @5xl/page:grid-cols-[minmax(0,1fr)_332px]">
       <div className="rounded-xl border border-slate-200 bg-white p-5">
         <h2 className="text-[15px] font-semibold text-slate-950">
           Detalle de cotización
