@@ -239,7 +239,7 @@ export function CustomerRequestOverview({
       />
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
-        <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.3)]">
+        <Card className="border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/30 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.3)]">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
               <SidebarNavIcon name="requests" className="h-[17px] w-[17px]" />
@@ -311,13 +311,13 @@ export function CustomerRequestOverview({
           </div>
         </Card>
 
-        <Card className="p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+        <Card className="border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
           <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
               <SidebarNavIcon name="cases" className="h-[17px] w-[17px]" />
             </div>
             <div>
-              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-slate-400">
+              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
                 Seguimiento
               </p>
               <div className="mt-0.5 flex flex-wrap items-center gap-2">
@@ -416,7 +416,7 @@ export function CustomerRequestOverview({
             <button
               type="button"
               onClick={onCancel}
-              className="mt-3 inline-flex h-7 items-center rounded-lg border border-red-200 bg-white px-3 text-[8px] font-medium text-red-600 transition hover:border-red-300 hover:bg-red-50"
+              className="mt-3 inline-flex h-6 items-center rounded-md border border-red-200/80 bg-white/70 px-2 text-[7px] font-medium text-red-500 transition hover:border-red-300 hover:bg-red-50 hover:text-red-600"
             >
               Cancelar solicitud
             </button>
