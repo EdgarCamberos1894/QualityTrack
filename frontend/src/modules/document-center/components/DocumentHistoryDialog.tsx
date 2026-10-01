@@ -34,24 +34,24 @@ export function DocumentHistoryDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="document-history-title"
-        className="w-full max-w-2xl overflow-hidden rounded-2xl bg-white shadow-2xl"
+        className="w-full max-w-xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
       >
-        <div className="border-b border-slate-200 px-6 py-5">
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-blue-700">
+        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/60 px-4 py-3.5">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
             Historial de versiones
           </p>
           <h2
             id="document-history-title"
-            className="mt-1 text-lg font-semibold text-slate-950"
+            className="mt-0.5 truncate text-[14px] font-semibold text-slate-950"
           >
             {document.name}
           </h2>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-0.5 truncate text-[9px] text-slate-500">
             {getDocumentSourceLabel(document)}
           </p>
         </div>
 
-        <div className="max-h-[60vh] overflow-y-auto px-6 py-5">
+        <div className="max-h-[60vh] overflow-y-auto px-4 py-3.5">
           {query.isPending ? (
             <LoadingState label="Cargando versiones…" />
           ) : query.isError ? (
@@ -60,46 +60,46 @@ export function DocumentHistoryDialog({
               title="No pudimos cargar el historial"
             />
           ) : (
-            <div className="space-y-3">
+            <div className="divide-y divide-slate-100 rounded-lg border border-slate-200">
               {query.data.map((version) => (
                 <article
                   key={version.id}
-                  className="rounded-xl border border-slate-200 bg-slate-50/60 p-4"
+                  className="flex flex-col gap-2.5 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="text-xs font-semibold text-slate-950">
-                        Versión {version.version} · {version.fileName}
-                      </p>
-                      <p className="mt-1 text-[10px] text-slate-500">
-                        {formatDocumentFileSize(version.fileSize)} ·{' '}
-                        {formatDocumentDateTime(version.uploadedAt)}
-                      </p>
-                      <p className="mt-1 text-[9px] text-slate-400">
-                        {version.uploadedByName}
-                      </p>
-                    </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-[9px] font-semibold text-slate-900">
+                      Versión {version.version} · {version.fileName}
+                    </p>
+                    <p className="mt-0.5 text-[8px] text-slate-500">
+                      {formatDocumentFileSize(version.fileSize)} ·{' '}
+                      {formatDocumentDateTime(version.uploadedAt)}
+                    </p>
+                    <p className="mt-0.5 truncate text-[7px] text-slate-400">
+                      {version.uploadedByName}
+                    </p>
+                  </div>
 
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        disabled={busyVersionId === version.id}
-                        onClick={() => onOpenVersion(version.id)}
-                      >
-                        Ver
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        disabled={busyVersionId === version.id}
-                        onClick={() =>
-                          onDownloadVersion(version.id, version.fileName)
-                        }
-                      >
-                        Descargar
-                      </Button>
-                    </div>
+                  <div className="flex shrink-0 gap-1.5">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="!h-7 !px-2 !text-[8px]"
+                      disabled={busyVersionId === version.id}
+                      onClick={() => onOpenVersion(version.id)}
+                    >
+                      Ver
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="!h-7 !px-2 !text-[8px]"
+                      disabled={busyVersionId === version.id}
+                      onClick={() =>
+                        onDownloadVersion(version.id, version.fileName)
+                      }
+                    >
+                      Descargar
+                    </Button>
                   </div>
                 </article>
               ))}
@@ -107,8 +107,12 @@ export function DocumentHistoryDialog({
           )}
         </div>
 
-        <div className="flex justify-end border-t border-slate-200 bg-slate-50 px-6 py-4">
-          <Button variant="secondary" onClick={onClose}>
+        <div className="flex justify-end border-t border-slate-100 bg-slate-50/60 px-4 py-2.5">
+          <Button
+            variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
+            onClick={onClose}
+          >
             Cerrar
           </Button>
         </div>
