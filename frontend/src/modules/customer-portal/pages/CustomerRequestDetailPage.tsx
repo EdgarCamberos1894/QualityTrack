@@ -35,7 +35,7 @@ export function CustomerRequestDetailPage() {
   const query = useCustomerRequestDetail(customer.customerId, validId)
   const quotationsQuery = useCustomerQuotations(
     customer.customerId,
-    query.data?.jobCase.status === 'READY_FOR_QUOTATION',
+    Boolean(query.data),
   )
   const deliveriesQuery = useCustomerRequestDeliveries(
     customer.customerId,
