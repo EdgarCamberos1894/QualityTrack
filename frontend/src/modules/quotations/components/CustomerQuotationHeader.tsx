@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { getCustomerQuotationStatusPresentation } from '../model/customerQuotationPresenter'
@@ -5,6 +7,7 @@ import { formatQuotationDate } from '../model/quotationPresenter'
 import type { CustomerQuotationDetailDto } from '../types/customerQuotation.types'
 
 interface CustomerQuotationHeaderProps {
+  customerId: number
   quotation: CustomerQuotationDetailDto
   customerName: string
   canDecide: boolean
@@ -19,15 +22,15 @@ function statusDescription(
   includesAdjustmentResponse: boolean,
 ): string {
   if (includesAdjustmentResponse) {
-    return 'Respuesta al ajuste incluida'
+    return 'Comercial respondió tu solicitud de ajuste en esta revisión.'
   }
 
   if (quotation.customerStatus === 'ADJUSTMENT_REQUESTED') {
-    return 'Nueva revisión en preparación'
+    return 'Tu solicitud de ajuste fue enviada. Comercial está preparando una nueva revisión.'
   }
 
   if (quotation.customerStatus === 'SENT') {
-    return `Vigente hasta ${formatQuotationDate(quotation.validUntil)}`
+    return `Disponible para tu decisión hasta ${formatQuotationDate(quotation.validUntil)}.`
   }
 
   return getCustomerQuotationStatusPresentation(quotation.customerStatus)
@@ -35,6 +38,7 @@ function statusDescription(
 }
 
 export function CustomerQuotationHeader({
+  customerId,
   quotation,
   customerName,
   canDecide,
@@ -50,65 +54,103 @@ export function CustomerQuotationHeader({
     quotation.customerStatus === 'SENT' &&
     Boolean(quotation.adjustment?.notes) &&
     Boolean(quotation.adjustment?.response)
-  const waitingForAdjustment =
-    quotation.customerStatus === 'ADJUSTMENT_REQUESTED'
 
   const label = includesAdjustmentResponse ? 'Nueva revisión' : status.label
   const description = statusDescription(quotation, includesAdjustmentResponse)
 
   return (
-    <header className="mb-4 flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
-      <div>
-        <p className="text-[10px] text-slate-500">
-          Cotizaciones / {quotation.quotationNumber}
-        </p>
-        <h1 className="mt-1 text-[26px] font-bold tracking-tight text-slate-950">
-          {quotation.quotationNumber}
-        </h1>
-        <p className="mt-1 text-[14px] font-medium text-slate-700">
-          Revisión {quotation.revision} · {customerName}
-        </p>
+    <header className="mb-3">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200/70">
+            <SidebarNavIcon name="quotations" className="h-4 w-4" />
+          </div>
+
+          <div className="min-w-0">
+            <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-600">
+              Gestión comercial
+            </p>
+
+            <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
+              <h1 className="truncate text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
+                {quotation.quotationNumber}
+              </h1>
+              <Badge tone={status.tone} className="px-2 py-0.5 text-[8px]">
+                {label}
+              </Badge>
+            </div>
+
+            <p className="mt-0.5 truncate text-[10px] text-slate-500">
+              Revisión {quotation.revision} · {customerName}
+            </p>
+          </div>
+        </div>
+
+        <Link
+          to={`/portal/${customerId}/quotations`}
+          className="inline-flex h-6 shrink-0 items-center gap-1 rounded-md border border-slate-300 bg-white/85 px-2 text-[7px] font-medium leading-none text-slate-500 transition hover:border-slate-400 hover:bg-white hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className="h-3 w-3 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="m15 18-6-6 6-6" />
+          </svg>
+          <span>Volver a cotizaciones</span>
+        </Link>
       </div>
 
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start">
-        <div className="min-w-[150px] pt-1 lg:text-right">
-          <Badge
-            tone={status.tone}
-            className="px-4 py-1.5 text-[10px] uppercase"
-          >
-            {label}
-          </Badge>
-          <p className="mt-2 text-[9px] leading-4 text-slate-500">
+      <div
+        className={
+          quotation.customerStatus === 'ADJUSTMENT_REQUESTED'
+            ? 'mt-3 flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50/60 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between'
+            : quotation.customerStatus === 'APPROVED'
+              ? 'mt-3 flex flex-col gap-3 rounded-xl border border-emerald-200 bg-emerald-50/55 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between'
+              : 'mt-3 flex flex-col gap-3 rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50/55 via-white to-blue-50/30 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between'
+        }
+      >
+        <div className="min-w-0">
+          <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-500">
+            Estado de la propuesta
+          </p>
+          <p className="mt-0.5 text-[9px] leading-4 text-slate-600">
             {description}
           </p>
         </div>
 
         {canDecide ? (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex shrink-0 flex-wrap items-center gap-1.5">
             <Button
+              size="sm"
               variant="secondary"
+              className="!h-7 !px-2.5 !text-[8px]"
               onClick={onRequestAdjustment}
               disabled={submitting}
             >
               Solicitar ajuste
             </Button>
-            <Button variant="danger" onClick={onReject} disabled={submitting}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="!h-7 !px-2.5 !text-[8px] !text-red-600 hover:!bg-red-50"
+              onClick={onReject}
+              disabled={submitting}
+            >
               Rechazar
             </Button>
-            <Button onClick={onApprove} disabled={submitting}>
+            <Button
+              size="sm"
+              className="!h-7 !px-3 !text-[8px]"
+              onClick={onApprove}
+              disabled={submitting}
+            >
               Aprobar cotización
-            </Button>
-          </div>
-        ) : waitingForAdjustment ? (
-          <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" disabled>
-              Ajuste enviado
-            </Button>
-            <Button variant="secondary" disabled>
-              Vista previa
-            </Button>
-            <Button variant="secondary" disabled>
-              Esperando respuesta
             </Button>
           </div>
         ) : null}
