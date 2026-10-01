@@ -19,6 +19,7 @@ const filters: Array<{ value: Filter; label: string }> = [
   { value: 'READY_FOR_QUOTATION', label: 'Cotización' },
   { value: 'IN_PRODUCTION', label: 'Producción' },
   { value: 'COMPLETED', label: 'Completadas' },
+  { value: 'CANCELLED', label: 'Canceladas' },
 ]
 
 export function CustomerRequestsPage() {
@@ -95,9 +96,18 @@ export function CustomerRequestsPage() {
       />
 
       <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-30px_rgba(15,23,42,0.38)]">
-        <div className="border-b border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/30 px-4 py-2.5 sm:px-5">
-          <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center lg:justify-between">
-            <label className="relative block w-full lg:w-[320px]">
+        <div className="border-b border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/35 px-4 py-3.5 sm:px-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                Solicitudes registradas
+              </p>
+              <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
+                Seguimiento de trabajos
+              </h2>
+            </div>
+
+            <label className="relative block lg:w-[390px]">
               <span className="sr-only">Buscar solicitudes</span>
               <svg
                 viewBox="0 0 24 24"
@@ -116,40 +126,40 @@ export function CustomerRequestsPage() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 placeholder="Buscar por folio, referencia o proyecto…"
-                className="h-8 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-[10px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+                className="h-9 w-full rounded-xl border border-slate-200 bg-slate-50/80 pl-9 pr-3 text-[11px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-100"
               />
             </label>
+          </div>
 
-            <div className="flex flex-wrap gap-1.5 lg:justify-end">
-              {filters.map((item) => {
-                const active = filter === item.value
-                const count = filterCount(item.value)
+          <div className="mt-3 flex flex-wrap gap-1">
+            {filters.map((item) => {
+              const active = filter === item.value
+              const count = filterCount(item.value)
 
-                return (
-                  <button
-                    key={item.value}
-                    type="button"
-                    onClick={() => setFilter(item.value)}
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => setFilter(item.value)}
+                  className={
+                    active
+                      ? 'inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[8px] font-semibold text-blue-700 shadow-sm'
+                      : 'inline-flex items-center gap-1 rounded-full border border-slate-200/70 bg-white px-2 py-0.5 text-[8px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50'
+                  }
+                >
+                  {item.label}
+                  <span
                     className={
                       active
-                        ? 'inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[9px] font-semibold text-blue-700 shadow-sm'
-                        : 'inline-flex items-center gap-1.5 rounded-full border border-slate-200/70 bg-white px-2.5 py-1 text-[9px] font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50'
+                        ? 'rounded-full bg-blue-100 px-1 py-0.5 text-[8px] text-blue-700'
+                        : 'rounded-full bg-slate-100 px-1 py-0.5 text-[8px] text-slate-500'
                     }
                   >
-                    {item.label}
-                    <span
-                      className={
-                        active
-                          ? 'rounded-full bg-blue-100 px-1.5 py-0.5 text-[8px] text-blue-700'
-                          : 'rounded-full bg-slate-100 px-1.5 py-0.5 text-[8px] text-slate-500'
-                      }
-                    >
-                      {count}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
+                    {count}
+                  </span>
+                </button>
+              )
+            })}
           </div>
         </div>
 
