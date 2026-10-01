@@ -137,7 +137,7 @@ export function CustomerRequestCreatePage() {
 
   return (
     <PageContainer className="py-4 lg:py-3">
-      <div className="lg:flex lg:min-h-[calc(100vh-100px)] lg:flex-col">
+      <div className="lg:flex lg:h-[calc(100dvh-100px)] lg:min-h-0 lg:flex-col lg:overflow-hidden">
         <div className="mb-3 shrink-0">
           <h1 className="text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
             {step === 2 ? 'Revisar y enviar' : 'Nueva solicitud'}
@@ -153,9 +153,9 @@ export function CustomerRequestCreatePage() {
 
         <form
           onSubmit={(event) => void submit(event)}
-          className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col"
+          className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col lg:overflow-hidden"
         >
-          <div className="lg:min-h-0 lg:flex-1">
+          <div className="lg:min-h-0 lg:flex-1 lg:overflow-hidden">
             {step === 0 ? (
               <CustomerRequestDetailsStep
                 register={register}
