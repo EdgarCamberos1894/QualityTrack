@@ -1,8 +1,8 @@
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
-import { PageHeader } from '@/shared/components/layout/PageHeader'
 import { DashboardAttention } from '../components/DashboardAttention'
+import { DashboardHero } from '../components/DashboardHero'
 import { DashboardMetricGrid } from '../components/DashboardMetricGrid'
 import { DashboardPipeline } from '../components/DashboardPipeline'
 import { DashboardRecentActivity } from '../components/DashboardRecentActivity'
@@ -34,13 +34,15 @@ export function HomePage() {
 
   return (
     <PageContainer>
-      <PageHeader
-        eyebrow="Operación interna"
-        title="Panel de operación"
-        description="Una lectura rápida del flujo comercial, productivo, de calidad y logística. Los datos se actualizan automáticamente cada minuto."
+      <DashboardHero
+        overview={dashboard.overview}
+        pipeline={dashboard.pipeline}
+        commercial={dashboard.commercial}
       />
 
-      <DashboardMetricGrid overview={dashboard.overview} />
+      <div className="mt-5">
+        <DashboardMetricGrid overview={dashboard.overview} />
+      </div>
 
       <div className="mt-5">
         <DashboardPipeline
@@ -49,7 +51,7 @@ export function HomePage() {
         />
       </div>
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className="mt-5 grid gap-5 lg:grid-cols-[0.88fr_1.12fr]">
         <DashboardAttention items={dashboard.attention} />
         <DashboardRecentActivity activity={dashboard.recentActivity} />
       </div>
