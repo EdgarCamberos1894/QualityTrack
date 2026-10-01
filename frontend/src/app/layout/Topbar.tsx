@@ -26,7 +26,10 @@ function getBreadcrumb(pathname: string, search: string): string {
   }
 
   if (pathname === '/resources') {
-    return 'Operación / Recursos de producción'
+    const tab = new URLSearchParams(search).get('tab')
+    return tab === 'materials'
+      ? 'Catálogos / Materiales'
+      : 'Catálogos / Máquinas'
   }
 
   if (pathname === '/quality') {
@@ -62,11 +65,11 @@ function getBreadcrumb(pathname: string, search: string): string {
   }
 
   if (pathname.startsWith('/job-cases/')) {
-    return 'Operación / Expedientes / Revisión'
+    return 'Comercial / Expedientes / Revisión'
   }
 
   if (pathname === '/job-cases') {
-    return 'Operación / Expedientes'
+    return 'Comercial / Expedientes'
   }
 
   if (pathname.startsWith('/work-orders/')) {
@@ -91,7 +94,7 @@ function getBreadcrumb(pathname: string, search: string): string {
     return 'Operación / Órdenes de trabajo'
   }
 
-  return 'Operación / Inicio'
+  return 'Principal / Panel'
 }
 
 export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
