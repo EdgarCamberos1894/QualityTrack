@@ -50,6 +50,7 @@ export function NonConformityCard({
   const canEditDetails = isAdmin || isQuality
   const canRework = isAdmin || isEngineering
   const canScrap = isAdmin || isQuality || isEngineering
+  const canChooseDisposition = canRework || canScrap || isAdmin
   const mutations = useNonConformityMutations(nonConformity.workOrderId)
   const [editOpen, setEditOpen] = useState(false)
   const [dispositionOpen, setDispositionOpen] = useState(false)
@@ -183,7 +184,10 @@ export function NonConformityCard({
               </Button>
             ) : null}
 
-            {open && detailsComplete && nonConformity.disposition === null ? (
+            {open &&
+            detailsComplete &&
+            nonConformity.disposition === null &&
+            canChooseDisposition ? (
               <Button size="sm" className="!h-7 !px-2.5 !text-[8px]" onClick={() => setDispositionOpen(true)}>
                 Definir disposición
               </Button>
