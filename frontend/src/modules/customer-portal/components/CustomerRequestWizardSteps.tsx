@@ -11,7 +11,7 @@ export function CustomerRequestWizardSteps({
   currentStep,
 }: CustomerRequestWizardStepsProps) {
   return (
-    <Card className="mb-3 px-4 py-2.5 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.28)]">
+    <Card className="mb-3 px-4 py-2 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.28)]">
       <div className="flex items-center">
         {steps.map((label, index) => {
           const completed = index < currentStep
@@ -23,10 +23,10 @@ export function CustomerRequestWizardSteps({
                 <span
                   className={
                     completed
-                      ? 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-[8px] font-bold text-white'
+                      ? 'flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-[8px] font-bold text-white'
                       : active
-                        ? 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-600 text-[8px] font-bold text-white shadow-sm shadow-blue-200'
-                        : 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-[8px] font-semibold text-slate-500'
+                        ? 'flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full bg-blue-600 text-[8px] font-bold text-white shadow-sm shadow-blue-200'
+                        : 'flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-[8px] font-semibold text-slate-500'
                   }
                 >
                   {completed ? '✓' : index + 1}
