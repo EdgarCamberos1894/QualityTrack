@@ -261,12 +261,17 @@ export function CustomerRequestReviewStep({
                   </span>
                   <div className="min-w-0">
                     <p className="truncate text-[9px] font-semibold text-slate-800">
-                      {document.file.name}
+                      {document.name?.trim() || document.file.name}
                     </p>
                     <p className="mt-0.5 text-[8px] text-slate-500">
                       {formatFileSize(document.file.size)} ·{' '}
                       {getFileExtension(document.file.name)}
                     </p>
+                    {document.description ? (
+                      <p className="mt-1 truncate text-[8px] text-slate-400">
+                        {document.description}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
               ))
