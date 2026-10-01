@@ -182,7 +182,7 @@ export function CustomerRequestCreatePage() {
             type="button"
             onClick={leaveRequestCreation}
             disabled={mutation.isPending}
-            className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-[9px] font-semibold text-slate-600 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-slate-900 bg-slate-900 px-2.5 text-[8px] font-semibold text-white shadow-sm transition hover:border-slate-800 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <svg
               viewBox="0 0 24 24"
