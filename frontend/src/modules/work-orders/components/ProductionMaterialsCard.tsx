@@ -59,29 +59,28 @@ export function ProductionMaterialsCard({
   })
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5">
-      <div>
-        <p className="text-[9px] font-semibold uppercase tracking-wide text-amber-700">
+    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+      <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
+        <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
           Materiales
         </p>
-        <h2 className="mt-1 text-sm font-semibold text-slate-950">
+        <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
           Consumo real por lote
         </h2>
-        <p className="mt-1 text-[10px] leading-5 text-slate-500">
-          Registra únicamente material realmente consumido. El consumo se
-          acumula por OT + lote.
+        <p className="mt-0.5 text-[8px] leading-4 text-slate-400">
+          Registra únicamente material realmente consumido por esta OT.
         </p>
       </div>
 
       {canRecord ? (
         <form
-          className="mt-5 grid gap-4 rounded-xl border border-slate-200 bg-slate-50/70 p-4 lg:grid-cols-[1fr_1fr_180px_auto]"
+          className="grid gap-3 border-b border-slate-100 bg-slate-50/45 px-4 py-3 lg:grid-cols-[1fr_1fr_150px_auto]"
           onSubmit={(event) => void submit(event)}
         >
           <div>
             <label
               htmlFor="production-material"
-              className="mb-2 block text-sm font-semibold text-slate-800"
+              className="mb-1.5 block text-[10px] font-semibold text-slate-800"
             >
               Material
             </label>
@@ -95,7 +94,7 @@ export function ProductionMaterialsCard({
                 )
                 setLotId(null)
               }}
-              className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+              className="h-8 w-full rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] text-slate-950 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
             >
               <option value="">Seleccionar material</option>
               {(materialsQuery.data ?? []).map((material) => (
@@ -109,7 +108,7 @@ export function ProductionMaterialsCard({
           <div>
             <label
               htmlFor="production-lot"
-              className="mb-2 block text-sm font-semibold text-slate-800"
+              className="mb-1.5 block text-[10px] font-semibold text-slate-800"
             >
               Lote
             </label>
@@ -122,7 +121,7 @@ export function ProductionMaterialsCard({
               onChange={(event) =>
                 setLotId(event.target.value ? Number(event.target.value) : null)
               }
-              className="h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-950 shadow-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100"
+              className="h-8 w-full rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] text-slate-950 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100"
             >
               <option value="">Seleccionar lote</option>
               {(lotsQuery.data ?? []).map((lot) => (
@@ -135,6 +134,8 @@ export function ProductionMaterialsCard({
 
           <TextField
             label="Cantidad usada"
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
             type="number"
             min="0.001"
             step="0.001"
@@ -145,7 +146,7 @@ export function ProductionMaterialsCard({
           <div className="flex items-end">
             <Button
               type="submit"
-              className="w-full"
+              className="!h-8 w-full !px-2.5 !text-[8px]"
               disabled={lotId === null || submitting}
             >
               {submitting ? 'Registrando…' : 'Registrar consumo'}
@@ -153,25 +154,25 @@ export function ProductionMaterialsCard({
           </div>
         </form>
       ) : (
-        <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-[10px] leading-5 text-slate-600">
+        <p className="mx-4 my-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[8px] leading-4 text-slate-500">
           El consumo solo puede registrarse mientras la producción está en
           ejecución y por un usuario PRODUCTION o ADMIN.
         </p>
       )}
 
       {materialsQuery.isError || lotsQuery.isError ? (
-        <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+        <p className="mx-4 mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[8px] leading-4 text-amber-800">
           No pudimos cargar el catálogo de materiales o lotes.
         </p>
       ) : null}
 
       {error ? (
-        <p className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+        <p className="mx-4 mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
           {getErrorMessage(error)}
         </p>
       ) : null}
 
-      <div className="mt-5">
+      <div className="p-4">
         {consumptions.length === 0 ? (
           <EmptyState
             title="Sin consumo registrado"
@@ -183,7 +184,7 @@ export function ProductionMaterialsCard({
               <article
                 id={`material-lot-${lot.id}`}
                 key={consumption.id}
-                className="scroll-mt-24 grid gap-2 rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-[10px] target:ring-2 target:ring-blue-300 sm:grid-cols-[1fr_1fr_auto]"
+                className="scroll-mt-24 grid gap-2 rounded-lg border border-slate-200 bg-slate-50/60 px-3 py-2.5 text-[8px] target:ring-2 target:ring-blue-200 sm:grid-cols-[1fr_1fr_auto]"
               >
                 <div>
                   <p className="font-semibold text-slate-950">
