@@ -57,82 +57,92 @@ export function ProductionOperationCard({
     !completed &&
     !inProgress
 
+  const statusTone = inProgress
+    ? 'warning'
+    : completed
+      ? 'success'
+      : cancelledCount > 0
+        ? 'danger'
+        : 'neutral'
+
+  const statusLabel = inProgress
+    ? 'En ejecución'
+    : completed
+      ? 'Completada'
+      : cancelledCount > 0
+        ? cancelledCount === 1
+          ? '1 intento cancelado'
+          : `${cancelledCount} intentos cancelados`
+        : !unlocked
+          ? 'Bloqueada'
+          : 'Pendiente'
+
   return (
     <article
       id={`routing-operation-${operation.id}`}
-      className={
-        inProgress
-          ? 'scroll-mt-24 rounded-xl border border-amber-300 bg-amber-50/40 p-4 target:ring-2 target:ring-blue-300'
-          : completed
-            ? 'scroll-mt-24 rounded-xl border border-emerald-200 bg-emerald-50/30 p-4 target:ring-2 target:ring-blue-300'
-            : 'scroll-mt-24 rounded-xl border border-slate-200 bg-white p-4 target:ring-2 target:ring-blue-300'
-      }
+      className="scroll-mt-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_10px_28px_-28px_rgba(15,23,42,0.28)] target:ring-2 target:ring-blue-200"
     >
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="flex min-w-0 gap-3">
+      <div className="flex flex-col gap-3 px-3.5 py-3 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex min-w-0 gap-2.5">
           <span
             className={
               completed
-                ? 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[11px] font-bold text-emerald-700'
+                ? 'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-[9px] font-bold text-emerald-700 ring-1 ring-emerald-100'
                 : inProgress
-                  ? 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[11px] font-bold text-amber-700'
-                  : 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-100 text-[11px] font-bold text-slate-600'
+                  ? 'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-amber-50 text-[9px] font-bold text-amber-700 ring-1 ring-amber-100'
+                  : 'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-[9px] font-bold text-slate-600 ring-1 ring-slate-200'
             }
           >
             {completed ? '✓' : operation.sequenceNumber}
           </span>
 
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-[9px] font-semibold uppercase tracking-wide text-amber-700">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <p className="text-[8px] font-bold uppercase tracking-wide text-blue-600">
                 {operation.code}
               </p>
-              {inProgress ? (
-                <Badge tone="warning">En ejecución</Badge>
-              ) : completed ? (
-                <Badge tone="success">Completada</Badge>
-              ) : cancelledCount > 0 ? (
-                <Badge tone="danger">
-                  {cancelledCount === 1
-                    ? '1 intento cancelado'
-                    : `${cancelledCount} intentos cancelados`}
-                </Badge>
-              ) : !unlocked ? (
-                <Badge tone="neutral">Bloqueada</Badge>
-              ) : (
-                <Badge tone="neutral">Pendiente</Badge>
-              )}
+              <Badge tone={statusTone} className="px-2 py-0.5 text-[7px]">
+                {statusLabel}
+              </Badge>
             </div>
-
-            <h3 className="mt-1 text-sm font-semibold text-slate-950">
+            <h3 className="mt-0.5 text-[10px] font-semibold text-slate-950">
               {operation.name}
             </h3>
-            <p className="mt-1 text-[10px] text-slate-500">
+            <p className="mt-0.5 text-[8px] text-slate-400">
               Estimado · {operation.estimatedMinutes} min
             </p>
             {operation.instructions ? (
-              <p className="mt-2 max-w-3xl text-[10px] leading-5 text-slate-600">
+              <p className="mt-1 max-w-3xl text-[8px] leading-4 text-slate-500">
                 {operation.instructions}
               </p>
             ) : null}
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-wrap gap-2">
+        <div className="flex shrink-0 flex-wrap gap-1.5">
           {canStart ? (
-            <Button size="sm" onClick={() => onStart(operation)}>
+            <Button
+              size="sm"
+              className="!h-7 !px-2.5 !text-[8px]"
+              onClick={() => onStart(operation)}
+            >
               {cancelledCount > 0 ? 'Reintentar' : 'Iniciar operación'}
             </Button>
           ) : null}
 
           {inProgress && canExecute ? (
             <>
-              <Button size="sm" onClick={() => onComplete(inProgress)}>
+              <Button
+                size="sm"
+                className="!h-7 !px-2.5 !text-[8px]"
+                onClick={() => onComplete(inProgress)}
+              >
                 Finalizar
               </Button>
               <Button
                 size="sm"
                 variant="danger"
+                className="!h-7 !px-2.5 !text-[8px]"
                 onClick={() => onCancel(inProgress)}
               >
                 Cancelar intento
@@ -143,17 +153,17 @@ export function ProductionOperationCard({
       </div>
 
       {!unlocked && !completed ? (
-        <p className="mt-4 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[10px] text-slate-600">
+        <p className="border-t border-slate-100 bg-slate-50/60 px-3.5 py-2 text-[8px] text-slate-500">
           Completa la operación anterior para habilitar este paso.
         </p>
       ) : null}
 
       {orderedAttempts.length > 0 ? (
-        <div className="mt-4 border-t border-slate-200 pt-4">
-          <p className="text-[9px] font-semibold uppercase tracking-wide text-slate-500">
+        <div className="border-t border-slate-100 bg-slate-50/35 px-3.5 py-2.5">
+          <p className="text-[7px] font-bold uppercase tracking-[0.08em] text-slate-400">
             Historial de intentos
           </p>
-          <div className="mt-2 grid gap-2">
+          <div className="mt-1.5 grid gap-1.5">
             {orderedAttempts.map((execution) => {
               const presentation = getExecutionPresentation(execution.status)
               const duration = executionDurationMinutes(execution)
@@ -162,12 +172,14 @@ export function ProductionOperationCard({
                 <div
                   id={`operation-execution-${execution.id}`}
                   key={execution.id}
-                  className="scroll-mt-24 grid gap-2 rounded-lg bg-white px-3 py-3 text-[10px] text-slate-600 target:ring-2 target:ring-blue-300 sm:grid-cols-[70px_110px_1fr_1fr_auto]"
+                  className="scroll-mt-24 grid gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-[8px] text-slate-500 target:ring-2 target:ring-blue-200 sm:grid-cols-[62px_95px_1fr_1fr_auto]"
                 >
-                  <span className="font-semibold text-slate-900">
+                  <span className="font-semibold text-slate-800">
                     Intento {execution.attemptNumber}
                   </span>
-                  <Badge tone={presentation.tone}>{presentation.label}</Badge>
+                  <Badge tone={presentation.tone} className="px-2 py-0.5 text-[7px]">
+                    {presentation.label}
+                  </Badge>
                   <span>
                     {execution.operatorName ?? 'Operador'} ·{' '}
                     {execution.machineCode ?? 'Sin máquina'}
@@ -176,7 +188,7 @@ export function ProductionOperationCard({
                     {formatProductionDateTime(execution.startedAt)}
                     {duration !== null ? ` · ${duration} min` : ''}
                   </span>
-                  <span className="font-semibold text-slate-800">
+                  <span className="font-semibold text-slate-700">
                     {execution.status === 'COMPLETED'
                       ? `${execution.quantityAccepted} OK / ${execution.quantityRejected} rechazadas`
                       : execution.status === 'CANCELLED'
