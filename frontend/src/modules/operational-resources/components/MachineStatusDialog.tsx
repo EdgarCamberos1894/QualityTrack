@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type {
   MachineDto,
   ManageableMachineStatus,
@@ -15,27 +15,47 @@ interface MachineStatusDialogProps {
   onSubmit: (status: ManageableMachineStatus) => Promise<boolean>
 }
 
-export function MachineStatusDialog({
+export function MachineStatusDialog(
+  props: MachineStatusDialogProps,
+) {
+  if (!props.machine) return null
+
+  return (
+    <MachineStatusDialogContent
+      key={props.machine.id}
+      {...props}
+      machine={props.machine}
+    />
+  )
+}
+
+interface MachineStatusDialogContentProps
+  extends Omit<MachineStatusDialogProps, 'machine'> {
+  machine: MachineDto
+}
+
+function getInitialStatus(machine: MachineDto): ManageableMachineStatus {
+  if (
+    machine.status === 'AVAILABLE' ||
+    machine.status === 'MAINTENANCE' ||
+    machine.status === 'OUT_OF_SERVICE'
+  ) {
+    return machine.status
+  }
+
+  return 'AVAILABLE'
+}
+
+function MachineStatusDialogContent({
   machine,
   submitting,
   error,
   onClose,
   onSubmit,
-}: MachineStatusDialogProps) {
-  const [status, setStatus] =
-    useState<ManageableMachineStatus>('AVAILABLE')
-
-  useEffect(() => {
-    if (
-      machine?.status === 'AVAILABLE' ||
-      machine?.status === 'MAINTENANCE' ||
-      machine?.status === 'OUT_OF_SERVICE'
-    ) {
-      setStatus(machine.status)
-    }
-  }, [machine])
-
-  if (!machine) return null
+}: MachineStatusDialogContentProps) {
+  const [status, setStatus] = useState<ManageableMachineStatus>(
+    () => getInitialStatus(machine),
+  )
 
   const submit = async () => {
     if (await onSubmit(status)) onClose()
