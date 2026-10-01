@@ -11,6 +11,7 @@ import { LeaveCustomerRequestDialog } from '../components/LeaveCustomerRequestDi
 import { CustomerRequestRequirementsStep } from '../components/CustomerRequestRequirementsStep'
 import { CustomerRequestReviewStep } from '../components/CustomerRequestReviewStep'
 import { CustomerRequestStepActions } from '../components/CustomerRequestStepActions'
+import { CustomerRequestsBackButton } from '../components/CustomerRequestsBackButton'
 import { CustomerRequestWizardSteps } from '../components/CustomerRequestWizardSteps'
 import { useCustomerPortalContext } from '../hooks/useCustomerPortalContext'
 import { useSubmitCustomerRequest } from '../hooks/useCustomerRequestMutations'
@@ -178,26 +179,10 @@ export function CustomerRequestCreatePage() {
             </div>
           </div>
 
-          <button
-            type="button"
+          <CustomerRequestsBackButton
             onClick={leaveRequestCreation}
             disabled={mutation.isPending}
-            className="inline-flex h-6 shrink-0 items-center gap-1 rounded-md border border-slate-300 bg-white/85 px-2 text-[7px] font-medium text-slate-500 transition hover:border-slate-400 hover:bg-white hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              className="h-3 w-3"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="m15 18-6-6 6-6" />
-            </svg>
-            Volver a solicitudes
-          </button>
+          />
         </div>
 
         <CustomerRequestWizardSteps currentStep={step} />
