@@ -72,7 +72,7 @@ export function InternalCustomerDetailPage() {
         }
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 @4xl/page:grid-cols-4">
         <Card className="px-5 py-4">
           <p className="text-[10px] text-slate-500">Estado</p>
           <div className="mt-2">
@@ -99,7 +99,7 @@ export function InternalCustomerDetailPage() {
         </Card>
       </div>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.7fr)]">
+      <div className="mt-5 grid gap-5 @4xl/page:grid-cols-[minmax(0,1fr)_minmax(360px,0.7fr)]">
         <Card className="p-5">
           <h2 className="text-sm font-semibold text-slate-950">
             Datos de empresa
