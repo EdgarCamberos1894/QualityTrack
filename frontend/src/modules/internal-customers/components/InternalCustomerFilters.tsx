@@ -10,7 +10,7 @@ export function InternalCustomerFilters({
   onChange,
 }: InternalCustomerFiltersProps) {
   return (
-    <div className="grid gap-3 border-y border-slate-200 bg-slate-50/70 px-4 py-3 md:grid-cols-[minmax(240px,1fr)_220px]">
+    <div className="grid gap-3 border-y border-slate-200 bg-slate-50/70 px-4 py-3 @2xl/page:grid-cols-[minmax(240px,1fr)_220px]">
       <label>
         <span className="sr-only">Buscar clientes</span>
         <input
