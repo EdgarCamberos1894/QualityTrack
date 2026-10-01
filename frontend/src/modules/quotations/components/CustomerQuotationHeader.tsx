@@ -108,11 +108,17 @@ export function CustomerQuotationHeader({
 
       <div
         className={
-          quotation.customerStatus === 'ADJUSTMENT_REQUESTED'
+          quotation.customerStatus === 'ADJUSTMENT_REQUESTED' ||
+          quotation.customerStatus === 'EXPIRED'
             ? 'mt-3 flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50/60 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between'
             : quotation.customerStatus === 'APPROVED'
               ? 'mt-3 flex flex-col gap-3 rounded-xl border border-emerald-200 bg-emerald-50/55 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between'
-              : 'mt-3 flex flex-col gap-3 rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50/55 via-white to-blue-50/30 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between'
+              : quotation.customerStatus === 'REJECTED' ||
+                  quotation.customerStatus === 'CANCELLED'
+                ? 'mt-3 flex flex-col gap-3 rounded-xl border border-red-100 bg-red-50/45 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between'
+                : quotation.customerStatus === 'REPLACED'
+                  ? 'mt-3 flex flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50/65 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between'
+                  : 'mt-3 flex flex-col gap-3 rounded-xl border border-blue-100 bg-gradient-to-r from-blue-50/55 via-white to-blue-50/30 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between'
         }
       >
         <div className="min-w-0">
