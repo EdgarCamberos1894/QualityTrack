@@ -65,3 +65,17 @@ button:disabled {
   outline: 2px solid var(--qt-blue);
   outline-offset: 2px;
 }
+
+/*
+ * Figma desktop frames are authored at 1440px. Between the lg breakpoint and
+ * 1439px, keep the application chrome (sidebar/topbar) at its native size and
+ * compact only the page canvas so the working area matches the density seen at
+ * 90% browser zoom without affecting sticky or viewport-sized navigation.
+ */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .qt-page-canvas {
+    width: 113.636364%;
+    zoom: 0.88;
+  }
+}
+
