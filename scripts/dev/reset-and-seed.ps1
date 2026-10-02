@@ -96,6 +96,7 @@ function Invoke-PsqlScalar {
         '--port', $env:DB_PORT,
         '--username', $env:DB_USER,
         '--dbname', $env:DB_NAME,
+        '--no-password',
         '--tuples-only',
         '--no-align',
         '--set=ON_ERROR_STOP=1',
@@ -210,8 +211,9 @@ try {
         '--port', $env:DB_PORT,
         '--username', $env:DB_USER,
         '--dbname', $env:DB_NAME,
+        '--no-password',
         '--set=ON_ERROR_STOP=1',
-        '--command', 'DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;'
+        '--command', 'BEGIN; DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public; COMMIT;'
     )
 
     & psql @resetArgs
