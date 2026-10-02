@@ -5,11 +5,9 @@ export const createDeliverySchema = z.object({
     .number()
     .int('La cantidad debe ser un entero.')
     .positive('La cantidad debe ser mayor a cero.'),
-  destinationRecipientName: z
+  destinationContactName: z
     .string()
-    .trim()
-    .min(1, 'Indica quién recibe.')
-    .max(160, 'El destinatario no puede superar 160 caracteres.'),
+    .max(160, 'El contacto no puede superar 160 caracteres.'),
   destinationAddress: z
     .string()
     .trim()
