@@ -2,8 +2,8 @@ import { apiClient } from '@/shared/api/apiClient'
 import type { ApiResponse } from '@/shared/api/api.types'
 import type {
   QualityInspectionDto,
-  QualityMeasurementDto,
-  SaveQualityMeasurementPayload,
+  QualityCheckDto,
+  SaveQualityCheckPayload,
   StartQualityInspectionPayload,
 } from '../types/quality.types'
 
@@ -29,25 +29,25 @@ export async function startQualityInspection(
   return response.data.data
 }
 
-export async function addQualityMeasurement(
+export async function addQualityCheck(
   inspectionId: number,
-  payload: SaveQualityMeasurementPayload,
-): Promise<QualityMeasurementDto> {
-  const response = await apiClient.post<ApiResponse<QualityMeasurementDto>>(
-    `/quality-inspections/${inspectionId}/measurements`,
+  payload: SaveQualityCheckPayload,
+): Promise<QualityCheckDto> {
+  const response = await apiClient.post<ApiResponse<QualityCheckDto>>(
+    `/quality-inspections/${inspectionId}/checks`,
     payload,
   )
 
   return response.data.data
 }
 
-export async function updateQualityMeasurement(
+export async function updateQualityCheck(
   inspectionId: number,
-  measurementId: number,
-  payload: SaveQualityMeasurementPayload,
-): Promise<QualityMeasurementDto> {
-  const response = await apiClient.put<ApiResponse<QualityMeasurementDto>>(
-    `/quality-inspections/${inspectionId}/measurements/${measurementId}`,
+  checkId: number,
+  payload: SaveQualityCheckPayload,
+): Promise<QualityCheckDto> {
+  const response = await apiClient.put<ApiResponse<QualityCheckDto>>(
+    `/quality-inspections/${inspectionId}/checks/${checkId}`,
     payload,
   )
 
