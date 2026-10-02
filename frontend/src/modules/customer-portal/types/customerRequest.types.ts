@@ -1,5 +1,27 @@
 export type MaterialRequirementType = 'SPECIFIED' | 'ASSISTANCE_REQUIRED'
 
+export type RequestDeliveryMode =
+  | 'SAVED_ADDRESS'
+  | 'CUSTOM_ADDRESS'
+  | 'CUSTOMER_PICKUP'
+  | 'DEFINE_LATER'
+
+export interface RequestDeliveryDestinationDto {
+  id: number
+  mode: RequestDeliveryMode
+  sourceCustomerAddressId: number | null
+  label: string | null
+  address: string | null
+  city: string | null
+  state: string | null
+  postalCode: string | null
+  country: string | null
+  contactName: string | null
+  contactPhone: string | null
+  deliveryInstructions: string | null
+  createdAt: string
+}
+
 export type CustomerRequestStatus =
   | 'SUBMITTED'
   | 'UNDER_REVIEW'
@@ -33,6 +55,7 @@ export interface CustomerRequestSummaryDto {
   materialRequirementType: MaterialRequirementType
   materialRequirement: string
   requestedDeliveryDate: string | null
+  deliveryDestination: RequestDeliveryDestinationDto
   requestedByUserId: number
   requestedByName: string
   createdAt: string
@@ -96,6 +119,17 @@ export interface SubmitCustomerRequestInput {
   materialRequirementType: MaterialRequirementType
   materialRequirement: string
   requestedDeliveryDate?: string
+  deliveryMode: RequestDeliveryMode
+  customerAddressId?: number
+  deliveryLabel?: string
+  deliveryAddress?: string
+  deliveryCity?: string
+  deliveryState?: string
+  deliveryPostalCode?: string
+  deliveryCountry?: string
+  deliveryContactName?: string
+  deliveryContactPhone?: string
+  deliveryInstructions?: string
   documents: RequestDocumentUpload[]
 }
 
