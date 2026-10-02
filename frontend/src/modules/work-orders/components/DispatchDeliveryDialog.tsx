@@ -62,7 +62,7 @@ export function DispatchDeliveryDialog({
             Confirmar salida de planta
           </h2>
           <p className="mt-1 text-[9px] text-slate-500">
-            PENDING → DISPATCHED. La OT permanece lista para entrega.
+            Registra la salida real de planta. La entrega quedará marcada como en tránsito.
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export function DispatchDeliveryDialog({
             {...register('carrier')}
           />
           <TextField
-            label="Guía / tracking (opcional)"
+            label="Guía o número de seguimiento (opcional)"
             maxLength={160}
             labelClassName="!mb-1.5 !text-[10px]"
             className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
