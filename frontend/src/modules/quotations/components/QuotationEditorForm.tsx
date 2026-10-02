@@ -102,10 +102,10 @@ export function QuotationEditorForm({
 
   return (
     <form
-      className="grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(285px,0.65fr)] lg:items-start"
+      className="grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(285px,0.65fr)] lg:items-stretch"
       onSubmit={(event) => event.preventDefault()}
     >
-      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-30px_rgba(15,23,42,0.3)]">
+      <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-30px_rgba(15,23,42,0.3)]">
         <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3">
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
             Documento comercial
@@ -118,7 +118,7 @@ export function QuotationEditorForm({
           </p>
         </div>
 
-        <div className="p-4">
+        <div className="flex min-h-0 flex-1 flex-col p-4">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <TextField
               label="Moneda"
@@ -187,7 +187,7 @@ export function QuotationEditorForm({
             </div>
           ) : null}
 
-          <div className="mt-4">
+          <div className="mt-4 min-h-0 flex-1">
             <QuotationItemsEditor
               control={control}
               register={register}
