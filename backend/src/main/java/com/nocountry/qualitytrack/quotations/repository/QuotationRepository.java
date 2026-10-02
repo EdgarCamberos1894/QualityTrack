@@ -115,6 +115,26 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
             @Param("customerId") Long customerId
     );
 
+
+    @EntityGraph(attributePaths = {
+            "jobCase",
+            "jobCase.customerRequest",
+            "jobCase.customerRequest.customer"
+    })
+    @Query("""
+            select quotation
+            from Quotation quotation
+            where quotation.status = com.nocountry.qualitytrack.quotations.enums.QuotationStatus.APPROVED
+              and quotation.jobCase.status = com.nocountry.qualitytrack.requests.enums.JobCaseStatus.AWAITING_WORK_ORDER
+              and not exists (
+                  select workOrder.id
+                  from WorkOrder workOrder
+                  where workOrder.jobCase = quotation.jobCase
+              )
+            order by quotation.approvedAt asc, quotation.id asc
+            """)
+    List<Quotation> findPendingWorkOrderCandidates();
+
     Optional<Quotation> findByQuotationNumberAndRevision(
             String quotationNumber,
             Integer revision
