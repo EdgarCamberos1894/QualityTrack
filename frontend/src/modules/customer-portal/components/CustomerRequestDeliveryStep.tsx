@@ -152,7 +152,7 @@ export function CustomerRequestDeliveryStep({
                         address.deliveryInstructions ?? '',
                         { shouldDirty: true },
                       )
-                    }
+                    }}
                     className={
                       selected
                         ? 'w-full rounded-xl border border-blue-400 bg-blue-50/55 px-3 py-2.5 text-left'
