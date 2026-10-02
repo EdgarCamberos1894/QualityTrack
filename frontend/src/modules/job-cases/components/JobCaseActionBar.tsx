@@ -1,6 +1,5 @@
 import type { AuthenticatedUser } from '@/modules/auth'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
-import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { Card } from '@/shared/components/ui/Card'
 import { getJobCaseCapabilities } from '../model/jobCaseCapabilities'
@@ -172,9 +171,7 @@ export function JobCaseActionBar({
             <h2 className="text-sm font-semibold text-slate-950">
               {status.label}
             </h2>
-            <Badge tone={status.tone} className="px-2 py-0.5 text-[8px]">
-              {jobCase.caseNumber}
-            </Badge>
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
           </div>
         </div>
       </div>
