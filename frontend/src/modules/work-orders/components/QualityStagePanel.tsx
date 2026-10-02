@@ -44,7 +44,8 @@ export function QualityStagePanel({
   const status = inspection
     ? getQualityInspectionStatusPresentation(inspection.status)
     : null
-  const isReinspection = inspection?.reworkNonConformityId !== null
+  const isReinspection =
+    inspection !== null && inspection.reworkNonConformityId !== null
 
   const nextStep = (() => {
     if (workOrderStatus === 'QUALITY_HOLD' && openNonConformity) {
