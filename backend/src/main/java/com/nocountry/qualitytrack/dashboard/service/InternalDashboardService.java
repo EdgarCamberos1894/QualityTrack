@@ -51,6 +51,7 @@ public class InternalDashboardService {
         long underReview = count(caseCounts, JobCaseStatus.UNDER_REVIEW);
         long waitingCustomer = count(caseCounts, JobCaseStatus.WAITING_CUSTOMER_INFO);
         long readyForQuotation = count(caseCounts, JobCaseStatus.READY_FOR_QUOTATION);
+        long awaitingWorkOrder = count(caseCounts, JobCaseStatus.AWAITING_WORK_ORDER);
         long inProduction = count(caseCounts, JobCaseStatus.IN_PRODUCTION);
         long completed = count(caseCounts, JobCaseStatus.COMPLETED);
 
@@ -58,6 +59,7 @@ public class InternalDashboardService {
                 + underReview
                 + waitingCustomer
                 + readyForQuotation
+                + awaitingWorkOrder
                 + inProduction;
 
         long activeProduction =
@@ -85,6 +87,7 @@ public class InternalDashboardService {
                         underReview,
                         waitingCustomer,
                         readyForQuotation,
+                        awaitingWorkOrder,
                         inProduction,
                         completed
                 ),
@@ -108,6 +111,14 @@ public class InternalDashboardService {
                                 readyForQuotation,
                                 "info",
                                 "/job-cases"
+                        ),
+                        attention(
+                                "AWAITING_WORK_ORDER",
+                                "Pendientes de crear OT",
+                                "Cotizaciones aprobadas que ya pasaron a Operación y esperan una orden de trabajo.",
+                                awaitingWorkOrder,
+                                "warning",
+                                "/work-orders"
                         ),
                         attention(
                                 "QUALITY_PENDING",
