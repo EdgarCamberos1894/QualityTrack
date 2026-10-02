@@ -3,17 +3,54 @@ import type { QuotationDto, QuotationStatus } from '../types/quotation.types'
 
 interface StatusPresentation {
   label: string
+  stage: string
+  description: string
   tone: BadgeProps['tone']
 }
 
 const statusPresentation: Record<QuotationStatus, StatusPresentation> = {
-  DRAFT: { label: 'Borrador', tone: 'neutral' },
-  SENT: { label: 'Enviada', tone: 'info' },
-  APPROVED: { label: 'Aprobada', tone: 'success' },
-  REJECTED: { label: 'Rechazada', tone: 'danger' },
-  SUPERSEDED: { label: 'Reemplazada', tone: 'neutral' },
-  EXPIRED: { label: 'Vencida', tone: 'warning' },
-  CANCELLED: { label: 'Cancelada', tone: 'danger' },
+  DRAFT: {
+    label: 'Borrador',
+    stage: 'Preparación',
+    description: 'Aún no se ha enviado al cliente.',
+    tone: 'neutral',
+  },
+  SENT: {
+    label: 'Esperando respuesta',
+    stage: 'Cliente',
+    description: 'La propuesta ya fue enviada y espera la decisión del cliente.',
+    tone: 'info',
+  },
+  APPROVED: {
+    label: 'Aprobada',
+    stage: 'Aprobada',
+    description: 'El cliente aceptó esta revisión y el trabajo puede continuar.',
+    tone: 'success',
+  },
+  REJECTED: {
+    label: 'Rechazada',
+    stage: 'Cerrada',
+    description: 'El cliente rechazó esta revisión.',
+    tone: 'danger',
+  },
+  SUPERSEDED: {
+    label: 'Reemplazada',
+    stage: 'Historial',
+    description: 'Existe una revisión posterior que sustituye esta cotización.',
+    tone: 'neutral',
+  },
+  EXPIRED: {
+    label: 'Vencida',
+    stage: 'Vencida',
+    description: 'La vigencia terminó sin que esta revisión fuera aprobada.',
+    tone: 'warning',
+  },
+  CANCELLED: {
+    label: 'Cancelada',
+    stage: 'Cerrada',
+    description: 'La cotización fue cancelada y ya no continúa en el flujo.',
+    tone: 'danger',
+  },
 }
 
 export function getQuotationStatusPresentation(
