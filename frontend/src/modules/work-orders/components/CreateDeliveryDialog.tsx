@@ -31,6 +31,7 @@ function defaults(
 
   return {
     quantity: availableQuantity || 1,
+    destinationLabel: hasAddress ? requestedDestination.label ?? '' : '',
     destinationContactName:
       hasAddress ? requestedDestination.contactName ?? '' : '',
     destinationAddress: hasAddress ? requestedDestination.address ?? '' : '',
@@ -40,6 +41,8 @@ function defaults(
       hasAddress ? requestedDestination.postalCode ?? '' : '',
     destinationCountry:
       hasAddress ? requestedDestination.country ?? 'México' : 'México',
+    destinationInstructions:
+      hasAddress ? requestedDestination.deliveryInstructions ?? '' : '',
     deliveryMethod:
       requestedDestination?.mode === 'CUSTOMER_PICKUP'
         ? 'Recolección en planta'
@@ -166,6 +169,16 @@ export function CreateDeliveryDialog({
           </div>
 
           <TextField
+            label="Nombre del destino (opcional)"
+            placeholder="Ej. Planta principal"
+            maxLength={120}
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+            error={errors.destinationLabel?.message}
+            {...register('destinationLabel')}
+          />
+
+          <TextField
             label="Contacto en destino (opcional)"
             placeholder="No tiene que ser quien finalmente reciba"
             maxLength={160}
@@ -218,6 +231,15 @@ export function CreateDeliveryDialog({
               {...register('destinationCountry')}
             />
           </div>
+
+          <TextareaField
+            label="Indicaciones de entrega (opcional)"
+            maxLength={1000}
+            labelClassName="!mb-1.5 !text-[10px]"
+            className="!min-h-16 !rounded-lg !px-3 !py-2 !text-[10px] !shadow-none"
+            error={errors.destinationInstructions?.message}
+            {...register('destinationInstructions')}
+          />
 
           <p className="rounded-lg border border-blue-100 bg-blue-50/60 px-3 py-2 text-[8px] leading-4 text-blue-800">
             Esta entrega conservará su propio snapshot del destino. “Recibido
