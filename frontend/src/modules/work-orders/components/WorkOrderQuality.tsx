@@ -1,16 +1,23 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import type { RecordMaterialConsumptionPayload } from '@/modules/materials'
 import { Badge } from '@/shared/components/ui/Badge'
-import { EmptyState } from '@/shared/components/feedback/EmptyState'
+import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { CompleteQualityInspectionDialog } from './CompleteQualityInspectionDialog'
 import { NonConformitySection } from './NonConformitySection'
-import { QualityInspectionCard } from './QualityInspectionCard'
-import { QualityMeasurementDialog } from './QualityMeasurementDialog'
 import { ProductionMaterialsCard } from './ProductionMaterialsCard'
-import { useQualityMutations } from '../hooks/useQualityMutations'
+import { QualityInspectionWorkspace } from './QualityInspectionWorkspace'
+import { QualityMeasurementDialog } from './QualityMeasurementDialog'
+import { QualityStagePanel } from './QualityStagePanel'
 import { useProductionMutations } from '../hooks/useProductionMutations'
+import { useQualityMutations } from '../hooks/useQualityMutations'
+import {
+  countMeasurementResults,
+  formatQualityDateTime,
+  getQualityInspectionStatusPresentation,
+} from '../model/qualityPresenter'
 import type { QualityMeasurementFormValues } from '../schemas/quality.schemas'
 import type {
   QualityInspectionDto,
@@ -27,8 +34,11 @@ interface MeasurementTarget {
   measurement: QualityMeasurementDto | null
 }
 
+type QualityDetail = 'nonConformity' | 'materials' | 'history' | null
+
 export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
   const session = useSessionStore((state) => state.session)
+  const location = useLocation()
   const roles = session?.user.roles ?? []
   const currentUserId = Number(session?.user.id)
   const isAdmin = roles.includes('ADMIN')
@@ -43,14 +53,45 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
     useState<MeasurementTarget | null>(null)
   const [completionTarget, setCompletionTarget] =
     useState<QualityInspectionDto | null>(null)
+  const [selectedInspectionId, setSelectedInspectionId] = useState<
+    number | null
+  >(null)
+  const [detail, setDetail] = useState<QualityDetail>(() => {
+    if (location.hash.startsWith('#non-conformity-')) return 'nonConformity'
+    if (location.hash.startsWith('#material-lot-')) return 'materials'
+    return null
+  })
 
   const inspections = useMemo(
     () =>
-      [...data.qualityInspections].sort((left, right) => right.id - left.id),
+      [...data.qualityInspections].sort(
+        (left, right) =>
+          new Date(right.createdAt).getTime() -
+          new Date(left.createdAt).getTime(),
+      ),
     [data.qualityInspections],
   )
 
-  const actionError = mutations.startInspection.error
+  const activeInspection =
+    inspections.find((inspection) => inspection.status === 'IN_PROGRESS') ??
+    inspections.find((inspection) => inspection.status === 'PENDING') ??
+    inspections.at(0) ??
+    null
+
+  const selectedInspection =
+    inspections.find((inspection) => inspection.id === selectedInspectionId) ??
+    activeInspection
+
+  const viewingHistoricalInspection =
+    selectedInspection !== null &&
+    activeInspection !== null &&
+    selectedInspection.id !== activeInspection.id
+
+  const openNonConformity =
+    [...data.nonConformities]
+      .filter((item) => item.status === 'OPEN')
+      .sort((left, right) => right.id - left.id)
+      .at(0) ?? null
 
   const canModifyInspection = (inspection: QualityInspectionDto) =>
     inspection.status === 'IN_PROGRESS' &&
@@ -58,6 +99,68 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
       (isQuality &&
         Number.isFinite(currentUserId) &&
         inspection.inspectorId === currentUserId))
+
+  const selectedCanEdit =
+    selectedInspection !== null &&
+    !viewingHistoricalInspection &&
+    canModifyInspection(selectedInspection)
+
+  const selectedCanStart =
+    selectedInspection !== null &&
+    !viewingHistoricalInspection &&
+    canManageQuality &&
+    selectedInspection.status === 'PENDING' &&
+    data.workOrder.status === 'QUALITY_PENDING'
+
+  const selectedCanComplete =
+    selectedInspection !== null &&
+    !viewingHistoricalInspection &&
+    canModifyInspection(selectedInspection)
+
+  useEffect(() => {
+    const inspectionMatch = location.hash.match(/^#quality-inspection-(\d+)$/)
+
+    if (inspectionMatch) {
+      setSelectedInspectionId(Number(inspectionMatch[1]))
+      return
+    }
+
+    const measurementMatch = location.hash.match(/^#quality-measurement-(\d+)$/)
+
+    if (measurementMatch) {
+      const measurementId = Number(measurementMatch[1])
+      const owner = inspections.find((inspection) =>
+        inspection.measurements.some(
+          (measurement) => measurement.id === measurementId,
+        ),
+      )
+
+      if (owner) setSelectedInspectionId(owner.id)
+      return
+    }
+
+    if (location.hash.startsWith('#non-conformity-')) {
+      setDetail('nonConformity')
+      return
+    }
+
+    if (location.hash.startsWith('#material-lot-')) {
+      setDetail('materials')
+    }
+  }, [inspections, location.hash])
+
+  useEffect(() => {
+    if (!location.hash) return
+
+    const frame = window.requestAnimationFrame(() => {
+      const target = document.getElementById(
+        decodeURIComponent(location.hash.slice(1)),
+      )
+      target?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [detail, location.hash, selectedInspectionId])
 
   const startInspection = async (inspectionId: number) => {
     mutations.startInspection.reset()
@@ -68,7 +171,7 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
         payload: {},
       })
     } catch {
-      // El error se presenta dentro de la pestaña.
+      // El error se presenta en el workspace de Calidad.
     }
   }
 
@@ -112,6 +215,7 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
     try {
       await mutations.completeInspection.mutateAsync(completionTarget.id)
       setCompletionTarget(null)
+      setSelectedInspectionId(null)
       return true
     } catch {
       return false
@@ -129,44 +233,15 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
     }
   }
 
+  const actionError = mutations.startInspection.error
+  const latestReworkMaterial = data.materials.at(-1)
+
   return (
     <div className="space-y-3">
-      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
-        <div className="flex flex-col gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Calidad
-            </p>
-            <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
-              Inspección, no conformidades y corrección trazable
-            </h2>
-            <p className="mt-0.5 max-w-2xl text-[8px] leading-4 text-slate-400">
-              Las mediciones determinan PASS o FAIL y cada corrección conserva la historia original.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            <Badge tone="info" className="px-2 py-0.5 text-[8px]">
-              {inspections.length} inspecciones
-            </Badge>
-            <Badge
-              tone={
-                data.nonConformities.some((nc) => nc.status === 'OPEN')
-                  ? 'danger'
-                  : 'neutral'
-              }
-              className="px-2 py-0.5 text-[8px]"
-            >
-              {data.nonConformities.filter((nc) => nc.status === 'OPEN').length}{' '}
-              NC abiertas
-            </Badge>
-          </div>
-        </div>
-      </section>
-
       {!canManageQuality ? (
         <p className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-[8px] leading-4 text-slate-500">
-          Las inspecciones son de solo lectura para tu rol. Las acciones de NC,
-          ingeniería y retrabajo aparecen únicamente cuando tu rol las permite.
+          Las inspecciones son de solo lectura para tu rol. Las decisiones de
+          Calidad aparecen únicamente cuando tu rol las permite.
         </p>
       ) : null}
 
@@ -176,11 +251,124 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
         </p>
       ) : null}
 
-      {data.nonConformities.length > 0 ? (
+      {viewingHistoricalInspection ? (
+        <section className="flex flex-col gap-2 rounded-xl border border-blue-100 bg-blue-50/45 px-3.5 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[8px] leading-4 text-blue-900">
+            Estás consultando la inspección #{selectedInspection?.id} como
+            referencia histórica. La inspección actual es #
+            {activeInspection?.id}.
+          </p>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
+            onClick={() => setSelectedInspectionId(null)}
+          >
+            Volver a inspección actual
+          </Button>
+        </section>
+      ) : null}
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(285px,0.75fr)] lg:items-stretch">
+        <QualityInspectionWorkspace
+          inspection={selectedInspection}
+          canStart={false}
+          canEdit={selectedCanEdit}
+          canComplete={false}
+          starting={false}
+          onStart={() => undefined}
+          onAddMeasurement={() => {
+            if (!selectedInspection) return
+            mutations.addMeasurement.reset()
+            setMeasurementTarget({
+              inspectionId: selectedInspection.id,
+              measurement: null,
+            })
+          }}
+          onEditMeasurement={(measurement) => {
+            if (!selectedInspection) return
+            mutations.updateMeasurement.reset()
+            setMeasurementTarget({
+              inspectionId: selectedInspection.id,
+              measurement,
+            })
+          }}
+          onComplete={() => undefined}
+        />
+
+        <QualityStagePanel
+          inspection={selectedInspection}
+          openNonConformity={openNonConformity}
+          workOrderStatus={data.workOrder.status}
+          canStart={selectedCanStart}
+          canComplete={selectedCanComplete}
+          starting={
+            mutations.startInspection.isPending &&
+            mutations.startInspection.variables?.inspectionId ===
+              selectedInspection?.id
+          }
+          onStart={() => {
+            if (selectedInspection) {
+              void startInspection(selectedInspection.id)
+            }
+          }}
+          onComplete={() => {
+            if (!selectedInspection) return
+            mutations.completeInspection.reset()
+            setCompletionTarget(selectedInspection)
+          }}
+          onOpenNonConformity={() =>
+            setDetail((current) =>
+              current === 'nonConformity' ? null : 'nonConformity',
+            )
+          }
+          onOpenHistory={() =>
+            setDetail((current) => (current === 'history' ? null : 'history'))
+          }
+          inspectionCount={inspections.length}
+        />
+      </div>
+
+      {data.workOrder.status === 'REWORK_IN_PROGRESS' ? (
+        <section className="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50/45 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[7px] font-bold uppercase tracking-[0.1em] text-amber-700">
+              Material de retrabajo
+            </p>
+            <p className="mt-1 text-[9px] font-semibold text-slate-900">
+              {latestReworkMaterial
+                ? 'Lote ' +
+                  latestReworkMaterial.consumption.lotNumber +
+                  ' · ' +
+                  latestReworkMaterial.consumption.quantityUsed +
+                  ' ' +
+                  latestReworkMaterial.consumption.unit
+                : 'Sin consumo adicional registrado'}
+            </p>
+            <p className="mt-1 text-[7px] text-slate-500">
+              Registra únicamente material consumido durante la corrección.
+            </p>
+          </div>
+          <Button
+            variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
+            onClick={() =>
+              setDetail((current) =>
+                current === 'materials' ? null : 'materials',
+              )
+            }
+          >
+            {detail === 'materials' ? 'Ocultar materiales' : 'Registrar / ver'}
+          </Button>
+        </section>
+      ) : null}
+
+      {detail === 'nonConformity' ? (
         <NonConformitySection data={data} />
       ) : null}
 
-      {data.workOrder.status === 'REWORK_IN_PROGRESS' ? (
+      {detail === 'materials' &&
+      data.workOrder.status === 'REWORK_IN_PROGRESS' ? (
         <ProductionMaterialsCard
           consumptions={data.materials}
           canRecord={canRecordReworkMaterial}
@@ -190,70 +378,71 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
         />
       ) : null}
 
-      <section className="space-y-2.5">
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Inspecciones
-            </p>
-            <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
-              Historial de calidad
-            </h2>
+      {detail === 'history' && inspections.length > 1 ? (
+        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+          <div className="flex items-center justify-between gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
+            <div>
+              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                Historial de calidad
+              </p>
+              <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
+                Inspecciones anteriores
+              </h2>
+            </div>
+            <span className="text-[8px] text-slate-400">
+              {inspections.length} registros
+            </span>
           </div>
-          <span className="text-[8px] text-slate-400">{inspections.length} registros</span>
-        </div>
 
-        {inspections.length === 0 ? (
-          <EmptyState
-            title="Sin inspecciones"
-            description="La inspección aparece después de completar Producción y ejecutar explícitamente Enviar a Calidad."
-          />
-        ) : (
-          <div className="space-y-2.5">
+          <div className="divide-y divide-slate-100">
             {inspections.map((inspection) => {
-              const canEdit = canModifyInspection(inspection)
-              const canStart =
-                canManageQuality &&
-                inspection.status === 'PENDING' &&
-                data.workOrder.status === 'QUALITY_PENDING'
+              const status = getQualityInspectionStatusPresentation(
+                inspection.status,
+              )
+              const totals = countMeasurementResults(inspection.measurements)
+              const current = inspection.id === activeInspection?.id
 
               return (
-                <QualityInspectionCard
+                <button
                   key={inspection.id}
-                  inspection={inspection}
-                  canStart={canStart}
-                  canEdit={canEdit}
-                  canComplete={canEdit}
-                  starting={
-                    mutations.startInspection.isPending &&
-                    mutations.startInspection.variables?.inspectionId ===
-                      inspection.id
-                  }
-                  onStart={() => void startInspection(inspection.id)}
-                  onAddMeasurement={() => {
-                    mutations.addMeasurement.reset()
-                    setMeasurementTarget({
-                      inspectionId: inspection.id,
-                      measurement: null,
-                    })
+                  type="button"
+                  className="grid w-full gap-2 px-4 py-3 text-left transition hover:bg-slate-50 sm:grid-cols-[minmax(0,1fr)_120px_100px_auto] sm:items-center"
+                  onClick={() => {
+                    setSelectedInspectionId(inspection.id)
+                    setDetail(null)
                   }}
-                  onEditMeasurement={(measurement) => {
-                    mutations.updateMeasurement.reset()
-                    setMeasurementTarget({
-                      inspectionId: inspection.id,
-                      measurement,
-                    })
-                  }}
-                  onComplete={() => {
-                    mutations.completeInspection.reset()
-                    setCompletionTarget(inspection)
-                  }}
-                />
+                >
+                  <div>
+                    <p className="text-[9px] font-semibold text-slate-900">
+                      {inspection.reworkNonConformityId
+                        ? 'Reinspección'
+                        : 'Inspección'}{' '}
+                      #{inspection.id}
+                      {current ? ' · Actual' : ''}
+                    </p>
+                    <p className="mt-0.5 text-[7px] text-slate-400">
+                      {inspection.inspectorName ?? 'Inspector por asignar'} ·{' '}
+                      {formatQualityDateTime(inspection.createdAt)}
+                    </p>
+                  </div>
+                  <Badge
+                    tone={status.tone}
+                    className="w-fit px-2 py-0.5 text-[7px]"
+                  >
+                    {status.label}
+                  </Badge>
+                  <span className="text-[8px] text-slate-500">
+                    {totals.pass} PASS · {totals.fail} FAIL
+                  </span>
+                  <span className="text-[8px] font-semibold text-blue-600">
+                    Ver detalle
+                  </span>
+                </button>
               )
             })}
           </div>
-        )}
-      </section>
+        </section>
+      ) : null}
 
       <QualityMeasurementDialog
         open={measurementTarget !== null}
