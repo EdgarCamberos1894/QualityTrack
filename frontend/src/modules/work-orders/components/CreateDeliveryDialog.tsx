@@ -9,19 +9,48 @@ import {
   createDeliverySchema,
   type CreateDeliveryFormValues,
 } from '../schemas/delivery.schemas'
+import type { WorkOrderDeliveryDestinationDto } from '../types/workOrder.types'
 
 interface CreateDeliveryDialogProps {
   open: boolean
   availableQuantity: number
+  requestedDestination: WorkOrderDeliveryDestinationDto | null
   submitting: boolean
   error: unknown
   onClose: () => void
   onSubmit: (values: CreateDeliveryFormValues) => Promise<boolean>
 }
 
+function defaults(
+  availableQuantity: number,
+  requestedDestination: WorkOrderDeliveryDestinationDto | null,
+): CreateDeliveryFormValues {
+  const hasAddress =
+    requestedDestination?.mode === 'SAVED_ADDRESS' ||
+    requestedDestination?.mode === 'CUSTOM_ADDRESS'
+
+  return {
+    quantity: availableQuantity || 1,
+    destinationContactName:
+      hasAddress ? requestedDestination.contactName ?? '' : '',
+    destinationAddress: hasAddress ? requestedDestination.address ?? '' : '',
+    destinationCity: hasAddress ? requestedDestination.city ?? '' : '',
+    destinationState: hasAddress ? requestedDestination.state ?? '' : '',
+    destinationPostalCode:
+      hasAddress ? requestedDestination.postalCode ?? '' : '',
+    destinationCountry:
+      hasAddress ? requestedDestination.country ?? 'México' : 'México',
+    deliveryMethod:
+      requestedDestination?.mode === 'CUSTOMER_PICKUP'
+        ? 'Recolección en planta'
+        : 'Entrega local',
+  }
+}
+
 export function CreateDeliveryDialog({
   open,
   availableQuantity,
+  requestedDestination,
   submitting,
   error,
   onClose,
@@ -35,32 +64,13 @@ export function CreateDeliveryDialog({
     formState: { errors },
   } = useForm<CreateDeliveryFormValues>({
     resolver: zodResolver(createDeliverySchema),
-    defaultValues: {
-      quantity: availableQuantity || 1,
-      destinationRecipientName: '',
-      destinationAddress: '',
-      destinationCity: '',
-      destinationState: '',
-      destinationPostalCode: '',
-      destinationCountry: 'México',
-      deliveryMethod: 'Entrega local',
-    },
+    defaultValues: defaults(availableQuantity, requestedDestination),
   })
 
   useEffect(() => {
     if (!open) return
-
-    reset({
-      quantity: availableQuantity || 1,
-      destinationRecipientName: '',
-      destinationAddress: '',
-      destinationCity: '',
-      destinationState: '',
-      destinationPostalCode: '',
-      destinationCountry: 'México',
-      deliveryMethod: 'Entrega local',
-    })
-  }, [availableQuantity, open, reset])
+    reset(defaults(availableQuantity, requestedDestination))
+  }, [availableQuantity, open, requestedDestination, reset])
 
   if (!open) return null
 
@@ -82,6 +92,10 @@ export function CreateDeliveryDialog({
 
     if (await onSubmit(values)) close()
   })
+
+  const hasRequestedAddress =
+    requestedDestination?.mode === 'SAVED_ADDRESS' ||
+    requestedDestination?.mode === 'CUSTOM_ADDRESS'
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4">
@@ -108,6 +122,27 @@ export function CreateDeliveryDialog({
         </div>
 
         <div className="space-y-3 px-4 py-3.5">
+          {hasRequestedAddress ? (
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50/55 px-3 py-2.5">
+              <p className="text-[8px] font-semibold text-emerald-800">
+                Destino acordado en la solicitud
+              </p>
+              <p className="mt-1 text-[8px] leading-4 text-emerald-700">
+                Los datos se precargaron desde la solicitud. Puedes ajustarlos
+                para este despacho sin modificar el acuerdo histórico.
+              </p>
+            </div>
+          ) : requestedDestination?.mode === 'DEFINE_LATER' ? (
+            <div className="rounded-xl border border-amber-200 bg-amber-50/65 px-3 py-2.5">
+              <p className="text-[8px] font-semibold text-amber-800">
+                El destino quedó pendiente en la solicitud
+              </p>
+              <p className="mt-1 text-[8px] leading-4 text-amber-700">
+                Confirma ahora la dirección real antes de crear el despacho.
+              </p>
+            </div>
+          ) : null}
+
           <div className="grid gap-3 sm:grid-cols-2">
             <TextField
               label="Cantidad"
@@ -122,7 +157,7 @@ export function CreateDeliveryDialog({
             <TextField
               label="Método de entrega"
               maxLength={80}
-              placeholder="Ej. Entrega local, recolección o paquetería"
+              placeholder="Ej. Entrega local o paquetería"
               labelClassName="!mb-1.5 !text-[10px]"
               className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
               error={errors.deliveryMethod?.message}
@@ -131,12 +166,13 @@ export function CreateDeliveryDialog({
           </div>
 
           <TextField
-            label="Recibe"
+            label="Contacto en destino (opcional)"
+            placeholder="No tiene que ser quien finalmente reciba"
             maxLength={160}
             labelClassName="!mb-1.5 !text-[10px]"
             className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
-            error={errors.destinationRecipientName?.message}
-            {...register('destinationRecipientName')}
+            error={errors.destinationContactName?.message}
+            {...register('destinationContactName')}
           />
 
           <TextareaField
@@ -184,7 +220,8 @@ export function CreateDeliveryDialog({
           </div>
 
           <p className="rounded-lg border border-blue-100 bg-blue-50/60 px-3 py-2 text-[8px] leading-4 text-blue-800">
-            El destino queda congelado en esta entrega para conservar la trazabilidad, aunque los datos del cliente cambien después.
+            Esta entrega conservará su propio snapshot del destino. “Recibido
+            por” se registra hasta confirmar la entrega real.
           </p>
 
           {quantityError ? (
@@ -201,10 +238,19 @@ export function CreateDeliveryDialog({
         </div>
 
         <div className="flex justify-end gap-1.5 border-t border-slate-100 bg-slate-50/60 px-4 py-2.5">
-          <Button variant="secondary" className="!h-7 !px-2.5 !text-[8px]" onClick={close} disabled={submitting}>
+          <Button
+            variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
+            onClick={close}
+            disabled={submitting}
+          >
             Cancelar
           </Button>
-          <Button type="submit" className="!h-7 !px-2.5 !text-[8px]" disabled={submitting}>
+          <Button
+            type="submit"
+            className="!h-7 !px-2.5 !text-[8px]"
+            disabled={submitting}
+          >
             {submitting ? 'Creando…' : 'Crear entrega'}
           </Button>
         </div>
