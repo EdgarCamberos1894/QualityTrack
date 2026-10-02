@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
@@ -8,9 +9,13 @@ import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
+import { CustomerAddressDialog } from '../components/CustomerAddressDialog'
 import { CustomerCompanyFields } from '../components/CustomerCompanyFields'
 import { CustomerCompanyHeader } from '../components/CustomerCompanyHeader'
-import { useCustomerCompany } from '../hooks/useCustomerCompany'
+import {
+  useCustomerAddresses,
+  useCustomerCompany,
+} from '../hooks/useCustomerCompany'
 import { useCustomerCompanyMutations } from '../hooks/useCustomerCompanyMutations'
 import { useCustomerPortalContext } from '../hooks/useCustomerPortalContext'
 import {
@@ -19,14 +24,18 @@ import {
 } from '../model/customerCompanyPresenter'
 import {
   customerCompanySchema,
+  type CustomerAddressFormValues,
   type CustomerCompanyFormValues,
 } from '../schemas/customerCompany.schemas'
 
 export function CustomerCompanyPage() {
   const { customer } = useCustomerPortalContext()
   const query = useCustomerCompany(customer.customerId)
+  const addressesQuery = useCustomerAddresses(customer.customerId)
   const mutations = useCustomerCompanyMutations(customer.customerId)
   const isAdmin = customer.role === 'ADMIN'
+  const [addressDialogOpen, setAddressDialogOpen] = useState(false)
+  const [editingAddressId, setEditingAddressId] = useState<number | null>(null)
 
   const company = query.data
   const {
@@ -60,6 +69,52 @@ export function CustomerCompanyPage() {
         <ErrorState error={query.error} title="No pudimos cargar la empresa" />
       </PageContainer>
     )
+  }
+
+  const editingAddress =
+    addressesQuery.data?.find((address) => address.id === editingAddressId) ??
+    null
+
+  const saveAddress = async (values: CustomerAddressFormValues) => {
+    const payload = {
+      label: values.label.trim(),
+      address: values.address.trim(),
+      city: values.city.trim(),
+      state: values.state.trim(),
+      postalCode: values.postalCode.trim(),
+      country: values.country.trim(),
+      ...(values.contactName.trim()
+        ? { contactName: values.contactName.trim() }
+        : {}),
+      ...(values.contactPhone.trim()
+        ? { contactPhone: values.contactPhone.trim() }
+        : {}),
+      ...(values.deliveryInstructions.trim()
+        ? { deliveryInstructions: values.deliveryInstructions.trim() }
+        : {}),
+      defaultAddress: values.defaultAddress,
+    }
+
+    try {
+      if (editingAddressId !== null) {
+        await mutations.updateAddress.mutateAsync({
+          addressId: editingAddressId,
+          payload,
+        })
+      } else {
+        await mutations.createAddress.mutateAsync(payload)
+      }
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  const closeAddressDialog = () => {
+    mutations.createAddress.reset()
+    mutations.updateAddress.reset()
+    setEditingAddressId(null)
+    setAddressDialogOpen(false)
   }
 
   const submit = handleSubmit(async (values) => {
@@ -214,6 +269,80 @@ export function CustomerCompanyPage() {
           </dl>
 
           <div className="mt-3 border-t border-slate-100 pt-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
+                  Direcciones de entrega
+                </p>
+                <p className="mt-1 text-[9px] leading-4 text-slate-500">
+                  Ubicaciones reutilizables al crear solicitudes.
+                </p>
+              </div>
+              {isAdmin ? (
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  className="!h-7 !px-2.5 !text-[8px]"
+                  onClick={() => {
+                    setEditingAddressId(null)
+                    mutations.createAddress.reset()
+                    setAddressDialogOpen(true)
+                  }}
+                >
+                  Agregar
+                </Button>
+              ) : null}
+            </div>
+
+            <div className="mt-2 space-y-2">
+              {(addressesQuery.data ?? []).slice(0, 3).map((address) => (
+                <div
+                  key={address.id}
+                  className="rounded-lg border border-slate-200 bg-white/80 px-3 py-2.5"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[9px] font-semibold text-slate-900">
+                        {address.label}
+                        {address.defaultAddress ? (
+                          <span className="ml-1.5 text-[7px] font-semibold text-blue-600">
+                            Predeterminada
+                          </span>
+                        ) : null}
+                      </p>
+                      <p className="mt-0.5 line-clamp-2 text-[8px] leading-4 text-slate-500">
+                        {address.address}, {address.city}, {address.state},{' '}
+                        {address.postalCode}
+                      </p>
+                    </div>
+                    {isAdmin ? (
+                      <button
+                        type="button"
+                        className="shrink-0 text-[8px] font-semibold text-blue-600 hover:text-blue-700"
+                        onClick={() => {
+                          setEditingAddressId(address.id)
+                          mutations.updateAddress.reset()
+                          setAddressDialogOpen(true)
+                        }}
+                      >
+                        Editar
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+
+              {!addressesQuery.isPending &&
+              (addressesQuery.data?.length ?? 0) === 0 ? (
+                <p className="rounded-lg border border-dashed border-slate-200 bg-slate-50/70 px-3 py-2.5 text-[8px] leading-4 text-slate-500">
+                  Aún no hay direcciones guardadas.
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="mt-3 border-t border-slate-100 pt-3">
             <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
               Accesos de la empresa
             </p>
@@ -230,6 +359,21 @@ export function CustomerCompanyPage() {
           </div>
         </aside>
       </form>
+
+      <CustomerAddressDialog
+        open={addressDialogOpen}
+        address={editingAddress}
+        submitting={
+          mutations.createAddress.isPending || mutations.updateAddress.isPending
+        }
+        error={
+          editingAddressId === null
+            ? mutations.createAddress.error
+            : mutations.updateAddress.error
+        }
+        onClose={closeAddressDialog}
+        onSubmit={saveAddress}
+      />
     </PageContainer>
   )
 }
