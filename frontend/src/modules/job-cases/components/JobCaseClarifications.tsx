@@ -26,7 +26,7 @@ export function JobCaseClarifications({
   const pending = requests.filter((request) => request.open).length
 
   return (
-    <Card className="h-full overflow-hidden border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+    <Card id="clarifications" className="scroll-mt-24 h-full overflow-hidden border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
       <div className="flex flex-col gap-3 border-b border-blue-100/70 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -62,8 +62,9 @@ export function JobCaseClarifications({
       <div className="space-y-3 p-4">
         {requests.map((request) => (
           <article
+            id={`clarification-${request.id}`}
             key={request.id}
-            className="rounded-lg border border-slate-200 bg-slate-50 p-4"
+            className="scroll-mt-24 rounded-lg border border-slate-200 bg-slate-50 p-4"
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
