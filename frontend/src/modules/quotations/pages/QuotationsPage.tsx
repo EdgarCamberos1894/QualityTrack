@@ -28,7 +28,13 @@ export function QuotationsPage() {
         matchesQuotationSearch(quotation, filters.search) &&
         (filters.status === 'ALL' ||
           (filters.status === 'ACTIVE'
-            ? quotation.status === 'DRAFT' || quotation.status === 'SENT'
+            ? [
+                'DRAFT',
+                'SENT',
+                'REJECTED',
+                'EXPIRED',
+                'CANCELLED',
+              ].includes(quotation.status)
             : quotation.status === filters.status)),
     )
   }, [filters, query.data])
