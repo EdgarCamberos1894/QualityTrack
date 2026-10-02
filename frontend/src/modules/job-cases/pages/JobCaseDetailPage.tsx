@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { useCreateQuotation, useQuotations } from '@/modules/quotations'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
@@ -34,9 +39,10 @@ export function JobCaseDetailPage() {
   const { caseId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [actionPanel, setActionPanel] = useState<ActionPanel>(null)
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false)
-  const [historyDialogOpen, setHistoryDialogOpen] = useState(false)
+  const historyDialogOpen = searchParams.get('view') === 'traceability'
   const session = useSessionStore((state) => state.session)
   const numericId = Number(caseId)
   const validId =
@@ -228,9 +234,14 @@ export function JobCaseDetailPage() {
           />
         ) : (
           <JobCaseRecentActivity
+            caseId={validId}
             events={recentActivityQuery.data.items}
             hasMore={recentActivityQuery.data.hasMore}
-            onOpenHistory={() => setHistoryDialogOpen(true)}
+            onOpenHistory={() => {
+              const next = new URLSearchParams(searchParams)
+              next.set('view', 'traceability')
+              setSearchParams(next)
+            }}
           />
         )}
       </div>
@@ -239,7 +250,11 @@ export function JobCaseDetailPage() {
         open={historyDialogOpen}
         caseId={validId}
         caseNumber={jobCase.caseNumber}
-        onClose={() => setHistoryDialogOpen(false)}
+        onClose={() => {
+          const next = new URLSearchParams(searchParams)
+          next.delete('view')
+          setSearchParams(next, { replace: true })
+        }}
       />
 
       <CompleteJobCaseReviewDialog
