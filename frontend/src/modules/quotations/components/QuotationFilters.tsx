@@ -46,11 +46,15 @@ export function QuotationFilters({ value, onChange }: QuotationFiltersProps) {
         <select
           value={value.status}
           onChange={(event) =>
-            update('status', event.target.value as QuotationStatus | 'ALL')
+            update(
+              'status',
+              event.target.value as QuotationStatus | 'ACTIVE' | 'ALL',
+            )
           }
           className="h-9 w-full rounded-xl border border-slate-300 bg-white px-3 text-[10px] font-medium text-slate-700 shadow-[0_1px_2px_rgba(15,23,42,0.04)] outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
         >
-          <option value="ALL">Todos los estados</option>
+          <option value="ACTIVE">Trabajo comercial activo</option>
+          <option value="ALL">Todos los estados / historial</option>
           {QUOTATION_STATUSES.map((status) => (
             <option key={status} value={status}>
               {getQuotationStatusPresentation(status).label}
