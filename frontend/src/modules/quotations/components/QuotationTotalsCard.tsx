@@ -38,7 +38,7 @@ export function QuotationTotalsCard({
     currency.trim().length === 3 ? currency.toUpperCase() : 'MXN'
 
   return (
-    <aside className="h-fit overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)] lg:sticky lg:top-[88px]">
+    <aside className="h-fit overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
       <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3">
         <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
           Resumen
