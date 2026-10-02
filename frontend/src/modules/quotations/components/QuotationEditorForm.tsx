@@ -106,7 +106,7 @@ export function QuotationEditorForm({
       onSubmit={(event) => event.preventDefault()}
     >
       <section className="flex h-full min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-30px_rgba(15,23,42,0.3)]">
-        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3">
+        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
             Documento comercial
           </p>
@@ -118,14 +118,14 @@ export function QuotationEditorForm({
           </p>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col p-4">
+        <div className="flex min-h-0 flex-1 flex-col p-3.5">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <TextField
               label="Moneda"
               maxLength={3}
               disabled={!editable}
-              labelClassName="!mb-1.5 !text-[9px]"
-              className="!h-9 !rounded-lg !px-2.5 !text-[10px] !uppercase !shadow-none"
+              labelClassName="!mb-1 !text-[8px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[9px] !uppercase !shadow-none"
               error={errors.currency?.message}
               {...register('currency')}
             />
@@ -133,8 +133,8 @@ export function QuotationEditorForm({
               label="Válida hasta"
               type="date"
               disabled={!editable}
-              labelClassName="!mb-1.5 !text-[9px]"
-              className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              labelClassName="!mb-1 !text-[8px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[9px] !shadow-none"
               error={errors.validUntil?.message}
               {...register('validUntil')}
             />
@@ -142,8 +142,8 @@ export function QuotationEditorForm({
               label="Entrega estimada"
               type="date"
               disabled={!editable}
-              labelClassName="!mb-1.5 !text-[9px]"
-              className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              labelClassName="!mb-1 !text-[8px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[9px] !shadow-none"
               error={errors.estimatedDeliveryDate?.message}
               {...register('estimatedDeliveryDate')}
             />
@@ -154,14 +154,14 @@ export function QuotationEditorForm({
               max="100"
               step="0.0001"
               disabled={!editable}
-              labelClassName="!mb-1.5 !text-[9px]"
-              className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              labelClassName="!mb-1 !text-[8px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[9px] !shadow-none"
               error={errors.taxRate?.message}
               {...register('taxRate', { valueAsNumber: true })}
             />
           </div>
 
-          <p className="mt-2 text-[7.5px] leading-4 text-slate-400">
+          <p className="mt-1.5 text-[7px] leading-3.5 text-slate-400">
             La fecha solicitada por el cliente es{' '}
             <span className="font-medium text-slate-500">
               {formatQuotationDate(quotation.source.requestedDeliveryDate)}
@@ -187,7 +187,7 @@ export function QuotationEditorForm({
             </div>
           ) : null}
 
-          <div className="mt-4 min-h-0 flex-1">
+          <div className="mt-3 min-h-0 flex-1">
             <QuotationItemsEditor
               control={control}
               register={register}
@@ -199,11 +199,11 @@ export function QuotationEditorForm({
         </div>
 
         {editable ? (
-          <div className="flex justify-end border-t border-slate-100 bg-slate-50/60 px-4 py-3">
+          <div className="flex justify-end border-t border-slate-100 bg-slate-50/60 px-3.5 py-2.5">
             <Button
               size="sm"
               variant="secondary"
-              className="!h-8 !px-3 !text-[8px]"
+              className="!h-7 !px-2.5 !text-[8px]"
               onClick={() => void save()}
               disabled={saving || sending}
             >
