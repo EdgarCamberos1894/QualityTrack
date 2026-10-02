@@ -136,7 +136,9 @@ export function QualityStagePanel({
         <div className="mt-1 flex flex-wrap items-center gap-2">
           <h2 className="text-[12px] font-semibold text-slate-950">
             {inspection
-              ? \`\${isReinspection ? 'Reinspección' : 'Inspección'} #\${inspection.id}\`
+              ? (isReinspection ? 'Reinspección' : 'Inspección') +
+                ' #' +
+                inspection.id
               : 'Sin inspección activa'}
           </h2>
           {status ? (
@@ -170,7 +172,12 @@ export function QualityStagePanel({
         </div>
       ) : null}
 
-      <div className={\`mt-4 rounded-xl border px-3 py-3 \${toneClasses[nextStep.tone]}\`}>
+      <div
+        className={
+          'mt-4 rounded-xl border px-3 py-3 ' +
+          toneClasses[nextStep.tone]
+        }
+      >
         <p className="text-[7px] font-bold uppercase tracking-[0.09em] opacity-75">
           {nextStep.eyebrow}
         </p>
