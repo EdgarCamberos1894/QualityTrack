@@ -8,21 +8,60 @@ import type {
 
 interface StatusPresentation {
   label: string
+  stage: string
+  description: string
   tone: BadgeProps['tone']
 }
 
 const statusPresentation: Record<JobCaseStatus, StatusPresentation> = {
-  SUBMITTED: { label: 'Sin asignar', tone: 'neutral' },
-  UNDER_REVIEW: { label: 'En revisión', tone: 'warning' },
-  WAITING_CUSTOMER_INFO: {
-    label: 'Esperando al cliente',
+  SUBMITTED: {
+    label: 'Pendiente de asignación',
+    stage: 'Revisión',
+    description: 'La solicitud ya tiene expediente y espera responsable interno.',
+    tone: 'neutral',
+  },
+  UNDER_REVIEW: {
+    label: 'En revisión',
+    stage: 'Revisión',
+    description: 'El equipo está validando requisitos, documentos y definición técnica.',
     tone: 'warning',
   },
-  READY_FOR_QUOTATION: { label: 'Listo para cotizar', tone: 'success' },
-  AWAITING_WORK_ORDER: { label: 'Pendiente de OT', tone: 'warning' },
-  IN_PRODUCTION: { label: 'En producción', tone: 'info' },
-  COMPLETED: { label: 'Completado', tone: 'success' },
-  CANCELLED: { label: 'Cancelado', tone: 'danger' },
+  WAITING_CUSTOMER_INFO: {
+    label: 'Esperando al cliente',
+    stage: 'Revisión',
+    description: 'Hace falta una respuesta del cliente para continuar la revisión.',
+    tone: 'warning',
+  },
+  READY_FOR_QUOTATION: {
+    label: 'Listo para cotizar',
+    stage: 'Cotización',
+    description: 'La revisión interna terminó y ya puede prepararse una cotización.',
+    tone: 'success',
+  },
+  AWAITING_WORK_ORDER: {
+    label: 'Pendiente de orden',
+    stage: 'Operación',
+    description: 'La cotización fue aprobada y falta crear la orden de trabajo.',
+    tone: 'warning',
+  },
+  IN_PRODUCTION: {
+    label: 'En producción',
+    stage: 'Producción',
+    description: 'El trabajo ya se encuentra dentro del flujo operativo.',
+    tone: 'info',
+  },
+  COMPLETED: {
+    label: 'Completado',
+    stage: 'Finalizado',
+    description: 'El expediente completó su recorrido operativo.',
+    tone: 'success',
+  },
+  CANCELLED: {
+    label: 'Cancelado',
+    stage: 'Cancelado',
+    description: 'El expediente fue cancelado y ya no continúa en el flujo.',
+    tone: 'danger',
+  },
 }
 
 export function getJobCaseStatusPresentation(
