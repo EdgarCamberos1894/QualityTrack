@@ -5,7 +5,6 @@ import { WorkOrderCreationPanel, useWorkOrders } from '@/modules/work-orders'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
-import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { CancelQuotationDialog } from '../components/CancelQuotationDialog'
 import { QuotationAdjustmentCard } from '../components/QuotationAdjustmentCard'
@@ -139,23 +138,19 @@ export function QuotationDetailPage() {
   const revisions =
     revisionsQuery.data ?? (revisionsQuery.isPending ? [] : [quotation])
 
-  const readOnlyTitle =
-    quotation.status === 'DRAFT'
-      ? 'Borrador de solo lectura'
-      : quotation.status === 'SENT'
-        ? 'Revisión enviada al cliente'
-        : 'Revisión congelada'
-
-  const readOnlyDescription =
-    quotation.status === 'DRAFT'
-      ? 'Solo el responsable comercial o un administrador puede modificar este borrador.'
-      : quotation.status === 'SENT'
-        ? 'La revisión está esperando una respuesta del cliente y conserva sus datos enviados.'
-        : 'Esta revisión conserva sus datos históricos y ya no admite edición directa.'
-
   return (
     <PageContainer className="py-4 lg:py-3">
-      <QuotationDetailHeader quotation={quotation} />
+      <QuotationDetailHeader
+        quotation={quotation}
+        canCancel={canCancel}
+        canCreateRevision={canCreateRevision}
+        creatingRevision={revisionMutation.isPending}
+        onCancel={() => {
+          cancelMutation.reset()
+          setCancelOpen(true)
+        }}
+        onCreateRevision={() => void createRevision()}
+      />
 
       <div className="space-y-3">
         <QuotationFlowSteps />
@@ -163,75 +158,15 @@ export function QuotationDetailPage() {
         <QuotationAdjustmentCard quotation={quotation} />
 
         {quotation.status === 'CANCELLED' ? (
-          <section className="flex flex-col gap-3 rounded-xl border border-red-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_-26px_rgba(185,28,28,0.2)] sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-red-600">
-                Revisión cancelada
-              </p>
-              <p className="mt-0.5 text-[10px] font-medium text-slate-700">
-                {quotation.cancellationReason?.trim()
-                  ? quotation.cancellationReason
-                  : 'No se registró un motivo de cancelación.'}
-              </p>
-            </div>
-
-            {canCreateRevision ? (
-              <Button
-                size="sm"
-                className="!h-7 !px-2.5 !text-[8px]"
-                onClick={() => void createRevision()}
-                disabled={revisionMutation.isPending}
-              >
-                {revisionMutation.isPending
-                  ? 'Creando revisión…'
-                  : 'Crear nueva revisión'}
-              </Button>
-            ) : null}
-          </section>
-        ) : canCancel || !editable ? (
-          <section className="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_-26px_rgba(15,23,42,0.2)] sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-                Control de revisión
-              </p>
-              <p className="mt-0.5 text-[10px] font-semibold text-slate-900">
-                {editable ? 'Borrador en preparación' : readOnlyTitle}
-              </p>
-              <p className="mt-1 max-w-2xl text-[8px] leading-4 text-slate-500">
-                {editable
-                  ? 'Puedes cancelar esta revisión mientras siga en borrador.'
-                  : readOnlyDescription}
-              </p>
-            </div>
-
-            <div className="flex shrink-0 flex-wrap gap-1.5">
-              {canCreateRevision ? (
-                <Button
-                  size="sm"
-                  className="!h-7 !px-2.5 !text-[8px]"
-                  onClick={() => void createRevision()}
-                  disabled={revisionMutation.isPending}
-                >
-                  {revisionMutation.isPending
-                    ? 'Creando revisión…'
-                    : 'Crear nueva revisión'}
-                </Button>
-              ) : null}
-
-              {canCancel ? (
-                <Button
-                  size="sm"
-                  variant="danger"
-                  className="!h-7 !px-2.5 !text-[8px]"
-                  onClick={() => {
-                    cancelMutation.reset()
-                    setCancelOpen(true)
-                  }}
-                >
-                  Cancelar cotización
-                </Button>
-              ) : null}
-            </div>
+          <section className="rounded-xl border border-red-200 bg-red-50/45 px-3.5 py-2.5">
+            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-red-600">
+              Revisión cancelada
+            </p>
+            <p className="mt-1 text-[9px] leading-4 text-red-900/75">
+              {quotation.cancellationReason?.trim()
+                ? quotation.cancellationReason
+                : 'No se registró un motivo de cancelación.'}
+            </p>
           </section>
         ) : null}
 
@@ -281,20 +216,19 @@ export function QuotationDetailPage() {
           onSave={save}
           onSend={send}
           onPreview={setPreview}
+          sidebarContent={
+            revisionsQuery.isError ? (
+              <p className="rounded-xl border border-amber-200 bg-amber-50/70 px-3 py-2 text-[8px] leading-4 text-amber-700">
+                No fue posible cargar el historial de revisiones.
+              </p>
+            ) : revisions.length > 1 ? (
+              <QuotationRevisionHistory
+                revisions={revisions}
+                currentId={quotation.id}
+              />
+            ) : null
+          }
         />
-
-        {revisionsQuery.isError ? (
-          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[9px] text-amber-700">
-            No fue posible cargar el historial de revisiones.
-          </p>
-        ) : revisionsQuery.isPending ? (
-          <LoadingState label="Cargando revisiones…" />
-        ) : (
-          <QuotationRevisionHistory
-            revisions={revisions}
-            currentId={quotation.id}
-          />
-        )}
       </div>
 
       <CancelQuotationDialog
