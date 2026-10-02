@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Button } from '@/shared/components/ui/Button'
+import { Card } from '@/shared/components/ui/Card'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { useJobCaseDocumentFileActions } from '../hooks/useJobCaseDocumentFileActions'
 import {
@@ -32,25 +34,29 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
 
   return (
     <>
-      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-30px_rgba(15,23,42,0.3)]">
-        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/45 px-4 py-2.5">
-          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-            Archivos de origen
-          </p>
-          <div className="mt-0.5 flex items-center justify-between gap-3">
+      <Card className="overflow-hidden border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/25 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+        <div className="flex flex-col gap-3 border-b border-blue-100/70 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <SidebarNavIcon name="documents" className="h-[17px] w-[17px]" />
+            </div>
             <div>
-              <h2 className="text-[12px] font-semibold text-slate-950">
-                Documentos de la solicitud
+              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                Archivos del trabajo
+              </p>
+              <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
+                Documentos
               </h2>
-              <p className="mt-0.5 text-[8px] leading-4 text-slate-500">
+              <p className="mt-0.5 text-[9px] leading-4 text-slate-500">
                 Abre los archivos que sustentan la revisión y consulta sus
                 versiones.
               </p>
             </div>
-            <span className="shrink-0 text-[8px] text-slate-400">
-              {documents.length} archivo{documents.length === 1 ? '' : 's'}
-            </span>
           </div>
+
+          <span className="shrink-0 text-[8px] text-slate-400">
+            {documents.length} archivo{documents.length === 1 ? '' : 's'}
+          </span>
         </div>
 
         {files.error ? (
@@ -149,7 +155,7 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
             )
           })}
         </div>
-      </section>
+      </Card>
 
       <JobCaseDocumentHistoryDialog
         document={historyDocument}
