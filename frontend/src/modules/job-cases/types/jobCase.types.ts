@@ -137,4 +137,4 @@ export interface DefineMaterialSpecificationPayload {
 }
 
 export type JobCaseDetailTab =
-  'documents' | 'clarifications' | 'material' | 'traceability'
+  'summary' | 'documents' | 'specification' | 'activity'
