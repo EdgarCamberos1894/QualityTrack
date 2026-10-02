@@ -40,7 +40,7 @@ export function DeliveryCard({
           {delivery.quantity === 1 ? '' : 's'}
         </p>
         <p className="mt-0.5 truncate text-[7px] text-slate-400">
-          {delivery.destinationRecipientName} ·{' '}
+          {delivery.destinationContactName ?? delivery.destinationLabel ?? 'Sin contacto'} ·{' '}
           {formatDeliveryMethod(delivery.deliveryMethod)}
         </p>
       </div>
