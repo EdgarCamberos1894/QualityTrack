@@ -45,6 +45,17 @@ export function getDeliveryAddress(delivery: DeliveryDto): string {
 
 export function getReservedQuantity(deliveries: DeliveryDto[]): number {
   return deliveries
+    .filter(
+      (delivery) =>
+        delivery.status === 'PENDING' || delivery.status === 'DISPATCHED',
+    )
+    .reduce((total, delivery) => total + delivery.quantity, 0)
+}
+
+export function getCommittedDeliveryQuantity(
+  deliveries: DeliveryDto[],
+): number {
+  return deliveries
     .filter((delivery) => delivery.status !== 'CANCELLED')
     .reduce((total, delivery) => total + delivery.quantity, 0)
 }
@@ -60,7 +71,10 @@ export function getAvailableDeliveryQuantity(
   deliveries: DeliveryDto[],
 ): number {
   if (plannedQuantity === null) return 0
-  return Math.max(plannedQuantity - getReservedQuantity(deliveries), 0)
+  return Math.max(
+    plannedQuantity - getCommittedDeliveryQuantity(deliveries),
+    0,
+  )
 }
 
 export function isDeliveredToday(delivery: DeliveryDto): boolean {
@@ -74,4 +88,13 @@ export function isDeliveredToday(delivery: DeliveryDto): boolean {
     delivered.getMonth() === today.getMonth() &&
     delivered.getDate() === today.getDate()
   )
+}
+
+
+export function formatDeliveryMethod(value: string): string {
+  const normalized = value.replaceAll('_', ' ').trim().toLowerCase()
+
+  if (!normalized) return 'Sin método'
+
+  return normalized.replace(/(^|\s)\S/g, (letter) => letter.toUpperCase())
 }
