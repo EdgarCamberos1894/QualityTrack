@@ -8,6 +8,7 @@ interface QualityHandoffPanelProps {
   workOrderStatus: WorkOrderStatus
   productionCompleted: boolean
   canHandoff: boolean
+  embedded?: boolean
 }
 
 export function QualityHandoffPanel({
@@ -15,6 +16,7 @@ export function QualityHandoffPanel({
   workOrderStatus,
   productionCompleted,
   canHandoff,
+  embedded = false,
 }: QualityHandoffPanelProps) {
   const mutations = useQualityMutations(workOrderId)
 
@@ -22,14 +24,19 @@ export function QualityHandoffPanel({
 
   if (workOrderStatus !== 'IN_PRODUCTION') {
     return (
-      <section className="rounded-xl border border-emerald-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_-26px_rgba(5,150,105,0.2)]">
+      <section
+        className={
+          embedded
+            ? 'rounded-xl border border-emerald-200 bg-emerald-50/60 px-3 py-3'
+            : 'rounded-xl border border-emerald-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_-26px_rgba(5,150,105,0.2)]'
+        }
+      >
         <p className="text-[9px] font-semibold text-emerald-900">
           Handoff de Calidad registrado
         </p>
         <p className="mt-0.5 text-[8px] leading-4 text-slate-500">
           La producción original quedó cerrada y el flujo formal de inspección
-          ya fue creado. Los resultados de Calidad se gestionan desde su
-          pestaña.
+          ya fue creado. Los resultados se gestionan en la etapa de Calidad.
         </p>
       </section>
     )
@@ -46,7 +53,13 @@ export function QualityHandoffPanel({
   }
 
   return (
-    <section className="rounded-xl border border-blue-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_-26px_rgba(37,99,235,0.2)]">
+    <section
+      className={
+        embedded
+          ? 'rounded-xl border border-blue-200 bg-blue-50/55 px-3 py-3'
+          : 'rounded-xl border border-blue-200 bg-white px-3.5 py-3 shadow-[0_10px_28px_-26px_rgba(37,99,235,0.2)]'
+      }
+    >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[9px] font-semibold text-blue-900">
