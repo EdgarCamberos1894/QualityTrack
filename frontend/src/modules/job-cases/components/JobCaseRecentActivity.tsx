@@ -23,13 +23,13 @@ export function JobCaseRecentActivity({
       <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/45 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-            Actividad
+            Trazabilidad
           </p>
           <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
-            Actividad reciente
+            Trazabilidad reciente
           </h2>
           <p className="mt-0.5 text-[8px] text-slate-500">
-            Los últimos movimientos registrados para entender el estado actual.
+            Cada movimiento conserva el contexto y enlaza al recurso relacionado cuando sigue disponible.
           </p>
         </div>
 
