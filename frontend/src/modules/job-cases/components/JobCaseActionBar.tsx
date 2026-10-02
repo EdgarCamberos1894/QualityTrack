@@ -98,6 +98,14 @@ function getReviewContext(
           'No existen pendientes bloqueantes. Comercial puede preparar la propuesta.',
         tone: 'success',
       }
+    case 'AWAITING_WORK_ORDER':
+      return {
+        eyebrow: 'Handoff a Operación',
+        title: 'Cotización aprobada · pendiente de OT',
+        description:
+          'El cliente aprobó la propuesta. El siguiente paso se gestiona desde Órdenes de trabajo.',
+        tone: 'warning',
+      }
     case 'IN_PRODUCTION':
       return {
         eyebrow: 'Etapa operativa',
@@ -196,6 +204,10 @@ export function JobCaseActionBar({
   const materialPending =
     jobCase.request.materialRequirementType === 'ASSISTANCE_REQUIRED' &&
     jobCase.materialSpecification === null
+  const isOperationalHandoff =
+    jobCase.status === 'AWAITING_WORK_ORDER' ||
+    jobCase.status === 'IN_PRODUCTION' ||
+    jobCase.status === 'COMPLETED'
 
   return (
     <aside className="flex h-full flex-col rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
@@ -205,7 +217,7 @@ export function JobCaseActionBar({
         </div>
         <div className="min-w-0">
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-            Revisión
+            {isOperationalHandoff ? 'Expediente' : 'Revisión'}
           </p>
           <div className="mt-0.5 flex flex-wrap items-center gap-2">
             <h2 className="text-sm font-semibold text-slate-950">
@@ -216,8 +228,13 @@ export function JobCaseActionBar({
             </Badge>
           </div>
           <p className="mt-1 text-[8px] leading-4 text-slate-500">
-            Valida que exista información suficiente antes de iniciar la
-            cotización.
+            {jobCase.status === 'AWAITING_WORK_ORDER'
+              ? 'La responsabilidad operativa ya pasó a la bandeja de Órdenes de trabajo.'
+              : jobCase.status === 'IN_PRODUCTION'
+                ? 'La ejecución continúa desde la orden de trabajo vinculada.'
+                : jobCase.status === 'COMPLETED'
+                  ? 'Consulta aquí el cierre y la trazabilidad del expediente.'
+                  : 'Valida que exista información suficiente antes de iniciar la cotización.'}
           </p>
         </div>
       </div>
