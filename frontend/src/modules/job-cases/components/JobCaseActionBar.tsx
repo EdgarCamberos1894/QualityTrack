@@ -237,73 +237,85 @@ export function JobCaseActionBar({
           {context.description}
         </p>
 
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {capabilities.canTake ? (
-            <Button
-              size="sm"
-              className="!h-7 !px-3 !text-[8px]"
-              onClick={onTake}
-              disabled={taking}
-            >
-              {taking ? 'Tomando…' : 'Tomar expediente'}
-            </Button>
+        <div className="mt-3 space-y-2.5">
+          {capabilities.canRequestInformation ||
+          capabilities.canDefineMaterial ? (
+            <div className="flex gap-1.5">
+              {capabilities.canRequestInformation ? (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="!h-7 !min-w-0 !flex-1 !px-2.5 !text-[8px]"
+                  onClick={onRequestInformation}
+                >
+                  Solicitar aclaración
+                </Button>
+              ) : null}
+
+              {capabilities.canDefineMaterial ? (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="!h-7 !min-w-0 !flex-1 !px-2.5 !text-[8px]"
+                  onClick={onDefineMaterial}
+                >
+                  {jobCase.materialSpecification
+                    ? 'Actualizar material'
+                    : jobCase.request.materialRequirementType ===
+                        'ASSISTANCE_REQUIRED'
+                      ? 'Definir material'
+                      : 'Añadir criterio técnico'}
+                </Button>
+              ) : null}
+            </div>
           ) : null}
 
-          {capabilities.canRequestInformation ? (
-            <Button
-              size="sm"
-              variant="secondary"
-              className="!h-7 !px-2.5 !text-[8px]"
-              onClick={onRequestInformation}
-            >
-              Solicitar aclaración
-            </Button>
-          ) : null}
+          {capabilities.canTake ||
+          capabilities.canAttemptComplete ||
+          canOpenQuotation ||
+          canCreateQuotation ? (
+            <div className="border-t border-current/10 pt-2.5">
+              {capabilities.canTake ? (
+                <Button
+                  size="sm"
+                  className="!h-8 !w-full !justify-center !px-3 !text-[8px]"
+                  onClick={onTake}
+                  disabled={taking}
+                >
+                  {taking ? 'Tomando…' : 'Tomar expediente'}
+                </Button>
+              ) : null}
 
-          {capabilities.canDefineMaterial ? (
-            <Button
-              size="sm"
-              variant="secondary"
-              className="!h-7 !px-2.5 !text-[8px]"
-              onClick={onDefineMaterial}
-            >
-              {jobCase.materialSpecification
-                ? 'Actualizar material'
-                : jobCase.request.materialRequirementType ===
-                    'ASSISTANCE_REQUIRED'
-                  ? 'Definir material'
-                  : 'Añadir criterio técnico'}
-            </Button>
-          ) : null}
+              {capabilities.canAttemptComplete ? (
+                <Button
+                  size="sm"
+                  className="!h-8 !w-full !justify-center !px-3 !text-[8px]"
+                  onClick={onComplete}
+                  disabled={completing || !capabilities.canCompleteReview}
+                >
+                  {completing ? 'Completando…' : 'Completar revisión'}
+                </Button>
+              ) : null}
 
-          {capabilities.canAttemptComplete ? (
-            <Button
-              size="sm"
-              className="!h-7 !px-2.5 !text-[8px]"
-              onClick={onComplete}
-              disabled={completing || !capabilities.canCompleteReview}
-            >
-              {completing ? 'Completando…' : 'Completar revisión'}
-            </Button>
-          ) : null}
-
-          {canOpenQuotation ? (
-            <Button
-              size="sm"
-              className="!h-7 !px-3 !text-[8px]"
-              onClick={onOpenQuotation}
-            >
-              Abrir cotización
-            </Button>
-          ) : canCreateQuotation ? (
-            <Button
-              size="sm"
-              className="!h-7 !px-3 !text-[8px]"
-              onClick={onCreateQuotation}
-              disabled={creatingQuotation}
-            >
-              {creatingQuotation ? 'Creando…' : 'Crear cotización'}
-            </Button>
+              {canOpenQuotation ? (
+                <Button
+                  size="sm"
+                  className="!h-8 !w-full !justify-center !px-3 !text-[8px]"
+                  onClick={onOpenQuotation}
+                >
+                  Abrir cotización
+                </Button>
+              ) : canCreateQuotation ? (
+                <Button
+                  size="sm"
+                  className="!h-8 !w-full !justify-center !px-3 !text-[8px]"
+                  onClick={onCreateQuotation}
+                  disabled={creatingQuotation}
+                >
+                  {creatingQuotation ? 'Creando…' : 'Crear cotización'}
+                </Button>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </div>
