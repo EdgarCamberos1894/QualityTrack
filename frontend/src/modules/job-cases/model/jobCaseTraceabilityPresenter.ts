@@ -22,12 +22,19 @@ function metadataString(
   return typeof value === 'string' && value.trim() ? value : null
 }
 
-function workOrderIdFor(event: JobCaseTimelineEventDto): number | null {
+function workOrderIdFor(
+  event: JobCaseTimelineEventDto,
+  fallbackWorkOrderId: number | null,
+): number | null {
   const action = event.actions?.find(
     (item) => item.type === 'VIEW_WORK_ORDER',
   )
 
-  return action?.resourceId ?? asNumber(event.metadata.workOrderId)
+  return (
+    action?.resourceId ??
+    asNumber(event.metadata.workOrderId) ??
+    fallbackWorkOrderId
+  )
 }
 
 function documentIdFor(event: JobCaseTimelineEventDto): number | null {
@@ -37,10 +44,11 @@ function documentIdFor(event: JobCaseTimelineEventDto): number | null {
 
 function workOrderHref(
   event: JobCaseTimelineEventDto,
+  fallbackWorkOrderId: number | null,
   view: 'preparation' | 'production' | 'quality' | 'delivery' | 'documents',
   anchor?: string,
 ): string | null {
-  const workOrderId = workOrderIdFor(event)
+  const workOrderId = workOrderIdFor(event, fallbackWorkOrderId)
   if (workOrderId === null) return null
 
   return `/work-orders/${workOrderId}?view=${view}${
@@ -52,6 +60,7 @@ export function getJobCaseTraceabilityActionHref(
   action: JobCaseTraceabilityActionDto,
   event: JobCaseTimelineEventDto,
   caseId: number,
+  fallbackWorkOrderId: number | null = null,
 ): string | null {
   const routingPurpose = metadataString(event, 'routingPurpose')
   const rework = routingPurpose === 'REWORK'
@@ -70,54 +79,65 @@ export function getJobCaseTraceabilityActionHref(
     case 'VIEW_ROUTING_SHEET':
       return workOrderHref(
         event,
+        fallbackWorkOrderId,
         rework ? 'quality' : 'preparation',
         `routing-sheet-${action.resourceId}`,
       )
     case 'VIEW_ROUTING_OPERATION':
       return workOrderHref(
         event,
+        fallbackWorkOrderId,
         rework ? 'quality' : 'preparation',
         `routing-operation-${action.resourceId}`,
       )
     case 'VIEW_OPERATION_EXECUTION':
       return workOrderHref(
         event,
+        fallbackWorkOrderId,
         rework ? 'quality' : 'production',
         `operation-execution-${action.resourceId}`,
       )
     case 'VIEW_DOCUMENT': {
-      const workOrderId = workOrderIdFor(event)
+      const workOrderId = workOrderIdFor(event, fallbackWorkOrderId)
       return workOrderId === null
         ? `/job-cases/${caseId}#document-${action.resourceId}`
         : workOrderHref(
             event,
+            fallbackWorkOrderId,
             'documents',
             `document-${action.resourceId}`,
           )
     }
     case 'VIEW_DOCUMENT_VERSION': {
       const documentId = documentIdFor(event)
-      const workOrderId = workOrderIdFor(event)
+      const workOrderId = workOrderIdFor(event, fallbackWorkOrderId)
 
       if (documentId !== null) {
         return workOrderId === null
           ? `/job-cases/${caseId}#document-${documentId}`
-          : workOrderHref(event, 'documents', `document-${documentId}`)
+          : workOrderHref(
+              event,
+              fallbackWorkOrderId,
+              'documents',
+              `document-${documentId}`,
+            )
       }
 
       return workOrderId === null
         ? null
-        : workOrderHref(event, 'documents')
+        : workOrderHref(event, fallbackWorkOrderId, 'documents')
     }
     case 'VIEW_MATERIAL_LOT':
       return workOrderHref(
         event,
+        fallbackWorkOrderId,
         'production',
         `material-lot-${action.resourceId}`,
       )
     case 'VIEW_QUALITY_INSPECTION':
       return workOrderHref(
         event,
+        fallbackWorkOrderId,
         'quality',
         `quality-inspection-${action.resourceId}`,
       )
@@ -125,18 +145,21 @@ export function getJobCaseTraceabilityActionHref(
     case 'VIEW_QUALITY_CHECK':
       return workOrderHref(
         event,
+        fallbackWorkOrderId,
         'quality',
         `quality-check-${action.resourceId}`,
       )
     case 'VIEW_NON_CONFORMITY':
       return workOrderHref(
         event,
+        fallbackWorkOrderId,
         'quality',
         `non-conformity-${action.resourceId}`,
       )
     case 'VIEW_DELIVERY':
       return workOrderHref(
         event,
+        fallbackWorkOrderId,
         'delivery',
         `delivery-${action.resourceId}`,
       )
@@ -148,13 +171,19 @@ export function getJobCaseTraceabilityActionHref(
 export function getPrimaryJobCaseTraceabilityHref(
   event: JobCaseTimelineEventDto,
   caseId: number,
+  fallbackWorkOrderId: number | null = null,
 ): string | null {
   const actions = event.actions ?? []
 
   const navigable = actions
     .map((action) => ({
       action,
-      href: getJobCaseTraceabilityActionHref(action, event, caseId),
+      href: getJobCaseTraceabilityActionHref(
+        action,
+        event,
+        caseId,
+        fallbackWorkOrderId,
+      ),
     }))
     .filter(
       (
