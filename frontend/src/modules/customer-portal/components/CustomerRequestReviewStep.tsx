@@ -6,6 +6,7 @@ import {
   formatFileSize,
 } from '../model/customerRequestPresenter'
 import type { CustomerRequestFormValues } from '../schemas/customerRequest.schemas'
+import type { CustomerAddressDto } from '../types/customerCompany.types'
 import type { RequestDocumentUpload } from '../types/customerRequest.types'
 
 interface CustomerRequestReviewStepProps {
@@ -13,6 +14,8 @@ interface CustomerRequestReviewStepProps {
   documents: RequestDocumentUpload[]
   onEditDetails: () => void
   onEditRequirements: () => void
+  onEditDelivery: () => void
+  addresses: CustomerAddressDto[]
   actions: ReactNode
 }
 
@@ -120,8 +123,49 @@ export function CustomerRequestReviewStep({
   documents,
   onEditDetails,
   onEditRequirements,
+  onEditDelivery,
+  addresses,
   actions,
 }: CustomerRequestReviewStepProps) {
+  const selectedAddress =
+    values.deliveryMode === 'SAVED_ADDRESS'
+      ? addresses.find(
+          (address) => String(address.id) === values.customerAddressId,
+        ) ?? null
+      : null
+
+  const deliveryLabel =
+    values.deliveryMode === 'SAVED_ADDRESS'
+      ? selectedAddress?.label ?? 'Dirección de la empresa'
+      : values.deliveryMode === 'CUSTOM_ADDRESS'
+        ? values.deliveryLabel || 'Otro destino'
+        : values.deliveryMode === 'CUSTOMER_PICKUP'
+          ? 'Recolección en planta'
+          : 'Destino por definir'
+
+  const deliveryAddress =
+    values.deliveryMode === 'SAVED_ADDRESS' && selectedAddress
+      ? [
+          selectedAddress.address,
+          selectedAddress.city,
+          selectedAddress.state,
+          selectedAddress.postalCode,
+          selectedAddress.country,
+        ].join(', ')
+      : values.deliveryMode === 'CUSTOM_ADDRESS'
+        ? [
+            values.deliveryAddress,
+            values.deliveryCity,
+            values.deliveryState,
+            values.deliveryPostalCode,
+            values.deliveryCountry,
+          ]
+            .filter(Boolean)
+            .join(', ')
+        : values.deliveryMode === 'CUSTOMER_PICKUP'
+          ? 'El cliente recogerá el pedido en planta.'
+          : 'Se acordará con el equipo durante la revisión.'
+
   const metrics = [
     {
       label: 'Cantidad',
@@ -242,6 +286,48 @@ export function CustomerRequestReviewStep({
                 {values.materialRequirement}
               </p>
             </div>
+          </div>
+        </div>
+
+        <div className="mt-3 border-t border-slate-200 pt-3">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-slate-400">
+                Entrega acordada
+              </p>
+              <h3 className="mt-0.5 text-[11px] font-semibold text-slate-950">
+                {deliveryLabel}
+              </h3>
+            </div>
+
+            <button
+              type="button"
+              onClick={onEditDelivery}
+              aria-label="Editar entrega"
+              title="Editar entrega"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100"
+            >
+              <PencilIcon />
+            </button>
+          </div>
+
+          <div className="mt-2.5 rounded-xl border border-slate-200 bg-slate-50/55 px-3 py-2.5">
+            <p className="text-[9px] font-medium leading-4 text-slate-700">
+              {deliveryAddress}
+            </p>
+            {values.deliveryContactName ? (
+              <p className="mt-1 text-[8px] text-slate-500">
+                Contacto: {values.deliveryContactName}
+                {values.deliveryContactPhone
+                  ? ' · ' + values.deliveryContactPhone
+                  : ''}
+              </p>
+            ) : null}
+            {values.deliveryInstructions ? (
+              <p className="mt-1 text-[8px] leading-4 text-slate-500">
+                {values.deliveryInstructions}
+              </p>
+            ) : null}
           </div>
         </div>
 
