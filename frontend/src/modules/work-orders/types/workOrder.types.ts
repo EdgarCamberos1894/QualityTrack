@@ -20,6 +20,22 @@ export const WORK_ORDER_PRIORITIES = [
 export type WorkOrderStatus = (typeof WORK_ORDER_STATUSES)[number]
 export type WorkOrderPriority = (typeof WORK_ORDER_PRIORITIES)[number]
 
+export interface PendingWorkOrderDto {
+  caseId: number
+  caseNumber: string
+  requestId: number
+  requestNumber: string
+  requestTitle: string
+  customerId: number
+  customerName: string
+  quantity: number
+  quotationId: number
+  quotationNumber: string
+  quotationRevision: number
+  approvedAt: string
+  estimatedDeliveryDate: string | null
+}
+
 export interface WorkOrderDto {
   id: number
   caseId: number
