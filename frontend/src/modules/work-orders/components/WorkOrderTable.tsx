@@ -86,7 +86,7 @@ export function WorkOrderTable({ workOrders }: WorkOrderTableProps) {
                     to={`/work-orders/${workOrder.id}`}
                     className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-[8px] font-semibold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
                   >
-                    Abrir 360
+                    Abrir orden
                     <svg
                       viewBox="0 0 20 20"
                       aria-hidden="true"
