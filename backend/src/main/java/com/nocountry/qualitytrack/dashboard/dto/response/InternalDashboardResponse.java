@@ -25,6 +25,7 @@ public record InternalDashboardResponse(
             long underReview,
             long waitingCustomerInfo,
             long readyForQuotation,
+            long awaitingWorkOrder,
             long inProduction,
             long completed
     ) {
