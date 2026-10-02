@@ -29,7 +29,7 @@ export function JobCaseRecentActivity({
           </p>
         </div>
 
-        {events.length > 0 ? (
+        {hasMore ? (
           <Button
             size="sm"
             variant="secondary"
