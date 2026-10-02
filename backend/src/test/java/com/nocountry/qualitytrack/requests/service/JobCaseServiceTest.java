@@ -12,6 +12,7 @@ import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.traceability.dto.response.TraceabilityEventResponse;
+import com.nocountry.qualitytrack.traceability.dto.response.TraceabilityTimelinePageResponse;
 import com.nocountry.qualitytrack.traceability.service.TraceabilityService;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.users.entity.UserSystemRole;
@@ -162,12 +163,17 @@ class JobCaseServiceTest {
     void returnsTimelineForAuthorizedInternalUser() {
         allowInternal(SystemRole.AUDITOR);
         when(jobCaseRepository.existsById(12L)).thenReturn(true);
-        when(traceabilityService.timeline(12L)).thenReturn(List.of(traceabilityEventResponse));
+        TraceabilityTimelinePageResponse page = new TraceabilityTimelinePageResponse(
+                List.of(traceabilityEventResponse),
+                null,
+                false
+        );
+        when(traceabilityService.timeline(12L, 20, null)).thenReturn(page);
 
-        var response = service.timeline(10L, 12L);
+        var response = service.timeline(10L, 12L, 20, null);
 
-        assertEquals(1, response.size());
-        verify(traceabilityService).timeline(12L);
+        assertEquals(1, response.items().size());
+        verify(traceabilityService).timeline(12L, 20, null);
     }
 
     @Test
@@ -177,11 +183,11 @@ class JobCaseServiceTest {
 
         BusinessException exception = assertThrows(
                 BusinessException.class,
-                () -> service.timeline(10L, 99L)
+                () -> service.timeline(10L, 99L, 20, null)
         );
 
         assertEquals(ApiErrorCode.RESOURCE_NOT_FOUND, exception.getCode());
-        verify(traceabilityService, never()).timeline(99L);
+        verify(traceabilityService, never()).timeline(99L, 20, null);
     }
 
     @Test
