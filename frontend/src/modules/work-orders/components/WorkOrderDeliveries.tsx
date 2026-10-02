@@ -1,8 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useSessionStore } from '@/modules/auth'
-import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
-import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { CancelDeliveryDialog } from './CancelDeliveryDialog'
 import {
@@ -12,6 +10,8 @@ import {
 import { CreateDeliveryDialog } from './CreateDeliveryDialog'
 import { DeliveryCard } from './DeliveryCard'
 import { DeliveryEvidenceDialog } from './DeliveryEvidenceDialog'
+import { DeliveryStagePanel } from './DeliveryStagePanel'
+import { DeliveryWorkspace } from './DeliveryWorkspace'
 import { DispatchDeliveryDialog } from './DispatchDeliveryDialog'
 import { useDeliveryMutations } from '../hooks/useDeliveryMutations'
 import {
@@ -43,6 +43,9 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
   const [createOpen, setCreateOpen] = useState(false)
   const [target, setTarget] = useState<DeliveryDto | null>(null)
   const [dialog, setDialog] = useState<DialogType>(null)
+  const [selectedDeliveryId, setSelectedDeliveryId] = useState<number | null>(
+    null,
+  )
 
   const deliveries = useMemo(
     () =>
@@ -67,17 +70,33 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
     [data.documents],
   )
 
-  const plannedQuantity = data.workOrder.plannedQuantity
+  const latestFirst = [...deliveries].reverse()
+  const priorityDelivery =
+    latestFirst.find((delivery) => delivery.status === 'DISPATCHED') ??
+    latestFirst.find((delivery) => delivery.status === 'PENDING') ??
+    latestFirst.find((delivery) => delivery.status === 'DELIVERED') ??
+    latestFirst.at(0) ??
+    null
+
+  const selectedDelivery =
+    deliveries.find((delivery) => delivery.id === selectedDeliveryId) ??
+    priorityDelivery
+
+  const plannedQuantity = data.workOrder.plannedQuantity ?? 0
   const reservedQuantity = getReservedQuantity(deliveries)
   const deliveredQuantity = getDeliveredQuantity(deliveries)
   const availableQuantity = getAvailableDeliveryQuantity(
-    plannedQuantity,
+    data.workOrder.plannedQuantity,
     deliveries,
   )
   const canCreate =
     canManage &&
     data.workOrder.status === 'READY_FOR_DELIVERY' &&
     availableQuantity > 0
+  const viewingAnotherDelivery =
+    selectedDelivery !== null &&
+    priorityDelivery !== null &&
+    selectedDelivery.id !== priorityDelivery.id
 
   const actionError =
     mutations.create.error ??
@@ -102,6 +121,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
           deliveryMethod: values.deliveryMethod.trim(),
         },
       })
+      setSelectedDeliveryId(null)
       return true
     } catch {
       return false
@@ -123,6 +143,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
       })
       setTarget(null)
       setDialog(null)
+      setSelectedDeliveryId(null)
       return true
     } catch {
       return false
@@ -149,6 +170,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
       })
       setTarget(null)
       setDialog(null)
+      setSelectedDeliveryId(null)
       return true
     } catch {
       return false
@@ -165,6 +187,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
       })
       setTarget(null)
       setDialog(null)
+      setSelectedDeliveryId(null)
       return true
     } catch {
       return false
@@ -181,6 +204,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
       })
       setTarget(null)
       setDialog(null)
+      setSelectedDeliveryId(null)
       return true
     } catch {
       return false
@@ -197,6 +221,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
       })
       setTarget(null)
       setDialog(null)
+      setSelectedDeliveryId(null)
       return true
     } catch {
       return false
@@ -214,64 +239,12 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
   }
 
   return (
-    <div className="space-y-2.5">
-      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
-        <div className="flex flex-col gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Logística
-            </p>
-            <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
-              Entregas parciales y cierre de la OT
-            </h2>
-            <p className="mt-0.5 max-w-2xl text-[8px] leading-4 text-slate-400">
-              La OT se cierra cuando la cantidad recibida acumulada cubre la cantidad planificada.
-            </p>
-          </div>
-
-          {canCreate ? (
-            <Button
-              className="!h-7 !px-2.5 !text-[8px]"
-              onClick={() => setCreateOpen(true)}
-            >
-              Preparar entrega
-            </Button>
-          ) : null}
-        </div>
-
-        <div className="grid divide-y divide-slate-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          <div className="px-4 py-3">
-            <p className="text-[7px] text-slate-400">Disponibles</p>
-            <p className="mt-0.5 text-[13px] font-bold text-slate-950">
-              {availableQuantity} / {plannedQuantity ?? 0}
-            </p>
-          </div>
-          <div className="px-4 py-3">
-            <p className="text-[7px] text-slate-400">Reservadas activas</p>
-            <p className="mt-0.5 text-[13px] font-bold text-slate-950">
-              {reservedQuantity}
-            </p>
-          </div>
-          <div className="px-4 py-3">
-            <p className="text-[7px] text-slate-400">Recibidas acumuladas</p>
-            <p className="mt-0.5 text-[13px] font-bold text-emerald-700">
-              {deliveredQuantity} / {plannedQuantity ?? 0}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {!canManage ? (
-        <p className="rounded-lg border border-slate-200 bg-slate-50/70 px-3 py-2.5 text-[8px] leading-4 text-slate-500">
-          Las entregas son de solo lectura para tu rol. Solo LOGISTICS o ADMIN
-          pueden prepararlas, despacharlas, cancelarlas y registrar recepción.
-        </p>
-      ) : null}
-
+    <div className="space-y-3">
       {data.workOrder.status !== 'READY_FOR_DELIVERY' &&
       data.workOrder.status !== 'DELIVERED' ? (
         <p className="rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2.5 text-[8px] leading-4 text-amber-800">
-          La OT debe estar READY_FOR_DELIVERY para gestionar entregas.
+          Esta es una consulta histórica. La OT debe estar READY_FOR_DELIVERY
+          para crear o gestionar nuevos despachos.
         </p>
       ) : null}
 
@@ -281,33 +254,85 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
         </p>
       ) : null}
 
-      {deliveries.length === 0 ? (
-        <EmptyState
-          title="Sin entregas"
-          description="Cuando la OT esté lista, LOGISTICS puede preparar el primer despacho."
-        />
-      ) : (
-        <div className="space-y-3">
-          {deliveries.map((delivery) => (
-            <DeliveryCard
-              key={delivery.id}
-              delivery={delivery}
-              canManage={canManage}
-              onDispatch={() => openDialog(delivery, 'dispatch')}
-              onComplete={() => openDialog(delivery, 'complete')}
-              onEvidence={() => openDialog(delivery, 'evidence')}
-              onCancel={() => openDialog(delivery, 'cancel')}
-            />
-          ))}
-        </div>
-      )}
+      {viewingAnotherDelivery ? (
+        <section className="flex flex-col gap-2 rounded-xl border border-blue-100 bg-blue-50/45 px-3.5 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[8px] leading-4 text-blue-900">
+            Estás consultando la entrega #{selectedDelivery.id}. La entrega con
+            prioridad operativa es #{priorityDelivery.id}.
+          </p>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
+            onClick={() => setSelectedDeliveryId(null)}
+          >
+            Volver a entrega prioritaria
+          </Button>
+        </section>
+      ) : null}
 
-      {data.workOrder.status === 'DELIVERED' ? (
-        <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50/70 px-3 py-2.5 text-[8px] font-semibold text-emerald-800">
-          <Badge tone="success">DELIVERED</Badge>
-          La cantidad recibida acumulada cubrió la cantidad planificada y la OT
-          quedó cerrada.
-        </div>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(285px,0.75fr)] lg:items-stretch">
+        <DeliveryWorkspace
+          delivery={selectedDelivery}
+          plannedQuantity={plannedQuantity}
+          availableQuantity={availableQuantity}
+        />
+
+        <DeliveryStagePanel
+          delivery={selectedDelivery}
+          plannedQuantity={plannedQuantity}
+          reservedQuantity={reservedQuantity}
+          deliveredQuantity={deliveredQuantity}
+          availableQuantity={availableQuantity}
+          canManage={canManage}
+          canCreate={canCreate}
+          onCreate={() => {
+            mutations.create.reset()
+            setCreateOpen(true)
+          }}
+          onDispatch={() => {
+            if (selectedDelivery) openDialog(selectedDelivery, 'dispatch')
+          }}
+          onComplete={() => {
+            if (selectedDelivery) openDialog(selectedDelivery, 'complete')
+          }}
+          onEvidence={() => {
+            if (selectedDelivery) openDialog(selectedDelivery, 'evidence')
+          }}
+          onCancel={() => {
+            if (selectedDelivery) openDialog(selectedDelivery, 'cancel')
+          }}
+        />
+      </div>
+
+      {deliveries.length > 0 ? (
+        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+          <div className="flex items-center justify-between gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
+            <div>
+              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                Historial logístico
+              </p>
+              <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
+                Entregas de la orden
+              </h2>
+            </div>
+            <span className="text-[8px] text-slate-400">
+              {deliveries.length} registro
+              {deliveries.length === 1 ? '' : 's'}
+            </span>
+          </div>
+
+          <div className="divide-y divide-slate-100">
+            {[...deliveries].reverse().map((delivery) => (
+              <DeliveryCard
+                key={delivery.id}
+                delivery={delivery}
+                selected={delivery.id === selectedDelivery?.id}
+                onSelect={() => setSelectedDeliveryId(delivery.id)}
+              />
+            ))}
+          </div>
+        </section>
       ) : null}
 
       <CreateDeliveryDialog
