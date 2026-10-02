@@ -228,6 +228,124 @@ export function getJobCaseTraceabilityActionHref(
   }
 }
 
+export interface JobCaseTraceabilityFallbackAction {
+  label: string
+  href: string
+}
+
+export function getFallbackJobCaseTraceabilityAction(
+  event: JobCaseTimelineEventDto,
+  caseId: number,
+  fallbackWorkOrderId: number | null = null,
+): JobCaseTraceabilityFallbackAction | null {
+  switch (event.aggregateType) {
+    case 'CUSTOMER_REQUEST':
+      return {
+        label: 'Ver solicitud',
+        href: `/job-cases/${caseId}#request-source`,
+      }
+    case 'JOB_CASE':
+      return {
+        label: getJobCaseTraceabilityActionLabel(
+          {
+            type: 'VIEW_JOB_CASE',
+            label: 'Ver expediente',
+            resourceType: 'JOB_CASE',
+            resourceId: caseId,
+          },
+          event,
+          caseId,
+        ),
+        href: sameCaseEventHref(event, caseId),
+      }
+    case 'QUOTATION':
+      return {
+        label: 'Ver cotización',
+        href: `/quotations/${event.aggregateId}`,
+      }
+    case 'WORK_ORDER':
+      return {
+        label: 'Ver orden de trabajo',
+        href: `/work-orders/${event.aggregateId}`,
+      }
+    case 'ROUTING_SHEET': {
+      const href = workOrderHref(
+        event,
+        fallbackWorkOrderId,
+        metadataString(event, 'routingPurpose') === 'REWORK'
+          ? 'quality'
+          : 'preparation',
+        `routing-sheet-${event.aggregateId}`,
+      )
+      return href ? { label: 'Ver hoja de ruta', href } : null
+    }
+    case 'OPERATION_EXECUTION': {
+      const href = workOrderHref(
+        event,
+        fallbackWorkOrderId,
+        metadataString(event, 'routingPurpose') === 'REWORK'
+          ? 'quality'
+          : 'production',
+        `operation-execution-${event.aggregateId}`,
+      )
+      return href ? { label: 'Ver ejecución', href } : null
+    }
+    case 'DOCUMENT':
+      return {
+        label: 'Ver documento',
+        href: `/job-cases/${caseId}#document-${event.aggregateId}`,
+      }
+    case 'DOCUMENT_VERSION': {
+      const documentId = documentIdFor(event)
+      return documentId === null
+        ? null
+        : {
+            label: 'Ver documento',
+            href: `/job-cases/${caseId}#document-${documentId}`,
+          }
+    }
+    case 'QUALITY_INSPECTION': {
+      const href = workOrderHref(
+        event,
+        fallbackWorkOrderId,
+        'quality',
+        `quality-inspection-${event.aggregateId}`,
+      )
+      return href ? { label: 'Ver inspección', href } : null
+    }
+    case 'QUALITY_MEASUREMENT':
+    case 'QUALITY_CHECK': {
+      const href = workOrderHref(
+        event,
+        fallbackWorkOrderId,
+        'quality',
+        `quality-check-${event.aggregateId}`,
+      )
+      return href ? { label: 'Ver control', href } : null
+    }
+    case 'NON_CONFORMITY': {
+      const href = workOrderHref(
+        event,
+        fallbackWorkOrderId,
+        'quality',
+        `non-conformity-${event.aggregateId}`,
+      )
+      return href ? { label: 'Ver no conformidad', href } : null
+    }
+    case 'DELIVERY': {
+      const href = workOrderHref(
+        event,
+        fallbackWorkOrderId,
+        'delivery',
+        `delivery-${event.aggregateId}`,
+      )
+      return href ? { label: 'Ver entrega', href } : null
+    }
+    default:
+      return null
+  }
+}
+
 export function getPrimaryJobCaseTraceabilityHref(
   event: JobCaseTimelineEventDto,
   caseId: number,
