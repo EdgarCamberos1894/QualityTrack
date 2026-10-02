@@ -5,7 +5,7 @@ export interface CustomerDeliveryDto {
   workOrderNumber: string
   quantity: number
   status: CustomerDeliveryStatus
-  destinationRecipientName: string
+  destinationContactName: string | null
   destinationAddress: string
   destinationCity: string
   destinationState: string
