@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useDocumentFileActions } from '@/modules/document-center'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -23,6 +24,7 @@ export function WorkOrderPinnedDocuments({
   onPin,
 }: WorkOrderPinnedDocumentsProps) {
   const [selection, setSelection] = useState<Record<number, number>>({})
+  const fileActions = useDocumentFileActions()
 
   const pinnedFor = (documentId: number) =>
     pinnedDocuments.find((item) => item.documentId === documentId)
@@ -52,9 +54,9 @@ export function WorkOrderPinnedDocuments({
         </div>
       ) : (
         <>
-          {error ? (
+          {error || fileActions.error ? (
             <p className="mx-4 mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
-              {getErrorMessage(error)}
+              {getErrorMessage(error ?? fileActions.error)}
             </p>
           ) : null}
 
@@ -67,6 +69,12 @@ export function WorkOrderPinnedDocuments({
                 selection[document.id] ??
                 pinned?.documentVersionId ??
                 document.currentVersion.id
+              const selectedVersion =
+                availableVersions.find(
+                  (version) => version.id === selectedVersionId,
+                ) ?? document.currentVersion
+              const openingSelected =
+                fileActions.busyVersionId === selectedVersion.id
 
               return (
                 <article key={document.id} className="px-4 py-3">
@@ -106,6 +114,21 @@ export function WorkOrderPinnedDocuments({
                         ))}
                       </select>
 
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="!h-7 !px-2.5 !text-[8px]"
+                        disabled={openingSelected}
+                        onClick={() =>
+                          void fileActions.openVersion(
+                            { id: document.id },
+                            selectedVersion.id,
+                          )
+                        }
+                      >
+                        {openingSelected ? 'Abriendo…' : 'Abrir'}
+                      </Button>
+
                       {canEdit ? (
                         <Button
                           size="sm"
@@ -113,6 +136,7 @@ export function WorkOrderPinnedDocuments({
                           className="!h-7 !px-2.5 !text-[8px]"
                           disabled={
                             saving ||
+                            openingSelected ||
                             pinned?.documentVersionId === selectedVersionId
                           }
                           onClick={() =>
