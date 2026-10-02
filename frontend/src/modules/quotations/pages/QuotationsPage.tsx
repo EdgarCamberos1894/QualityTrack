@@ -111,7 +111,9 @@ export function QuotationsPage() {
               </p>
             </div>
             <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:pl-4 sm:py-1">
-              <p className="text-[8px] font-medium text-slate-400">Aprobadas</p>
+              <p className="text-[8px] font-medium text-slate-400">
+                Aprobadas → Operación
+              </p>
               <p className="mt-0.5 text-[16px] font-bold text-emerald-700">
                 {approved}
               </p>
