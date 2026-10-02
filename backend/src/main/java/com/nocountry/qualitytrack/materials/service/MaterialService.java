@@ -221,14 +221,13 @@ public class MaterialService {
                 .orElseThrow(() -> notFound("No se encontró la orden de trabajo."));
 
         boolean productionOpen =
-                workOrder.getStatus() == WorkOrderStatus.IN_PRODUCTION
-                        && !workOrder.isProductionCompleted();
+                workOrder.getStatus() == WorkOrderStatus.IN_PRODUCTION;
         boolean reworkOpen =
                 workOrder.getStatus() == WorkOrderStatus.REWORK_IN_PROGRESS;
 
         if (!productionOpen && !reworkOpen) {
             conflict(
-                    "El consumo real solo puede registrarse durante producción o retrabajo en ejecución."
+                    "El consumo real solo puede registrarse mientras la orden siga en Producción o retrabajo."
             );
         }
 
