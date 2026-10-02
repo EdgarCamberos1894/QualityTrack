@@ -9,7 +9,7 @@ export interface DeliveryDto {
   workOrderNumber: string
   quantity: number
   status: DeliveryStatus
-  destinationRecipientName: string
+  destinationContactName: string | null
   destinationAddress: string
   destinationCity: string
   destinationState: string
@@ -36,7 +36,7 @@ export interface DeliveryDto {
 
 export interface CreateDeliveryPayload {
   quantity: number
-  destinationRecipientName: string
+  destinationContactName?: string
   destinationAddress: string
   destinationCity: string
   destinationState: string
