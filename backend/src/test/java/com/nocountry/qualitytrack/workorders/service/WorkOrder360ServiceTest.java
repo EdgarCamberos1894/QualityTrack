@@ -137,7 +137,7 @@ class WorkOrder360ServiceTest {
                 31L
         );
 
-        when(traceabilityService.timeline(12L)).thenReturn(List.of(event));
+        when(traceabilityService.timelineAll(12L)).thenReturn(List.of(event));
         when(actionResolver.resolve(event)).thenReturn(List.of(action));
 
         when(quotationService.listRevisionsInternal(10L, 20L)).thenReturn(List.of());
