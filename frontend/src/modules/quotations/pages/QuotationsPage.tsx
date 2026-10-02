@@ -13,7 +13,7 @@ import type { QuotationFiltersValue } from '../types/quotation.types'
 
 const initialFilters: QuotationFiltersValue = {
   search: '',
-  status: 'ALL',
+  status: 'ACTIVE',
 }
 
 export function QuotationsPage() {
@@ -26,7 +26,10 @@ export function QuotationsPage() {
     return quotations.filter(
       (quotation) =>
         matchesQuotationSearch(quotation, filters.search) &&
-        (filters.status === 'ALL' || quotation.status === filters.status),
+        (filters.status === 'ALL' ||
+          (filters.status === 'ACTIVE'
+            ? quotation.status === 'DRAFT' || quotation.status === 'SENT'
+            : quotation.status === filters.status)),
     )
   }, [filters, query.data])
 
@@ -55,7 +58,8 @@ export function QuotationsPage() {
   const approved = quotations.filter(
     (quotation) => quotation.status === 'APPROVED',
   ).length
-  const hasFilters = filters.search.length > 0 || filters.status !== 'ALL'
+  const hasFilters =
+    filters.search.length > 0 || filters.status !== 'ACTIVE'
 
   return (
     <PageContainer className="py-4 lg:py-3">
@@ -117,7 +121,7 @@ export function QuotationsPage() {
               Bandeja comercial
             </p>
             <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
-              Revisiones vigentes
+              Trabajo comercial
             </h2>
           </div>
           <p className="text-[8px] font-medium text-slate-400">
@@ -148,8 +152,8 @@ export function QuotationsPage() {
           <div className="bg-slate-50/35 p-4">
             <Card className="p-4 shadow-none">
               <EmptyState
-                title="No hay cotizaciones que coincidan"
-                description="Ajusta la búsqueda o el estado para consultar otros flujos."
+                title="No hay trabajo comercial pendiente"
+                description="Ajusta la búsqueda o consulta todos los estados para revisar el historial."
               />
             </Card>
           </div>
