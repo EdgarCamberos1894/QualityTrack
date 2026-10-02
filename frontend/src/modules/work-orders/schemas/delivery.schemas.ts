@@ -5,6 +5,7 @@ export const createDeliverySchema = z.object({
     .number()
     .int('La cantidad debe ser un entero.')
     .positive('La cantidad debe ser mayor a cero.'),
+  destinationLabel: z.string().max(120, 'El nombre del destino no puede superar 120 caracteres.'),
   destinationContactName: z
     .string()
     .max(160, 'El contacto no puede superar 160 caracteres.'),
@@ -33,6 +34,9 @@ export const createDeliverySchema = z.object({
     .trim()
     .min(1, 'Indica el país.')
     .max(100, 'El país no puede superar 100 caracteres.'),
+  destinationInstructions: z
+    .string()
+    .max(1000, 'Las indicaciones no pueden superar 1000 caracteres.'),
   deliveryMethod: z
     .string()
     .trim()
