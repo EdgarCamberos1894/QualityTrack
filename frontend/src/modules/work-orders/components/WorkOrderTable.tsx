@@ -48,10 +48,10 @@ export function WorkOrderTable({ workOrders }: WorkOrderTableProps) {
 
             <div className="col-span-2 min-w-0 md:col-span-1">
               <p className="truncate text-[9px] font-medium text-slate-700">
-                {workOrder.customerName}
+                Para {workOrder.customerName}
               </p>
               <p className="mt-0.5 truncate text-[7px] text-slate-400">
-                {workOrder.approvedQuotationNumber} · Rev{' '}
+                Desde {workOrder.approvedQuotationNumber} · Revisión{' '}
                 {workOrder.approvedQuotationRevision}
               </p>
             </div>
@@ -62,18 +62,19 @@ export function WorkOrderTable({ workOrders }: WorkOrderTableProps) {
                   {status.label}
                 </Badge>
                 <span className="text-[7px] font-medium text-slate-500">
-                  {getWorkOrderPriorityLabel(workOrder.priority)}
+                  Prioridad {getWorkOrderPriorityLabel(workOrder.priority).toLowerCase()}
                 </span>
               </div>
               <p className="mt-1 text-[7px] text-slate-400">
-                {workOrder.plannedQuantity ?? 'Sin definir'} piezas
+                {workOrder.plannedQuantity ?? 'Cantidad por definir'}{' '}
+                {workOrder.plannedQuantity ? 'piezas planeadas' : ''}
               </p>
             </div>
 
             <div className="col-span-2 grid grid-cols-2 gap-3 md:col-span-1 md:block">
               <div>
                 <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
-                  Inicio
+                  Inicio previsto
                 </p>
                 <p className="mt-1 text-[8px] font-medium text-slate-700">
                   {formatWorkOrderDate(workOrder.plannedStartDate)}
@@ -81,7 +82,7 @@ export function WorkOrderTable({ workOrders }: WorkOrderTableProps) {
               </div>
               <div className="md:mt-1.5">
                 <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
-                  Entrega
+                  Entrega comprometida
                 </p>
                 <p className="mt-1 text-[8px] font-medium text-slate-700">
                   {formatWorkOrderDate(workOrder.agreedDeliveryDate)}
@@ -101,7 +102,7 @@ function OpenAction({ to }: { to: string }) {
       to={to}
       className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-[8px] font-semibold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
     >
-      Abrir
+      Ver orden
       <svg
         viewBox="0 0 20 20"
         aria-hidden="true"
