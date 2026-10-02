@@ -9,20 +9,21 @@ import { CompleteQualityInspectionDialog } from './CompleteQualityInspectionDial
 import { NonConformitySection } from './NonConformitySection'
 import { ProductionMaterialsCard } from './ProductionMaterialsCard'
 import { QualityInspectionWorkspace } from './QualityInspectionWorkspace'
-import { QualityMeasurementDialog } from './QualityMeasurementDialog'
+import { QualityCheckDialog } from './QualityCheckDialog'
 import { QualityPendingWorkspace } from './QualityPendingWorkspace'
 import { QualityStagePanel } from './QualityStagePanel'
 import { useProductionMutations } from '../hooks/useProductionMutations'
 import { useQualityMutations } from '../hooks/useQualityMutations'
 import {
-  countMeasurementResults,
+  countQualityCheckResults,
   formatQualityDateTime,
   getQualityInspectionStatusPresentation,
 } from '../model/qualityPresenter'
-import type { QualityMeasurementFormValues } from '../schemas/quality.schemas'
+import type { QualityCheckFormValues } from '../schemas/quality.schemas'
 import type {
+  QualityCheckDto,
   QualityInspectionDto,
-  QualityMeasurementDto,
+  SaveQualityCheckPayload,
 } from '../types/quality.types'
 import type { WorkOrder360Dto } from '../types/workOrder360.types'
 
@@ -30,9 +31,9 @@ interface WorkOrderQualityProps {
   data: WorkOrder360Dto
 }
 
-interface MeasurementTarget {
+interface CheckTarget {
   inspectionId: number
-  measurement: QualityMeasurementDto | null
+  qualityCheck: QualityCheckDto | null
 }
 
 type QualityDetail = 'nonConformity' | 'materials' | 'history' | null
@@ -50,8 +51,8 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
     (isAdmin || isProduction) && data.workOrder.status === 'REWORK_IN_PROGRESS'
   const mutations = useQualityMutations(data.workOrder.id)
   const productionMutations = useProductionMutations(data.workOrder.id)
-  const [measurementTarget, setMeasurementTarget] =
-    useState<MeasurementTarget | null>(null)
+  const [checkTarget, setCheckTarget] =
+    useState<CheckTarget | null>(null)
   const [completionTarget, setCompletionTarget] =
     useState<QualityInspectionDto | null>(null)
   const [selectedInspectionId, setSelectedInspectionId] = useState<
@@ -129,14 +130,14 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
       return
     }
 
-    const measurementMatch = location.hash.match(/^#quality-measurement-(\d+)$/)
+    const checkMatch = location.hash.match(
+      /^#quality-(?:check|measurement)-(\d+)$/,
+    )
 
-    if (measurementMatch) {
-      const measurementId = Number(measurementMatch[1])
+    if (checkMatch) {
+      const checkId = Number(checkMatch[1])
       const owner = inspections.find((inspection) =>
-        inspection.measurements.some(
-          (measurement) => measurement.id === measurementId,
-        ),
+        inspection.checks.some((qualityCheck) => qualityCheck.id === checkId),
       )
 
       if (owner) setSelectedInspectionId(owner.id)
@@ -179,34 +180,57 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
     }
   }
 
-  const saveMeasurement = async (values: QualityMeasurementFormValues) => {
-    if (!measurementTarget) return false
+  const saveCheck = async (values: QualityCheckFormValues) => {
+    if (!checkTarget) return false
 
-    const payload = {
-      characteristic: values.characteristic.trim(),
-      nominalValue: values.nominalValue,
-      lowerLimit: values.lowerLimit,
-      upperLimit: values.upperLimit,
-      measuredValue: values.measuredValue,
-      unit: values.unit.trim(),
-      ...(values.notes.trim() ? { notes: values.notes.trim() } : {}),
+    let payload: SaveQualityCheckPayload
+
+    if (values.type === 'NUMERIC_RANGE') {
+      if (
+        values.nominalValue === undefined ||
+        values.lowerLimit === undefined ||
+        values.upperLimit === undefined ||
+        values.measuredValue === undefined
+      ) {
+        return false
+      }
+
+      payload = {
+        type: 'NUMERIC_RANGE',
+        name: values.name.trim(),
+        nominalValue: values.nominalValue,
+        lowerLimit: values.lowerLimit,
+        upperLimit: values.upperLimit,
+        measuredValue: values.measuredValue,
+        unit: values.unit.trim(),
+        ...(values.notes.trim() ? { notes: values.notes.trim() } : {}),
+      }
+    } else {
+      if (!values.result) return false
+
+      payload = {
+        type: 'PASS_FAIL',
+        name: values.name.trim(),
+        result: values.result,
+        ...(values.notes.trim() ? { notes: values.notes.trim() } : {}),
+      }
     }
 
     try {
-      if (measurementTarget.measurement) {
-        await mutations.updateMeasurement.mutateAsync({
-          inspectionId: measurementTarget.inspectionId,
-          measurementId: measurementTarget.measurement.id,
+      if (checkTarget.qualityCheck) {
+        await mutations.updateCheck.mutateAsync({
+          inspectionId: checkTarget.inspectionId,
+          checkId: checkTarget.qualityCheck.id,
           payload,
         })
       } else {
-        await mutations.addMeasurement.mutateAsync({
-          inspectionId: measurementTarget.inspectionId,
+        await mutations.addCheck.mutateAsync({
+          inspectionId: checkTarget.inspectionId,
           payload,
         })
       }
 
-      setMeasurementTarget(null)
+      setCheckTarget(null)
       return true
     } catch {
       return false
@@ -302,20 +326,20 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
             canComplete={false}
             starting={false}
             onStart={() => undefined}
-            onAddMeasurement={() => {
+            onAddCheck={() => {
               if (!selectedInspection) return
-              mutations.addMeasurement.reset()
-              setMeasurementTarget({
+              mutations.addCheck.reset()
+              setCheckTarget({
                 inspectionId: selectedInspection.id,
-                measurement: null,
+                qualityCheck: null,
               })
             }}
-            onEditMeasurement={(measurement) => {
+            onEditCheck={(measurement) => {
               if (!selectedInspection) return
-              mutations.updateMeasurement.reset()
-              setMeasurementTarget({
+              mutations.updateCheck.reset()
+              setCheckTarget({
                 inspectionId: selectedInspection.id,
-                measurement,
+                qualityCheck,
               })
             }}
             onComplete={() => undefined}
@@ -425,7 +449,7 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
               const status = getQualityInspectionStatusPresentation(
                 inspection.status,
               )
-              const totals = countMeasurementResults(inspection.measurements)
+              const totals = countQualityCheckResults(inspection.checks)
               const current = inspection.id === activeInspection?.id
 
               return (
@@ -470,24 +494,24 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
         </section>
       ) : null}
 
-      <QualityMeasurementDialog
-        open={measurementTarget !== null}
-        measurement={measurementTarget?.measurement ?? null}
+      <QualityCheckDialog
+        open={checkTarget !== null}
+        measurement={checkTarget?.measurement ?? null}
         submitting={
-          mutations.addMeasurement.isPending ||
-          mutations.updateMeasurement.isPending
+          mutations.addCheck.isPending ||
+          mutations.updateCheck.isPending
         }
         error={
-          measurementTarget?.measurement
-            ? mutations.updateMeasurement.error
-            : mutations.addMeasurement.error
+          checkTarget?.measurement
+            ? mutations.updateCheck.error
+            : mutations.addCheck.error
         }
         onClose={() => {
-          mutations.addMeasurement.reset()
-          mutations.updateMeasurement.reset()
-          setMeasurementTarget(null)
+          mutations.addCheck.reset()
+          mutations.updateCheck.reset()
+          setCheckTarget(null)
         }}
-        onSubmit={saveMeasurement}
+        onSubmit={saveCheck}
       />
 
       <CompleteQualityInspectionDialog
