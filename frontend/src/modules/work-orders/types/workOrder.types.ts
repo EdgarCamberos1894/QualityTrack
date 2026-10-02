@@ -67,6 +67,28 @@ export interface WorkOrderDocumentDto {
   linkedAt: string
 }
 
+export type RequestDeliveryMode =
+  | 'SAVED_ADDRESS'
+  | 'CUSTOM_ADDRESS'
+  | 'CUSTOMER_PICKUP'
+  | 'DEFINE_LATER'
+
+export interface WorkOrderDeliveryDestinationDto {
+  id: number
+  mode: RequestDeliveryMode
+  sourceCustomerAddressId: number | null
+  label: string | null
+  address: string | null
+  city: string | null
+  state: string | null
+  postalCode: string | null
+  country: string | null
+  contactName: string | null
+  contactPhone: string | null
+  deliveryInstructions: string | null
+  createdAt: string
+}
+
 export interface WorkOrderSourceDto {
   caseId: number
   caseNumber: string
@@ -81,6 +103,7 @@ export interface WorkOrderSourceDto {
   materialRequirementType: string | null
   materialRequirement: string | null
   requestedDeliveryDate: string | null
+  deliveryDestination: WorkOrderDeliveryDestinationDto
   requestedByUserId: number
   requestedByName: string | null
   materialSpecification: unknown | null
