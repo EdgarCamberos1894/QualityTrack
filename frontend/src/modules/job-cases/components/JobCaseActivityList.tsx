@@ -4,6 +4,7 @@ import {
   getJobCaseTimelineEventLabel,
 } from '../model/jobCasePresenter'
 import {
+  getFallbackJobCaseTraceabilityAction,
   getJobCaseTraceabilityActionHref,
   getJobCaseTraceabilityActionLabel,
   getPrimaryJobCaseTraceabilityHref,
@@ -68,6 +69,14 @@ export function JobCaseActivityList({
                 ),
             )
           : actions
+        const fallbackAction =
+          primaryAction === undefined
+            ? getFallbackJobCaseTraceabilityAction(
+                event,
+                caseId,
+                workOrderId,
+              )
+            : null
 
         return (
           <article
@@ -92,21 +101,33 @@ export function JobCaseActivityList({
                   </p>
                 ) : null}
 
-                {primaryAction ? (
+                {primaryAction || fallbackAction ? (
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                    <Link
-                      to={primaryAction.href}
-                      className="inline-flex h-7 items-center justify-center rounded-lg bg-blue-600 px-2.5 text-[8px] font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                    >
-                      {getJobCaseTraceabilityActionLabel(
-                        primaryAction.action,
-                        event,
-                        caseId,
-                      )}
-                      <span aria-hidden="true" className="ml-1">
-                        →
-                      </span>
-                    </Link>
+                    {primaryAction ? (
+                      <Link
+                        to={primaryAction.href}
+                        className="inline-flex h-7 items-center justify-center rounded-lg bg-blue-600 px-2.5 text-[8px] font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      >
+                        {getJobCaseTraceabilityActionLabel(
+                          primaryAction.action,
+                          event,
+                          caseId,
+                        )}
+                        <span aria-hidden="true" className="ml-1">
+                          →
+                        </span>
+                      </Link>
+                    ) : fallbackAction ? (
+                      <Link
+                        to={fallbackAction.href}
+                        className="inline-flex h-7 items-center justify-center rounded-lg bg-blue-600 px-2.5 text-[8px] font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      >
+                        {fallbackAction.label}
+                        <span aria-hidden="true" className="ml-1">
+                          →
+                        </span>
+                      </Link>
+                    ) : null}
 
                     {secondaryActions.map(({ action, href }) => (
                       <Link
