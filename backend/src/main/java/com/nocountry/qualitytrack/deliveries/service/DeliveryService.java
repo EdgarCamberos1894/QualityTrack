@@ -78,12 +78,14 @@ public class DeliveryService {
             delivery = Delivery.create(
                     workOrder,
                     request.quantity(),
+                    request.destinationLabel(),
                     request.destinationContactName(),
                     request.destinationAddress(),
                     request.destinationCity(),
                     request.destinationState(),
                     request.destinationPostalCode(),
                     request.destinationCountry(),
+                    request.destinationInstructions(),
                     request.deliveryMethod(),
                     actor
             );
@@ -108,7 +110,10 @@ public class DeliveryService {
                         "quantity", delivery.getQuantity(),
                         "reservedQuantity", projectedQuantity,
                         "plannedQuantity", workOrder.getPlannedQuantity(),
-                        "deliveryMethod", delivery.getDeliveryMethod()
+                        "deliveryMethod", delivery.getDeliveryMethod(),
+                        "destinationLabel", delivery.getDestinationLabel(),
+                        "destinationCity", delivery.getDestinationCity(),
+                        "destinationState", delivery.getDestinationState()
                 )
         );
 
