@@ -20,6 +20,7 @@ export function DashboardPipeline({
     { label: 'En revisión', value: pipeline.underReview },
     { label: 'Esperando cliente', value: pipeline.waitingCustomerInfo },
     { label: 'Listos para cotizar', value: pipeline.readyForQuotation },
+    { label: 'Pendientes de OT', value: pipeline.awaitingWorkOrder },
     { label: 'En producción', value: pipeline.inProduction },
     { label: 'Completados', value: pipeline.completed },
   ]
@@ -56,7 +57,7 @@ export function DashboardPipeline({
         </div>
       </div>
 
-      <div className="grid gap-px bg-slate-200 sm:grid-cols-2 lg:grid-cols-6">
+      <div className="grid gap-px bg-slate-200 sm:grid-cols-2 lg:grid-cols-7">
         {stages.map((stage, index) => (
           <div
             key={stage.label}
