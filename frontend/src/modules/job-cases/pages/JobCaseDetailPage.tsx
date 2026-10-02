@@ -110,6 +110,7 @@ export function JobCaseDetailPage() {
       return (
         <JobCaseMaterial
           specification={detailQuery.data.materialSpecification}
+          request={detailQuery.data.request}
         />
       )
     }
