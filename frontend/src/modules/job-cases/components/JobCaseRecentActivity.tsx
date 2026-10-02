@@ -25,7 +25,7 @@ export function JobCaseRecentActivity({
             Actividad reciente
           </h2>
           <p className="mt-0.5 text-[8px] text-slate-500">
-            Los últimos movimientos útiles para entender el estado actual.
+            Los últimos movimientos registrados para entender el estado actual.
           </p>
         </div>
 
