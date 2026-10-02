@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
-import { WorkOrderCreationPanel, useWorkOrders } from '@/modules/work-orders'
+import { useWorkOrders } from '@/modules/work-orders'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
@@ -95,8 +95,6 @@ export function QuotationDetailPage() {
   const editable = quotation.status === 'DRAFT' && canManage
   const canCreateRevision =
     canManage && revisionEligibleStatuses.has(quotation.status)
-  const canCreateWorkOrder =
-    roles.includes('ADMIN') || roles.includes('COMMERCIAL')
   const canCancel =
     canManage &&
     (quotation.status === 'DRAFT' || quotation.status === 'SENT') &&
@@ -207,26 +205,54 @@ export function QuotationDetailPage() {
           ) : workOrdersQuery.isError ? (
             <section className="rounded-xl border border-amber-200 bg-amber-50/70 px-3.5 py-2.5">
               <p className="text-[9px] font-semibold text-amber-900">
-                No pudimos comprobar si el expediente ya tiene una orden de trabajo.
+                No pudimos comprobar el handoff a Operación.
               </p>
               <p className="mt-1 text-[8px] leading-4 text-amber-800">
-                Vuelve a intentarlo antes de crear una OT para evitar duplicados.
+                La cotización sigue aprobada. Consulta la bandeja de Órdenes de
+                trabajo para validar el siguiente paso.
               </p>
             </section>
+          ) : existingWorkOrder ? (
+            <section className="flex flex-col gap-3 rounded-xl border border-emerald-200 bg-white px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-emerald-700">
+                  Handoff completado
+                </p>
+                <p className="mt-0.5 text-[11px] font-semibold text-slate-950">
+                  {existingWorkOrder.workOrderNumber}
+                </p>
+                <p className="mt-1 text-[8px] text-slate-500">
+                  Esta aprobación ya fue convertida en una orden de trabajo.
+                </p>
+              </div>
+              <Link
+                to={`/work-orders/${existingWorkOrder.id}`}
+                className="inline-flex h-7 items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 text-[8px] font-semibold text-emerald-800 transition hover:bg-emerald-100"
+              >
+                Abrir orden
+              </Link>
+            </section>
           ) : (
-            <WorkOrderCreationPanel
-              caseId={quotation.caseId}
-              quotationNumber={quotation.quotationNumber}
-              quotationRevision={quotation.revision}
-              customerName={quotation.customerName}
-              plannedQuantity={quotation.source.quantity}
-              agreedDeliveryDate={quotation.estimatedDeliveryDate}
-              canCreate={canCreateWorkOrder}
-              existingWorkOrder={existingWorkOrder}
-              onCreated={(workOrder) =>
-                navigate(`/work-orders/${workOrder.id}`)
-              }
-            />
+            <section className="flex flex-col gap-3 rounded-xl border border-blue-200 bg-blue-50/35 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                  Handoff a Operación
+                </p>
+                <p className="mt-0.5 text-[11px] font-semibold text-slate-950">
+                  Cotización aprobada · pendiente de OT
+                </p>
+                <p className="mt-1 text-[8px] leading-4 text-slate-500">
+                  La acción operativa ya no se gestiona desde Cotizaciones.
+                  Este expediente está disponible en Órdenes de trabajo.
+                </p>
+              </div>
+              <Link
+                to="/work-orders"
+                className="inline-flex h-7 items-center justify-center rounded-lg bg-blue-600 px-2.5 text-[8px] font-semibold text-white transition hover:bg-blue-700"
+              >
+                Ir a Órdenes de trabajo
+              </Link>
+            </section>
           )
         ) : null}
 
