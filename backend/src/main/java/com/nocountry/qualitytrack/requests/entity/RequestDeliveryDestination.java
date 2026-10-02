@@ -97,9 +97,9 @@ public class RequestDeliveryDestination {
                 source.getState(),
                 source.getPostalCode(),
                 source.getCountry(),
-                firstNonBlank(contactName, source.getContactName()),
-                firstNonBlank(contactPhone, source.getContactPhone()),
-                firstNonBlank(deliveryInstructions, source.getDeliveryInstructions())
+                normalizeOptional(contactName),
+                normalizeOptional(contactPhone),
+                normalizeOptional(deliveryInstructions)
         );
         request.attachDeliveryDestination(destination);
         return destination;
@@ -170,11 +170,6 @@ public class RequestDeliveryDestination {
         this.contactName = normalizeOptional(contactName);
         this.contactPhone = normalizeOptional(contactPhone);
         this.deliveryInstructions = normalizeOptional(deliveryInstructions);
-    }
-
-    private static String firstNonBlank(String preferred, String fallback) {
-        String normalized = normalizeOptional(preferred);
-        return normalized == null ? fallback : normalized;
     }
 
     private static String requireText(String value, String message) {
