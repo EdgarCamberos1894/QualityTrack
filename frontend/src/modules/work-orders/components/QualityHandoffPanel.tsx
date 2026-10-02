@@ -143,7 +143,7 @@ export function QualityHandoffPanel({
 
               <div className="rounded-xl border border-slate-200 bg-slate-50/65 px-3 py-2.5">
                 <p className="text-[7px] font-bold uppercase tracking-[0.1em] text-slate-400">
-                  Consumos registrados
+                  Lotes con consumo
                 </p>
                 <p className="mt-1 text-[11px] font-semibold text-slate-900">
                   {materialConsumptionCount}
