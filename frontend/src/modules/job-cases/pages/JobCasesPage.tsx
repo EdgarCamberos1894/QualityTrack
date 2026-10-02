@@ -146,33 +146,40 @@ export function JobCasesPage() {
 
         <JobCaseFilters value={filters} onChange={setFilters} />
 
-        {hasFilters ? (
-          <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-white px-4 py-2 sm:px-5">
-            <p className="text-[8px] text-slate-400">
-              Filtros aplicados a la bandeja
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/65 px-4 py-2.5 sm:px-5">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+            <p className="text-[9px] font-semibold text-slate-700">
+              {visibleJobCases.length}{' '}
+              {visibleJobCases.length === 1
+                ? 'expediente visible'
+                : 'expedientes visibles'}
             </p>
+          </div>
+
+          {hasFilters ? (
             <button
               type="button"
               onClick={() => setFilters(initialFilters)}
-              className="text-[8px] font-semibold text-blue-600 transition hover:text-blue-700"
+              className="text-[9px] font-semibold text-blue-600 transition hover:text-blue-700"
             >
               Limpiar filtros
             </button>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
 
-        {visibleJobCases.length > 0 ? (
-          <JobCaseTable jobCases={visibleJobCases} />
-        ) : (
-          <div className="bg-slate-50/35 p-4">
+        <div className="bg-slate-50/40 p-3.5 sm:p-4">
+          {visibleJobCases.length > 0 ? (
+            <JobCaseTable jobCases={visibleJobCases} />
+          ) : (
             <Card className="p-4 shadow-none">
               <EmptyState
                 title="No hay expedientes que coincidan"
                 description="Ajusta la búsqueda o los filtros para consultar otros expedientes."
               />
             </Card>
-          </div>
-        )}
+          )}
+        </div>
       </section>
     </PageContainer>
   )
