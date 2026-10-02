@@ -128,17 +128,31 @@ export function CreateWorkOrderDialog({
               >
                 Prioridad
               </label>
-              <select
-                id="work-order-priority"
-                className="h-8 w-full rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] text-slate-950 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
-                {...register('priority')}
-              >
-                {priorityOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  id="work-order-priority"
+                  className="h-8 w-full appearance-none rounded-lg border border-slate-300 bg-white px-2.5 pr-8 !text-[10px] !font-normal !leading-none text-slate-950 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+                  {...register('priority')}
+                >
+                  {priorityOptions.map((option) => (
+                    <option
+                      key={option.value}
+                      value={option.value}
+                      className="text-[10px] font-normal"
+                    >
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 20 20"
+                  className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
+                  fill="currentColor"
+                >
+                  <path d="M5.22 7.47a.75.75 0 0 1 1.06 0L10 11.19l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 8.53a.75.75 0 0 1 0-1.06Z" />
+                </svg>
+              </div>
             </div>
 
             <TextField
