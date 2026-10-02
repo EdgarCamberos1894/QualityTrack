@@ -1,13 +1,5 @@
 import { z } from 'zod'
 
-const optionalNumber = z.preprocess(
-  (value) =>
-    value === '' || value === undefined || Number.isNaN(value)
-      ? undefined
-      : value,
-  z.number().optional(),
-)
-
 export const qualityCheckSchema = z
   .object({
     type: z.enum(['NUMERIC_RANGE', 'PASS_FAIL']),
@@ -16,10 +8,10 @@ export const qualityCheckSchema = z
       .trim()
       .min(1, 'Indica qué se está verificando.')
       .max(200, 'El nombre del control no puede superar 200 caracteres.'),
-    nominalValue: optionalNumber,
-    lowerLimit: optionalNumber,
-    upperLimit: optionalNumber,
-    measuredValue: optionalNumber,
+    nominalValue: z.number().optional(),
+    lowerLimit: z.number().optional(),
+    upperLimit: z.number().optional(),
+    measuredValue: z.number().optional(),
     unit: z.string().trim().max(20, 'La unidad no puede superar 20 caracteres.'),
     result: z.enum(['PASS', 'FAIL']).optional(),
     notes: z.string().max(2000, 'Las notas no pueden superar 2000 caracteres.'),
