@@ -124,7 +124,7 @@ class DeliveryServiceTest {
     void createsPartialDeliveryWhileReservedQuantityFitsPlan() {
         when(accessPolicy.requireLogisticsActor(10L)).thenReturn(logistics);
         when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
-        when(deliveryRepository.sumReservedQuantityByWorkOrderId(7L, DeliveryStatus.CANCELLED))
+        when(deliveryRepository.sumCommittedQuantityByWorkOrderId(7L, DeliveryStatus.CANCELLED))
                 .thenReturn(8L);
         when(deliveryRepository.saveAndFlush(any(Delivery.class)))
                 .thenAnswer(invocation -> {
@@ -147,7 +147,7 @@ class DeliveryServiceTest {
     void rejectsDeliveryWhenActiveReservationsWouldExceedPlan() {
         when(accessPolicy.requireLogisticsActor(10L)).thenReturn(logistics);
         when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
-        when(deliveryRepository.sumReservedQuantityByWorkOrderId(7L, DeliveryStatus.CANCELLED))
+        when(deliveryRepository.sumCommittedQuantityByWorkOrderId(7L, DeliveryStatus.CANCELLED))
                 .thenReturn(15L);
 
         assertThrows(
