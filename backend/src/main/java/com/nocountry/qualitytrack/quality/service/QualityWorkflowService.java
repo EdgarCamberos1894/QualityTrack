@@ -530,12 +530,9 @@ public class QualityWorkflowService {
             QualityInspection inspection,
             SaveQualityCheckRequest request
     ) {
+        validateCheckRequest(request);
+
         if (request.type() == QualityCheckType.NUMERIC_RANGE) {
-            if (request.result() != null) {
-                throw new IllegalArgumentException(
-                        "El resultado de un control NUMERIC_RANGE se calcula en backend."
-                );
-            }
             return QualityCheck.createNumericRange(
                     inspection,
                     request.name(),
@@ -560,12 +557,9 @@ public class QualityWorkflowService {
             QualityCheck qualityCheck,
             SaveQualityCheckRequest request
     ) {
+        validateCheckRequest(request);
+
         if (request.type() == QualityCheckType.NUMERIC_RANGE) {
-            if (request.result() != null) {
-                throw new IllegalArgumentException(
-                        "El resultado de un control NUMERIC_RANGE se calcula en backend."
-                );
-            }
             qualityCheck.updateNumericRange(
                     request.name(),
                     request.nominalValue(),
@@ -583,6 +577,43 @@ public class QualityWorkflowService {
                 request.result(),
                 request.notes()
         );
+    }
+
+    private void validateCheckRequest(SaveQualityCheckRequest request) {
+        if (request.type() == QualityCheckType.NUMERIC_RANGE) {
+            if (request.nominalValue() == null
+                    || request.lowerLimit() == null
+                    || request.upperLimit() == null
+                    || request.measuredValue() == null
+                    || request.unit() == null
+                    || request.unit().isBlank()) {
+                throw new IllegalArgumentException(
+                        "Un control NUMERIC_RANGE requiere nominal, límites, valor medido y unidad."
+                );
+            }
+            if (request.result() != null) {
+                throw new IllegalArgumentException(
+                        "El resultado de un control NUMERIC_RANGE se calcula en backend."
+                );
+            }
+            return;
+        }
+
+        if (request.result() == null) {
+            throw new IllegalArgumentException(
+                    "Un control PASS_FAIL requiere un resultado PASS o FAIL."
+            );
+        }
+
+        if (request.nominalValue() != null
+                || request.lowerLimit() != null
+                || request.upperLimit() != null
+                || request.measuredValue() != null
+                || (request.unit() != null && !request.unit().isBlank())) {
+            throw new IllegalArgumentException(
+                    "Un control PASS_FAIL no acepta valores numéricos ni unidad."
+            );
+        }
     }
 
     private void traceCheck(
