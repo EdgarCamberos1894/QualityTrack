@@ -80,6 +80,29 @@ export function getJobCaseClarificationSummary(
   return `${resolved} resuelta${resolved === 1 ? '' : 's'}`
 }
 
+export function getJobCaseMaterialSummary(
+  jobCase: JobCaseDto & {
+    materialSpecification?: {
+      materialName: string
+      standardOrGrade: string | null
+    } | null
+  },
+): string {
+  if (jobCase.materialSpecification) {
+    return jobCase.materialSpecification.standardOrGrade
+      ? `${jobCase.materialSpecification.materialName} · ${jobCase.materialSpecification.standardOrGrade}`
+      : jobCase.materialSpecification.materialName
+  }
+
+  if (jobCase.request.materialRequirementType === 'ASSISTANCE_REQUIRED') {
+    return 'Pendiente de definición técnica'
+  }
+
+  return jobCase.request.materialRequirement
+    ? `Cliente · ${jobCase.request.materialRequirement}`
+    : 'Definido por el cliente'
+}
+
 export function matchesJobCaseSearch(
   jobCase: JobCaseDto,
   search: string,
