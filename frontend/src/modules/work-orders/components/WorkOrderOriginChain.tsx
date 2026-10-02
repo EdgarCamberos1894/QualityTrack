@@ -41,7 +41,7 @@ export function WorkOrderOriginChain({ data }: WorkOrderOriginChainProps) {
           {
             label: 'Entrega',
             value: `#${latestDelivery.id}`,
-            href: `/work-orders/${workOrder.id}?tab=delivery#delivery-${latestDelivery.id}`,
+            href: `/work-orders/${workOrder.id}?view=delivery#delivery-${latestDelivery.id}`,
           },
         ]
       : []),
