@@ -1,82 +1,111 @@
 import { useNavigate } from 'react-router-dom'
 import { CompactBackButton } from '@/shared/components/navigation/CompactBackButton'
-import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge } from '@/shared/components/ui/Badge'
-import {
-  formatWorkOrderDate,
-  getWorkOrderPriorityLabel,
-  getWorkOrderStatusPresentation,
-} from '../model/workOrderPresenter'
+import { getWorkOrderStatusPresentation } from '../model/workOrderPresenter'
 import type { WorkOrderDetailDto } from '../types/workOrder.types'
 
 interface WorkOrderDetailHeaderProps {
   workOrder: WorkOrderDetailDto
+  canCancel: boolean
+  onCancel: () => void
+  onOpenDocuments: () => void
+  onOpenTraceability: () => void
 }
 
 export function WorkOrderDetailHeader({
   workOrder,
+  canCancel,
+  onCancel,
+  onOpenDocuments,
+  onOpenTraceability,
 }: WorkOrderDetailHeaderProps) {
   const navigate = useNavigate()
   const status = getWorkOrderStatusPresentation(workOrder.status)
 
+  const closeMenu = (target: EventTarget | null) => {
+    const element = target instanceof HTMLElement ? target : null
+    element?.closest('details')?.removeAttribute('open')
+  }
+
   return (
-    <section className="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/70 shadow-[0_16px_44px_-36px_rgba(15,23,42,0.34)]">
-      <div className="px-5 py-4 sm:px-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-start gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200/70">
-              <SidebarNavIcon name="work-orders" className="h-4 w-4" />
-            </span>
-
-            <div className="min-w-0">
-              <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-600">
-                Expediente 360
-              </p>
-              <div className="mt-0.5 flex flex-wrap items-center gap-2">
-                <h1 className="text-[20px] font-bold tracking-tight text-slate-950">
-                  {workOrder.workOrderNumber}
-                </h1>
-                <Badge tone={status.tone} className="px-2 py-0.5 text-[8px]">
-                  {status.label}
-                </Badge>
-              </div>
-              <p className="mt-1 max-w-2xl truncate text-[10px] font-medium text-slate-600">
-                {workOrder.source.title} · {workOrder.source.customerName}
-              </p>
-            </div>
+    <section className="mb-4 rounded-2xl border border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/55 px-5 py-4 shadow-[0_16px_44px_-36px_rgba(15,23,42,0.34)] sm:px-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-600">
+            Orden de trabajo
+          </p>
+          <div className="mt-0.5 flex flex-wrap items-center gap-2">
+            <h1 className="text-[20px] font-bold tracking-tight text-slate-950">
+              {workOrder.workOrderNumber}
+            </h1>
+            <Badge tone={status.tone} className="px-2 py-0.5 text-[8px]">
+              {status.label}
+            </Badge>
           </div>
+          <p className="mt-1 max-w-3xl truncate text-[10px] font-medium text-slate-600">
+            {workOrder.source.title}
+          </p>
+          <p className="mt-1 text-[8px] text-slate-400">
+            {workOrder.source.customerName}
+          </p>
+        </div>
 
+        <div className="flex shrink-0 items-center gap-2">
           <CompactBackButton
             label="Volver a órdenes"
             onClick={() => navigate('/work-orders')}
           />
-        </div>
 
-        <div className="mt-4 grid border-t border-slate-200/80 pt-3 sm:grid-cols-4">
-          <div className="py-1 sm:pr-4">
-            <p className="text-[8px] font-medium text-slate-400">Prioridad</p>
-            <p className="mt-0.5 text-[10px] font-semibold text-slate-800">
-              {getWorkOrderPriorityLabel(workOrder.priority)}
-            </p>
-          </div>
-          <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1">
-            <p className="text-[8px] font-medium text-slate-400">Cantidad</p>
-            <p className="mt-0.5 text-[10px] font-semibold text-slate-800">
-              {workOrder.plannedQuantity ?? workOrder.source.quantity} piezas
-            </p>
-          </div>
-          <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1">
-            <p className="text-[8px] font-medium text-slate-400">Inicio planeado</p>
-            <p className="mt-0.5 text-[10px] font-semibold text-slate-800">
-              {formatWorkOrderDate(workOrder.plannedStartDate)}
-            </p>
-          </div>
-          <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:pl-4 sm:py-1">
-            <p className="text-[8px] font-medium text-slate-400">Entrega acordada</p>
-            <p className="mt-0.5 text-[10px] font-semibold text-slate-800">
-              {formatWorkOrderDate(workOrder.agreedDeliveryDate)}
-            </p>
-          </div>
+          <details className="relative">
+            <summary
+              aria-label="Más acciones de la orden"
+              className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-500 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 [&::-webkit-details-marker]:hidden"
+            >
+              <span aria-hidden="true" className="text-[15px] leading-none">
+                •••
+              </span>
+            </summary>
+
+            <div className="absolute right-0 z-30 mt-2 w-52 overflow-hidden rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10">
+              <button
+                type="button"
+                className="flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[9px] font-medium text-slate-700 transition hover:bg-slate-50"
+                onClick={(event) => {
+                  closeMenu(event.currentTarget)
+                  onOpenDocuments()
+                }}
+              >
+                Ver documentos 360
+              </button>
+
+              <button
+                type="button"
+                className="flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[9px] font-medium text-slate-700 transition hover:bg-slate-50"
+                onClick={(event) => {
+                  closeMenu(event.currentTarget)
+                  onOpenTraceability()
+                }}
+              >
+                Ver trazabilidad 360
+              </button>
+
+              {canCancel ? (
+                <>
+                  <div className="my-1 border-t border-slate-100" />
+                  <button
+                    type="button"
+                    className="flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[9px] font-medium text-red-600 transition hover:bg-red-50"
+                    onClick={(event) => {
+                      closeMenu(event.currentTarget)
+                      onCancel()
+                    }}
+                  >
+                    Cancelar orden
+                  </button>
+                </>
+              ) : null}
+            </div>
+          </details>
         </div>
       </div>
     </section>
