@@ -7,6 +7,7 @@ interface JobCaseTimelineDialogProps {
   open: boolean
   caseId: number
   caseNumber: string
+  workOrderId?: number | null
   onClose: () => void
 }
 
@@ -14,6 +15,7 @@ export function JobCaseTimelineDialog({
   open,
   caseId,
   caseNumber,
+  workOrderId = null,
   onClose,
 }: JobCaseTimelineDialogProps) {
   const historyQuery = useJobCaseTimelineHistory(caseId, open)
@@ -62,7 +64,11 @@ export function JobCaseTimelineDialog({
               Todavía no hay eventos registrados.
             </p>
           ) : (
-            <JobCaseActivityList events={events} caseId={caseId} />
+            <JobCaseActivityList
+              events={events}
+              caseId={caseId}
+              workOrderId={workOrderId}
+            />
           )}
 
           {historyQuery.isFetchNextPageError ? (
