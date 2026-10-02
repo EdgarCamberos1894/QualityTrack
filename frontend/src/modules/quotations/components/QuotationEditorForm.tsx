@@ -213,7 +213,7 @@ export function QuotationEditorForm({
         ) : null}
       </section>
 
-      <div className="space-y-3 lg:sticky lg:top-[88px]">
+      <div className="flex h-full min-h-0 flex-col gap-3 lg:sticky lg:top-[88px]">
         <QuotationTotalsCard
           totals={totals}
           currency={currency}
