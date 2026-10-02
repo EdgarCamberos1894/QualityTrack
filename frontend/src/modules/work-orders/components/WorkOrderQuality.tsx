@@ -334,7 +334,7 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
                 qualityCheck: null,
               })
             }}
-            onEditCheck={(measurement) => {
+            onEditCheck={(qualityCheck) => {
               if (!selectedInspection) return
               mutations.updateCheck.reset()
               setCheckTarget({
@@ -496,13 +496,13 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
 
       <QualityCheckDialog
         open={checkTarget !== null}
-        measurement={checkTarget?.measurement ?? null}
+        qualityCheck={checkTarget?.qualityCheck ?? null}
         submitting={
           mutations.addCheck.isPending ||
           mutations.updateCheck.isPending
         }
         error={
-          checkTarget?.measurement
+          checkTarget?.qualityCheck
             ? mutations.updateCheck.error
             : mutations.addCheck.error
         }
