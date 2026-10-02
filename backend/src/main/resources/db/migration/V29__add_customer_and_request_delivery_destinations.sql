@@ -95,6 +95,17 @@ CREATE TABLE request_delivery_destinations (
 CREATE INDEX idx_request_delivery_destinations_source_address
     ON request_delivery_destinations (source_customer_address_id);
 
+INSERT INTO request_delivery_destinations (
+    request_id,
+    mode,
+    label
+)
+SELECT
+    id,
+    'DEFINE_LATER',
+    'Destino por definir'
+FROM customer_requests;
+
 ALTER TABLE deliveries
     ALTER COLUMN destination_recipient_name DROP NOT NULL;
 
