@@ -11,7 +11,7 @@ import com.nocountry.qualitytrack.requests.repository.CaseMaterialSpecificationR
 import com.nocountry.qualitytrack.requests.repository.JobCaseRepository;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
-import com.nocountry.qualitytrack.traceability.dto.response.TraceabilityEventResponse;
+import com.nocountry.qualitytrack.traceability.dto.response.TraceabilityTimelinePageResponse;
 import com.nocountry.qualitytrack.traceability.service.TraceabilityService;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.users.entity.UserSystemRole;
@@ -78,7 +78,12 @@ public class JobCaseService {
     }
 
     @Transactional(readOnly = true)
-    public List<TraceabilityEventResponse> timeline(Long currentUserId, Long caseId) {
+    public TraceabilityTimelinePageResponse timeline(
+            Long currentUserId,
+            Long caseId,
+            int limit,
+            String cursor
+    ) {
         requireCanReadJobCases(currentUserId);
 
         if (!jobCaseRepository.existsById(caseId)) {
@@ -88,7 +93,7 @@ public class JobCaseService {
             );
         }
 
-        return traceabilityService.timeline(caseId);
+        return traceabilityService.timeline(caseId, limit, cursor);
     }
 
     private void requireCanReadJobCases(Long userId) {
