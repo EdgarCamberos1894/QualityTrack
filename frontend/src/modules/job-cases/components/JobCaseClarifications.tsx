@@ -26,7 +26,7 @@ export function JobCaseClarifications({
   const pending = requests.filter((request) => request.open).length
 
   return (
-    <Card className="overflow-hidden border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+    <Card className="h-full overflow-hidden border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
       <div className="flex flex-col gap-3 border-b border-blue-100/70 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
