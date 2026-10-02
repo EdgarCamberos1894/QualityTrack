@@ -13,6 +13,7 @@ import { JobCaseDetailHeader } from '../components/JobCaseDetailHeader'
 import { JobCaseDocuments } from '../components/JobCaseDocuments'
 import { JobCaseFlowSteps } from '../components/JobCaseFlowSteps'
 import { JobCaseMaterial } from '../components/JobCaseMaterial'
+import { JobCaseSourceCard } from '../components/JobCaseSourceCard'
 import { JobCaseSummary } from '../components/JobCaseSummary'
 import { JobCaseTimeline } from '../components/JobCaseTimeline'
 import { MaterialSpecificationForm } from '../components/MaterialSpecificationForm'
@@ -132,6 +133,8 @@ export function JobCaseDetailPage() {
       <div className="space-y-4">
         <JobCaseFlowSteps status={jobCase.status} />
 
+        <JobCaseSourceCard jobCase={jobCase} />
+
         {mutationError ? (
           <div
             role="alert"
@@ -194,12 +197,14 @@ export function JobCaseDetailPage() {
 
         <JobCaseDocuments documents={jobCase.documents} />
 
-        <JobCaseMaterial
-          specification={jobCase.materialSpecification}
-          request={jobCase.request}
-        />
+        <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
+          <JobCaseMaterial
+            specification={jobCase.materialSpecification}
+            request={jobCase.request}
+          />
 
-        <JobCaseClarifications requests={jobCase.informationRequests} />
+          <JobCaseClarifications requests={jobCase.informationRequests} />
+        </div>
 
         {timelineQuery.isPending ? (
           <LoadingState label="Cargando actividad…" />
