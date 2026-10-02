@@ -72,6 +72,7 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
   const session = useSessionStore((state) => state.session)
   const location = useLocation()
   const mutations = useWorkOrderPreparationMutations(data.workOrder.id)
+  const documentPanelRef = useRef<HTMLDivElement | null>(null)
   const routingPanelRef = useRef<HTMLDivElement | null>(null)
   const [detailPanel, setDetailPanel] = useState<DetailPanel>(() => {
     if (location.hash.startsWith('#routing-')) return 'routing'
@@ -86,6 +87,19 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
       setDetailPanel('documents')
     }
   }, [location.hash])
+
+  useEffect(() => {
+    if (detailPanel !== 'documents') return
+
+    const frame = window.requestAnimationFrame(() => {
+      documentPanelRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      })
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [detailPanel])
 
   useEffect(() => {
     if (detailPanel !== 'routing') return
@@ -355,7 +369,10 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
               </Button>
 
               {detailPanel === 'documents' ? (
-                <div className="mt-3 border-t border-blue-100 pt-3">
+                <div
+                  ref={documentPanelRef}
+                  className="mt-3 scroll-mt-20 border-t border-blue-100 pt-3"
+                >
                   <WorkOrderPinnedDocuments
                     documents={caseDocuments}
                     pinnedDocuments={data.workOrder.pinnedDocuments}
