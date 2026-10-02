@@ -1,13 +1,18 @@
 import { useMemo, useState } from 'react'
+import { useSessionStore } from '@/modules/auth'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Card } from '@/shared/components/ui/Card'
+import { PendingWorkOrderQueue } from '../components/PendingWorkOrderQueue'
 import { WorkOrderFilters } from '../components/WorkOrderFilters'
 import { WorkOrderTable } from '../components/WorkOrderTable'
-import { useWorkOrders } from '../hooks/useWorkOrders'
+import {
+  usePendingWorkOrders,
+  useWorkOrders,
+} from '../hooks/useWorkOrders'
 import { matchesWorkOrderSearch } from '../model/workOrderPresenter'
 import type { WorkOrderFiltersValue } from '../types/workOrder.types'
 
@@ -18,7 +23,9 @@ const initialFilters: WorkOrderFiltersValue = {
 }
 
 export function WorkOrdersPage() {
+  const session = useSessionStore((state) => state.session)
   const workOrdersQuery = useWorkOrders()
+  const pendingQuery = usePendingWorkOrders()
   const [filters, setFilters] = useState<WorkOrderFiltersValue>(initialFilters)
 
   const filteredWorkOrders = useMemo(() => {
@@ -32,7 +39,7 @@ export function WorkOrdersPage() {
     )
   }, [filters, workOrdersQuery.data])
 
-  if (workOrdersQuery.isPending) {
+  if (workOrdersQuery.isPending || pendingQuery.isPending) {
     return (
       <PageContainer className="py-4 lg:py-3">
         <LoadingState label="Cargando órdenes de trabajo…" />
@@ -52,6 +59,10 @@ export function WorkOrdersPage() {
   }
 
   const workOrders = workOrdersQuery.data
+  const pendingWorkOrders = pendingQuery.data ?? []
+  const roles = session?.user.roles ?? []
+  const canCreateWorkOrder =
+    roles.includes('ADMIN') || roles.includes('COMMERCIAL')
   const preparing = workOrders.filter(
     (workOrder) => workOrder.status === 'CREATED',
   ).length
@@ -94,8 +105,16 @@ export function WorkOrdersPage() {
             </div>
           </div>
 
-          <div className="mt-4 grid border-t border-slate-200/80 pt-3 sm:grid-cols-4">
+          <div className="mt-4 grid border-t border-slate-200/80 pt-3 sm:grid-cols-5">
             <div className="py-1 sm:pr-4">
+              <p className="text-[8px] font-medium text-slate-400">
+                Pendientes de crear
+              </p>
+              <p className="mt-0.5 text-[16px] font-bold text-amber-700">
+                {pendingWorkOrders.length}
+              </p>
+            </div>
+            <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1">
               <p className="text-[8px] font-medium text-slate-400">Órdenes</p>
               <p className="mt-0.5 text-[16px] font-bold text-slate-950">
                 {workOrders.length}
@@ -128,6 +147,23 @@ export function WorkOrdersPage() {
           </div>
         </div>
       </section>
+
+      {pendingQuery.isError ? (
+        <section className="mt-4 rounded-xl border border-amber-200 bg-amber-50/70 px-3.5 py-2.5">
+          <p className="text-[9px] font-semibold text-amber-900">
+            No pudimos cargar los compromisos pendientes de crear OT.
+          </p>
+          <p className="mt-1 text-[8px] leading-4 text-amber-800">
+            Las órdenes existentes siguen disponibles, pero conviene recargar
+            antes de crear una nueva.
+          </p>
+        </section>
+      ) : (
+        <PendingWorkOrderQueue
+          pendingWorkOrders={pendingWorkOrders}
+          canCreate={canCreateWorkOrder}
+        />
+      )}
 
       <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
         <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/55 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
