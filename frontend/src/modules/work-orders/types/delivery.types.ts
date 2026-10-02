@@ -9,12 +9,14 @@ export interface DeliveryDto {
   workOrderNumber: string
   quantity: number
   status: DeliveryStatus
+  destinationLabel: string | null
   destinationContactName: string | null
   destinationAddress: string
   destinationCity: string
   destinationState: string
   destinationPostalCode: string
   destinationCountry: string
+  destinationInstructions: string | null
   deliveryMethod: string
   carrier: string | null
   trackingNumber: string | null
@@ -36,12 +38,14 @@ export interface DeliveryDto {
 
 export interface CreateDeliveryPayload {
   quantity: number
+  destinationLabel?: string
   destinationContactName?: string
   destinationAddress: string
   destinationCity: string
   destinationState: string
   destinationPostalCode: string
   destinationCountry: string
+  destinationInstructions?: string
   deliveryMethod: string
 }
 
