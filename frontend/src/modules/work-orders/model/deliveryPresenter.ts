@@ -43,7 +43,7 @@ export function getDeliveryAddress(delivery: DeliveryDto): string {
     .join(', ')
 }
 
-export function getReservedQuantity(deliveries: DeliveryDto[]): number {
+export function getOpenDeliveryQuantity(deliveries: DeliveryDto[]): number {
   return deliveries
     .filter(
       (delivery) =>
@@ -101,7 +101,9 @@ export function formatDeliveryMethod(value: string): string {
   }
   const normalizedKey = value.trim().toUpperCase()
 
-  if (knownMethods[normalizedKey]) return knownMethods[normalizedKey]
+  const knownLabel = knownMethods[normalizedKey]
+
+  if (knownLabel) return knownLabel
 
   const normalized = value.replace(/_/g, ' ').trim().toLowerCase()
 
