@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { useCreateQuotation, useQuotations } from '@/modules/quotations'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
@@ -19,7 +14,6 @@ import { JobCaseDocuments } from '../components/JobCaseDocuments'
 import { JobCaseFlowSteps } from '../components/JobCaseFlowSteps'
 import { JobCaseMaterial } from '../components/JobCaseMaterial'
 import { JobCaseSummary } from '../components/JobCaseSummary'
-import { JobCaseTabs } from '../components/JobCaseTabs'
 import { JobCaseTimeline } from '../components/JobCaseTimeline'
 import { MaterialSpecificationForm } from '../components/MaterialSpecificationForm'
 import { useJobCaseDetail } from '../hooks/useJobCaseDetail'
@@ -30,28 +24,13 @@ import {
   useTakeJobCase,
 } from '../hooks/useJobCaseMutations'
 import { useJobCaseTimeline } from '../hooks/useJobCaseTimeline'
-import type { JobCaseDetailTab } from '../types/jobCase.types'
 
 type ActionPanel = 'information' | 'material' | null
-
-const validTabs: JobCaseDetailTab[] = [
-  'summary',
-  'documents',
-  'specification',
-  'activity',
-]
-
-function resolveTab(value: string | null): JobCaseDetailTab {
-  return validTabs.includes(value as JobCaseDetailTab)
-    ? (value as JobCaseDetailTab)
-    : 'summary'
-}
 
 export function JobCaseDetailPage() {
   const { caseId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
   const [actionPanel, setActionPanel] = useState<ActionPanel>(null)
   const session = useSessionStore((state) => state.session)
   const numericId = Number(caseId)
@@ -68,7 +47,6 @@ export function JobCaseDetailPage() {
   const materialMutation = useDefineJobCaseMaterial(validId ?? 0)
   const completeMutation = useCompleteJobCaseReview(validId ?? 0)
   const createQuotationMutation = useCreateQuotation()
-  const activeTab = resolveTab(searchParams.get('tab'))
 
   useEffect(() => {
     if (!detailQuery.data || !location.hash) return
@@ -82,7 +60,7 @@ export function JobCaseDetailPage() {
     })
 
     return () => window.cancelAnimationFrame(frame)
-  }, [activeTab, detailQuery.data, location.hash])
+  }, [detailQuery.data, location.hash])
 
   if (validId === null || !session) {
     return (
@@ -147,75 +125,12 @@ export function JobCaseDetailPage() {
     navigate(`/quotations/${quotation.id}`)
   }
 
-  let content
-
-  if (activeTab === 'summary') {
-    content = (
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-stretch">
-        <JobCaseSummary jobCase={jobCase} />
-
-        <JobCaseActionBar
-          jobCase={jobCase}
-          user={session.user}
-          taking={takeMutation.isPending}
-          completing={completeMutation.isPending}
-          creatingQuotation={createQuotationMutation.isPending}
-          quotationId={currentQuotation?.id ?? null}
-          quotationLookupReady={quotationLookupReady}
-          onTake={() => takeMutation.mutate()}
-          onRequestInformation={() => setActionPanel('information')}
-          onDefineMaterial={() => setActionPanel('material')}
-          onComplete={() => completeMutation.mutate()}
-          onCreateQuotation={() => void createQuotation()}
-          onOpenQuotation={() => {
-            if (currentQuotation) {
-              navigate(`/quotations/${currentQuotation.id}`)
-            }
-          }}
-        />
-      </div>
-    )
-  } else if (activeTab === 'documents') {
-    content = <JobCaseDocuments documents={jobCase.documents} />
-  } else if (activeTab === 'specification') {
-    content = (
-      <JobCaseMaterial
-        specification={jobCase.materialSpecification}
-        request={jobCase.request}
-      />
-    )
-  } else if (timelineQuery.isPending) {
-    content = <LoadingState label="Cargando actividad…" />
-  } else if (timelineQuery.isError) {
-    content = (
-      <ErrorState
-        error={timelineQuery.error}
-        title="No pudimos cargar la actividad"
-      />
-    )
-  } else {
-    content = (
-      <div className="space-y-3">
-        <JobCaseClarifications requests={jobCase.informationRequests} />
-        <JobCaseTimeline events={timelineQuery.data} />
-      </div>
-    )
-  }
-
   return (
     <PageContainer className="py-4 lg:py-3">
       <JobCaseDetailHeader jobCase={jobCase} />
 
       <div className="space-y-4">
         <JobCaseFlowSteps status={jobCase.status} />
-
-        <JobCaseTabs
-          activeTab={activeTab}
-          documentCount={jobCase.documents.length}
-          onChange={(tab) =>
-            setSearchParams(tab === 'summary' ? {} : { tab })
-          }
-        />
 
         {mutationError ? (
           <div
@@ -253,7 +168,49 @@ export function JobCaseDetailPage() {
           />
         ) : null}
 
-        {content}
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-stretch">
+          <JobCaseSummary jobCase={jobCase} />
+
+          <JobCaseActionBar
+            jobCase={jobCase}
+            user={session.user}
+            taking={takeMutation.isPending}
+            completing={completeMutation.isPending}
+            creatingQuotation={createQuotationMutation.isPending}
+            quotationId={currentQuotation?.id ?? null}
+            quotationLookupReady={quotationLookupReady}
+            onTake={() => takeMutation.mutate()}
+            onRequestInformation={() => setActionPanel('information')}
+            onDefineMaterial={() => setActionPanel('material')}
+            onComplete={() => completeMutation.mutate()}
+            onCreateQuotation={() => void createQuotation()}
+            onOpenQuotation={() => {
+              if (currentQuotation) {
+                navigate(`/quotations/${currentQuotation.id}`)
+              }
+            }}
+          />
+        </div>
+
+        <JobCaseDocuments documents={jobCase.documents} />
+
+        <JobCaseMaterial
+          specification={jobCase.materialSpecification}
+          request={jobCase.request}
+        />
+
+        <JobCaseClarifications requests={jobCase.informationRequests} />
+
+        {timelineQuery.isPending ? (
+          <LoadingState label="Cargando actividad…" />
+        ) : timelineQuery.isError ? (
+          <ErrorState
+            error={timelineQuery.error}
+            title="No pudimos cargar la actividad"
+          />
+        ) : (
+          <JobCaseTimeline events={timelineQuery.data} />
+        )}
       </div>
     </PageContainer>
   )
