@@ -62,6 +62,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -109,6 +111,7 @@ public class DemoDataSeeder {
     private String adminEmail;
 
     @EventListener(ApplicationReadyEvent.class)
+    @Order(Ordered.LOWEST_PRECEDENCE)
     public void seedAfterStartup() {
         if (userRepository.existsByEmail(SEED_MARKER_EMAIL)) {
             log.info("Demo seed already present. Skipping.");
@@ -444,7 +447,7 @@ public class DemoDataSeeder {
         RoutingSheetResponse inProductionRouting =
                 prepareAndReleaseRouting(actors, inProduction);
         RoutingOperationResponse firstOperation =
-                inProductionRouting.operations().getFirst();
+                inProductionRouting.operations().get(0);
         productionWorkflowService.start(
                 actors.production().getId(),
                 firstOperation.id(),
