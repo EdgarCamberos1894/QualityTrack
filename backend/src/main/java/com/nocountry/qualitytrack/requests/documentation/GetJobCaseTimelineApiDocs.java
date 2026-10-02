@@ -31,6 +31,14 @@ import java.lang.annotation.Target;
                 )
         ),
         @ApiResponse(
+                responseCode = "400",
+                description = "El límite está fuera del rango permitido o el cursor no es válido",
+                content = @Content(
+                        mediaType = "application/problem+json",
+                        schema = @Schema(implementation = ProblemDetail.class)
+                )
+        ),
+        @ApiResponse(
                 responseCode = "401",
                 description = "La petición no contiene una autenticación válida",
                 content = @Content(
