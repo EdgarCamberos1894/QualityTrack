@@ -100,7 +100,7 @@ export function WorkOrdersPage() {
               </h1>
               <p className="mt-1 max-w-2xl text-[10px] leading-4 text-slate-500">
                 Sigue cada paquete operativo desde su preparación hasta calidad,
-                entrega y cierre dentro del Expediente 360.
+                entrega y cierre, conservando la trazabilidad en el expediente.
               </p>
             </div>
           </div>
