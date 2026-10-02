@@ -133,14 +133,14 @@ export function JobCasesPage() {
         <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/55 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div>
             <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Bandeja de trabajo
+              Seguimiento de solicitudes
             </p>
             <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
               Expedientes registrados
             </h2>
           </div>
           <p className="text-[8px] font-medium text-slate-400">
-            {visibleJobCases.length} de {jobCases.length} visibles
+            Ubica primero el trabajo y su etapa; el detalle técnico vive dentro del expediente.
           </p>
         </div>
 
