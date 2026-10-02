@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
-  addQualityMeasurement,
+  addQualityCheck,
   completeQualityInspection,
   handoffWorkOrderToQuality,
   startQualityInspection,
-  updateQualityMeasurement,
+  updateQualityCheck,
 } from '../api/quality.api'
 import type {
-  SaveQualityMeasurementPayload,
+  SaveQualityCheckPayload,
   StartQualityInspectionPayload,
 } from '../types/quality.types'
 import { workOrderKeys } from './useWorkOrders'
@@ -34,27 +34,27 @@ export function useQualityMutations(workOrderId: number) {
     onSuccess: refreshWorkOrder,
   })
 
-  const addMeasurement = useMutation({
+  const addCheck = useMutation({
     mutationFn: ({
       inspectionId,
       payload,
     }: {
       inspectionId: number
-      payload: SaveQualityMeasurementPayload
-    }) => addQualityMeasurement(inspectionId, payload),
+      payload: SaveQualityCheckPayload
+    }) => addQualityCheck(inspectionId, payload),
     onSuccess: refreshWorkOrder,
   })
 
-  const updateMeasurement = useMutation({
+  const updateCheck = useMutation({
     mutationFn: ({
       inspectionId,
-      measurementId,
+      checkId,
       payload,
     }: {
       inspectionId: number
-      measurementId: number
-      payload: SaveQualityMeasurementPayload
-    }) => updateQualityMeasurement(inspectionId, measurementId, payload),
+      checkId: number
+      payload: SaveQualityCheckPayload
+    }) => updateQualityCheck(inspectionId, checkId, payload),
     onSuccess: refreshWorkOrder,
   })
 
@@ -67,8 +67,8 @@ export function useQualityMutations(workOrderId: number) {
   return {
     handoff,
     startInspection,
-    addMeasurement,
-    updateMeasurement,
+    addCheck,
+    updateCheck,
     completeInspection,
   }
 }
