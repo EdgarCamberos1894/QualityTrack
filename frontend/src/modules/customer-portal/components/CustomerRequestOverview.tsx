@@ -262,6 +262,27 @@ export function CustomerRequestOverview({
     quotationId,
     quotationStatus,
   )
+  const destination = request.deliveryDestination
+  const destinationLabel =
+    destination.mode === 'CUSTOMER_PICKUP'
+      ? 'Recolección en planta'
+      : destination.mode === 'DEFINE_LATER'
+        ? 'Destino por definir'
+        : destination.label ?? 'Destino acordado'
+  const destinationDetail =
+    destination.mode === 'CUSTOMER_PICKUP'
+      ? 'La empresa recogerá el pedido cuando esté listo.'
+      : destination.mode === 'DEFINE_LATER'
+        ? 'El destino se acordará durante la revisión.'
+        : [
+            destination.address,
+            destination.city,
+            destination.state,
+            destination.postalCode,
+            destination.country,
+          ]
+            .filter(Boolean)
+            .join(', ')
 
   return (
     <>
@@ -352,6 +373,28 @@ export function CustomerRequestOverview({
             <p className="mt-1.5 whitespace-pre-wrap text-[10px] leading-5 text-slate-700">
               {request.description}
             </p>
+          </div>
+
+          <div className="mt-3 border-t border-slate-100 pt-3">
+            <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-slate-400">
+              Entrega acordada
+            </p>
+            <div className="mt-2 rounded-xl bg-slate-50/80 px-3 py-2.5">
+              <p className="text-[10px] font-semibold text-slate-900">
+                {destinationLabel}
+              </p>
+              <p className="mt-0.5 text-[9px] leading-4 text-slate-600">
+                {destinationDetail}
+              </p>
+              {destination.contactName ? (
+                <p className="mt-1 text-[8px] text-slate-500">
+                  Contacto: {destination.contactName}
+                  {destination.contactPhone
+                    ? ' · ' + destination.contactPhone
+                    : ''}
+                </p>
+              ) : null}
+            </div>
           </div>
 
           <div className="mt-3 border-t border-slate-100 pt-3">
