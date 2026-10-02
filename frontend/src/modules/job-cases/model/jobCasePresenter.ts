@@ -1,6 +1,7 @@
 import type { BadgeProps } from '@/shared/components/ui/Badge'
 import type {
   CaseInformationRequestDto,
+  JobCaseDetailDto,
   JobCaseDto,
   JobCaseStatus,
 } from '../types/jobCase.types'
@@ -81,12 +82,7 @@ export function getJobCaseClarificationSummary(
 }
 
 export function getJobCaseMaterialSummary(
-  jobCase: JobCaseDto & {
-    materialSpecification?: {
-      materialName: string
-      standardOrGrade: string | null
-    } | null
-  },
+  jobCase: JobCaseDetailDto,
 ): string {
   if (jobCase.materialSpecification) {
     return jobCase.materialSpecification.standardOrGrade
