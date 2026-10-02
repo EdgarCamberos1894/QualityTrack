@@ -65,10 +65,15 @@ function DeliveryCard({
           </dd>
         </div>
         <div className="rounded-lg border border-slate-200/80 bg-white/75 p-3">
-          <dt className="text-[9px] text-slate-500">Contacto en destino</dt>
+          <dt className="text-[9px] text-slate-500">Destino</dt>
           <dd className="mt-1 text-[11px] font-semibold text-slate-900">
-            {delivery.destinationContactName ?? 'Sin contacto definido'}
+            {delivery.destinationLabel ?? 'Destino de entrega'}
           </dd>
+          <p className="mt-1 text-[9px] text-slate-500">
+            {delivery.destinationContactName
+              ? 'Contacto: ' + delivery.destinationContactName
+              : 'Sin contacto definido'}
+          </p>
         </div>
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 sm:col-span-2">
           <dt className="text-[9px] text-slate-500">Destino</dt>
