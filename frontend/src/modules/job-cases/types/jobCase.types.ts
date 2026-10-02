@@ -126,6 +126,12 @@ export interface JobCaseTimelineEventDto {
   occurredAt: string
 }
 
+export interface JobCaseTimelinePageDto {
+  items: JobCaseTimelineEventDto[]
+  nextCursor: string | null
+  hasMore: boolean
+}
+
 export interface CreateInformationRequestPayload {
   question: string
 }
