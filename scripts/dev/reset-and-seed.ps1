@@ -7,10 +7,10 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$repoRoot = (Resolve-Path (Join-Path $scriptDir '..\\..')).Path
+$repoRoot = (Resolve-Path (Join-Path $scriptDir '..\..')).Path
 $backendDir = Join-Path $repoRoot 'backend'
 $envFile = Join-Path $backendDir '.env'
-$demoStorageRoot = Join-Path $backendDir 'storage\\demo-seed-documents'
+$demoStorageRoot = Join-Path $backendDir 'storage\demo-seed-documents'
 
 function Import-DotEnv {
     param([string]$Path)
@@ -135,7 +135,7 @@ function Assert-SafeResetTarget {
     }
 
     $profiles = [Environment]::GetEnvironmentVariable('SPRING_PROFILES_ACTIVE', 'Process')
-    if ($profiles -and $profiles.ToLowerInvariant() -match '(^|,)\\s*(prod|production)\\s*(,|$)') {
+    if ($profiles -and $profiles.ToLowerInvariant() -match '(^|,)\s*(prod|production)\s*(,|$)') {
         throw "Reset bloqueado: SPRING_PROFILES_ACTIVE contiene un perfil de producción."
     }
 
@@ -262,7 +262,7 @@ try {
 
     Push-Location $backendDir
     try {
-        & .\\mvnw.cmd spring-boot:run
+        & .\mvnw.cmd spring-boot:run
         $backendExitCode = $LASTEXITCODE
     }
     finally {
