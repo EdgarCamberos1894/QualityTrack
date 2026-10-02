@@ -5,6 +5,7 @@ import { JobCaseActivityList } from './JobCaseActivityList'
 
 interface JobCaseRecentActivityProps {
   caseId: number
+  workOrderId?: number | null
   events: JobCaseTimelineEventDto[]
   hasMore: boolean
   onOpenHistory: () => void
@@ -12,6 +13,7 @@ interface JobCaseRecentActivityProps {
 
 export function JobCaseRecentActivity({
   caseId,
+  workOrderId = null,
   events,
   hasMore,
   onOpenHistory,
@@ -51,7 +53,11 @@ export function JobCaseRecentActivity({
           />
         ) : (
           <>
-            <JobCaseActivityList events={events} caseId={caseId} />
+            <JobCaseActivityList
+            events={events}
+            caseId={caseId}
+            workOrderId={workOrderId}
+          />
             {hasMore ? (
               <p className="mt-3 text-[8px] text-slate-400">
                 Se muestran únicamente los movimientos más recientes.
