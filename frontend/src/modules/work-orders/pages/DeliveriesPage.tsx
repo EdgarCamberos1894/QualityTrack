@@ -9,11 +9,16 @@ import { useDeliveries } from '../hooks/useDeliveries'
 import { useWorkOrders } from '../hooks/useWorkOrders'
 import {
   formatDeliveryDateTime,
+  formatDeliveryMethod,
   getAvailableDeliveryQuantity,
   getDeliveryStatusPresentation,
   isDeliveredToday,
 } from '../model/deliveryPresenter'
-import type { DeliveryDto, DeliveryQueueItem } from '../types/delivery.types'
+import type {
+  DeliveryDto,
+  DeliveryQueueItem,
+  DeliveryStatus,
+} from '../types/delivery.types'
 import type { WorkOrderDto } from '../types/workOrder.types'
 
 function buildQueue(
@@ -96,6 +101,20 @@ function movementLabel(delivery: DeliveryDto | null): string {
     return formatDeliveryDateTime(delivery.cancelledAt)
   }
   return 'Pendiente de despacho'
+}
+
+const statusAccent: Record<DeliveryStatus, string> = {
+  PENDING: 'from-amber-500 to-orange-400',
+  DISPATCHED: 'from-blue-500 to-cyan-400',
+  DELIVERED: 'from-emerald-500 to-teal-400',
+  CANCELLED: 'from-red-500 to-rose-400',
+}
+
+const statusSurface: Record<DeliveryStatus, string> = {
+  PENDING: 'bg-amber-50 text-amber-700',
+  DISPATCHED: 'bg-blue-50 text-blue-600',
+  DELIVERED: 'bg-emerald-50 text-emerald-600',
+  CANCELLED: 'bg-red-50 text-red-600',
 }
 
 export function DeliveriesPage() {
@@ -182,138 +201,187 @@ export function DeliveriesPage() {
         <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div>
             <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Cola logística
+              Entregas registradas
             </p>
-            <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
-              Despachos y entregas
+            <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
+              Seguimiento logístico
             </h2>
             <p className="mt-0.5 max-w-2xl text-[8px] leading-4 text-slate-400">
-              Se permiten entregas parciales. La OT se cierra cuando la cantidad
-              recibida acumulada cubre la cantidad planificada.
+              Las entregas parciales permanecen visibles hasta completar la
+              cantidad comprometida de la orden.
             </p>
           </div>
           <span className="text-[8px] font-medium text-slate-400">
-            {queue.length} movimientos
+            {queue.length}{' '}
+            {queue.length === 1 ? 'movimiento visible' : 'movimientos visibles'}
           </span>
         </div>
 
-        {queue.length === 0 ? (
-          <div className="px-5 py-7 text-center">
-            <p className="text-[10px] font-semibold text-slate-700">
-              No hay entregas ni órdenes listas para despacho
-            </p>
-            <p className="mt-1 text-[8px] text-slate-400">
-              Las órdenes aparecerán aquí cuando Calidad las libere para entrega.
-            </p>
-          </div>
-        ) : (
-          <div className="divide-y divide-slate-100">
-            {queue.map((item) => {
-              const delivery = item.delivery
-              const status = delivery
-                ? getDeliveryStatusPresentation(delivery.status)
-                : null
-
-              const actionLabel =
-                delivery?.status === 'PENDING'
-                  ? 'Despachar'
-                  : delivery
-                    ? 'Ver'
-                    : 'Preparar'
-
-              return (
-                <article
+        <div className="bg-slate-50/40 p-3.5 sm:p-4">
+          {queue.length === 0 ? (
+            <div className="px-5 py-7 text-center">
+              <p className="text-[10px] font-semibold text-slate-700">
+                No hay entregas ni órdenes listas para despacho
+              </p>
+              <p className="mt-1 text-[8px] text-slate-400">
+                Las órdenes aparecerán aquí cuando Calidad las libere para entrega.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {queue.map((item) => (
+                <DeliveryCard
                   key={
-                    delivery
-                      ? `delivery-${delivery.id}`
+                    item.delivery
+                      ? `delivery-${item.delivery.id}`
                       : `ready-${item.workOrderId}`
                   }
-                  className="grid gap-3 px-4 py-3 transition hover:bg-blue-50/25 sm:px-5 lg:grid-cols-[minmax(0,1.45fr)_minmax(150px,0.7fr)_minmax(150px,0.75fr)_110px]"
-                >
-                  <div className="min-w-0">
-                    <Link
-                      to={`/work-orders/${item.workOrderId}?tab=delivery`}
-                      className="truncate text-[11px] font-semibold text-slate-950 transition hover:text-blue-700"
-                    >
-                      {delivery
-                        ? `Entrega #${delivery.id} · ${item.workOrderNumber}`
-                        : item.workOrderNumber}
-                    </Link>
-                    <p className="mt-0.5 truncate text-[9px] font-medium text-slate-700">
-                      {item.customerName}
-                    </p>
-                    <p className="mt-0.5 truncate text-[8px] text-slate-400">
-                      {delivery
-                        ? `${delivery.quantity} piezas · ${delivery.deliveryMethod}`
-                        : `${item.availableQuantity} de ${item.plannedQuantity} piezas disponibles`}
-                    </p>
-                  </div>
-
-                  <div className="self-center">
-                    <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
-                      Estado
-                    </p>
-                    <div className="mt-1">
-                      {status ? (
-                        <Badge
-                          tone={status.tone}
-                          className="px-2 py-0.5 text-[7px]"
-                        >
-                          {status.label}
-                        </Badge>
-                      ) : (
-                        <Badge
-                          tone="success"
-                          className="px-2 py-0.5 text-[7px]"
-                        >
-                          Lista para entrega
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="self-center">
-                    <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
-                      Movimiento
-                    </p>
-                    <p className="mt-1 text-[9px] font-medium text-slate-700">
-                      {movementLabel(delivery)}
-                    </p>
-                    {delivery?.trackingNumber ? (
-                      <p className="mt-0.5 truncate text-[7px] text-slate-400">
-                        Guía {delivery.trackingNumber}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className="flex items-center justify-start lg:justify-end">
-                    <Link
-                      to={`/work-orders/${item.workOrderId}?tab=delivery`}
-                      className="inline-flex h-7 min-w-[88px] items-center justify-center gap-1 rounded-lg bg-blue-600 px-2.5 text-[8px] font-semibold text-white transition hover:bg-blue-700"
-                    >
-                      {actionLabel}
-                      <svg
-                        viewBox="0 0 20 20"
-                        aria-hidden="true"
-                        className="h-3 w-3"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M6 10h8" />
-                        <path d="m11 7 3 3-3 3" />
-                      </svg>
-                    </Link>
-                  </div>
-                </article>
-              )
-            })}
-          </div>
-        )}
+                  item={item}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </section>
     </PageContainer>
+  )
+}
+
+function DeliveryCard({ item }: { item: DeliveryQueueItem }) {
+  const delivery = item.delivery
+  const status = delivery
+    ? getDeliveryStatusPresentation(delivery.status)
+    : {
+        label: 'Lista para preparar',
+        stage: 'Preparación',
+        description:
+          'Calidad liberó la orden y todavía falta preparar el movimiento de entrega.',
+        tone: 'success' as const,
+      }
+
+  const accentClass = delivery
+    ? statusAccent[delivery.status]
+    : 'from-emerald-500 to-teal-400'
+  const surfaceClass = delivery
+    ? statusSurface[delivery.status]
+    : 'bg-emerald-50 text-emerald-600'
+  const actionLabel =
+    delivery?.status === 'PENDING'
+      ? 'Despachar'
+      : delivery?.status === 'DELIVERED'
+        ? 'Abrir historial'
+        : delivery
+          ? 'Abrir entrega'
+          : 'Preparar'
+  const primaryAction = !delivery || delivery.status === 'PENDING'
+
+  return (
+    <article className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_10px_28px_-24px_rgba(15,23,42,0.32)] transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md">
+      <div
+        className={`absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r ${accentClass}`}
+      />
+
+      <div className="p-4">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex min-w-0 gap-3">
+            <div
+              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${surfaceClass}`}
+            >
+              <SidebarNavIcon
+                name="deliveries"
+                className="h-[17px] w-[17px]"
+              />
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-slate-400">
+                  {item.workOrderNumber}
+                </p>
+                {delivery ? (
+                  <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[8px] font-semibold text-slate-500">
+                    Entrega #{delivery.id}
+                  </span>
+                ) : null}
+              </div>
+
+              <Link
+                to={`/work-orders/${item.workOrderId}?tab=delivery`}
+                className="mt-1.5 block truncate text-sm font-semibold text-slate-950 transition group-hover:text-blue-700"
+              >
+                {item.customerName}
+              </Link>
+
+              <p className="mt-1 truncate text-[10px] leading-4 text-slate-500">
+                {delivery
+                  ? delivery.trackingNumber
+                    ? `Guía ${delivery.trackingNumber}`
+                    : 'Movimiento de entrega registrado'
+                  : 'Orden liberada para preparar entrega'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <Badge tone={status.tone} className="px-2.5 py-0.5 text-[9px]">
+              {status.label}
+            </Badge>
+            <Link
+              to={`/work-orders/${item.workOrderId}?tab=delivery`}
+              className={
+                primaryAction
+                  ? 'inline-flex h-9 min-w-28 items-center justify-center rounded-lg bg-blue-600 px-3.5 text-[10px] font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700'
+                  : 'inline-flex h-9 min-w-28 items-center justify-center rounded-lg border border-slate-200 bg-white px-3.5 text-[10px] font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700'
+              }
+            >
+              {actionLabel}
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          <SummaryCell
+            label="Cantidad"
+            value={
+              delivery
+                ? `${delivery.quantity} pieza${delivery.quantity === 1 ? '' : 's'}`
+                : `${item.availableQuantity} de ${item.plannedQuantity} disponibles`
+            }
+          />
+          <SummaryCell
+            label="Método"
+            value={
+              delivery
+                ? formatDeliveryMethod(delivery.deliveryMethod)
+                : 'Por definir al preparar'
+            }
+          />
+          <SummaryCell label="Movimiento" value={movementLabel(delivery)} />
+        </div>
+
+        <div className="mt-4 flex flex-col gap-1 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[9px] leading-4 text-slate-500">
+            {status.description}
+          </p>
+          <p className="shrink-0 text-[8px] font-semibold text-slate-500">
+            Etapa · {status.stage}
+          </p>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+function SummaryCell({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-slate-100 bg-slate-50/70 px-3 py-2.5">
+      <p className="text-[8px] font-bold uppercase tracking-wide text-slate-400">
+        {label}
+      </p>
+      <p className="mt-1 truncate text-[10px] font-semibold text-slate-900">
+        {value}
+      </p>
+    </div>
   )
 }
 
@@ -334,7 +402,9 @@ function Metric({
     <div
       className={[
         'py-1',
-        separated ? 'border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1' : 'sm:pr-4',
+        separated
+          ? 'border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1'
+          : 'sm:pr-4',
         last ? 'sm:pr-0' : '',
       ].join(' ')}
     >
