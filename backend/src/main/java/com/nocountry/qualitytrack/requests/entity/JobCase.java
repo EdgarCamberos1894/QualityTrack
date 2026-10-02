@@ -123,10 +123,20 @@ public class JobCase {
         this.status = JobCaseStatus.READY_FOR_QUOTATION;
     }
 
-    public void markInProduction() {
+    public void markAwaitingWorkOrder() {
         if (status != JobCaseStatus.READY_FOR_QUOTATION) {
             throw new IllegalStateException(
-                    "Solo se puede iniciar producción desde READY_FOR_QUOTATION."
+                    "Solo un expediente READY_FOR_QUOTATION puede esperar una orden de trabajo."
+            );
+        }
+
+        this.status = JobCaseStatus.AWAITING_WORK_ORDER;
+    }
+
+    public void markInProduction() {
+        if (status != JobCaseStatus.AWAITING_WORK_ORDER) {
+            throw new IllegalStateException(
+                    "Solo se puede iniciar producción desde AWAITING_WORK_ORDER."
             );
         }
 
