@@ -119,7 +119,7 @@ public class WorkOrder360Service {
                 .toList();
 
         List<Traceability360EventResponse> timeline = traceabilityService
-                .timeline(caseId)
+                .timelineAll(caseId)
                 .stream()
                 .map(event -> Traceability360EventResponse.from(
                         event,
