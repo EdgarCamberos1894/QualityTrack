@@ -109,7 +109,7 @@ export function DeliveryEvidenceDialog({
               Subir archivo
             </p>
             <p className="mt-0.5 text-[8px] leading-4 text-slate-500">
-              Se guardará como DELIVERY_EVIDENCE y quedará ligado a esta entrega.
+              Se guardará como evidencia de entrega y quedará vinculada a este despacho.
             </p>
 
             <input
