@@ -1,7 +1,7 @@
 import { Fragment } from 'react'
 import { Card } from '@/shared/components/ui/Card'
 
-const steps = ['Detalles', 'Requisitos y documentos', 'Revisar y enviar']
+const steps = ['Detalles', 'Requisitos y documentos', 'Entrega', 'Revisar y enviar']
 
 interface CustomerRequestWizardStepsProps {
   currentStep: number
