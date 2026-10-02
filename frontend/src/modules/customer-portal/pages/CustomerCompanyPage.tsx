@@ -296,7 +296,7 @@ export function CustomerCompanyPage() {
             </div>
 
             <div className="mt-2 space-y-2">
-              {(addressesQuery.data ?? []).slice(0, 3).map((address) => (
+              {(addressesQuery.data ?? []).map((address) => (
                 <div
                   key={address.id}
                   className="rounded-lg border border-slate-200 bg-white/80 px-3 py-2.5"
