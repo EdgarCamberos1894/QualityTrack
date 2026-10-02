@@ -43,7 +43,7 @@ export function QuotationPreviewDialog({
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 p-3 sm:p-4"
       onMouseDown={onClose}
     >
-      <div className="flex w-[min(92vw,1120px)] max-h-[92vh] flex-col">
+      <div className="flex w-[min(78vw,820px)] max-h-[94vh] flex-col">
         <div className="mb-2 flex shrink-0 items-center justify-between px-1 text-white/80">
           <div>
             <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-200">
@@ -61,7 +61,7 @@ export function QuotationPreviewDialog({
           role="dialog"
           aria-modal="true"
           aria-label="Vista previa de cotización"
-          className="min-h-0 max-h-[86vh] overflow-y-auto rounded-2xl"
+          className="min-h-0 max-h-[89vh] overflow-y-auto rounded-2xl"
           onMouseDown={(event) => event.stopPropagation()}
         >
           <QuotationDocumentSheet
@@ -89,7 +89,7 @@ export function QuotationPreviewDialog({
               subtotal: item.quantity * item.unitPrice,
             }))}
             compact
-            className="min-h-[min(74vh,680px)] rounded-2xl"
+            className="min-h-[min(85vh,720px)] rounded-2xl"
           />
         </section>
       </div>
