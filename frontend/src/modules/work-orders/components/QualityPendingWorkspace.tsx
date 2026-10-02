@@ -214,7 +214,7 @@ export function QualityPendingWorkspace({
             Siguiente acción
           </p>
           <p className="mt-1 text-[9px] font-semibold text-slate-950">
-            Iniciar inspección y capturar mediciones
+            Iniciar inspección y registrar controles
           </p>
           <p className="mt-1 text-[7px] text-slate-500">
             QualityInspection PENDING → IN_PROGRESS
@@ -237,8 +237,7 @@ export function QualityPendingWorkspace({
           )}
 
           <p className="mt-2 text-[7px] leading-3.5 text-slate-400">
-            Al iniciar se asignará el inspector y se registrará el comienzo
-            formal de la inspección.
+            Al iniciar se asignará el inspector y podrás registrar mediciones, verificaciones visuales o pruebas PASS/FAIL.
           </p>
         </div>
       </aside>
