@@ -92,7 +92,18 @@ export function isDeliveredToday(delivery: DeliveryDto): boolean {
 
 
 export function formatDeliveryMethod(value: string): string {
-  const normalized = value.replaceAll('_', ' ').trim().toLowerCase()
+  const knownMethods: Record<string, string> = {
+    LOCAL_DELIVERY: 'Entrega local',
+    CUSTOMER_PICKUP: 'Recolección del cliente',
+    PICKUP: 'Recolección',
+    COURIER: 'Paquetería',
+    PARCEL: 'Paquetería',
+  }
+  const normalizedKey = value.trim().toUpperCase()
+
+  if (knownMethods[normalizedKey]) return knownMethods[normalizedKey]
+
+  const normalized = value.replace(/_/g, ' ').trim().toLowerCase()
 
   if (!normalized) return 'Sin método'
 
