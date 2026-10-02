@@ -33,7 +33,7 @@ export function QuotationItemsEditor({
     currency.trim().length === 3 ? currency.toUpperCase() : 'MXN'
 
   return (
-    <section className="flex h-full min-h-[150px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-50/45">
+    <section className="flex min-h-[150px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-50/45 lg:h-[300px]">
       <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-3.5 py-2.5">
         <div>
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
@@ -62,7 +62,7 @@ export function QuotationItemsEditor({
         ) : null}
       </div>
 
-      <div className="min-h-0 flex-1 space-y-2 overflow-y-auto overscroll-contain p-2.5 pr-2 lg:max-h-[280px]">
+      <div className="min-h-0 flex-1 space-y-2 overflow-x-hidden overflow-y-auto overscroll-contain p-2">
         {fields.length === 0 ? (
           <div className="rounded-lg border border-dashed border-slate-300 bg-white px-4 py-4 text-center text-[9px] text-slate-400">
             Todavía no hay conceptos en esta revisión.
@@ -76,16 +76,16 @@ export function QuotationItemsEditor({
           return (
             <div
               key={field.id}
-              className="grid gap-2 rounded-lg border border-slate-200 bg-white p-2.5 lg:grid-cols-[minmax(240px,1fr)_90px_120px_130px_auto]"
+              className="grid min-w-0 gap-2 rounded-lg border border-slate-200 bg-white p-2 lg:grid-cols-[minmax(0,1fr)_72px_100px_82px_48px]"
             >
-              <div>
-                <label className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">
+              <div className="min-w-0">
+                <label className="text-[7px] font-semibold uppercase tracking-wide text-slate-400">
                   Descripción
                 </label>
                 <input
                   disabled={!editable}
                   {...register(`items.${index}.description`)}
-                  className="mt-1 h-8 w-full rounded-lg border border-slate-300 px-2.5 text-[10px] text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
+                  className="mt-1 h-7 w-full min-w-0 rounded-md border border-slate-300 px-2 text-[9px] text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
                 />
                 {errors.items?.[index]?.description?.message ? (
                   <p className="mt-1 text-[8px] text-red-600">
@@ -95,7 +95,7 @@ export function QuotationItemsEditor({
               </div>
 
               <div>
-                <label className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">
+                <label className="text-[7px] font-semibold uppercase tracking-wide text-slate-400">
                   Cantidad
                 </label>
                 <input
@@ -106,7 +106,7 @@ export function QuotationItemsEditor({
                   {...register(`items.${index}.quantity`, {
                     valueAsNumber: true,
                   })}
-                  className="mt-1 h-8 w-full rounded-lg border border-slate-300 px-2.5 text-[10px] text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
+                  className="mt-1 h-7 w-full min-w-0 rounded-md border border-slate-300 px-2 text-[9px] text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
                 />
                 {errors.items?.[index]?.quantity?.message ? (
                   <p className="mt-1 text-[8px] text-red-600">
@@ -116,7 +116,7 @@ export function QuotationItemsEditor({
               </div>
 
               <div>
-                <label className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">
+                <label className="text-[7px] font-semibold uppercase tracking-wide text-slate-400">
                   Precio unitario
                 </label>
                 <input
@@ -127,7 +127,7 @@ export function QuotationItemsEditor({
                   {...register(`items.${index}.unitPrice`, {
                     valueAsNumber: true,
                   })}
-                  className="mt-1 h-8 w-full rounded-lg border border-slate-300 px-2.5 text-[10px] text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
+                  className="mt-1 h-7 w-full min-w-0 rounded-md border border-slate-300 px-2 text-[9px] text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
                 />
                 {errors.items?.[index]?.unitPrice?.message ? (
                   <p className="mt-1 text-[8px] text-red-600">
@@ -136,11 +136,11 @@ export function QuotationItemsEditor({
                 ) : null}
               </div>
 
-              <div className="flex flex-col justify-center lg:pt-3">
-                <p className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">
+              <div className="min-w-0 flex flex-col justify-center lg:pt-2.5">
+                <p className="text-[7px] font-semibold uppercase tracking-wide text-slate-400">
                   Importe
                 </p>
-                <p className="mt-1 text-[10px] font-semibold text-slate-900">
+                <p className="mt-1 truncate text-[9px] font-semibold text-slate-900">
                   {new Intl.NumberFormat('es-MX', {
                     style: 'currency',
                     currency: safeCurrency,
@@ -149,11 +149,11 @@ export function QuotationItemsEditor({
               </div>
 
               {editable ? (
-                <div className="flex items-end">
+                <div className="flex items-end justify-end">
                   <Button
                     size="sm"
                     variant="ghost"
-                    className="!h-7 !px-2 !text-[8px] text-slate-500"
+                    className="!h-7 !px-1 !text-[7px] text-slate-500"
                     onClick={() => remove(index)}
                     aria-label={`Eliminar concepto ${index + 1}`}
                   >
