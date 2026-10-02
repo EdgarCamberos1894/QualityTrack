@@ -14,6 +14,7 @@ import { QuotationFlowSteps } from '../components/QuotationFlowSteps'
 import { QuotationPreviewDialog } from '../components/QuotationPreviewDialog'
 import { QuotationRevisionHistory } from '../components/QuotationRevisionHistory'
 import { QuotationSourceCard } from '../components/QuotationSourceCard'
+import { SendQuotationConfirmationDialog } from '../components/SendQuotationConfirmationDialog'
 import { useQuotationDetail } from '../hooks/useQuotationDetail'
 import {
   useCancelQuotation,
@@ -37,6 +38,11 @@ export function QuotationDetailPage() {
   const session = useSessionStore((state) => state.session)
   const [preview, setPreview] = useState<QuotationPreviewData | null>(null)
   const [cancelOpen, setCancelOpen] = useState(false)
+  const [pendingSend, setPendingSend] = useState<{
+    payload: UpdateQuotationPayload
+    adjustmentResponse: string | null
+    preview: QuotationPreviewData
+  } | null>(null)
   const numericId = Number(quotationId)
   const validId =
     Number.isInteger(numericId) && numericId > 0 ? numericId : null
@@ -117,6 +123,31 @@ export function QuotationDetailPage() {
       : undefined
 
     await sendMutation.mutateAsync(sendPayload)
+  }
+
+  const requestSend = (
+    payload: UpdateQuotationPayload,
+    adjustmentResponse: string | null,
+    previewData: QuotationPreviewData,
+  ) => {
+    updateMutation.reset()
+    sendMutation.reset()
+    setPendingSend({
+      payload,
+      adjustmentResponse,
+      preview: previewData,
+    })
+  }
+
+  const confirmSend = async () => {
+    if (!pendingSend) return
+
+    try {
+      await send(pendingSend.payload, pendingSend.adjustmentResponse)
+      setPendingSend(null)
+    } catch {
+      // Mutation errors remain visible in the confirmation dialog.
+    }
   }
 
   const createRevision = async () => {
@@ -214,7 +245,7 @@ export function QuotationDetailPage() {
           saving={updateMutation.isPending}
           sending={sendMutation.isPending}
           onSave={save}
-          onSend={send}
+          onSend={requestSend}
           onPreview={setPreview}
           sidebarContent={
             revisionsQuery.isError ? (
@@ -230,6 +261,23 @@ export function QuotationDetailPage() {
           }
         />
       </div>
+
+      {pendingSend ? (
+        <SendQuotationConfirmationDialog
+          quotation={quotation}
+          preview={pendingSend.preview}
+          submitting={updateMutation.isPending || sendMutation.isPending}
+          error={updateMutation.error ?? sendMutation.error}
+          onClose={() => {
+            if (!updateMutation.isPending && !sendMutation.isPending) {
+              updateMutation.reset()
+              sendMutation.reset()
+              setPendingSend(null)
+            }
+          }}
+          onConfirm={() => void confirmSend()}
+        />
+      ) : null}
 
       <CancelQuotationDialog
         quotation={cancelOpen ? quotation : null}
