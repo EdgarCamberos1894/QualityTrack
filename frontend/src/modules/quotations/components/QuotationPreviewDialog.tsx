@@ -43,7 +43,7 @@ export function QuotationPreviewDialog({
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 p-3 sm:p-4"
       onMouseDown={onClose}
     >
-      <div className="flex w-[min(90vw,880px)] max-h-[94vh] flex-col">
+      <div className="flex w-[min(86vw,820px)] max-h-[94vh] flex-col">
         <div className="mb-2 flex shrink-0 items-center justify-between px-1 text-white/80">
           <div>
             <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-200">
@@ -61,7 +61,7 @@ export function QuotationPreviewDialog({
           role="dialog"
           aria-modal="true"
           aria-label="Vista previa de cotización"
-          className="min-h-0 max-h-[89vh] overflow-y-auto rounded-2xl"
+          className="min-h-0 max-h-[88vh] overflow-y-auto rounded-2xl"
           onMouseDown={(event) => event.stopPropagation()}
         >
           <QuotationDocumentSheet
@@ -81,6 +81,7 @@ export function QuotationPreviewDialog({
               materialLabel ||
               'Según especificación técnica de la solicitud'
             }
+            compact
             items={preview.items.map((item, index) => ({
               key: item.id ?? `preview-${index}`,
               description: item.description,
