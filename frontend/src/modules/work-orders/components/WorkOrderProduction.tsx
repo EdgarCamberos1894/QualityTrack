@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { useMachines } from '@/modules/machines'
@@ -9,6 +9,7 @@ import { CompleteExecutionDialog } from './CompleteExecutionDialog'
 import { ProductionBlocker } from './ProductionBlocker'
 import { ProductionCurrentOperationPanel } from './ProductionCurrentOperationPanel'
 import { ProductionMaterialsCard } from './ProductionMaterialsCard'
+import { RecordMaterialConsumptionDialog } from './RecordMaterialConsumptionDialog'
 import { ProductionRouteList } from './ProductionRouteList'
 import { QualityHandoffPanel } from './QualityHandoffPanel'
 import { StartOperationDialog } from './StartOperationDialog'
@@ -40,6 +41,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
   const routingReleased = productionRouting?.status === 'RELEASED'
   const machinesQuery = useMachines(canExecute && Boolean(routingReleased))
   const mutations = useProductionMutations(data.workOrder.id)
+  const materialsHistoryRef = useRef<HTMLDivElement | null>(null)
   const [startOperation, setStartOperation] =
     useState<RoutingOperationDto | null>(null)
   const [activeExecution, setActiveExecution] =
@@ -56,6 +58,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
   const [materialsOpen, setMaterialsOpen] = useState(() =>
     location.hash.startsWith('#material-lot-'),
   )
+  const [materialDialogOpen, setMaterialDialogOpen] = useState(false)
 
   const productionExecutions = useMemo(
     () =>
@@ -182,6 +185,19 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
 
     return () => window.cancelAnimationFrame(frame)
   }, [expandedOperationId, location.hash, materialsOpen])
+
+  useEffect(() => {
+    if (!materialsOpen || location.hash.startsWith('#material-lot-')) return
+
+    const frame = window.requestAnimationFrame(() => {
+      materialsHistoryRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [location.hash, materialsOpen])
 
   const clearExecutionErrors = () => {
     mutations.startExecution.reset()
@@ -433,32 +449,52 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
                 )}
               </div>
 
-              <Button
-                size="sm"
-                variant="secondary"
-                className="!h-7 shrink-0 !px-2.5 !text-[7.5px]"
-                onClick={() => setMaterialsOpen((current) => !current)}
-              >
-                {materialsOpen
-                  ? 'Ocultar'
-                  : canExecute && productionOpen
-                    ? 'Registrar / ver'
-                    : 'Ver consumos'}
-              </Button>
+              <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
+                {canExecute && productionOpen ? (
+                  <Button
+                    size="sm"
+                    className="!h-7 !px-2.5 !text-[7.5px]"
+                    onClick={() => {
+                      mutations.recordConsumption.reset()
+                      setMaterialDialogOpen(true)
+                    }}
+                  >
+                    Registrar consumo
+                  </Button>
+                ) : null}
+
+                {data.materials.length > 0 ? (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="!h-7 !px-2.5 !text-[7.5px]"
+                    onClick={() => setMaterialsOpen((current) => !current)}
+                  >
+                    {materialsOpen ? 'Ocultar consumos' : 'Ver consumos'}
+                  </Button>
+                ) : null}
+              </div>
             </div>
           </div>
         </aside>
       </div>
 
       {materialsOpen ? (
-        <ProductionMaterialsCard
-          consumptions={data.materials}
-          canRecord={canExecute && productionOpen}
-          submitting={mutations.recordConsumption.isPending}
-          error={mutations.recordConsumption.error}
-          onRecord={recordMaterial}
-        />
+        <div ref={materialsHistoryRef} className="scroll-mt-20">
+          <ProductionMaterialsCard consumptions={data.materials} />
+        </div>
       ) : null}
+
+      <RecordMaterialConsumptionDialog
+        open={materialDialogOpen}
+        submitting={mutations.recordConsumption.isPending}
+        error={mutations.recordConsumption.error}
+        onClose={() => {
+          mutations.recordConsumption.reset()
+          setMaterialDialogOpen(false)
+        }}
+        onSubmit={recordMaterial}
+      />
 
       <StartOperationDialog
         open={startOperation !== null}
