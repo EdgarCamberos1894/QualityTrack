@@ -90,7 +90,7 @@ export function QualityPage() {
                 Calidad
               </h1>
               <p className="mt-1 max-w-2xl text-[10px] leading-4 text-slate-500">
-                Atiende inspecciones pendientes, órdenes retenidas por una no
+                Atiende inspecciones pendientes, órdenes pausadas por una no
                 conformidad y ciclos de retrabajo desde su Expediente 360.
               </p>
             </div>
@@ -115,7 +115,7 @@ export function QualityPage() {
             </div>
             <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1">
               <p className="text-[8px] font-medium text-slate-400">
-                Retenidas
+                Pausadas por calidad
               </p>
               <p
                 className={
@@ -142,11 +142,11 @@ export function QualityPage() {
       <div className="mt-4">
         <OperationalWorkOrderQueue
           title="Cola de calidad"
-          description="Las órdenes retenidas se muestran primero, seguidas por retrabajos y nuevas inspecciones pendientes."
+          description="Las órdenes pausadas por calidad aparecen primero, seguidas por retrabajos y nuevas inspecciones pendientes."
           workOrders={queue}
           tab="quality"
           emptyTitle="Sin trabajo pendiente de calidad"
-          emptyDescription="Las órdenes aparecerán aquí al enviarse a Calidad o cuando una NC mantenga la OT retenida."
+          emptyDescription="Las órdenes aparecerán aquí al enviarse a Calidad o cuando una no conformidad mantenga la orden pausada."
           getActionLabel={(workOrder) => {
             if (workOrder.status === 'QUALITY_HOLD') return 'Resolver'
             if (workOrder.status === 'REWORK_IN_PROGRESS') return 'Continuar'
