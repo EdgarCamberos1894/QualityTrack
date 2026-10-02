@@ -41,15 +41,12 @@ jobs:
         run: npm ci --include=optional --legacy-peer-deps
 
       - name: Check architecture
-        continue-on-error: true
         run: npm run architecture:check
 
       - name: Check formatting
-        continue-on-error: true
         run: npm run format:check
 
       - name: Lint
-        continue-on-error: true
         run: npm run lint
 
       - name: Typecheck
