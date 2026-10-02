@@ -29,3 +29,19 @@ export type CustomerCompanyFormValues = z.infer<typeof customerCompanySchema>
 export type CustomerInvitationFormValues = z.infer<
   typeof customerInvitationSchema
 >
+
+
+export const customerAddressSchema = z.object({
+  label: z.string().trim().min(1, 'Indica un nombre para la dirección.').max(120),
+  address: z.string().trim().min(1, 'Indica la dirección.').max(300),
+  city: z.string().trim().min(1, 'Indica la ciudad.').max(120),
+  state: z.string().trim().min(1, 'Indica el estado.').max(120),
+  postalCode: z.string().trim().min(1, 'Indica el código postal.').max(20),
+  country: z.string().trim().min(1, 'Indica el país.').max(100),
+  contactName: z.string().max(160),
+  contactPhone: z.string().max(30),
+  deliveryInstructions: z.string().max(1000),
+  defaultAddress: z.boolean(),
+})
+
+export type CustomerAddressFormValues = z.infer<typeof customerAddressSchema>
