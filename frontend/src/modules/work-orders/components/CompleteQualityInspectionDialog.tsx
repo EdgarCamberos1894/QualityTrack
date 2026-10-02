@@ -1,7 +1,7 @@
 import { Button } from '@/shared/components/ui/Button'
 import { Badge } from '@/shared/components/ui/Badge'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
-import { countMeasurementResults } from '../model/qualityPresenter'
+import { countQualityCheckResults } from '../model/qualityPresenter'
 import type { QualityInspectionDto } from '../types/quality.types'
 
 interface CompleteQualityInspectionDialogProps {
@@ -21,7 +21,7 @@ export function CompleteQualityInspectionDialog({
 }: CompleteQualityInspectionDialogProps) {
   if (!inspection) return null
 
-  const totals = countMeasurementResults(inspection.measurements)
+  const totals = countQualityCheckResults(inspection.checks)
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4">
@@ -48,7 +48,7 @@ export function CompleteQualityInspectionDialog({
 
         <div className="space-y-3 px-4 py-3.5">
           <div className="grid divide-y divide-slate-100 rounded-lg border border-slate-200 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-            <Metric label="Mediciones" value={inspection.measurements.length} />
+            <Metric label="Controles" value={inspection.checks.length} />
             <Metric label="PASS" value={totals.pass} valueClassName="text-emerald-700" />
             <Metric label="FAIL" value={totals.fail} valueClassName="text-red-600" />
           </div>
