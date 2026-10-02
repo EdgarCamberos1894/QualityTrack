@@ -43,7 +43,8 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                 Documentos de la solicitud
               </h2>
               <p className="mt-0.5 text-[8px] leading-4 text-slate-500">
-                Abre los archivos que sustentan la revisión y consulta sus versiones.
+                Abre los archivos que sustentan la revisión y consulta sus
+                versiones.
               </p>
             </div>
             <span className="shrink-0 text-[8px] text-slate-400">
@@ -99,11 +100,12 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                     ) : null}
 
                     <p className="mt-1.5 text-[8px] text-slate-500">
-                      {version.fileName} · {formatJobCaseFileSize(version.fileSize)}
+                      {version.fileName} ·{' '}
+                      {formatJobCaseFileSize(version.fileSize)}
                     </p>
                     <p className="mt-0.5 text-[7px] text-slate-400">
-                      Actualizado {formatJobCaseDateTime(version.uploadedAt)} por{' '}
-                      {version.uploadedByName ?? 'usuario no disponible'}
+                      Actualizado {formatJobCaseDateTime(version.uploadedAt)}{' '}
+                      por {version.uploadedByName ?? 'usuario no disponible'}
                     </p>
                   </div>
 
@@ -113,7 +115,9 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                       variant="secondary"
                       className="!h-7 !px-2.5 !text-[8px]"
                       disabled={files.busy !== null}
-                      onClick={() => void files.openVersion(document.id, version)}
+                      onClick={() =>
+                        void files.openVersion(document.id, version)
+                      }
                     >
                       {opening ? 'Abriendo…' : 'Ver'}
                     </Button>
