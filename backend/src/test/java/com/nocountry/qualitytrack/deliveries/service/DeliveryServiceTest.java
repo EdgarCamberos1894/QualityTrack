@@ -97,12 +97,14 @@ class DeliveryServiceTest {
         Delivery delivery = Delivery.create(
                 workOrder,
                 5,
+                "Planta principal",
                 "Cliente SA",
                 "Av. Principal 123",
                 "Tepic",
                 "Nayarit",
                 "63000",
                 "México",
+                null,
                 "PAQUETERIA",
                 logistics
         );
@@ -182,12 +184,14 @@ class DeliveryServiceTest {
         Delivery pending = Delivery.create(
                 workOrder,
                 2,
+                "Planta principal",
                 "Cliente SA",
                 "Av. Principal 123",
                 "Tepic",
                 "Nayarit",
                 "63000",
                 "México",
+                null,
                 "PAQUETERIA",
                 logistics
         );
@@ -195,12 +199,14 @@ class DeliveryServiceTest {
         Delivery cancelledBeforeDispatch = Delivery.create(
                 workOrder,
                 2,
+                "Planta principal",
                 "Cliente SA",
                 "Av. Principal 123",
                 "Tepic",
                 "Nayarit",
                 "63000",
                 "México",
+                null,
                 "PAQUETERIA",
                 logistics
         );
@@ -314,12 +320,14 @@ class DeliveryServiceTest {
         Delivery delivery = Delivery.create(
                 workOrder,
                 quantity,
+                "Planta principal",
                 "Cliente SA",
                 "Av. Principal 123",
                 "Tepic",
                 "Nayarit",
                 "63000",
                 "México",
+                null,
                 "PAQUETERIA",
                 logistics
         );
@@ -336,12 +344,14 @@ class DeliveryServiceTest {
     private CreateDeliveryRequest createRequest(int quantity) {
         return new CreateDeliveryRequest(
                 quantity,
+                "Planta principal",
                 "Cliente SA",
                 "Av. Principal 123",
                 "Tepic",
                 "Nayarit",
                 "63000",
                 "México",
+                "Acceso por almacén",
                 "PAQUETERIA"
         );
     }
