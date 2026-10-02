@@ -135,8 +135,8 @@ function Assert-SafeResetTarget {
     }
 
     $profiles = [Environment]::GetEnvironmentVariable('SPRING_PROFILES_ACTIVE', 'Process')
-    if ($profiles -and $profiles.ToLowerInvariant() -match '(^|,)\s*(prod|production)\s*(,|$)') {
-        throw "Reset bloqueado: SPRING_PROFILES_ACTIVE contiene un perfil de producción."
+    if ($profiles -and $profiles.ToLowerInvariant() -match '(prod|production)') {
+        throw "Reset bloqueado: SPRING_PROFILES_ACTIVE parece contener un perfil de producción."
     }
 
     $otherConnections = Invoke-PsqlScalar @"
