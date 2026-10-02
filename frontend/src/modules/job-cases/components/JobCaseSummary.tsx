@@ -11,13 +11,7 @@ interface JobCaseSummaryProps {
   jobCase: JobCaseDetailDto
 }
 
-function DataItem({
-  label,
-  value,
-}: {
-  label: string
-  value: string | number
-}) {
+function DataItem({ label, value }: { label: string; value: string | number }) {
   return (
     <div>
       <dt className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">
@@ -163,10 +157,7 @@ export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
               label="Expediente abierto"
               value={formatJobCaseDate(jobCase.openedAt)}
             />
-            <DataItem
-              label="Aclaraciones"
-              value={clarificationSummary}
-            />
+            <DataItem label="Aclaraciones" value={clarificationSummary} />
             <DataItem
               label="Material técnico"
               value={getMaterialReviewLabel(jobCase)}
