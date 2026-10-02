@@ -64,6 +64,15 @@ public class TraceabilityService {
     }
 
     @Transactional(readOnly = true)
+    public List<TraceabilityEventResponse> timelineAll(Long caseId) {
+        return traceabilityEventRepository
+                .findAllByJobCase_IdOrderByOccurredAtDescIdDesc(caseId)
+                .stream()
+                .map(TraceabilityEventResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public TraceabilityTimelinePageResponse timeline(
             Long caseId,
             int limit,
