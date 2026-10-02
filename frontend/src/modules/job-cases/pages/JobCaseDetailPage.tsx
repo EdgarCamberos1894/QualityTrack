@@ -14,9 +14,10 @@ import { JobCaseDetailHeader } from '../components/JobCaseDetailHeader'
 import { JobCaseDocuments } from '../components/JobCaseDocuments'
 import { JobCaseFlowSteps } from '../components/JobCaseFlowSteps'
 import { JobCaseMaterial } from '../components/JobCaseMaterial'
+import { JobCaseRecentActivity } from '../components/JobCaseRecentActivity'
 import { JobCaseSourceCard } from '../components/JobCaseSourceCard'
 import { JobCaseSummary } from '../components/JobCaseSummary'
-import { JobCaseTimeline } from '../components/JobCaseTimeline'
+import { JobCaseTimelineDialog } from '../components/JobCaseTimelineDialog'
 import { MaterialSpecificationForm } from '../components/MaterialSpecificationForm'
 import { useJobCaseDetail } from '../hooks/useJobCaseDetail'
 import {
@@ -25,7 +26,7 @@ import {
   useRequestJobCaseInformation,
   useTakeJobCase,
 } from '../hooks/useJobCaseMutations'
-import { useJobCaseTimeline } from '../hooks/useJobCaseTimeline'
+import { useJobCaseRecentActivity } from '../hooks/useJobCaseTimeline'
 
 type ActionPanel = 'information' | 'material' | null
 
@@ -35,6 +36,7 @@ export function JobCaseDetailPage() {
   const navigate = useNavigate()
   const [actionPanel, setActionPanel] = useState<ActionPanel>(null)
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false)
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false)
   const session = useSessionStore((state) => state.session)
   const numericId = Number(caseId)
   const validId =
@@ -44,7 +46,7 @@ export function JobCaseDetailPage() {
     session?.user.roles.includes('ADMIN') === true ||
     session?.user.roles.includes('COMMERCIAL') === true
   const quotationsQuery = useQuotations(canReadQuotationFlow)
-  const timelineQuery = useJobCaseTimeline(validId)
+  const recentActivityQuery = useJobCaseRecentActivity(validId)
   const takeMutation = useTakeJobCase(validId ?? 0)
   const infoMutation = useRequestJobCaseInformation(validId ?? 0)
   const materialMutation = useDefineJobCaseMaterial(validId ?? 0)
@@ -217,17 +219,28 @@ export function JobCaseDetailPage() {
           <JobCaseClarifications requests={jobCase.informationRequests} />
         </div>
 
-        {timelineQuery.isPending ? (
-          <LoadingState label="Cargando actividad…" />
-        ) : timelineQuery.isError ? (
+        {recentActivityQuery.isPending ? (
+          <LoadingState label="Cargando actividad reciente…" />
+        ) : recentActivityQuery.isError ? (
           <ErrorState
-            error={timelineQuery.error}
-            title="No pudimos cargar la actividad"
+            error={recentActivityQuery.error}
+            title="No pudimos cargar la actividad reciente"
           />
         ) : (
-          <JobCaseTimeline events={timelineQuery.data} />
+          <JobCaseRecentActivity
+            events={recentActivityQuery.data.items}
+            hasMore={recentActivityQuery.data.hasMore}
+            onOpenHistory={() => setHistoryDialogOpen(true)}
+          />
         )}
       </div>
+
+      <JobCaseTimelineDialog
+        open={historyDialogOpen}
+        caseId={validId}
+        caseNumber={jobCase.caseNumber}
+        onClose={() => setHistoryDialogOpen(false)}
+      />
 
       <CompleteJobCaseReviewDialog
         open={completeDialogOpen}
