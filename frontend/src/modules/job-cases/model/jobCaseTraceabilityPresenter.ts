@@ -22,6 +22,66 @@ function metadataString(
   return typeof value === 'string' && value.trim() ? value : null
 }
 
+
+function sameCaseEventHref(
+  event: JobCaseTimelineEventDto,
+  caseId: number,
+): string {
+  const informationRequestId = asNumber(event.metadata.informationRequestId)
+
+  if (
+    event.eventType === 'CUSTOMER_INFORMATION_REQUESTED' ||
+    event.eventType === 'CUSTOMER_INFORMATION_RESPONDED'
+  ) {
+    return informationRequestId === null
+      ? `/job-cases/${caseId}#clarifications`
+      : `/job-cases/${caseId}#clarification-${informationRequestId}`
+  }
+
+  if (event.eventType === 'MATERIAL_SPECIFICATION_DEFINED') {
+    return `/job-cases/${caseId}#material-specification`
+  }
+
+  if (
+    event.eventType === 'REQUEST_SUBMITTED' ||
+    event.eventType === 'JOB_CASE_CREATED'
+  ) {
+    return `/job-cases/${caseId}#request-source`
+  }
+
+  return `/job-cases/${caseId}#case-overview`
+}
+
+export function getJobCaseTraceabilityActionLabel(
+  action: JobCaseTraceabilityActionDto,
+  event: JobCaseTimelineEventDto,
+  caseId: number,
+): string {
+  if (action.type !== 'VIEW_JOB_CASE' || action.resourceId !== caseId) {
+    return action.label
+  }
+
+  if (
+    event.eventType === 'CUSTOMER_INFORMATION_REQUESTED' ||
+    event.eventType === 'CUSTOMER_INFORMATION_RESPONDED'
+  ) {
+    return 'Ver aclaración'
+  }
+
+  if (event.eventType === 'MATERIAL_SPECIFICATION_DEFINED') {
+    return 'Ver material'
+  }
+
+  if (
+    event.eventType === 'REQUEST_SUBMITTED' ||
+    event.eventType === 'JOB_CASE_CREATED'
+  ) {
+    return 'Ver solicitud'
+  }
+
+  return 'Ver expediente'
+}
+
 function workOrderIdFor(
   event: JobCaseTimelineEventDto,
   fallbackWorkOrderId: number | null,
@@ -70,7 +130,7 @@ export function getJobCaseTraceabilityActionHref(
       return `/job-cases/${caseId}#request-source`
     case 'VIEW_JOB_CASE':
       return action.resourceId === caseId
-        ? null
+        ? sameCaseEventHref(event, caseId)
         : `/job-cases/${action.resourceId}`
     case 'VIEW_QUOTATION':
       return `/quotations/${action.resourceId}`
