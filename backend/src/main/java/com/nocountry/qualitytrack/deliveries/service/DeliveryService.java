@@ -78,7 +78,7 @@ public class DeliveryService {
             delivery = Delivery.create(
                     workOrder,
                     request.quantity(),
-                    request.destinationRecipientName(),
+                    request.destinationContactName(),
                     request.destinationAddress(),
                     request.destinationCity(),
                     request.destinationState(),
