@@ -5,13 +5,14 @@ import com.nocountry.qualitytrack.nonconformities.enums.NonConformityStatus;
 import com.nocountry.qualitytrack.nonconformities.enums.NonConformityDisposition;
 import com.nocountry.qualitytrack.nonconformities.repository.NonConformityRepository;
 import com.nocountry.qualitytrack.nonconformities.service.NonConformityReferenceGenerator;
-import com.nocountry.qualitytrack.quality.dto.request.SaveQualityMeasurementRequest;
+import com.nocountry.qualitytrack.quality.dto.request.SaveQualityCheckRequest;
 import com.nocountry.qualitytrack.quality.entity.QualityInspection;
-import com.nocountry.qualitytrack.quality.entity.QualityMeasurement;
+import com.nocountry.qualitytrack.quality.entity.QualityCheck;
 import com.nocountry.qualitytrack.quality.enums.QualityInspectionStatus;
-import com.nocountry.qualitytrack.quality.enums.QualityMeasurementResult;
+import com.nocountry.qualitytrack.quality.enums.QualityCheckType;
+import com.nocountry.qualitytrack.quality.enums.QualityCheckResult;
 import com.nocountry.qualitytrack.quality.repository.QualityInspectionRepository;
-import com.nocountry.qualitytrack.quality.repository.QualityMeasurementRepository;
+import com.nocountry.qualitytrack.quality.repository.QualityCheckRepository;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
@@ -56,7 +57,7 @@ class QualityWorkflowServiceTest {
     @Mock private WorkOrderAccessPolicy accessPolicy;
     @Mock private WorkOrderRepository workOrderRepository;
     @Mock private QualityInspectionRepository inspectionRepository;
-    @Mock private QualityMeasurementRepository measurementRepository;
+    @Mock private QualityCheckRepository checkRepository;
     @Mock private NonConformityRepository nonConformityRepository;
     @Mock private NonConformityReferenceGenerator nonConformityReferenceGenerator;
     @Mock private TraceabilityService traceabilityService;
@@ -73,7 +74,7 @@ class QualityWorkflowServiceTest {
                 accessPolicy,
                 workOrderRepository,
                 inspectionRepository,
-                measurementRepository,
+                checkRepository,
                 nonConformityRepository,
                 nonConformityReferenceGenerator,
                 traceabilityService
@@ -108,7 +109,7 @@ class QualityWorkflowServiceTest {
                     ReflectionTestUtils.setField(inspection, "id", 100L);
                     return inspection;
                 });
-        when(measurementRepository.findAllByQualityInspection_IdOrderByIdAsc(100L))
+        when(checkRepository.findAllByQualityInspection_IdOrderByIdAsc(100L))
                 .thenReturn(List.of());
         when(nonConformityRepository.findByQualityInspection_Id(100L))
                 .thenReturn(Optional.empty());
@@ -124,16 +125,16 @@ class QualityWorkflowServiceTest {
     }
 
     @Test
-    void allPassingMeasurementsApproveInspectionAndOrder() {
+    void allPassingChecksApproveInspectionAndOrder() {
         QualityInspection inspection = startedInspection();
-        QualityMeasurement measurement = measurement(
+        QualityCheck measurement = qualityCheck(
                 inspection,
                 "25.020"
         );
 
         stubLockedInspection(inspection);
         when(accessPolicy.requireAssignedQualityActor(10L, 10L)).thenReturn(actor);
-        when(measurementRepository.findAllByQualityInspection_IdOrderByIdAsc(100L))
+        when(checkRepository.findAllByQualityInspection_IdOrderByIdAsc(100L))
                 .thenReturn(List.of(measurement));
         when(inspectionRepository.saveAndFlush(inspection)).thenReturn(inspection);
 
@@ -158,16 +159,16 @@ class QualityWorkflowServiceTest {
     }
 
     @Test
-    void failingMeasurementRejectsInspectionAndOpensNonConformity() {
+    void failingCheckRejectsInspectionAndOpensNonConformity() {
         QualityInspection inspection = startedInspection();
-        QualityMeasurement measurement = measurement(
+        QualityCheck measurement = qualityCheck(
                 inspection,
                 "25.080"
         );
 
         stubLockedInspection(inspection);
         when(accessPolicy.requireAssignedQualityActor(10L, 10L)).thenReturn(actor);
-        when(measurementRepository.findAllByQualityInspection_IdOrderByIdAsc(100L))
+        when(checkRepository.findAllByQualityInspection_IdOrderByIdAsc(100L))
                 .thenReturn(List.of(measurement));
         when(nonConformityRepository.existsByQualityInspection_Id(100L)).thenReturn(false);
         when(nonConformityReferenceGenerator.nextNumber()).thenReturn("NC-0001");
@@ -202,14 +203,16 @@ class QualityWorkflowServiceTest {
     }
 
     @Test
-    void updateMeasurementChecksQualityRoleBeforeLookingUpResources() {
-        SaveQualityMeasurementRequest request = new SaveQualityMeasurementRequest(
+    void updateCheckChecksQualityRoleBeforeLookingUpResources() {
+        SaveQualityCheckRequest request = new SaveQualityCheckRequest(
+                QualityCheckType.NUMERIC_RANGE,
                 "Diámetro exterior",
                 new BigDecimal("25.000"),
                 new BigDecimal("24.950"),
                 new BigDecimal("25.050"),
                 new BigDecimal("25.020"),
                 "mm",
+                null,
                 null
         );
 
@@ -221,7 +224,7 @@ class QualityWorkflowServiceTest {
 
         assertThrows(
                 BusinessException.class,
-                () -> service.updateMeasurement(
+                () -> service.updateCheck(
                         99L,
                         100L,
                         200L,
@@ -230,51 +233,52 @@ class QualityWorkflowServiceTest {
         );
 
         verifyNoInteractions(
-                measurementRepository,
+                checkRepository,
                 inspectionRepository,
                 workOrderRepository
         );
     }
 
     @Test
-    void updatingMeasurementTracesPreviousAndRecalculatedResult() {
+    void updatingNumericCheckTracesPreviousAndRecalculatedResult() {
         QualityInspection inspection = startedInspection();
-        QualityMeasurement measurement = measurement(inspection, "25.080");
+        QualityCheck measurement = qualityCheck(inspection, "25.080");
 
         stubLockedInspection(inspection);
         when(accessPolicy.requireAssignedQualityActor(10L, 10L)).thenReturn(actor);
-        when(measurementRepository.findInspectionIdById(200L))
+        when(checkRepository.findInspectionIdById(200L))
                 .thenReturn(Optional.of(100L));
-        when(measurementRepository.findByIdForUpdate(200L))
+        when(checkRepository.findByIdForUpdate(200L))
                 .thenReturn(Optional.of(measurement));
-        when(measurementRepository.saveAndFlush(measurement))
+        when(checkRepository.saveAndFlush(measurement))
                 .thenReturn(measurement);
 
-        SaveQualityMeasurementRequest request = new SaveQualityMeasurementRequest(
+        SaveQualityCheckRequest request = new SaveQualityCheckRequest(
                 "Diámetro exterior",
                 new BigDecimal("25.000"),
                 new BigDecimal("24.950"),
                 new BigDecimal("25.050"),
                 new BigDecimal("25.020"),
                 "mm",
+                null,
                 "Lectura corregida"
         );
 
-        var response = service.updateMeasurement(
+        var response = service.updateCheck(
                 10L,
                 100L,
                 200L,
                 request
         );
 
-        assertEquals(QualityMeasurementResult.PASS, response.result());
+        assertEquals(QualityCheckResult.PASS, response.result());
         verify(traceabilityService).record(
                 any(),
-                eq(TraceabilityAggregateType.QUALITY_MEASUREMENT),
+                eq(TraceabilityAggregateType.QUALITY_CHECK),
                 eq(200L),
-                eq(TraceabilityEventType.QUALITY_MEASUREMENT_UPDATED),
-                eq(QualityMeasurementResult.FAIL.name()),
-                eq(QualityMeasurementResult.PASS.name()),
+                eq(TraceabilityEventType.QUALITY_CHECK_UPDATED),
+                eq(QualityCheckResult.FAIL.name()),
+                eq(QualityCheckResult.PASS.name()),
                 eq(10L),
                 any()
         );
@@ -284,7 +288,7 @@ class QualityWorkflowServiceTest {
     void approvedReinspectionClosesOriginalNonConformity() {
         NonConformity nonConformity = reworkNonConformity();
         QualityInspection reinspection = reinspection(nonConformity);
-        QualityMeasurement measurement = QualityMeasurement.create(
+        QualityCheck measurement = QualityCheck.createNumericRange(
                 reinspection,
                 "Diámetro exterior",
                 new BigDecimal("25.000"),
@@ -292,6 +296,7 @@ class QualityWorkflowServiceTest {
                 new BigDecimal("25.050"),
                 new BigDecimal("25.020"),
                 "mm",
+                null,
                 null
         );
 
@@ -303,7 +308,7 @@ class QualityWorkflowServiceTest {
                 .thenReturn(Optional.of(reinspection));
         when(accessPolicy.requireAssignedQualityActor(10L, 10L))
                 .thenReturn(actor);
-        when(measurementRepository.findAllByQualityInspection_IdOrderByIdAsc(101L))
+        when(checkRepository.findAllByQualityInspection_IdOrderByIdAsc(101L))
                 .thenReturn(List.of(measurement));
         when(nonConformityRepository.findByIdForUpdate(300L))
                 .thenReturn(Optional.of(nonConformity));
@@ -334,7 +339,7 @@ class QualityWorkflowServiceTest {
     void failedReinspectionKeepsSameNonConformityOpen() {
         NonConformity nonConformity = reworkNonConformity();
         QualityInspection reinspection = reinspection(nonConformity);
-        QualityMeasurement measurement = QualityMeasurement.create(
+        QualityCheck measurement = QualityCheck.createNumericRange(
                 reinspection,
                 "Diámetro exterior",
                 new BigDecimal("25.000"),
@@ -342,6 +347,7 @@ class QualityWorkflowServiceTest {
                 new BigDecimal("25.050"),
                 new BigDecimal("25.090"),
                 "mm",
+                null,
                 null
         );
 
@@ -353,7 +359,7 @@ class QualityWorkflowServiceTest {
                 .thenReturn(Optional.of(reinspection));
         when(accessPolicy.requireAssignedQualityActor(10L, 10L))
                 .thenReturn(actor);
-        when(measurementRepository.findAllByQualityInspection_IdOrderByIdAsc(101L))
+        when(checkRepository.findAllByQualityInspection_IdOrderByIdAsc(101L))
                 .thenReturn(List.of(measurement));
         when(nonConformityRepository.findByIdForUpdate(300L))
                 .thenReturn(Optional.of(nonConformity));
@@ -412,11 +418,11 @@ class QualityWorkflowServiceTest {
         return inspection;
     }
 
-    private QualityMeasurement measurement(
+    private QualityCheck qualityCheck(
             QualityInspection inspection,
             String measuredValue
     ) {
-        QualityMeasurement measurement = QualityMeasurement.create(
+        QualityCheck measurement = QualityCheck.createNumericRange(
                 inspection,
                 "Diámetro exterior",
                 new BigDecimal("25.000"),
@@ -424,6 +430,7 @@ class QualityWorkflowServiceTest {
                 new BigDecimal("25.050"),
                 new BigDecimal(measuredValue),
                 "mm",
+                null,
                 null
         );
         ReflectionTestUtils.setField(measurement, "id", 200L);
