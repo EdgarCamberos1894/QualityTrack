@@ -136,5 +136,3 @@ export interface DefineMaterialSpecificationPayload {
   technicalNotes: string
 }
 
-export type JobCaseDetailTab =
-  'summary' | 'documents' | 'specification' | 'activity'
