@@ -2,7 +2,7 @@ import type { BadgeProps } from '@/shared/components/ui/Badge'
 import type {
   NonConformityDisposition,
   QualityInspectionStatus,
-  QualityMeasurementDto,
+  QualityCheckDto,
 } from '../types/quality.types'
 
 interface Presentation {
@@ -51,20 +51,28 @@ export function formatQualityDateTime(value: string | null): string {
   }).format(date)
 }
 
-export function formatQualityNumber(value: number): string {
+export function formatQualityNumber(value: number | null): string {
+  if (value === null) return '—'
+
   return new Intl.NumberFormat('es-MX', {
     maximumFractionDigits: 6,
   }).format(value)
 }
 
-export function countMeasurementResults(
-  measurements: QualityMeasurementDto[],
+export function countQualityCheckResults(
+  checks: QualityCheckDto[],
 ): { pass: number; fail: number } {
-  return measurements.reduce(
-    (totals, measurement) => {
-      totals[measurement.result === 'PASS' ? 'pass' : 'fail'] += 1
+  return checks.reduce(
+    (totals, qualityCheck) => {
+      totals[qualityCheck.result === 'PASS' ? 'pass' : 'fail'] += 1
       return totals
     },
     { pass: 0, fail: 0 },
   )
+}
+
+export function getQualityCheckTypeLabel(
+  type: QualityCheckDto['type'],
+): string {
+  return type === 'NUMERIC_RANGE' ? 'Medición' : 'Conformidad'
 }
