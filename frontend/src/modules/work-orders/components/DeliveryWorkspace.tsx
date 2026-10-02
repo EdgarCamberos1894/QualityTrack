@@ -6,11 +6,13 @@ import {
   getDeliveryStatusPresentation,
 } from '../model/deliveryPresenter'
 import type { DeliveryDto } from '../types/delivery.types'
+import type { WorkOrderDeliveryDestinationDto } from '../types/workOrder.types'
 
 interface DeliveryWorkspaceProps {
   delivery: DeliveryDto | null
   plannedQuantity: number
   availableQuantity: number
+  requestedDestination: WorkOrderDeliveryDestinationDto | null
 }
 
 function Step({
@@ -51,6 +53,7 @@ export function DeliveryWorkspace({
   delivery,
   plannedQuantity,
   availableQuantity,
+  requestedDestination,
 }: DeliveryWorkspaceProps) {
   if (!delivery) {
     return (
@@ -77,17 +80,68 @@ export function DeliveryWorkspace({
             <Step label="Recepción" state="pending" />
           </div>
 
-          <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50/35 px-3.5 py-3">
-            <p className="text-[7px] font-bold uppercase tracking-[0.1em] text-blue-600">
-              Producto disponible
-            </p>
-            <p className="mt-1 text-[13px] font-bold text-slate-950">
-              {availableQuantity} de {plannedQuantity} piezas
-            </p>
-            <p className="mt-1 text-[8px] leading-4 text-slate-500">
-              Puedes preparar una entrega total o parcial. Cada despacho conserva
-              su propio destino y trazabilidad.
-            </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="rounded-xl border border-blue-100 bg-blue-50/35 px-3.5 py-3">
+              <p className="text-[7px] font-bold uppercase tracking-[0.1em] text-blue-600">
+                Producto disponible
+              </p>
+              <p className="mt-1 text-[13px] font-bold text-slate-950">
+                {availableQuantity} de {plannedQuantity} piezas
+              </p>
+              <p className="mt-1 text-[8px] leading-4 text-slate-500">
+                Puedes preparar una entrega total o parcial.
+              </p>
+            </div>
+
+            <div
+              className={
+                requestedDestination?.mode === 'DEFINE_LATER' ||
+                !requestedDestination
+                  ? 'rounded-xl border border-amber-200 bg-amber-50/55 px-3.5 py-3'
+                  : 'rounded-xl border border-emerald-200 bg-emerald-50/45 px-3.5 py-3'
+              }
+            >
+              <p
+                className={
+                  requestedDestination?.mode === 'DEFINE_LATER' ||
+                  !requestedDestination
+                    ? 'text-[7px] font-bold uppercase tracking-[0.1em] text-amber-700'
+                    : 'text-[7px] font-bold uppercase tracking-[0.1em] text-emerald-700'
+                }
+              >
+                Destino acordado en la solicitud
+              </p>
+
+              {requestedDestination &&
+              (requestedDestination.mode === 'SAVED_ADDRESS' ||
+                requestedDestination.mode === 'CUSTOM_ADDRESS') ? (
+                <>
+                  <p className="mt-1 text-[9px] font-semibold text-slate-950">
+                    {requestedDestination.label ?? 'Destino de entrega'}
+                  </p>
+                  <p className="mt-1 text-[8px] leading-4 text-slate-600">
+                    {[
+                      requestedDestination.address,
+                      requestedDestination.city,
+                      requestedDestination.state,
+                      requestedDestination.postalCode,
+                      requestedDestination.country,
+                    ]
+                      .filter(Boolean)
+                      .join(', ')}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="mt-1 text-[9px] font-semibold text-amber-900">
+                    Destino por definir
+                  </p>
+                  <p className="mt-1 text-[8px] leading-4 text-amber-800/80">
+                    Confirma la dirección real antes de crear el despacho.
+                  </p>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </section>
