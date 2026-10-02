@@ -1,5 +1,7 @@
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
+import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge } from '@/shared/components/ui/Badge'
+import { Card } from '@/shared/components/ui/Card'
 import { formatJobCaseDateTime } from '../model/jobCasePresenter'
 import type { CaseInformationRequestDto } from '../types/jobCase.types'
 
@@ -12,47 +14,68 @@ export function JobCaseClarifications({
 }: JobCaseClarificationsProps) {
   if (requests.length === 0) {
     return (
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
+      <Card className="border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 p-4">
         <EmptyState
           title="Sin aclaraciones"
           description="No se han solicitado aclaraciones al cliente para este expediente."
         />
-      </section>
+      </Card>
     )
   }
 
+  const pending = requests.filter((request) => request.open).length
+
   return (
-    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-30px_rgba(15,23,42,0.3)]">
-      <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/45 px-4 py-2.5">
-        <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-          Comunicación con cliente
-        </p>
-        <div className="mt-0.5 flex items-center justify-between gap-3">
-          <h2 className="text-[12px] font-semibold text-slate-950">
-            Aclaraciones del expediente
-          </h2>
-          <span className="text-[8px] text-slate-400">
-            {requests.filter((request) => request.open).length} pendientes
-          </span>
+    <Card className="overflow-hidden border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+      <div className="flex flex-col gap-3 border-b border-blue-100/70 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex items-start gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+            <SidebarNavIcon name="requests" className="h-[17px] w-[17px]" />
+          </div>
+          <div>
+            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+              Comunicación con cliente
+            </p>
+            <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
+              Preguntas y respuestas
+            </h2>
+            <p className="mt-0.5 text-[9px] leading-4 text-slate-500">
+              Consulta qué se preguntó, quién respondió y si queda algo por
+              resolver.
+            </p>
+          </div>
         </div>
+
+        <span
+          className={
+            pending > 0
+              ? 'shrink-0 rounded-full bg-amber-50 px-2 py-1 text-[8px] font-semibold text-amber-700'
+              : 'shrink-0 rounded-full bg-emerald-50 px-2 py-1 text-[8px] font-semibold text-emerald-700'
+          }
+        >
+          {pending > 0
+            ? `${pending} pendiente${pending === 1 ? '' : 's'}`
+            : 'Sin pendientes'}
+        </span>
       </div>
 
-      <div className="divide-y divide-slate-100">
+      <div className="space-y-3 p-4">
         {requests.map((request) => (
-          <article key={request.id} className="px-4 py-3.5">
+          <article
+            key={request.id}
+            className="rounded-lg border border-slate-200 bg-slate-50 p-4"
+          >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">
-                  Aclaración #{request.id}
-                </p>
-                <h3 className="mt-0.5 text-[11px] font-semibold leading-5 text-slate-950">
+                <p className="text-xs font-semibold leading-5 text-slate-900">
                   {request.question}
-                </h3>
-                <p className="mt-1 text-[8px] text-slate-400">
+                </p>
+                <p className="mt-1 text-[9px] text-slate-500">
                   Solicitada por {request.requestedByName ?? 'Sistema'} ·{' '}
                   {formatJobCaseDateTime(request.requestedAt)}
                 </p>
               </div>
+
               <Badge
                 tone={request.open ? 'warning' : 'success'}
                 className="px-2 py-0.5 text-[8px]"
@@ -62,27 +85,23 @@ export function JobCaseClarifications({
             </div>
 
             {request.response ? (
-              <div className="mt-2.5 rounded-lg border border-slate-100 bg-slate-50/70 px-3 py-2.5">
-                <p className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">
-                  Respuesta del cliente
-                </p>
-                <p className="mt-1 text-[10px] leading-4 text-slate-700">
+              <div className="mt-3 border-l-2 border-emerald-300 pl-3">
+                <p className="text-[10px] leading-5 text-slate-700">
                   {request.response}
                 </p>
-                <p className="mt-1.5 text-[7px] text-slate-400">
+                <p className="mt-1 text-[8px] text-slate-400">
                   Respondida por {request.respondedByName ?? 'Cliente'} ·{' '}
                   {formatJobCaseDateTime(request.respondedAt)}
                 </p>
               </div>
             ) : (
-              <p className="mt-2.5 rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2 text-[8px] leading-4 text-amber-800">
-                Esta aclaración sigue esperando respuesta y bloquea el cierre de
-                la revisión.
+              <p className="mt-3 text-[10px] font-semibold text-amber-700">
+                Pendiente de respuesta del cliente
               </p>
             )}
           </article>
         ))}
       </div>
-    </section>
+    </Card>
   )
 }
