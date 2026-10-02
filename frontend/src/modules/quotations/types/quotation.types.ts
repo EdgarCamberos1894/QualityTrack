@@ -39,7 +39,7 @@ export interface QuotationDto {
 
 export interface QuotationFiltersValue {
   search: string
-  status: QuotationStatus | 'ALL'
+  status: QuotationStatus | 'ACTIVE' | 'ALL'
 }
 
 export interface QuotationItemDto {
