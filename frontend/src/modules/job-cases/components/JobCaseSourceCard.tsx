@@ -23,6 +23,20 @@ export function JobCaseSourceCard({ jobCase }: JobCaseSourceCardProps) {
       ? 'Asesoría técnica requerida'
       : jobCase.request.materialRequirement ?? 'Sin especificar'
 
+  const destination = jobCase.request.deliveryDestination
+  const delivery =
+    destination.mode === 'CUSTOMER_PICKUP'
+      ? 'Recolección en planta'
+      : destination.mode === 'DEFINE_LATER'
+        ? 'Destino por definir'
+        : [
+            destination.label,
+            destination.city,
+            destination.state,
+          ]
+            .filter(Boolean)
+            .join(' · ') || 'Destino acordado'
+
   return (
     <section className="rounded-xl border border-blue-100/80 bg-gradient-to-r from-white via-white to-blue-50/30 px-4 py-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.22)]">
       <div className="flex items-center gap-3">
@@ -39,7 +53,7 @@ export function JobCaseSourceCard({ jobCase }: JobCaseSourceCardProps) {
         </div>
       </div>
 
-      <dl className="mt-3 grid gap-x-4 gap-y-2.5 border-t border-blue-100/70 pt-3 sm:grid-cols-2 xl:grid-cols-4">
+      <dl className="mt-3 grid gap-x-4 gap-y-2.5 border-t border-blue-100/70 pt-3 sm:grid-cols-2 xl:grid-cols-5">
         <Item label="Trabajo" value={jobCase.request.title} />
         <Item
           label="Cantidad"
@@ -52,6 +66,7 @@ export function JobCaseSourceCard({ jobCase }: JobCaseSourceCardProps) {
           label="Fecha solicitada"
           value={formatJobCaseDate(jobCase.request.requestedDeliveryDate)}
         />
+        <Item label="Entrega" value={delivery} />
       </dl>
     </section>
   )
