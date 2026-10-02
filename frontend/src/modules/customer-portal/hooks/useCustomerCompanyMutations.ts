@@ -1,13 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   cancelCustomerInvitation,
+  createCustomerAddress,
   createCustomerInvitation,
+  deleteCustomerAddress,
   removeCustomerMember,
+  updateCustomerAddress,
   updateCustomerCompany,
   updateCustomerMemberRole,
 } from '../api/customerCompany.api'
 import type {
   CreateCustomerInvitationPayload,
+  SaveCustomerAddressPayload,
   UpdateCustomerCompanyPayload,
   UpdateCustomerMemberRolePayload,
 } from '../types/customerCompany.types'
@@ -22,6 +26,41 @@ export function useCustomerCompanyMutations(customerId: number) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: customerCompanyKeys.detail(customerId),
+      })
+    },
+  })
+
+  const createAddress = useMutation({
+    mutationFn: (payload: SaveCustomerAddressPayload) =>
+      createCustomerAddress(customerId, payload),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: customerCompanyKeys.addresses(customerId),
+      })
+    },
+  })
+
+  const updateAddress = useMutation({
+    mutationFn: ({
+      addressId,
+      payload,
+    }: {
+      addressId: number
+      payload: SaveCustomerAddressPayload
+    }) => updateCustomerAddress(customerId, addressId, payload),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: customerCompanyKeys.addresses(customerId),
+      })
+    },
+  })
+
+  const deleteAddress = useMutation({
+    mutationFn: (addressId: number) =>
+      deleteCustomerAddress(customerId, addressId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: customerCompanyKeys.addresses(customerId),
       })
     },
   })
@@ -70,5 +109,14 @@ export function useCustomerCompanyMutations(customerId: number) {
     },
   })
 
-  return { updateCompany, invite, cancelInvitation, updateMemberRole, removeMember }
+  return {
+    updateCompany,
+    createAddress,
+    updateAddress,
+    deleteAddress,
+    invite,
+    cancelInvitation,
+    updateMemberRole,
+    removeMember,
+  }
 }
