@@ -1,14 +1,15 @@
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import {
-  countMeasurementResults,
+  countQualityCheckResults,
   formatQualityDateTime,
   formatQualityNumber,
+  getQualityCheckTypeLabel,
   getQualityInspectionStatusPresentation,
 } from '../model/qualityPresenter'
 import type {
+  QualityCheckDto,
   QualityInspectionDto,
-  QualityMeasurementDto,
 } from '../types/quality.types'
 
 interface QualityInspectionWorkspaceProps {
@@ -18,8 +19,8 @@ interface QualityInspectionWorkspaceProps {
   canComplete: boolean
   starting: boolean
   onStart: () => void
-  onAddMeasurement: () => void
-  onEditMeasurement: (measurement: QualityMeasurementDto) => void
+  onAddCheck: () => void
+  onEditCheck: (qualityCheck: QualityCheckDto) => void
   onComplete: () => void
 }
 
@@ -30,8 +31,8 @@ export function QualityInspectionWorkspace({
   canComplete,
   starting,
   onStart,
-  onAddMeasurement,
-  onEditMeasurement,
+  onAddCheck,
+  onEditCheck,
   onComplete,
 }: QualityInspectionWorkspaceProps) {
   if (!inspection) {
@@ -44,14 +45,15 @@ export function QualityInspectionWorkspace({
           Sin inspección disponible
         </h2>
         <p className="mt-2 text-[8px] leading-4 text-slate-500">
-          La inspección aparece cuando Producción realiza el handoff formal a Calidad.
+          La inspección aparece cuando Producción realiza el handoff formal a
+          Calidad.
         </p>
       </section>
     )
   }
 
   const status = getQualityInspectionStatusPresentation(inspection.status)
-  const totals = countMeasurementResults(inspection.measurements)
+  const totals = countQualityCheckResults(inspection.checks)
   const isReinspection = inspection.reworkNonConformityId !== null
 
   return (
@@ -108,9 +110,9 @@ export function QualityInspectionWorkspace({
             </p>
           </div>
           <div>
-            <p className="text-slate-400">Mediciones</p>
+            <p className="text-slate-400">Controles</p>
             <p className="mt-0.5 font-medium text-slate-700">
-              {inspection.measurements.length}
+              {inspection.checks.length}
             </p>
           </div>
         </div>
@@ -118,10 +120,11 @@ export function QualityInspectionWorkspace({
         <div className="flex flex-wrap items-center justify-between gap-2.5">
           <div>
             <h3 className="text-[9px] font-semibold text-slate-950">
-              Mediciones de inspección
+              Controles de inspección
             </h3>
             <p className="mt-0.5 text-[7px] text-slate-400">
-              PASS o FAIL se calcula en servidor a partir del rango registrado.
+              Combina mediciones con tolerancia y verificaciones de conformidad
+              según lo que requiera la pieza.
             </p>
           </div>
 
@@ -130,73 +133,84 @@ export function QualityInspectionWorkspace({
               size="sm"
               variant="secondary"
               className="!h-7 !px-2.5 !text-[8px]"
-              onClick={onAddMeasurement}
+              onClick={onAddCheck}
             >
-              Registrar medición
+              Registrar control
             </Button>
           ) : null}
         </div>
 
-        {inspection.measurements.length === 0 ? (
+        {inspection.checks.length === 0 ? (
           <div className="mt-3 rounded-xl border border-dashed border-slate-200 bg-slate-50/55 px-3 py-5 text-center">
             <p className="text-[8px] font-medium text-slate-600">
-              Todavía no hay mediciones
+              Todavía no hay controles registrados
             </p>
             <p className="mt-1 text-[7px] text-slate-400">
-              Se requiere al menos una para finalizar la inspección.
+              Se requiere al menos uno para finalizar la inspección.
             </p>
           </div>
         ) : (
           <div className="mt-3 overflow-x-auto rounded-xl border border-slate-200">
-            <table className="w-full min-w-[650px] text-left">
+            <table className="w-full min-w-[670px] text-left">
               <thead className="bg-slate-50 text-[7px] font-bold uppercase tracking-wide text-slate-400">
                 <tr>
-                  <th className="px-3 py-2">Característica</th>
-                  <th className="px-3 py-2">Nominal</th>
-                  <th className="px-3 py-2">Rango</th>
-                  <th className="px-3 py-2">Medido</th>
+                  <th className="px-3 py-2">Control</th>
+                  <th className="px-3 py-2">Tipo</th>
+                  <th className="px-3 py-2">Criterio / valor</th>
                   <th className="px-3 py-2">Resultado</th>
                   <th className="px-3 py-2 text-right">Acción</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-[8px] text-slate-600">
-                {inspection.measurements.map((measurement) => (
+                {inspection.checks.map((qualityCheck) => (
                   <tr
-                    id={`quality-measurement-${measurement.id}`}
-                    key={measurement.id}
+                    id={`quality-check-${qualityCheck.id}`}
+                    key={qualityCheck.id}
                     className="scroll-mt-24 target:bg-blue-50/40"
                   >
                     <td className="px-3 py-2.5">
                       <p className="font-semibold text-slate-900">
-                        {measurement.characteristic}
+                        {qualityCheck.name}
                       </p>
-                      {measurement.notes ? (
-                        <p className="mt-0.5 max-w-xs text-[7px] text-slate-400">
-                          {measurement.notes}
+                      {qualityCheck.notes ? (
+                        <p className="mt-0.5 max-w-sm text-[7px] leading-3.5 text-slate-400">
+                          {qualityCheck.notes}
                         </p>
                       ) : null}
                     </td>
                     <td className="px-3 py-2.5">
-                      {formatQualityNumber(measurement.nominalValue)}{' '}
-                      {measurement.unit}
+                      <Badge tone="neutral" className="px-2 py-0.5 text-[7px]">
+                        {getQualityCheckTypeLabel(qualityCheck.type)}
+                      </Badge>
                     </td>
                     <td className="px-3 py-2.5">
-                      {formatQualityNumber(measurement.lowerLimit)} –{' '}
-                      {formatQualityNumber(measurement.upperLimit)}{' '}
-                      {measurement.unit}
-                    </td>
-                    <td className="px-3 py-2.5 font-semibold text-slate-900">
-                      {formatQualityNumber(measurement.measuredValue)}{' '}
-                      {measurement.unit}
+                      {qualityCheck.type === 'NUMERIC_RANGE' ? (
+                        <div>
+                          <p className="font-semibold text-slate-900">
+                            {formatQualityNumber(qualityCheck.measuredValue)}{' '}
+                            {qualityCheck.unit}
+                          </p>
+                          <p className="mt-0.5 text-[7px] text-slate-400">
+                            Rango {formatQualityNumber(qualityCheck.lowerLimit)} –{' '}
+                            {formatQualityNumber(qualityCheck.upperLimit)}{' '}
+                            {qualityCheck.unit} · nominal{' '}
+                            {formatQualityNumber(qualityCheck.nominalValue)}
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="font-medium text-slate-700">
+                          Evaluación de conformidad del inspector
+                        </p>
+                      )}
                     </td>
                     <td className="px-3 py-2.5">
                       <Badge
                         tone={
-                          measurement.result === 'PASS' ? 'success' : 'danger'
+                          qualityCheck.result === 'PASS' ? 'success' : 'danger'
                         }
                         className="px-2 py-0.5 text-[7px]"
                       >
-                        {measurement.result}
+                        {qualityCheck.result}
                       </Badge>
                     </td>
                     <td className="px-3 py-2.5 text-right">
@@ -205,13 +219,13 @@ export function QualityInspectionWorkspace({
                           size="sm"
                           variant="ghost"
                           className="!h-7 !px-2 !text-[8px]"
-                          onClick={() => onEditMeasurement(measurement)}
+                          onClick={() => onEditCheck(qualityCheck)}
                         >
                           Editar
                         </Button>
                       ) : (
                         <span className="text-[7px] text-slate-400">
-                          Bloqueada
+                          Bloqueado
                         </span>
                       )}
                     </td>
@@ -243,7 +257,7 @@ export function QualityInspectionWorkspace({
             <Button
               className="!h-7 !px-2.5 !text-[8px]"
               onClick={onComplete}
-              disabled={inspection.measurements.length === 0}
+              disabled={inspection.checks.length === 0}
             >
               {isReinspection
                 ? 'Finalizar reinspección'
