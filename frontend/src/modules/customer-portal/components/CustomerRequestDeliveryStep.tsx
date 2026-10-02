@@ -186,43 +186,54 @@ export function CustomerRequestDeliveryStep({
         ) : null}
 
         {deliveryMode === 'CUSTOM_ADDRESS' ? (
-          <section className="mt-4 space-y-3 border-t border-slate-100 pt-3">
+          <section className="mt-3 space-y-2.5 border-t border-slate-100 pt-3">
             <TextField
               label="Nombre del destino (opcional)"
               placeholder="Ej. Almacén Guadalajara"
               maxLength={120}
+              labelClassName="!mb-1 !text-[9px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
               error={errors.deliveryLabel?.message}
               {...register('deliveryLabel')}
             />
             <TextareaField
               label="Dirección"
-              className="!min-h-16"
+              className="!min-h-14 !rounded-lg !px-2.5 !py-2 !text-[10px] !leading-4 !shadow-none"
+              labelClassName="!mb-1 !text-[9px]"
               maxLength={300}
               error={errors.deliveryAddress?.message}
               {...register('deliveryAddress')}
             />
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-2.5 sm:grid-cols-2">
               <TextField
                 label="Ciudad"
                 maxLength={120}
+                labelClassName="!mb-1 !text-[9px]"
+                className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
                 error={errors.deliveryCity?.message}
                 {...register('deliveryCity')}
               />
               <TextField
                 label="Estado"
                 maxLength={120}
+                labelClassName="!mb-1 !text-[9px]"
+                className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
                 error={errors.deliveryState?.message}
                 {...register('deliveryState')}
               />
               <TextField
                 label="Código postal"
                 maxLength={20}
+                labelClassName="!mb-1 !text-[9px]"
+                className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
                 error={errors.deliveryPostalCode?.message}
                 {...register('deliveryPostalCode')}
               />
               <TextField
                 label="País"
                 maxLength={100}
+                labelClassName="!mb-1 !text-[9px]"
+                className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
                 error={errors.deliveryCountry?.message}
                 {...register('deliveryCountry')}
               />
@@ -232,7 +243,7 @@ export function CustomerRequestDeliveryStep({
 
         {deliveryMode === 'SAVED_ADDRESS' ||
         deliveryMode === 'CUSTOM_ADDRESS' ? (
-          <section className="mt-4 space-y-3 border-t border-slate-100 pt-3">
+          <section className="mt-3 space-y-2.5 border-t border-slate-100 pt-3">
             <div>
               <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
                 Contacto en destino
@@ -242,23 +253,28 @@ export function CustomerRequestDeliveryStep({
                 físicamente el pedido.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-2.5 sm:grid-cols-2">
               <TextField
                 label="Nombre (opcional)"
                 maxLength={160}
+                labelClassName="!mb-1 !text-[9px]"
+                className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
                 error={errors.deliveryContactName?.message}
                 {...register('deliveryContactName')}
               />
               <TextField
                 label="Teléfono (opcional)"
                 maxLength={30}
+                labelClassName="!mb-1 !text-[9px]"
+                className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
                 error={errors.deliveryContactPhone?.message}
                 {...register('deliveryContactPhone')}
               />
             </div>
             <TextareaField
               label="Indicaciones de entrega (opcional)"
-              className="!min-h-16"
+              className="!min-h-14 !rounded-lg !px-2.5 !py-2 !text-[10px] !leading-4 !shadow-none"
+              labelClassName="!mb-1 !text-[9px]"
               maxLength={1000}
               placeholder="Ej. Acceso por almacén, horario, referencias..."
               error={errors.deliveryInstructions?.message}
