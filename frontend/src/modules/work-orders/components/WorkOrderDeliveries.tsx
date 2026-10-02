@@ -112,7 +112,9 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
         workOrderId: data.workOrder.id,
         payload: {
           quantity: values.quantity,
-          destinationRecipientName: values.destinationRecipientName.trim(),
+          ...(values.destinationContactName.trim()
+            ? { destinationContactName: values.destinationContactName.trim() }
+            : {}),
           destinationAddress: values.destinationAddress.trim(),
           destinationCity: values.destinationCity.trim(),
           destinationState: values.destinationState.trim(),
@@ -338,6 +340,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
       <CreateDeliveryDialog
         open={createOpen}
         availableQuantity={availableQuantity}
+        requestedDestination={data.workOrder.source.deliveryDestination}
         submitting={mutations.create.isPending}
         error={mutations.create.error}
         onClose={() => {
