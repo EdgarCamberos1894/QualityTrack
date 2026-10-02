@@ -38,7 +38,7 @@ export function JobCaseSourceCard({ jobCase }: JobCaseSourceCardProps) {
             .join(' · ') || 'Destino acordado'
 
   return (
-    <section className="rounded-xl border border-blue-100/80 bg-gradient-to-r from-white via-white to-blue-50/30 px-4 py-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.22)]">
+    <section id="request-source" className="scroll-mt-24 rounded-xl border border-blue-100/80 bg-gradient-to-r from-white via-white to-blue-50/30 px-4 py-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.22)]">
       <div className="flex items-center gap-3">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
           <SidebarNavIcon name="requests" className="h-4 w-4" />
