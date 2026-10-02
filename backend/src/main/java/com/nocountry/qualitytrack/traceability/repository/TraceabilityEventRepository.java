@@ -22,6 +22,12 @@ public interface TraceabilityEventRepository extends JpaRepository<TraceabilityE
     );
 
     @EntityGraph(attributePaths = {"performedByUser"})
+    List<TraceabilityEvent> findAllByJobCase_IdOrderByOccurredAtDescIdDesc(
+            Long caseId
+    );
+
+
+    @EntityGraph(attributePaths = {"performedByUser"})
     @Query("""
             select event
             from TraceabilityEvent event
