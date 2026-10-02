@@ -137,6 +137,30 @@ export interface JobCaseDetailDto extends JobCaseDto {
   materialSpecification: CaseMaterialSpecificationDto | null
 }
 
+export type JobCaseTraceabilityActionType =
+  | 'VIEW_CUSTOMER_REQUEST'
+  | 'VIEW_JOB_CASE'
+  | 'VIEW_QUOTATION'
+  | 'VIEW_WORK_ORDER'
+  | 'VIEW_ROUTING_SHEET'
+  | 'VIEW_ROUTING_OPERATION'
+  | 'VIEW_OPERATION_EXECUTION'
+  | 'VIEW_DOCUMENT'
+  | 'VIEW_DOCUMENT_VERSION'
+  | 'VIEW_MATERIAL_LOT'
+  | 'VIEW_QUALITY_INSPECTION'
+  | 'VIEW_QUALITY_MEASUREMENT'
+  | 'VIEW_QUALITY_CHECK'
+  | 'VIEW_NON_CONFORMITY'
+  | 'VIEW_DELIVERY'
+
+export interface JobCaseTraceabilityActionDto {
+  type: JobCaseTraceabilityActionType
+  label: string
+  resourceType: string
+  resourceId: number
+}
+
 export interface JobCaseTimelineEventDto {
   id: number
   aggregateType: string
@@ -148,6 +172,7 @@ export interface JobCaseTimelineEventDto {
   performedByName: string | null
   metadata: Record<string, unknown>
   occurredAt: string
+  actions: JobCaseTraceabilityActionDto[]
 }
 
 export interface JobCaseTimelinePageDto {
