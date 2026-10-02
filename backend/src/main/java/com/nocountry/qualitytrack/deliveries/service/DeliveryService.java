@@ -64,13 +64,13 @@ public class DeliveryService {
         WorkOrder workOrder = requireWorkOrderForUpdate(workOrderId);
         requireReadyForDelivery(workOrder);
 
-        long reservedQuantity = deliveryRepository.sumReservedQuantityByWorkOrderId(
+        long committedQuantity = deliveryRepository.sumCommittedQuantityByWorkOrderId(
                 workOrderId,
                 DeliveryStatus.CANCELLED
         );
-        long projectedQuantity = reservedQuantity + request.quantity();
+        long projectedQuantity = committedQuantity + request.quantity();
         if (projectedQuantity > workOrder.getPlannedQuantity()) {
-            conflict("La cantidad reservada en entregas activas no puede exceder la cantidad planeada de la OT.");
+            conflict("La cantidad comprometida en entregas no canceladas no puede exceder la cantidad planeada de la OT.");
         }
 
         Delivery delivery;
@@ -108,7 +108,7 @@ public class DeliveryService {
                         "workOrderId", workOrder.getId(),
                         "workOrderNumber", workOrder.getWorkOrderNumber(),
                         "quantity", delivery.getQuantity(),
-                        "reservedQuantity", projectedQuantity,
+                        "committedQuantity", projectedQuantity,
                         "plannedQuantity", workOrder.getPlannedQuantity(),
                         "deliveryMethod", delivery.getDeliveryMethod(),
                         "destinationLabel", delivery.getDestinationLabel(),
