@@ -4,6 +4,7 @@ import type { ApiResponse } from '@/shared/api/api.types'
 import type {
   CancelWorkOrderPayload,
   CreateWorkOrderPayload,
+  PendingWorkOrderDto,
   ReopenRoutingSheetPayload,
   RoutingOperationPayload,
   RoutingSheetDto,
@@ -16,6 +17,14 @@ import type {
 export async function getWorkOrders(): Promise<WorkOrderDto[]> {
   const response =
     await apiClient.get<ApiResponse<WorkOrderDto[]>>('/work-orders')
+
+  return response.data.data
+}
+
+export async function getPendingWorkOrders(): Promise<PendingWorkOrderDto[]> {
+  const response = await apiClient.get<ApiResponse<PendingWorkOrderDto[]>>(
+    '/work-orders/pending-creation',
+  )
 
   return response.data.data
 }
