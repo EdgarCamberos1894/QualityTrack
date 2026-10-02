@@ -7,11 +7,9 @@ import {
   getWorkOrderPriorityLabel,
   getWorkOrderStatusPresentation,
 } from '../model/workOrderPresenter'
-import type {
-  WorkOrderDetailTab,
-  WorkOrderDto,
-  WorkOrderStatus,
-} from '../types/workOrder.types'
+import type { WorkOrderDto, WorkOrderStatus } from '../types/workOrder.types'
+
+type WorkOrderDetailTab = 'production' | 'quality'
 
 interface OperationalWorkOrderQueueProps {
   title: string
@@ -164,7 +162,9 @@ export function OperationalWorkOrderQueue({
                       />
                       <SummaryCell
                         label="Entrega comprometida"
-                        value={formatWorkOrderDate(workOrder.agreedDeliveryDate)}
+                        value={formatWorkOrderDate(
+                          workOrder.agreedDeliveryDate,
+                        )}
                       />
                     </div>
 

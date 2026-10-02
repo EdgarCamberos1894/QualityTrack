@@ -19,6 +19,8 @@ function activeStep(status: JobCaseStatus): number {
       return 4
     case 'CANCELLED':
       return 0
+    default:
+      return 1
   }
 }
 

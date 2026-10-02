@@ -71,6 +71,17 @@ export function CustomerCompanyPage() {
     )
   }
 
+  if (!company) {
+    return (
+      <PageContainer className="py-3 lg:py-2">
+        <ErrorState
+          error={new Error('La respuesta no incluyó información de empresa.')}
+          title="No pudimos cargar la empresa"
+        />
+      </PageContainer>
+    )
+  }
+
   const editingAddress =
     addressesQuery.data?.find((address) => address.id === editingAddressId) ??
     null
@@ -137,11 +148,11 @@ export function CustomerCompanyPage() {
     <PageContainer className="py-3 lg:flex lg:h-[calc(100dvh-100px)] lg:min-h-0 lg:flex-col lg:overflow-hidden lg:py-2">
       <div className="shrink-0">
         <CustomerCompanyHeader
-        name={company.name}
-        status={company.status}
-        city={company.city}
-        state={company.state}
-        administrativeEmail={company.administrativeEmail}
+          name={company.name}
+          status={company.status}
+          city={company.city}
+          state={company.state}
+          administrativeEmail={company.administrativeEmail}
         />
       </div>
 
@@ -171,7 +182,10 @@ export function CustomerCompanyPage() {
             </div>
 
             {!isAdmin ? (
-              <Badge tone="neutral" className="self-start px-2 py-0.5 text-[8px]">
+              <Badge
+                tone="neutral"
+                className="self-start px-2 py-0.5 text-[8px]"
+              >
                 Solo consulta
               </Badge>
             ) : isDirty ? (
@@ -203,7 +217,8 @@ export function CustomerCompanyPage() {
             {isAdmin ? (
               <div className="mt-3.5 flex items-center justify-between gap-4 border-t border-slate-100 pt-3">
                 <p className="text-[8px] leading-4 text-slate-400">
-                  Los cambios afectan la información compartida por toda la empresa.
+                  Los cambios afectan la información compartida por toda la
+                  empresa.
                 </p>
                 <Button
                   type="submit"
@@ -233,7 +248,10 @@ export function CustomerCompanyPage() {
                 {customer.customerName}
               </h2>
               <div className="mt-1.5">
-                <Badge tone={isAdmin ? 'info' : 'neutral'} className="text-[8px]">
+                <Badge
+                  tone={isAdmin ? 'info' : 'neutral'}
+                  className="text-[8px]"
+                >
                   {getCustomerRoleLabel(customer.role)}
                 </Badge>
               </div>
@@ -347,7 +365,8 @@ export function CustomerCompanyPage() {
               Accesos de la empresa
             </p>
             <p className="mt-1 text-[9px] leading-4 text-slate-500">
-              Consulta quién puede entrar al portal y qué rol tiene cada persona.
+              Consulta quién puede entrar al portal y qué rol tiene cada
+              persona.
             </p>
 
             <Link

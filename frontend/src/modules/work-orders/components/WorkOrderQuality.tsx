@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
-import type { RecordMaterialConsumptionPayload } from '@/modules/materials'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -12,7 +11,6 @@ import { QualityInspectionWorkspace } from './QualityInspectionWorkspace'
 import { QualityCheckDialog } from './QualityCheckDialog'
 import { QualityPendingWorkspace } from './QualityPendingWorkspace'
 import { QualityStagePanel } from './QualityStagePanel'
-import { useProductionMutations } from '../hooks/useProductionMutations'
 import { useQualityMutations } from '../hooks/useQualityMutations'
 import {
   countQualityCheckResults,
@@ -45,14 +43,9 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
   const currentUserId = Number(session?.user.id)
   const isAdmin = roles.includes('ADMIN')
   const isQuality = roles.includes('QUALITY')
-  const isProduction = roles.includes('PRODUCTION')
   const canManageQuality = isAdmin || isQuality
-  const canRecordReworkMaterial =
-    (isAdmin || isProduction) && data.workOrder.status === 'REWORK_IN_PROGRESS'
   const mutations = useQualityMutations(data.workOrder.id)
-  const productionMutations = useProductionMutations(data.workOrder.id)
-  const [checkTarget, setCheckTarget] =
-    useState<CheckTarget | null>(null)
+  const [checkTarget, setCheckTarget] = useState<CheckTarget | null>(null)
   const [completionTarget, setCompletionTarget] =
     useState<QualityInspectionDto | null>(null)
   const [selectedInspectionId, setSelectedInspectionId] = useState<
@@ -250,17 +243,6 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
     }
   }
 
-  const recordReworkMaterial = async (
-    payload: RecordMaterialConsumptionPayload,
-  ) => {
-    try {
-      await productionMutations.recordConsumption.mutateAsync(payload)
-      return true
-    } catch {
-      return false
-    }
-  }
-
   const actionError = mutations.startInspection.error
   const latestReworkMaterial = data.materials.at(-1)
 
@@ -413,19 +395,11 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
         </section>
       ) : null}
 
-      {detail === 'nonConformity' ? (
-        <NonConformitySection data={data} />
-      ) : null}
+      {detail === 'nonConformity' ? <NonConformitySection data={data} /> : null}
 
       {detail === 'materials' &&
       data.workOrder.status === 'REWORK_IN_PROGRESS' ? (
-        <ProductionMaterialsCard
-          consumptions={data.materials}
-          canRecord={canRecordReworkMaterial}
-          submitting={productionMutations.recordConsumption.isPending}
-          error={productionMutations.recordConsumption.error}
-          onRecord={recordReworkMaterial}
-        />
+        <ProductionMaterialsCard consumptions={data.materials} />
       ) : null}
 
       {detail === 'history' && inspections.length > 1 ? (
@@ -498,8 +472,7 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
         open={checkTarget !== null}
         qualityCheck={checkTarget?.qualityCheck ?? null}
         submitting={
-          mutations.addCheck.isPending ||
-          mutations.updateCheck.isPending
+          mutations.addCheck.isPending || mutations.updateCheck.isPending
         }
         error={
           checkTarget?.qualityCheck
