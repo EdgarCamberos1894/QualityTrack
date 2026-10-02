@@ -8,7 +8,7 @@ import type {
   JobCaseDetailDto,
   JobCaseDocumentVersionDto,
   JobCaseDto,
-  JobCaseTimelineEventDto,
+  JobCaseTimelinePageDto,
 } from '../types/jobCase.types'
 
 export async function getJobCases(): Promise<JobCaseDto[]> {
@@ -27,9 +27,19 @@ export async function getJobCase(caseId: number): Promise<JobCaseDetailDto> {
 
 export async function getJobCaseTimeline(
   caseId: number,
-): Promise<JobCaseTimelineEventDto[]> {
-  const response = await apiClient.get<ApiResponse<JobCaseTimelineEventDto[]>>(
+  options: {
+    limit?: number
+    cursor?: string | null
+  } = {},
+): Promise<JobCaseTimelinePageDto> {
+  const response = await apiClient.get<ApiResponse<JobCaseTimelinePageDto>>(
     `/job-cases/${caseId}/timeline`,
+    {
+      params: {
+        limit: options.limit ?? 20,
+        ...(options.cursor ? { cursor: options.cursor } : {}),
+      },
+    },
   )
 
   return response.data.data
