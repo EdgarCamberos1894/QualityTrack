@@ -76,7 +76,8 @@ export function JobCaseClarifications({
               </div>
             ) : (
               <p className="mt-2.5 rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2 text-[8px] leading-4 text-amber-800">
-                Esta aclaración sigue esperando respuesta y bloquea el cierre de la revisión.
+                Esta aclaración sigue esperando respuesta y bloquea el cierre de
+                la revisión.
               </p>
             )}
           </article>
