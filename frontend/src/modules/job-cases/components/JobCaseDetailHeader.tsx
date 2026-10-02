@@ -75,7 +75,9 @@ export function JobCaseDetailHeader({ jobCase }: JobCaseDetailHeaderProps) {
             </p>
           </div>
           <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:pl-4 sm:py-1">
-            <p className="text-[8px] font-medium text-slate-400">Aclaraciones</p>
+            <p className="text-[8px] font-medium text-slate-400">
+              Aclaraciones
+            </p>
             <p className="mt-0.5 truncate text-[10px] font-semibold text-slate-800">
               {clarificationSummary}
             </p>
