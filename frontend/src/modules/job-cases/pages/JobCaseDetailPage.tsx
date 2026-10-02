@@ -16,6 +16,7 @@ import { JobCaseActionBar } from '../components/JobCaseActionBar'
 import { JobCaseClarifications } from '../components/JobCaseClarifications'
 import { JobCaseDetailHeader } from '../components/JobCaseDetailHeader'
 import { JobCaseDocuments } from '../components/JobCaseDocuments'
+import { JobCaseFlowSteps } from '../components/JobCaseFlowSteps'
 import { JobCaseMaterial } from '../components/JobCaseMaterial'
 import { JobCaseSummary } from '../components/JobCaseSummary'
 import { JobCaseTabs } from '../components/JobCaseTabs'
@@ -34,7 +35,6 @@ import type { JobCaseDetailTab } from '../types/jobCase.types'
 type ActionPanel = 'information' | 'material' | null
 
 const validTabs: JobCaseDetailTab[] = [
-  'summary',
   'documents',
   'clarifications',
   'material',
@@ -44,7 +44,7 @@ const validTabs: JobCaseDetailTab[] = [
 function resolveTab(value: string | null): JobCaseDetailTab {
   return validTabs.includes(value as JobCaseDetailTab)
     ? (value as JobCaseDetailTab)
-    : 'summary'
+    : 'documents'
 }
 
 export function JobCaseDetailPage() {
@@ -132,7 +132,7 @@ export function JobCaseDetailPage() {
       return <JobCaseTimeline events={timelineQuery.data} />
     }
 
-    return <JobCaseSummary jobCase={detailQuery.data} />
+    return <JobCaseDocuments documents={detailQuery.data.documents} />
   }, [
     activeTab,
     detailQuery.data,
@@ -203,7 +203,11 @@ export function JobCaseDetailPage() {
     <PageContainer className="py-4 lg:py-3">
       <JobCaseDetailHeader jobCase={detailQuery.data} />
 
-      <div className="space-y-3">
+      <JobCaseFlowSteps status={detailQuery.data.status} />
+
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
+        <JobCaseSummary jobCase={detailQuery.data} />
+
         <JobCaseActionBar
           jobCase={detailQuery.data}
           user={session.user}
@@ -223,7 +227,9 @@ export function JobCaseDetailPage() {
             }
           }}
         />
+      </div>
 
+      <div className="mt-4 space-y-3">
         {mutationError ? (
           <div
             role="alert"
@@ -267,7 +273,7 @@ export function JobCaseDetailPage() {
             clarifications: detailQuery.data.informationRequests.length,
             timeline: timelineCount,
           }}
-          onChange={(tab) => setSearchParams(tab === 'summary' ? {} : { tab })}
+          onChange={(tab) => setSearchParams({ tab })}
         />
 
         {content}
