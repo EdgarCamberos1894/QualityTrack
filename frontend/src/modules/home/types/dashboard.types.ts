@@ -17,6 +17,7 @@ export interface DashboardPipelineDto {
   underReview: number
   waitingCustomerInfo: number
   readyForQuotation: number
+  awaitingWorkOrder: number
   inProduction: number
   completed: number
 }
