@@ -18,6 +18,7 @@ import { JobCaseDetailHeader } from '../components/JobCaseDetailHeader'
 import { JobCaseDocuments } from '../components/JobCaseDocuments'
 import { JobCaseFlowSteps } from '../components/JobCaseFlowSteps'
 import { JobCaseMaterial } from '../components/JobCaseMaterial'
+import { JobCaseSourceCard } from '../components/JobCaseSourceCard'
 import { JobCaseSummary } from '../components/JobCaseSummary'
 import { JobCaseTabs } from '../components/JobCaseTabs'
 import { JobCaseTimeline } from '../components/JobCaseTimeline'
@@ -203,10 +204,13 @@ export function JobCaseDetailPage() {
     <PageContainer className="py-4 lg:py-3">
       <JobCaseDetailHeader jobCase={detailQuery.data} />
 
-      <JobCaseFlowSteps status={detailQuery.data.status} />
+      <div className="space-y-4">
+        <JobCaseFlowSteps status={detailQuery.data.status} />
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
-        <JobCaseSummary jobCase={detailQuery.data} />
+        <JobCaseSourceCard jobCase={detailQuery.data} />
+
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-stretch">
+          <JobCaseSummary jobCase={detailQuery.data} />
 
         <JobCaseActionBar
           jobCase={detailQuery.data}
@@ -226,10 +230,10 @@ export function JobCaseDetailPage() {
               navigate(`/quotations/${currentQuotation.id}`)
             }
           }}
-        />
-      </div>
+          />
+        </div>
 
-      <div className="mt-4 space-y-3">
+        <div className="space-y-3">
         {mutationError ? (
           <div
             role="alert"
@@ -276,7 +280,8 @@ export function JobCaseDetailPage() {
           onChange={(tab) => setSearchParams({ tab })}
         />
 
-        {content}
+          {content}
+        </div>
       </div>
     </PageContainer>
   )
