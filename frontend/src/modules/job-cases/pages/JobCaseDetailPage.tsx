@@ -18,7 +18,6 @@ import { JobCaseDetailHeader } from '../components/JobCaseDetailHeader'
 import { JobCaseDocuments } from '../components/JobCaseDocuments'
 import { JobCaseFlowSteps } from '../components/JobCaseFlowSteps'
 import { JobCaseMaterial } from '../components/JobCaseMaterial'
-import { JobCaseSourceCard } from '../components/JobCaseSourceCard'
 import { JobCaseSummary } from '../components/JobCaseSummary'
 import { JobCaseTabs } from '../components/JobCaseTabs'
 import { JobCaseTimeline } from '../components/JobCaseTimeline'
@@ -36,16 +35,16 @@ import type { JobCaseDetailTab } from '../types/jobCase.types'
 type ActionPanel = 'information' | 'material' | null
 
 const validTabs: JobCaseDetailTab[] = [
+  'summary',
   'documents',
-  'clarifications',
-  'material',
-  'traceability',
+  'specification',
+  'activity',
 ]
 
 function resolveTab(value: string | null): JobCaseDetailTab {
   return validTabs.includes(value as JobCaseDetailTab)
     ? (value as JobCaseDetailTab)
-    : 'documents'
+    : 'summary'
 }
 
 export function JobCaseDetailPage() {
@@ -95,19 +94,50 @@ export function JobCaseDetailPage() {
   const content = useMemo(() => {
     if (!detailQuery.data) return null
 
+    if (activeTab === 'summary') {
+      return (
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-stretch">
+          <JobCaseSummary jobCase={detailQuery.data} />
+
+          <JobCaseActionBar
+            jobCase={detailQuery.data}
+            user={session.user}
+            taking={takeMutation.isPending}
+            completing={completeMutation.isPending}
+            creatingQuotation={createQuotationMutation.isPending}
+            quotationId={
+              quotationsQuery.data?.find(
+                (quotation) => quotation.caseId === validId,
+              )?.id ?? null
+            }
+            quotationLookupReady={
+              !canReadQuotationFlow ||
+              (!quotationsQuery.isPending && !quotationsQuery.isError)
+            }
+            onTake={() => takeMutation.mutate()}
+            onRequestInformation={() => setActionPanel('information')}
+            onDefineMaterial={() => setActionPanel('material')}
+            onComplete={() => completeMutation.mutate()}
+            onCreateQuotation={() => void createQuotation()}
+            onOpenQuotation={() => {
+              const quotation = quotationsQuery.data?.find(
+                (item) => item.caseId === validId,
+              )
+
+              if (quotation) {
+                navigate(`/quotations/${quotation.id}`)
+              }
+            }}
+          />
+        </div>
+      )
+    }
+
     if (activeTab === 'documents') {
       return <JobCaseDocuments documents={detailQuery.data.documents} />
     }
 
-    if (activeTab === 'clarifications') {
-      return (
-        <JobCaseClarifications
-          requests={detailQuery.data.informationRequests}
-        />
-      )
-    }
-
-    if (activeTab === 'material') {
+    if (activeTab === 'specification') {
       return (
         <JobCaseMaterial
           specification={detailQuery.data.materialSpecification}
@@ -116,31 +146,44 @@ export function JobCaseDetailPage() {
       )
     }
 
-    if (activeTab === 'traceability') {
-      if (timelineQuery.isPending) {
-        return <LoadingState label="Cargando trazabilidad…" />
-      }
-
-      if (timelineQuery.isError) {
-        return (
-          <ErrorState
-            error={timelineQuery.error}
-            title="No pudimos cargar la trazabilidad"
-          />
-        )
-      }
-
-      return <JobCaseTimeline events={timelineQuery.data} />
+    if (timelineQuery.isPending) {
+      return <LoadingState label="Cargando actividad…" />
     }
 
-    return <JobCaseDocuments documents={detailQuery.data.documents} />
+    if (timelineQuery.isError) {
+      return (
+        <ErrorState
+          error={timelineQuery.error}
+          title="No pudimos cargar la actividad"
+        />
+      )
+    }
+
+    return (
+      <div className="space-y-3">
+        <JobCaseClarifications
+          requests={detailQuery.data.informationRequests}
+        />
+        <JobCaseTimeline events={timelineQuery.data} />
+      </div>
+    )
   }, [
     activeTab,
+    canReadQuotationFlow,
+    completeMutation,
+    createQuotationMutation,
     detailQuery.data,
+    navigate,
+    quotationsQuery.data,
+    quotationsQuery.isError,
+    quotationsQuery.isPending,
+    session.user,
+    takeMutation,
     timelineQuery.data,
     timelineQuery.error,
     timelineQuery.isError,
     timelineQuery.isPending,
+    validId,
   ])
 
   if (validId === null || !session) {
@@ -207,31 +250,13 @@ export function JobCaseDetailPage() {
       <div className="space-y-4">
         <JobCaseFlowSteps status={detailQuery.data.status} />
 
-        <JobCaseSourceCard jobCase={detailQuery.data} />
-
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-stretch">
-          <JobCaseSummary jobCase={detailQuery.data} />
-
-          <JobCaseActionBar
-            jobCase={detailQuery.data}
-            user={session.user}
-            taking={takeMutation.isPending}
-            completing={completeMutation.isPending}
-            creatingQuotation={createQuotationMutation.isPending}
-            quotationId={currentQuotation?.id ?? null}
-            quotationLookupReady={quotationLookupReady}
-            onTake={() => takeMutation.mutate()}
-            onRequestInformation={() => setActionPanel('information')}
-            onDefineMaterial={() => setActionPanel('material')}
-            onComplete={() => completeMutation.mutate()}
-            onCreateQuotation={() => void createQuotation()}
-            onOpenQuotation={() => {
-              if (currentQuotation) {
-                navigate(`/quotations/${currentQuotation.id}`)
-              }
-            }}
-          />
-        </div>
+        <JobCaseTabs
+          activeTab={activeTab}
+          documentCount={detailQuery.data.documents.length}
+          onChange={(tab) =>
+            setSearchParams(tab === 'summary' ? {} : { tab })
+          }
+        />
 
         {mutationError ? (
           <div
@@ -269,34 +294,7 @@ export function JobCaseDetailPage() {
           />
         ) : null}
 
-        <section className="space-y-3">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-                Anexos de revisión
-              </p>
-              <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
-                Evidencia y trazabilidad
-              </h2>
-              <p className="mt-0.5 text-[8px] text-slate-500">
-                Consulta los elementos que respaldan la decisión del expediente.
-              </p>
-            </div>
-
-            <JobCaseTabs
-              activeTab={activeTab}
-              counts={{
-                documents: detailQuery.data.documents.length,
-                clarifications: detailQuery.data.informationRequests.length,
-                timeline: timelineCount,
-              }}
-              onChange={(tab) => setSearchParams({ tab })}
-            />
-          </div>
-
-          {content}
-        </section>
+        {content}
       </div>
     </PageContainer>
-  )
-}
+  )}
