@@ -156,11 +156,11 @@ export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
               value={jobCase.assignedToName ?? 'Sin asignar'}
             />
             <DataItem
-              label="Asignado"
+              label="Tomado para revisión"
               value={formatJobCaseDate(jobCase.assignedAt)}
             />
             <DataItem
-              label="Revisión iniciada"
+              label="Expediente abierto"
               value={formatJobCaseDate(jobCase.openedAt)}
             />
             <DataItem
@@ -171,10 +171,12 @@ export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
               label="Material técnico"
               value={getMaterialReviewLabel(jobCase)}
             />
-            <DataItem
-              label="Cierre de revisión"
-              value={formatJobCaseDate(jobCase.closedAt)}
-            />
+            {jobCase.closedAt ? (
+              <DataItem
+                label="Cierre del expediente"
+                value={formatJobCaseDate(jobCase.closedAt)}
+              />
+            ) : null}
           </dl>
 
           {reviewMessage ? (
