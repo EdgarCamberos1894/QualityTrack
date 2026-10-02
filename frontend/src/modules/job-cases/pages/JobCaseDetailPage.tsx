@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { useCreateQuotation, useQuotations } from '@/modules/quotations'
+import { useWorkOrders } from '@/modules/work-orders'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
@@ -52,6 +53,7 @@ export function JobCaseDetailPage() {
     session?.user.roles.includes('ADMIN') === true ||
     session?.user.roles.includes('COMMERCIAL') === true
   const quotationsQuery = useQuotations(canReadQuotationFlow)
+  const workOrdersQuery = useWorkOrders(validId !== null)
   const recentActivityQuery = useJobCaseRecentActivity(validId)
   const takeMutation = useTakeJobCase(validId ?? 0)
   const infoMutation = useRequestJobCaseInformation(validId ?? 0)
@@ -107,6 +109,9 @@ export function JobCaseDetailPage() {
   const currentQuotation =
     quotationsQuery.data?.find((quotation) => quotation.caseId === validId) ??
     null
+  const workOrderId =
+    workOrdersQuery.data?.find((workOrder) => workOrder.caseId === validId)
+      ?.id ?? null
   const quotationLookupReady =
     !canReadQuotationFlow ||
     (!quotationsQuery.isPending && !quotationsQuery.isError)
@@ -235,6 +240,7 @@ export function JobCaseDetailPage() {
         ) : (
           <JobCaseRecentActivity
             caseId={validId}
+            workOrderId={workOrderId}
             events={recentActivityQuery.data.items}
             hasMore={recentActivityQuery.data.hasMore}
             onOpenHistory={() => {
@@ -250,6 +256,7 @@ export function JobCaseDetailPage() {
         open={historyDialogOpen}
         caseId={validId}
         caseNumber={jobCase.caseNumber}
+        workOrderId={workOrderId}
         onClose={() => {
           const next = new URLSearchParams(searchParams)
           next.delete('view')
