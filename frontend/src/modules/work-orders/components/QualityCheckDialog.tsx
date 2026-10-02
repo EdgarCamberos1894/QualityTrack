@@ -150,7 +150,10 @@ export function QualityCheckDialog({
                   labelClassName="!mb-1.5 !text-[10px]"
                   className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
                   error={errors.nominalValue?.message}
-                  {...register('nominalValue', { valueAsNumber: true })}
+                  {...register('nominalValue', {
+                    setValueAs: (value) =>
+                      value === '' ? undefined : Number(value),
+                  })}
                 />
                 <TextField
                   label="Unidad"
@@ -171,7 +174,10 @@ export function QualityCheckDialog({
                   labelClassName="!mb-1.5 !text-[10px]"
                   className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
                   error={errors.lowerLimit?.message}
-                  {...register('lowerLimit', { valueAsNumber: true })}
+                  {...register('lowerLimit', {
+                    setValueAs: (value) =>
+                      value === '' ? undefined : Number(value),
+                  })}
                 />
                 <TextField
                   label="Valor medido"
@@ -180,7 +186,10 @@ export function QualityCheckDialog({
                   labelClassName="!mb-1.5 !text-[10px]"
                   className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
                   error={errors.measuredValue?.message}
-                  {...register('measuredValue', { valueAsNumber: true })}
+                  {...register('measuredValue', {
+                    setValueAs: (value) =>
+                      value === '' ? undefined : Number(value),
+                  })}
                 />
                 <TextField
                   label="Límite superior"
@@ -189,7 +198,10 @@ export function QualityCheckDialog({
                   labelClassName="!mb-1.5 !text-[10px]"
                   className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
                   error={errors.upperLimit?.message}
-                  {...register('upperLimit', { valueAsNumber: true })}
+                  {...register('upperLimit', {
+                    setValueAs: (value) =>
+                      value === '' ? undefined : Number(value),
+                  })}
                 />
               </div>
 
