@@ -155,10 +155,10 @@ export function DeliveryWorkspace({
         <div className="grid gap-3 sm:grid-cols-[0.8fr_1.2fr]">
           <div className="rounded-xl border border-slate-200 bg-slate-50/45 px-3 py-3">
             <p className="text-[7px] font-bold uppercase tracking-[0.09em] text-slate-400">
-              Destinatario
+              Contacto en destino
             </p>
             <p className="mt-1 text-[10px] font-semibold text-slate-950">
-              {delivery.destinationRecipientName}
+              {delivery.destinationContactName ?? 'Sin contacto definido'}
             </p>
             <p className="mt-1 text-[8px] text-slate-500">
               {formatDeliveryMethod(delivery.deliveryMethod)}
