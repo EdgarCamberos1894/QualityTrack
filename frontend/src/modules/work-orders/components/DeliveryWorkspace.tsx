@@ -158,7 +158,12 @@ export function DeliveryWorkspace({
               Contacto en destino
             </p>
             <p className="mt-1 text-[10px] font-semibold text-slate-950">
-              {delivery.destinationContactName ?? 'Sin contacto definido'}
+              {delivery.destinationLabel ?? 'Destino de entrega'}
+            </p>
+            <p className="mt-1 text-[8px] text-slate-500">
+              {delivery.destinationContactName
+                ? 'Contacto: ' + delivery.destinationContactName
+                : 'Sin contacto definido'}
             </p>
             <p className="mt-1 text-[8px] text-slate-500">
               {formatDeliveryMethod(delivery.deliveryMethod)}
@@ -177,6 +182,17 @@ export function DeliveryWorkspace({
             </p>
           </div>
         </div>
+
+        {delivery.destinationInstructions ? (
+          <div className="rounded-xl border border-blue-100 bg-blue-50/35 px-3 py-2.5">
+            <p className="text-[7px] font-bold uppercase tracking-[0.09em] text-blue-600">
+              Indicaciones de entrega
+            </p>
+            <p className="mt-1 text-[8px] leading-4 text-slate-600">
+              {delivery.destinationInstructions}
+            </p>
+          </div>
+        ) : null}
 
         <div className="grid gap-3 border-t border-slate-100 pt-3 sm:grid-cols-2">
           <div>
