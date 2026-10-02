@@ -6,6 +6,7 @@ import type {
   CreateInformationRequestPayload,
   DefineMaterialSpecificationPayload,
   JobCaseDetailDto,
+  JobCaseDocumentVersionDto,
   JobCaseDto,
   JobCaseTimelineEventDto,
 } from '../types/jobCase.types'
@@ -32,6 +33,32 @@ export async function getJobCaseTimeline(
   )
 
   return response.data.data
+}
+
+export async function getJobCaseDocumentVersions(
+  documentId: number,
+): Promise<JobCaseDocumentVersionDto[]> {
+  const response = await apiClient.get<ApiResponse<JobCaseDocumentVersionDto[]>>(
+    `/documents/${documentId}/versions`,
+  )
+
+  return response.data.data
+}
+
+export async function getJobCaseDocumentContent(
+  documentId: number,
+  versionId: number,
+  download = false,
+): Promise<Blob> {
+  const response = await apiClient.get<Blob>(
+    `/documents/${documentId}/versions/${versionId}/content`,
+    {
+      params: download ? { download: true } : undefined,
+      responseType: 'blob',
+    },
+  )
+
+  return response.data
 }
 
 export async function takeJobCase(caseId: number): Promise<JobCaseDto> {
