@@ -4,8 +4,7 @@ import { useForm, useWatch } from 'react-hook-form'
 import { Button } from '@/shared/components/ui/Button'
 import { TextareaField } from '@/shared/components/ui/TextareaField'
 import { TextField } from '@/shared/components/ui/TextField'
-import { QuotationItemsEditor } from './QuotationItemsEditor'
-import { QuotationTotalsCard } from './QuotationTotalsCard'
+import { formatQuotationDate } from '../model/quotationPresenter'
 import {
   calculateQuotationTotals,
   createQuotationFormValues,
@@ -19,6 +18,8 @@ import type {
   QuotationDetailDto,
   UpdateQuotationPayload,
 } from '../types/quotation.types'
+import { QuotationItemsEditor } from './QuotationItemsEditor'
+import { QuotationTotalsCard } from './QuotationTotalsCard'
 
 interface QuotationEditorFormProps {
   quotation: QuotationDetailDto
@@ -61,6 +62,11 @@ export function QuotationEditorForm({
   const items = useWatch({ control, name: 'items' })
   const taxRate = useWatch({ control, name: 'taxRate' })
   const currency = useWatch({ control, name: 'currency' })
+  const validUntil = useWatch({ control, name: 'validUntil' })
+  const estimatedDeliveryDate = useWatch({
+    control,
+    name: 'estimatedDeliveryDate',
+  })
   const totals = calculateQuotationTotals({ items, taxRate })
   const requiresAdjustmentResponse = Boolean(quotation.adjustmentNotes)
 
@@ -94,41 +100,50 @@ export function QuotationEditorForm({
 
   return (
     <form
-      className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_260px]"
+      className="grid gap-4 lg:grid-cols-[minmax(0,1.55fr)_minmax(285px,0.65fr)] lg:items-start"
       onSubmit={(event) => event.preventDefault()}
     >
       <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-30px_rgba(15,23,42,0.3)]">
-        <div className="flex items-center justify-between gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Documento comercial
-            </p>
-            <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
-              Información de la revisión
-            </h2>
-          </div>
-
-          <Button
-            size="sm"
-            variant="secondary"
-            className="!h-7 !px-2.5 !text-[8px]"
-            onClick={() => void preview()}
-            disabled={saving || sending}
-          >
-            Vista previa
-          </Button>
+        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3">
+          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+            Documento comercial
+          </p>
+          <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
+            Información comercial
+          </h2>
+          <p className="mt-0.5 text-[8px] text-slate-500">
+            Define los términos económicos y el alcance que verá el cliente.
+          </p>
         </div>
 
-        <div className="p-3.5">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="p-4">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <TextField
               label="Moneda"
               maxLength={3}
               disabled={!editable}
-              labelClassName="!mb-1.5 !text-[10px]"
-              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !uppercase !shadow-none"
+              labelClassName="!mb-1.5 !text-[9px]"
+              className="!h-9 !rounded-lg !px-2.5 !text-[10px] !uppercase !shadow-none"
               error={errors.currency?.message}
               {...register('currency')}
+            />
+            <TextField
+              label="Válida hasta"
+              type="date"
+              disabled={!editable}
+              labelClassName="!mb-1.5 !text-[9px]"
+              className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              error={errors.validUntil?.message}
+              {...register('validUntil')}
+            />
+            <TextField
+              label="Entrega estimada"
+              type="date"
+              disabled={!editable}
+              labelClassName="!mb-1.5 !text-[9px]"
+              className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              error={errors.estimatedDeliveryDate?.message}
+              {...register('estimatedDeliveryDate')}
             />
             <TextField
               label="Impuesto (%)"
@@ -137,33 +152,23 @@ export function QuotationEditorForm({
               max="100"
               step="0.0001"
               disabled={!editable}
-              labelClassName="!mb-1.5 !text-[10px]"
-              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              labelClassName="!mb-1.5 !text-[9px]"
+              className="!h-9 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
               error={errors.taxRate?.message}
               {...register('taxRate', { valueAsNumber: true })}
             />
-            <TextField
-              label="Válida hasta"
-              type="date"
-              disabled={!editable}
-              labelClassName="!mb-1.5 !text-[10px]"
-              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
-              error={errors.validUntil?.message}
-              {...register('validUntil')}
-            />
-            <TextField
-              label="Entrega estimada"
-              type="date"
-              disabled={!editable}
-              labelClassName="!mb-1.5 !text-[10px]"
-              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
-              error={errors.estimatedDeliveryDate?.message}
-              {...register('estimatedDeliveryDate')}
-            />
           </div>
 
+          <p className="mt-2 text-[7.5px] leading-4 text-slate-400">
+            La fecha solicitada por el cliente es{' '}
+            <span className="font-medium text-slate-500">
+              {formatQuotationDate(quotation.source.requestedDeliveryDate)}
+            </span>
+            ; la entrega estimada es el compromiso incluido en esta propuesta.
+          </p>
+
           {quotation.adjustmentNotes ? (
-            <div className="mt-3">
+            <div className="mt-4">
               <TextareaField
                 label="Respuesta al ajuste"
                 disabled={!editable}
@@ -180,7 +185,7 @@ export function QuotationEditorForm({
             </div>
           ) : null}
 
-          <div className="mt-3">
+          <div className="mt-4">
             <QuotationItemsEditor
               control={control}
               register={register}
@@ -189,40 +194,18 @@ export function QuotationEditorForm({
               currency={currency}
             />
           </div>
-
-          {actionError ? (
-            <p
-              role="alert"
-              className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700"
-            >
-              {actionError}
-            </p>
-          ) : null}
         </div>
 
         {editable ? (
-          <div className="flex flex-wrap justify-end gap-1.5 border-t border-slate-100 bg-slate-50/60 px-3.5 py-2.5">
+          <div className="flex justify-end border-t border-slate-100 bg-slate-50/60 px-4 py-3">
             <Button
               size="sm"
               variant="secondary"
-              className="!h-7 !px-2.5 !text-[8px]"
+              className="!h-8 !px-3 !text-[8px]"
               onClick={() => void save()}
               disabled={saving || sending}
             >
               {saving ? 'Guardando…' : 'Guardar cambios'}
-            </Button>
-
-            <Button
-              size="sm"
-              className="!h-7 !px-2.5 !text-[8px]"
-              onClick={() => void send()}
-              disabled={saving || sending}
-            >
-              {sending
-                ? 'Enviando…'
-                : quotation.adjustmentNotes
-                  ? 'Enviar nueva revisión'
-                  : 'Enviar al cliente'}
             </Button>
           </div>
         ) : null}
@@ -232,6 +215,19 @@ export function QuotationEditorForm({
         totals={totals}
         currency={currency}
         taxRate={taxRate}
+        validUntil={validUntil}
+        estimatedDeliveryDate={estimatedDeliveryDate}
+        editable={editable}
+        saving={saving}
+        sending={sending}
+        actionError={actionError}
+        sendLabel={
+          quotation.adjustmentNotes
+            ? 'Revisar y enviar nueva revisión'
+            : 'Revisar y enviar'
+        }
+        onPreview={() => void preview()}
+        onSend={() => void send()}
       />
     </form>
   )
