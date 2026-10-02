@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useParams, useSearchParams } from 'react-router-dom'
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
@@ -16,14 +21,13 @@ import { WorkOrderProduction } from '../components/WorkOrderProduction'
 import { WorkOrderQuality } from '../components/WorkOrderQuality'
 import { WorkOrderSecondaryDialog } from '../components/WorkOrderSecondaryDialog'
 import { WorkOrderSummary } from '../components/WorkOrderSummary'
-import { WorkOrderTimeline } from '../components/WorkOrderTimeline'
 import { useCancelWorkOrder } from '../hooks/useCancelWorkOrder'
 import { useWorkOrder360 } from '../hooks/useWorkOrder360'
 import type { CancelWorkOrderFormValues } from '../schemas/workOrderCancellation.schema'
 import type { WorkOrderStatus } from '../types/workOrder.types'
 
 type OperationalView = 'preparation' | 'production' | 'quality' | 'delivery'
-type SecondaryView = 'documents' | 'traceability'
+type SecondaryView = 'documents'
 
 const operationalViews: OperationalView[] = [
   'preparation',
@@ -66,6 +70,7 @@ export function WorkOrderDetailPage() {
   const session = useSessionStore((state) => state.session)
   const [cancelOpen, setCancelOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const numericId = Number(workOrderId)
   const validId =
@@ -80,9 +85,7 @@ export function WorkOrderDetailPage() {
     ? (requestedView as OperationalView)
     : null
   const secondaryView: SecondaryView | null =
-    requestedView === 'documents' || requestedView === 'traceability'
-      ? requestedView
-      : null
+    requestedView === 'documents' ? 'documents' : null
 
   useEffect(() => {
     if (!query.data || !location.hash) return
@@ -97,6 +100,15 @@ export function WorkOrderDetailPage() {
 
     return () => window.cancelAnimationFrame(frame)
   }, [location.hash, query.data, requestedView])
+
+  useEffect(() => {
+    if (!query.data || requestedView !== 'traceability') return
+
+    navigate(
+      `/job-cases/${query.data.workOrder.source.caseId}?view=traceability`,
+      { replace: true },
+    )
+  }, [navigate, query.data, requestedView])
 
   const cancel = async (values: CancelWorkOrderFormValues) => {
     try {
@@ -183,7 +195,11 @@ export function WorkOrderDetailPage() {
           setCancelOpen(true)
         }}
         onOpenDocuments={() => setSearchParams({ view: 'documents' })}
-        onOpenTraceability={() => setSearchParams({ view: 'traceability' })}
+        onOpenTraceability={() =>
+          navigate(
+            `/job-cases/${data.workOrder.source.caseId}?view=traceability`,
+          )
+        }
       />
 
       <div className="space-y-3">
@@ -229,22 +245,12 @@ export function WorkOrderDetailPage() {
 
       <WorkOrderSecondaryDialog
         open={secondaryView === 'documents'}
-        eyebrow="Expediente 360"
-        title="Documentos vinculados"
-        description="Consulta documental secundaria de la orden y sus recursos relacionados."
+        eyebrow="Orden de trabajo"
+        title="Documentos relacionados"
+        description="Consulta los documentos del expediente y los recursos vinculados a esta orden."
         onClose={closeSecondaryView}
       >
         <WorkOrderDocuments documents={data.documents} />
-      </WorkOrderSecondaryDialog>
-
-      <WorkOrderSecondaryDialog
-        open={secondaryView === 'traceability'}
-        eyebrow="Expediente 360"
-        title="Trazabilidad completa"
-        description="Historial auditable del trabajo y accesos a sus registros de origen."
-        onClose={closeSecondaryView}
-      >
-        <WorkOrderTimeline data={data} />
       </WorkOrderSecondaryDialog>
 
       <CancelWorkOrderDialog
