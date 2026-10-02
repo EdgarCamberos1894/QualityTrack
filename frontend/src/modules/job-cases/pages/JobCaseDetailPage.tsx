@@ -6,6 +6,7 @@ import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
+import { CompleteJobCaseReviewDialog } from '../components/CompleteJobCaseReviewDialog'
 import { InformationRequestForm } from '../components/InformationRequestForm'
 import { JobCaseActionBar } from '../components/JobCaseActionBar'
 import { JobCaseClarifications } from '../components/JobCaseClarifications'
@@ -33,6 +34,7 @@ export function JobCaseDetailPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const [actionPanel, setActionPanel] = useState<ActionPanel>(null)
+  const [completeDialogOpen, setCompleteDialogOpen] = useState(false)
   const session = useSessionStore((state) => state.session)
   const numericId = Number(caseId)
   const validId =
@@ -121,6 +123,15 @@ export function JobCaseDetailPage() {
     setActionPanel(null)
   }
 
+  const completeReview = async () => {
+    try {
+      await completeMutation.mutateAsync()
+      setCompleteDialogOpen(false)
+    } catch {
+      // The mutation error remains visible inside the confirmation dialog.
+    }
+  }
+
   const createQuotation = async () => {
     const quotation = await createQuotationMutation.mutateAsync(validId)
     navigate(`/quotations/${quotation.id}`)
@@ -185,7 +196,7 @@ export function JobCaseDetailPage() {
             onTake={() => takeMutation.mutate()}
             onRequestInformation={() => setActionPanel('information')}
             onDefineMaterial={() => setActionPanel('material')}
-            onComplete={() => completeMutation.mutate()}
+            onComplete={() => setCompleteDialogOpen(true)}
             onCreateQuotation={() => void createQuotation()}
             onOpenQuotation={() => {
               if (currentQuotation) {
@@ -217,6 +228,20 @@ export function JobCaseDetailPage() {
           <JobCaseTimeline events={timelineQuery.data} />
         )}
       </div>
+
+      <CompleteJobCaseReviewDialog
+        open={completeDialogOpen}
+        jobCase={jobCase}
+        submitting={completeMutation.isPending}
+        error={completeMutation.error}
+        onClose={() => {
+          if (!completeMutation.isPending) {
+            completeMutation.reset()
+            setCompleteDialogOpen(false)
+          }
+        }}
+        onConfirm={() => void completeReview()}
+      />
     </PageContainer>
   )
 }
