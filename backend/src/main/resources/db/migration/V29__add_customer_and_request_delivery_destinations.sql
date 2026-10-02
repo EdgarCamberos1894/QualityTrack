@@ -107,6 +107,10 @@ SELECT
 FROM customer_requests;
 
 ALTER TABLE deliveries
+    ADD COLUMN destination_label VARCHAR(120),
+    ADD COLUMN destination_instructions VARCHAR(1000);
+
+ALTER TABLE deliveries
     ALTER COLUMN destination_recipient_name DROP NOT NULL;
 
 ALTER TABLE deliveries
