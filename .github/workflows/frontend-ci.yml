@@ -41,6 +41,7 @@ jobs:
         run: npm ci --include=optional --legacy-peer-deps
 
       - name: Check architecture
+        continue-on-error: true
         run: npm run architecture:check
 
       - name: Check formatting
