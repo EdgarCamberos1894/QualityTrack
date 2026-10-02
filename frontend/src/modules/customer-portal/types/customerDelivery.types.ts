@@ -5,12 +5,14 @@ export interface CustomerDeliveryDto {
   workOrderNumber: string
   quantity: number
   status: CustomerDeliveryStatus
+  destinationLabel: string | null
   destinationContactName: string | null
   destinationAddress: string
   destinationCity: string
   destinationState: string
   destinationPostalCode: string
   destinationCountry: string
+  destinationInstructions: string | null
   deliveryMethod: string
   carrier: string | null
   trackingNumber: string | null
