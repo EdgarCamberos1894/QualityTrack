@@ -14,7 +14,7 @@ export function JobCaseDetailHeader({ jobCase }: JobCaseDetailHeaderProps) {
   const status = getJobCaseStatusPresentation(jobCase.status)
 
   return (
-    <div className="mb-3 flex items-center justify-between gap-4">
+    <header className="mb-3 flex items-center justify-between gap-4">
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200/70">
           <SidebarNavIcon name="cases" className="h-4 w-4" />
@@ -22,24 +22,20 @@ export function JobCaseDetailHeader({ jobCase }: JobCaseDetailHeaderProps) {
 
         <div className="min-w-0">
           <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-600">
-            Revisión interna
+            Gestión de expedientes
           </p>
 
           <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
-            <h1 className="max-w-3xl truncate text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
-              {jobCase.request.title}
+            <h1 className="truncate text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
+              {jobCase.caseNumber}
             </h1>
             <Badge tone={status.tone} className="px-2 py-0.5 text-[8px]">
               {status.label}
             </Badge>
-            <span className="text-[8px] font-semibold text-slate-400">
-              {jobCase.caseNumber}
-            </span>
           </div>
 
           <p className="mt-0.5 truncate text-[10px] text-slate-500">
-            Solicitud {jobCase.request.requestNumber} ·{' '}
-            {jobCase.request.customerName}
+            {jobCase.request.title} · {jobCase.request.customerName}
           </p>
         </div>
       </div>
@@ -48,6 +44,6 @@ export function JobCaseDetailHeader({ jobCase }: JobCaseDetailHeaderProps) {
         label="Volver a expedientes"
         onClick={() => navigate('/job-cases')}
       />
-    </div>
+    </header>
   )
 }
