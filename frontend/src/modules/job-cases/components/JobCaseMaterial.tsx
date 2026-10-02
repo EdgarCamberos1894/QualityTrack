@@ -1,7 +1,5 @@
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
-import {
-  formatJobCaseDateTime,
-} from '../model/jobCasePresenter'
+import { formatJobCaseDateTime } from '../model/jobCasePresenter'
 import type {
   CaseMaterialSpecificationDto,
   JobCaseRequestSummaryDto,
