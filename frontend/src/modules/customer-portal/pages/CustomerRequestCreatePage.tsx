@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -32,6 +32,7 @@ export function CustomerRequestCreatePage() {
   const [documents, setDocuments] = useState<RequestDocumentUpload[]>([])
   const [documentError, setDocumentError] = useState<string | null>(null)
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false)
+  const deliveryDefaultsInitialized = useRef(false)
 
   const {
     register,
@@ -77,6 +78,47 @@ export function CustomerRequestCreatePage() {
     control,
     name: 'customerAddressId',
   })
+  useEffect(() => {
+    if (
+      deliveryDefaultsInitialized.current ||
+      addressesQuery.isPending ||
+      addressesQuery.isError
+    ) {
+      return
+    }
+
+    deliveryDefaultsInitialized.current = true
+    const addresses = addressesQuery.data ?? []
+    const preferred =
+      addresses.find((address) => address.defaultAddress) ?? addresses.at(0)
+
+    if (preferred) {
+      setValue('deliveryMode', 'SAVED_ADDRESS', { shouldDirty: false })
+      setValue('customerAddressId', String(preferred.id), {
+        shouldDirty: false,
+      })
+      setValue('deliveryContactName', preferred.contactName ?? '', {
+        shouldDirty: false,
+      })
+      setValue('deliveryContactPhone', preferred.contactPhone ?? '', {
+        shouldDirty: false,
+      })
+      setValue(
+        'deliveryInstructions',
+        preferred.deliveryInstructions ?? '',
+        { shouldDirty: false },
+      )
+      return
+    }
+
+    setValue('deliveryMode', 'CUSTOM_ADDRESS', { shouldDirty: false })
+  }, [
+    addressesQuery.data,
+    addressesQuery.isError,
+    addressesQuery.isPending,
+    setValue,
+  ])
+
   const canCreate = customer.role !== 'VIEWER'
   const requestsPath = `/portal/${customer.customerId}/requests`
 
