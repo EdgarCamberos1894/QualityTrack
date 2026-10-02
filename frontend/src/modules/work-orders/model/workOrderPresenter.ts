@@ -7,19 +7,66 @@ import type {
 
 interface StatusPresentation {
   label: string
+  stage: string
+  description: string
   tone: BadgeProps['tone']
 }
 
 const statusPresentation: Record<WorkOrderStatus, StatusPresentation> = {
-  CREATED: { label: 'En preparación', tone: 'neutral' },
-  READY_FOR_PRODUCTION: { label: 'Lista para producción', tone: 'info' },
-  IN_PRODUCTION: { label: 'En producción', tone: 'info' },
-  QUALITY_PENDING: { label: 'Calidad pendiente', tone: 'warning' },
-  QUALITY_HOLD: { label: 'Retenida por calidad', tone: 'warning' },
-  REWORK_IN_PROGRESS: { label: 'En retrabajo', tone: 'warning' },
-  READY_FOR_DELIVERY: { label: 'Lista para entrega', tone: 'success' },
-  DELIVERED: { label: 'Entregada', tone: 'success' },
-  CANCELLED: { label: 'Cancelada', tone: 'danger' },
+  CREATED: {
+    label: 'En preparación',
+    stage: 'Preparación',
+    description: 'La orden se está preparando antes de liberarla a producción.',
+    tone: 'neutral',
+  },
+  READY_FOR_PRODUCTION: {
+    label: 'Lista para producción',
+    stage: 'Preparación',
+    description: 'La preparación terminó y la orden ya puede iniciar operaciones.',
+    tone: 'info',
+  },
+  IN_PRODUCTION: {
+    label: 'En producción',
+    stage: 'Producción',
+    description: 'Hay trabajo operativo en curso para esta orden.',
+    tone: 'info',
+  },
+  QUALITY_PENDING: {
+    label: 'Pendiente de calidad',
+    stage: 'Calidad',
+    description: 'La producción terminó y la orden espera su inspección de calidad.',
+    tone: 'warning',
+  },
+  QUALITY_HOLD: {
+    label: 'Pausada por calidad',
+    stage: 'Calidad',
+    description: 'Calidad detuvo el avance hasta resolver la incidencia detectada.',
+    tone: 'warning',
+  },
+  REWORK_IN_PROGRESS: {
+    label: 'En retrabajo',
+    stage: 'Producción',
+    description: 'La orden está en retrabajo por una no conformidad.',
+    tone: 'warning',
+  },
+  READY_FOR_DELIVERY: {
+    label: 'Lista para entrega',
+    stage: 'Entrega',
+    description: 'Calidad aprobó la orden y ya puede prepararse la entrega.',
+    tone: 'success',
+  },
+  DELIVERED: {
+    label: 'Entregada',
+    stage: 'Finalizada',
+    description: 'La entrega ya fue registrada para esta orden.',
+    tone: 'success',
+  },
+  CANCELLED: {
+    label: 'Cancelada',
+    stage: 'Cancelada',
+    description: 'La orden fue cancelada y no continuará en el flujo operativo.',
+    tone: 'danger',
+  },
 }
 
 const priorityLabels: Record<WorkOrderPriority, string> = {
