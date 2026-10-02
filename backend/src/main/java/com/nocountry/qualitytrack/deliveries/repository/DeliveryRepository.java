@@ -72,7 +72,7 @@ public interface DeliveryRepository extends JpaRepository<Delivery, Long> {
             where d.workOrder.id = :workOrderId
               and d.status <> :cancelledStatus
             """)
-    long sumReservedQuantityByWorkOrderId(
+    long sumCommittedQuantityByWorkOrderId(
             @Param("workOrderId") Long workOrderId,
             @Param("cancelledStatus") DeliveryStatus cancelledStatus
     );
