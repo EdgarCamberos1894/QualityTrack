@@ -43,7 +43,7 @@ export function CreateDeliveryDialog({
       destinationState: '',
       destinationPostalCode: '',
       destinationCountry: 'México',
-      deliveryMethod: 'LOCAL_DELIVERY',
+      deliveryMethod: 'Entrega local',
     },
   })
 
@@ -58,7 +58,7 @@ export function CreateDeliveryDialog({
       destinationState: '',
       destinationPostalCode: '',
       destinationCountry: 'México',
-      deliveryMethod: 'LOCAL_DELIVERY',
+      deliveryMethod: 'Entrega local',
     })
   }, [availableQuantity, open, reset])
 
@@ -120,8 +120,9 @@ export function CreateDeliveryDialog({
               {...register('quantity', { valueAsNumber: true })}
             />
             <TextField
-              label="Método"
+              label="Método de entrega"
               maxLength={80}
+              placeholder="Ej. Entrega local, recolección o paquetería"
               labelClassName="!mb-1.5 !text-[10px]"
               className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
               error={errors.deliveryMethod?.message}
@@ -183,7 +184,7 @@ export function CreateDeliveryDialog({
           </div>
 
           <p className="rounded-lg border border-blue-100 bg-blue-50/60 px-3 py-2 text-[8px] leading-4 text-blue-800">
-            El destino se conserva como snapshot histórico de esta entrega.
+            El destino queda congelado en esta entrega para conservar la trazabilidad, aunque los datos del cliente cambien después.
           </p>
 
           {quantityError ? (
