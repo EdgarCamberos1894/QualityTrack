@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -69,8 +70,21 @@ function Requirement({
 
 export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
   const session = useSessionStore((state) => state.session)
+  const location = useLocation()
   const mutations = useWorkOrderPreparationMutations(data.workOrder.id)
-  const [detailPanel, setDetailPanel] = useState<DetailPanel>(null)
+  const [detailPanel, setDetailPanel] = useState<DetailPanel>(() => {
+    if (location.hash.startsWith('#routing-')) return 'routing'
+    if (location.hash.startsWith('#document-')) return 'documents'
+    return null
+  })
+
+  useEffect(() => {
+    if (location.hash.startsWith('#routing-')) {
+      setDetailPanel('routing')
+    } else if (location.hash.startsWith('#document-')) {
+      setDetailPanel('documents')
+    }
+  }, [location.hash])
   const roles = session?.user.roles ?? []
   const canPlan =
     roles.includes('ADMIN') ||
