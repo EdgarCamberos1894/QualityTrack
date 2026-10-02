@@ -212,28 +212,27 @@ export function JobCaseDetailPage() {
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-stretch">
           <JobCaseSummary jobCase={detailQuery.data} />
 
-        <JobCaseActionBar
-          jobCase={detailQuery.data}
-          user={session.user}
-          taking={takeMutation.isPending}
-          completing={completeMutation.isPending}
-          creatingQuotation={createQuotationMutation.isPending}
-          quotationId={currentQuotation?.id ?? null}
-          quotationLookupReady={quotationLookupReady}
-          onTake={() => takeMutation.mutate()}
-          onRequestInformation={() => setActionPanel('information')}
-          onDefineMaterial={() => setActionPanel('material')}
-          onComplete={() => completeMutation.mutate()}
-          onCreateQuotation={() => void createQuotation()}
-          onOpenQuotation={() => {
-            if (currentQuotation) {
-              navigate(`/quotations/${currentQuotation.id}`)
-            }
-          }}
+          <JobCaseActionBar
+            jobCase={detailQuery.data}
+            user={session.user}
+            taking={takeMutation.isPending}
+            completing={completeMutation.isPending}
+            creatingQuotation={createQuotationMutation.isPending}
+            quotationId={currentQuotation?.id ?? null}
+            quotationLookupReady={quotationLookupReady}
+            onTake={() => takeMutation.mutate()}
+            onRequestInformation={() => setActionPanel('information')}
+            onDefineMaterial={() => setActionPanel('material')}
+            onComplete={() => completeMutation.mutate()}
+            onCreateQuotation={() => void createQuotation()}
+            onOpenQuotation={() => {
+              if (currentQuotation) {
+                navigate(`/quotations/${currentQuotation.id}`)
+              }
+            }}
           />
         </div>
 
-        <div className="space-y-3">
         {mutationError ? (
           <div
             role="alert"
@@ -270,18 +269,33 @@ export function JobCaseDetailPage() {
           />
         ) : null}
 
-        <JobCaseTabs
-          activeTab={activeTab}
-          counts={{
-            documents: detailQuery.data.documents.length,
-            clarifications: detailQuery.data.informationRequests.length,
-            timeline: timelineCount,
-          }}
-          onChange={(tab) => setSearchParams({ tab })}
-        />
+        <section className="space-y-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                Anexos de revisión
+              </p>
+              <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
+                Evidencia y trazabilidad
+              </h2>
+              <p className="mt-0.5 text-[8px] text-slate-500">
+                Consulta los elementos que respaldan la decisión del expediente.
+              </p>
+            </div>
+
+            <JobCaseTabs
+              activeTab={activeTab}
+              counts={{
+                documents: detailQuery.data.documents.length,
+                clarifications: detailQuery.data.informationRequests.length,
+                timeline: timelineCount,
+              }}
+              onChange={(tab) => setSearchParams({ tab })}
+            />
+          </div>
 
           {content}
-        </div>
+        </section>
       </div>
     </PageContainer>
   )
