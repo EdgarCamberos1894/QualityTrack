@@ -75,7 +75,7 @@ export function WorkOrderDetailHeader({
                   onOpenDocuments()
                 }}
               >
-                Ver documentos 360
+                Documentos relacionados
               </button>
 
               <button
@@ -86,7 +86,7 @@ export function WorkOrderDetailHeader({
                   onOpenTraceability()
                 }}
               >
-                Ver trazabilidad 360
+                Trazabilidad del expediente
               </button>
 
               {canCancel ? (
