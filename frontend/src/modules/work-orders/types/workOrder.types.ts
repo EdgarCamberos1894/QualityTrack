@@ -199,15 +199,6 @@ export interface ProductionStatusDto {
   executions: OperationExecutionDto[]
 }
 
-export type WorkOrderDetailTab =
-  | 'summary'
-  | 'preparation'
-  | 'production'
-  | 'traceability'
-  | 'documents'
-  | 'quality'
-  | 'delivery'
-
 export interface CreateWorkOrderPayload {
   priority: WorkOrderPriority
   plannedStartDate: string
