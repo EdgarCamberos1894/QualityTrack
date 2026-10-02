@@ -38,9 +38,9 @@ export async function getJobCaseTimeline(
 export async function getJobCaseDocumentVersions(
   documentId: number,
 ): Promise<JobCaseDocumentVersionDto[]> {
-  const response = await apiClient.get<ApiResponse<JobCaseDocumentVersionDto[]>>(
-    `/documents/${documentId}/versions`,
-  )
+  const response = await apiClient.get<
+    ApiResponse<JobCaseDocumentVersionDto[]>
+  >(`/documents/${documentId}/versions`)
 
   return response.data.data
 }
