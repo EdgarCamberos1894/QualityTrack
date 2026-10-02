@@ -224,13 +224,13 @@ export function getTimelineEventSummary(event: TraceabilityEventDto): string {
   return `${event.aggregateType} #${event.aggregateId}`
 }
 
-function workOrderTabHref(
+function workOrderViewHref(
   data: WorkOrder360Dto,
-  tab: string,
+  view: string,
   anchor?: string,
 ): string {
   const suffix = anchor ? `#${anchor}` : ''
-  return `/work-orders/${data.workOrder.id}?tab=${tab}${suffix}`
+  return `/work-orders/${data.workOrder.id}?view=${view}${suffix}`
 }
 
 export function getTraceabilityActionHref(
@@ -250,7 +250,7 @@ export function getTraceabilityActionHref(
       const routing = data.routingSheets.find(
         (item) => item.id === action.resourceId,
       )
-      return workOrderTabHref(
+      return workOrderViewHref(
         data,
         routing?.purpose === 'REWORK' ? 'quality' : 'preparation',
         `routing-sheet-${action.resourceId}`,
@@ -260,7 +260,7 @@ export function getTraceabilityActionHref(
       const routing = data.routingSheets.find((item) =>
         item.operations.some((operation) => operation.id === action.resourceId),
       )
-      return workOrderTabHref(
+      return workOrderViewHref(
         data,
         routing?.purpose === 'REWORK' ? 'quality' : 'preparation',
         `routing-operation-${action.resourceId}`,
@@ -270,14 +270,14 @@ export function getTraceabilityActionHref(
       const execution = data.production.executions.find(
         (item) => item.id === action.resourceId,
       )
-      return workOrderTabHref(
+      return workOrderViewHref(
         data,
         execution?.routingPurpose === 'REWORK' ? 'quality' : 'production',
         `operation-execution-${action.resourceId}`,
       )
     }
     case 'VIEW_DOCUMENT':
-      return workOrderTabHref(
+      return workOrderViewHref(
         data,
         'documents',
         `document-${action.resourceId}`,
@@ -286,20 +286,20 @@ export function getTraceabilityActionHref(
       const owner = data.documents.find((entry) =>
         entry.versions.some((version) => version.id === action.resourceId),
       )
-      return workOrderTabHref(
+      return workOrderViewHref(
         data,
         'documents',
         owner ? `document-${owner.document.id}` : undefined,
       )
     }
     case 'VIEW_MATERIAL_LOT':
-      return workOrderTabHref(
+      return workOrderViewHref(
         data,
         'production',
         `material-lot-${action.resourceId}`,
       )
     case 'VIEW_QUALITY_INSPECTION':
-      return workOrderTabHref(
+      return workOrderViewHref(
         data,
         'quality',
         `quality-inspection-${action.resourceId}`,
@@ -310,20 +310,20 @@ export function getTraceabilityActionHref(
           (measurement) => measurement.id === action.resourceId,
         ),
       )
-      return workOrderTabHref(
+      return workOrderViewHref(
         data,
         'quality',
         inspection ? `quality-measurement-${action.resourceId}` : undefined,
       )
     }
     case 'VIEW_NON_CONFORMITY':
-      return workOrderTabHref(
+      return workOrderViewHref(
         data,
         'quality',
         `non-conformity-${action.resourceId}`,
       )
     case 'VIEW_DELIVERY':
-      return workOrderTabHref(data, 'delivery', `delivery-${action.resourceId}`)
+      return workOrderViewHref(data, 'delivery', `delivery-${action.resourceId}`)
     default:
       return null
   }
