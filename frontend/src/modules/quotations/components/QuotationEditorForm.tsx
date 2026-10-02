@@ -177,7 +177,9 @@ export function QuotationEditorForm({
           {quotation.adjustmentNotes ? (
             <div className="mt-4">
               <TextareaField
+                id="quotation-adjustment-response"
                 label="Respuesta al ajuste"
+                placeholder="Explica qué condiciones pueden ajustarse y cuál es la nueva propuesta."
                 disabled={!editable}
                 labelClassName="!mb-1.5 !text-[10px]"
                 className="!min-h-20 !rounded-lg !px-3 !py-2 !text-[10px] !shadow-none placeholder:!text-[9px]"
