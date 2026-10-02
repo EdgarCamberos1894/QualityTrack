@@ -191,6 +191,18 @@ export function DeliveryStagePanel({
           </Button>
         ) : null}
 
+        {canCreate &&
+        delivery &&
+        (delivery.status === 'PENDING' || delivery.status === 'DISPATCHED') ? (
+          <Button
+            variant="secondary"
+            className="!h-7 !w-full !justify-center !text-[7.5px]"
+            onClick={onCreate}
+          >
+            Preparar otra entrega
+          </Button>
+        ) : null}
+
         {canManage &&
         delivery &&
         (delivery.status === 'PENDING' || delivery.status === 'DISPATCHED') ? (
