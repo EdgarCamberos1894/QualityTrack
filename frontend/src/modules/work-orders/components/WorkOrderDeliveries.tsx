@@ -287,6 +287,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
           delivery={selectedDelivery}
           plannedQuantity={plannedQuantity}
           availableQuantity={availableQuantity}
+          requestedDestination={data.workOrder.source.deliveryDestination}
         />
 
         <DeliveryStagePanel
