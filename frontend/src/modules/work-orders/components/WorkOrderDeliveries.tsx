@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -37,6 +38,7 @@ type DialogType = 'dispatch' | 'complete' | 'evidence' | 'cancel' | null
 
 export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
   const session = useSessionStore((state) => state.session)
+  const location = useLocation()
   const roles = session?.user.roles ?? []
   const canManage = roles.includes('ADMIN') || roles.includes('LOGISTICS')
   const mutations = useDeliveryMutations()
@@ -81,6 +83,30 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
   const selectedDelivery =
     deliveries.find((delivery) => delivery.id === selectedDeliveryId) ??
     priorityDelivery
+
+  useEffect(() => {
+    const match = location.hash.match(/^#delivery-(\d+)$/)
+    if (!match) return
+
+    const deliveryId = Number(match[1])
+    if (!deliveries.some((delivery) => delivery.id === deliveryId)) return
+
+    setSelectedDeliveryId(deliveryId)
+  }, [deliveries, location.hash])
+
+  useEffect(() => {
+    if (!selectedDelivery || location.hash !== `#delivery-${selectedDelivery.id}`) {
+      return
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      document
+        .getElementById(`delivery-${selectedDelivery.id}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [location.hash, selectedDelivery])
 
   const plannedQuantity = data.workOrder.plannedQuantity ?? 0
   const inProgressQuantity = getOpenDeliveryQuantity(deliveries)
@@ -295,7 +321,10 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
         </section>
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(285px,0.75fr)] lg:items-stretch">
+      <div
+        id={selectedDelivery ? `delivery-${selectedDelivery.id}` : undefined}
+        className="scroll-mt-24 grid gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(285px,0.75fr)] lg:items-stretch"
+      >
         <DeliveryWorkspace
           delivery={selectedDelivery}
           plannedQuantity={plannedQuantity}
