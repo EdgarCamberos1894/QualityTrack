@@ -132,11 +132,26 @@ export function CustomerRequestDeliveryStep({
                   <button
                     key={address.id}
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
                       setValue('customerAddressId', String(address.id), {
                         shouldDirty: true,
                         shouldValidate: true,
                       })
+                      setValue(
+                        'deliveryContactName',
+                        address.contactName ?? '',
+                        { shouldDirty: true },
+                      )
+                      setValue(
+                        'deliveryContactPhone',
+                        address.contactPhone ?? '',
+                        { shouldDirty: true },
+                      )
+                      setValue(
+                        'deliveryInstructions',
+                        address.deliveryInstructions ?? '',
+                        { shouldDirty: true },
+                      )
                     }
                     className={
                       selected
