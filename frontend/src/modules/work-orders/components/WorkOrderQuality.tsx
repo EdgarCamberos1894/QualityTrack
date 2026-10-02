@@ -10,6 +10,7 @@ import { NonConformitySection } from './NonConformitySection'
 import { ProductionMaterialsCard } from './ProductionMaterialsCard'
 import { QualityInspectionWorkspace } from './QualityInspectionWorkspace'
 import { QualityMeasurementDialog } from './QualityMeasurementDialog'
+import { QualityPendingWorkspace } from './QualityPendingWorkspace'
 import { QualityStagePanel } from './QualityStagePanel'
 import { useProductionMutations } from '../hooks/useProductionMutations'
 import { useQualityMutations } from '../hooks/useQualityMutations'
@@ -92,6 +93,9 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
       .filter((item) => item.status === 'OPEN')
       .sort((left, right) => right.id - left.id)
       .at(0) ?? null
+  const productionRouting =
+    data.routingSheets.find((routing) => routing.purpose === 'PRODUCTION') ??
+    null
 
   const canModifyInspection = (inspection: QualityInspectionDto) =>
     inspection.status === 'IN_PROGRESS' &&
@@ -269,65 +273,87 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
         </section>
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(285px,0.75fr)] lg:items-stretch">
-        <QualityInspectionWorkspace
+      {selectedInspection?.status === 'PENDING' &&
+      data.workOrder.status === 'QUALITY_PENDING' &&
+      !viewingHistoricalInspection ? (
+        <QualityPendingWorkspace
           inspection={selectedInspection}
-          canStart={false}
-          canEdit={selectedCanEdit}
-          canComplete={false}
-          starting={false}
-          onStart={() => undefined}
-          onAddMeasurement={() => {
-            if (!selectedInspection) return
-            mutations.addMeasurement.reset()
-            setMeasurementTarget({
-              inspectionId: selectedInspection.id,
-              measurement: null,
-            })
-          }}
-          onEditMeasurement={(measurement) => {
-            if (!selectedInspection) return
-            mutations.updateMeasurement.reset()
-            setMeasurementTarget({
-              inspectionId: selectedInspection.id,
-              measurement,
-            })
-          }}
-          onComplete={() => undefined}
-        />
-
-        <QualityStagePanel
-          inspection={selectedInspection}
-          openNonConformity={openNonConformity}
-          workOrderStatus={data.workOrder.status}
+          productionRouting={productionRouting}
+          executions={data.production.executions}
+          plannedQuantity={data.production.plannedQuantity}
+          pinnedDocuments={data.workOrder.pinnedDocuments}
+          materials={data.materials}
           canStart={selectedCanStart}
-          canComplete={selectedCanComplete}
           starting={
             mutations.startInspection.isPending &&
             mutations.startInspection.variables?.inspectionId ===
-              selectedInspection?.id
+              selectedInspection.id
           }
           onStart={() => {
-            if (selectedInspection) {
-              void startInspection(selectedInspection.id)
-            }
+            void startInspection(selectedInspection.id)
           }}
-          onComplete={() => {
-            if (!selectedInspection) return
-            mutations.completeInspection.reset()
-            setCompletionTarget(selectedInspection)
-          }}
-          onOpenNonConformity={() =>
-            setDetail((current) =>
-              current === 'nonConformity' ? null : 'nonConformity',
-            )
-          }
-          onOpenHistory={() =>
-            setDetail((current) => (current === 'history' ? null : 'history'))
-          }
-          inspectionCount={inspections.length}
         />
-      </div>
+      ) : (
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(285px,0.75fr)] lg:items-stretch">
+          <QualityInspectionWorkspace
+            inspection={selectedInspection}
+            canStart={false}
+            canEdit={selectedCanEdit}
+            canComplete={false}
+            starting={false}
+            onStart={() => undefined}
+            onAddMeasurement={() => {
+              if (!selectedInspection) return
+              mutations.addMeasurement.reset()
+              setMeasurementTarget({
+                inspectionId: selectedInspection.id,
+                measurement: null,
+              })
+            }}
+            onEditMeasurement={(measurement) => {
+              if (!selectedInspection) return
+              mutations.updateMeasurement.reset()
+              setMeasurementTarget({
+                inspectionId: selectedInspection.id,
+                measurement,
+              })
+            }}
+            onComplete={() => undefined}
+          />
+
+          <QualityStagePanel
+            inspection={selectedInspection}
+            openNonConformity={openNonConformity}
+            workOrderStatus={data.workOrder.status}
+            canStart={selectedCanStart}
+            canComplete={selectedCanComplete}
+            starting={
+              mutations.startInspection.isPending &&
+              mutations.startInspection.variables?.inspectionId ===
+                selectedInspection?.id
+            }
+            onStart={() => {
+              if (selectedInspection) {
+                void startInspection(selectedInspection.id)
+              }
+            }}
+            onComplete={() => {
+              if (!selectedInspection) return
+              mutations.completeInspection.reset()
+              setCompletionTarget(selectedInspection)
+            }}
+            onOpenNonConformity={() =>
+              setDetail((current) =>
+                current === 'nonConformity' ? null : 'nonConformity',
+              )
+            }
+            onOpenHistory={() =>
+              setDetail((current) => (current === 'history' ? null : 'history'))
+            }
+            inspectionCount={inspections.length}
+          />
+        </div>
+      )}
 
       {data.workOrder.status === 'REWORK_IN_PROGRESS' ? (
         <section className="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50/45 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between">
