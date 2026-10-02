@@ -4,6 +4,7 @@ import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { CreateWorkOrderDialog } from './CreateWorkOrderDialog'
 import { useCreateWorkOrder } from '../hooks/useCreateWorkOrder'
+import type { CreateWorkOrderFormValues } from '../schemas/createWorkOrder.schema'
 import { formatWorkOrderDate } from '../model/workOrderPresenter'
 import type { PendingWorkOrderDto } from '../types/workOrder.types'
 
@@ -64,9 +65,7 @@ function PendingWorkOrderRow({
   const [open, setOpen] = useState(false)
   const mutation = useCreateWorkOrder(candidate.caseId)
 
-  const create = async (values: Parameters<
-    typeof mutation.mutateAsync
-  >[0]) => {
+  const create = async (values: CreateWorkOrderFormValues) => {
     try {
       const workOrder = await mutation.mutateAsync(values)
       setOpen(false)
@@ -108,7 +107,7 @@ function PendingWorkOrderRow({
             {candidate.quotationNumber} · Rev {candidate.quotationRevision}
           </Link>
           <p className="mt-0.5 text-[7px] text-slate-400">
-            {formatWorkOrderDate(candidate.approvedAt)}
+            {formatWorkOrderDate(candidate.approvedAt.slice(0, 10))}
           </p>
         </div>
 
