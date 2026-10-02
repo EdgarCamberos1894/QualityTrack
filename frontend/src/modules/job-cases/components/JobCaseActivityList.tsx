@@ -5,6 +5,7 @@ import {
 } from '../model/jobCasePresenter'
 import {
   getJobCaseTraceabilityActionHref,
+  getJobCaseTraceabilityActionLabel,
   getPrimaryJobCaseTraceabilityHref,
 } from '../model/jobCaseTraceabilityPresenter'
 import type { JobCaseTimelineEventDto } from '../types/jobCase.types'
@@ -97,7 +98,11 @@ export function JobCaseActivityList({
                       to={primaryAction.href}
                       className="inline-flex h-7 items-center justify-center rounded-lg bg-blue-600 px-2.5 text-[8px] font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
                     >
-                      {primaryAction.action.label}
+                      {getJobCaseTraceabilityActionLabel(
+                        primaryAction.action,
+                        event,
+                        caseId,
+                      )}
                       <span aria-hidden="true" className="ml-1">
                         →
                       </span>
@@ -109,7 +114,11 @@ export function JobCaseActivityList({
                         to={href}
                         className="inline-flex h-7 items-center justify-center rounded-lg border border-slate-200 bg-white px-2.5 text-[8px] font-semibold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
                       >
-                        {action.label}
+                        {getJobCaseTraceabilityActionLabel(
+                          action,
+                          event,
+                          caseId,
+                        )}
                       </Link>
                     ))}
                   </div>
