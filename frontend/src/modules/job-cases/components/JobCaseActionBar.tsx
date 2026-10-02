@@ -142,7 +142,10 @@ export function JobCaseActionBar({
               >
                 {jobCase.materialSpecification
                   ? 'Actualizar material'
-                  : 'Definir material'}
+                  : jobCase.request.materialRequirementType ===
+                      'ASSISTANCE_REQUIRED'
+                    ? 'Definir material'
+                    : 'Añadir criterio técnico'}
               </Button>
             ) : null}
 
