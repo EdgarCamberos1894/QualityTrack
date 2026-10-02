@@ -254,6 +254,7 @@ class QualityWorkflowServiceTest {
                 .thenReturn(measurement);
 
         SaveQualityCheckRequest request = new SaveQualityCheckRequest(
+                QualityCheckType.NUMERIC_RANGE,
                 "Diámetro exterior",
                 new BigDecimal("25.000"),
                 new BigDecimal("24.950"),
@@ -296,7 +297,6 @@ class QualityWorkflowServiceTest {
                 new BigDecimal("25.050"),
                 new BigDecimal("25.020"),
                 "mm",
-                null,
                 null
         );
 
@@ -347,7 +347,6 @@ class QualityWorkflowServiceTest {
                 new BigDecimal("25.050"),
                 new BigDecimal("25.090"),
                 "mm",
-                null,
                 null
         );
 
@@ -430,7 +429,6 @@ class QualityWorkflowServiceTest {
                 new BigDecimal("25.050"),
                 new BigDecimal(measuredValue),
                 "mm",
-                null,
                 null
         );
         ReflectionTestUtils.setField(measurement, "id", 200L);
