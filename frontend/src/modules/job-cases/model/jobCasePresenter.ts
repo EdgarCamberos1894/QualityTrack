@@ -1,5 +1,9 @@
 import type { BadgeProps } from '@/shared/components/ui/Badge'
-import type { JobCaseDto, JobCaseStatus } from '../types/jobCase.types'
+import type {
+  CaseInformationRequestDto,
+  JobCaseDto,
+  JobCaseStatus,
+} from '../types/jobCase.types'
 
 interface StatusPresentation {
   label: string
@@ -31,6 +35,49 @@ export function formatJobCaseDate(value: string | null): string {
   return new Intl.DateTimeFormat('es-MX', {
     dateStyle: 'medium',
   }).format(new Date(value))
+}
+
+export function formatJobCaseDateTime(value: string | null): string {
+  if (!value) return 'Sin registrar'
+
+  return new Intl.DateTimeFormat('es-MX', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(value))
+}
+
+export function formatJobCaseFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+
+  const units = ['KB', 'MB', 'GB']
+  let value = bytes / 1024
+  let unitIndex = 0
+
+  while (value >= 1024 && unitIndex < units.length - 1) {
+    value /= 1024
+    unitIndex += 1
+  }
+
+  return `${value >= 10 ? value.toFixed(0) : value.toFixed(1)} ${units[unitIndex]}`
+}
+
+export function getJobCaseClarificationSummary(
+  requests: CaseInformationRequestDto[],
+): string {
+  if (requests.length === 0) return 'Sin aclaraciones'
+
+  const pending = requests.filter((request) => request.open).length
+  const resolved = requests.length - pending
+
+  if (pending > 0 && resolved > 0) {
+    return `${pending} pendiente${pending === 1 ? '' : 's'} · ${resolved} resuelta${resolved === 1 ? '' : 's'}`
+  }
+
+  if (pending > 0) {
+    return `${pending} pendiente${pending === 1 ? '' : 's'}`
+  }
+
+  return `${resolved} resuelta${resolved === 1 ? '' : 's'}`
 }
 
 export function matchesJobCaseSearch(
