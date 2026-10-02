@@ -1,7 +1,7 @@
 import type { AuthenticatedUser } from '@/modules/auth'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
+import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
-import { Card } from '@/shared/components/ui/Card'
 import { getJobCaseCapabilities } from '../model/jobCaseCapabilities'
 import {
   formatJobCaseDate,
@@ -84,10 +84,10 @@ function getReviewContext(
       }
 
       return {
-        eyebrow: 'Siguiente paso',
+        eyebrow: 'Decisión disponible',
         title: 'La revisión puede completarse',
         description:
-          'Valida la solicitud y sus documentos antes de marcar el expediente como listo para cotizar.',
+          'La información bloqueante está resuelta. Confirma el expediente antes de enviarlo a cotización.',
         tone: 'info',
       }
     case 'READY_FOR_QUOTATION':
@@ -126,6 +126,40 @@ function getReviewContext(
   }
 }
 
+function Checkpoint({
+  label,
+  value,
+  tone,
+}: {
+  label: string
+  value: string
+  tone: 'success' | 'warning' | 'neutral'
+}) {
+  const dotClass =
+    tone === 'success'
+      ? 'bg-emerald-500'
+      : tone === 'warning'
+        ? 'bg-amber-500'
+        : 'bg-slate-300'
+
+  return (
+    <div className="relative flex gap-3 pb-3 last:pb-0">
+      <div className="relative flex w-3 shrink-0 justify-center">
+        <span className={`mt-1.5 h-2 w-2 rounded-full ${dotClass}`} />
+        <span className="absolute bottom-0 top-4 w-px bg-slate-100 last:hidden" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[7px] font-bold uppercase tracking-[0.08em] text-slate-400">
+          {label}
+        </p>
+        <p className="mt-0.5 text-[8px] font-medium leading-4 text-slate-700">
+          {value}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export function JobCaseActionBar({
   jobCase,
   user,
@@ -156,28 +190,40 @@ export function JobCaseActionBar({
     jobCase.informationRequests,
   )
   const materialSummary = getJobCaseMaterialSummary(jobCase)
+  const openClarifications = jobCase.informationRequests.filter(
+    (request) => request.open,
+  ).length
+  const materialPending =
+    jobCase.request.materialRequirementType === 'ASSISTANCE_REQUIRED' &&
+    jobCase.materialSpecification === null
 
   return (
-    <Card className="h-full border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+    <aside className="flex h-full flex-col rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
       <div className="flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-          <SidebarNavIcon name="cases" className="h-[17px] w-[17px]" />
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100">
+          <SidebarNavIcon name="quality" className="h-[17px] w-[17px]" />
         </div>
         <div className="min-w-0">
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-            Revisión interna
+            Revisión
           </p>
           <div className="mt-0.5 flex flex-wrap items-center gap-2">
             <h2 className="text-sm font-semibold text-slate-950">
               {status.label}
             </h2>
-            <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+            <Badge tone={status.tone} className="px-2 py-0.5 text-[8px]">
+              Interno
+            </Badge>
           </div>
+          <p className="mt-1 text-[8px] leading-4 text-slate-500">
+            Valida que exista información suficiente antes de iniciar la
+            cotización.
+          </p>
         </div>
       </div>
 
       <div
-        className={`mt-3 rounded-xl border px-3.5 py-3 ${toneClasses[context.tone]}`}
+        className={`mt-4 rounded-xl border px-3.5 py-3 ${toneClasses[context.tone]}`}
       >
         <p
           className={`text-[8px] font-bold uppercase tracking-[0.1em] ${eyebrowClasses[context.tone]}`}
@@ -262,32 +308,76 @@ export function JobCaseActionBar({
         </div>
       </div>
 
-      <dl className="mt-3 divide-y divide-slate-100 border-t border-slate-100">
-        <div className="flex items-center justify-between gap-4 py-2.5">
-          <dt className="text-[8px] text-slate-500">Responsable</dt>
-          <dd className="truncate text-[9px] font-semibold text-slate-900">
-            {jobCase.assignedToName ?? 'Sin asignar'}
-          </dd>
+      <div className="mt-5">
+        <p className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-400">
+          Estado de la revisión
+        </p>
+
+        <div className="mt-3">
+          <Checkpoint
+            label="Solicitud"
+            value="Información base recibida"
+            tone="success"
+          />
+          <Checkpoint
+            label="Documentación"
+            value={
+              jobCase.documents.length > 0
+                ? `${jobCase.documents.length} archivo${
+                    jobCase.documents.length === 1 ? '' : 's'
+                  } disponible${
+                    jobCase.documents.length === 1 ? '' : 's'
+                  }`
+                : 'Sin archivos adjuntos'
+            }
+            tone={jobCase.documents.length > 0 ? 'success' : 'neutral'}
+          />
+          <Checkpoint
+            label="Aclaraciones"
+            value={clarificationSummary}
+            tone={openClarifications > 0 ? 'warning' : 'success'}
+          />
+          <Checkpoint
+            label="Material"
+            value={materialSummary}
+            tone={materialPending ? 'warning' : 'success'}
+          />
         </div>
-        <div className="flex items-center justify-between gap-4 py-2.5">
-          <dt className="text-[8px] text-slate-500">Aclaraciones</dt>
-          <dd className="text-right text-[9px] font-semibold text-slate-900">
-            {clarificationSummary}
-          </dd>
-        </div>
-        <div className="flex items-center justify-between gap-4 py-2.5">
-          <dt className="text-[8px] text-slate-500">Material técnico</dt>
-          <dd className="max-w-[65%] text-right text-[9px] font-semibold text-slate-900">
-            {materialSummary}
-          </dd>
-        </div>
-        <div className="flex items-center justify-between gap-4 py-2.5">
-          <dt className="text-[8px] text-slate-500">Tomado para revisión</dt>
-          <dd className="text-right text-[8px] font-medium text-slate-700">
-            {formatJobCaseDate(jobCase.assignedAt)}
-          </dd>
-        </div>
-      </dl>
-    </Card>
+      </div>
+
+      <div className="mt-auto border-t border-slate-100 pt-4">
+        <p className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-400">
+          Gestión interna
+        </p>
+        <dl className="mt-2 divide-y divide-slate-100">
+          <div className="flex items-center justify-between gap-4 py-2.5">
+            <dt className="text-[8px] text-slate-500">Responsable</dt>
+            <dd className="truncate text-[9px] font-semibold text-slate-900">
+              {jobCase.assignedToName ?? 'Sin asignar'}
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-4 py-2.5">
+            <dt className="text-[8px] text-slate-500">
+              Tomado para revisión
+            </dt>
+            <dd className="text-right text-[8px] font-medium text-slate-700">
+              {formatJobCaseDate(jobCase.assignedAt)}
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-4 py-2.5">
+            <dt className="text-[8px] text-slate-500">Documentos</dt>
+            <dd className="text-[9px] font-semibold text-slate-900">
+              {jobCase.documents.length}
+            </dd>
+          </div>
+          <div className="flex items-center justify-between gap-4 py-2.5">
+            <dt className="text-[8px] text-slate-500">Aclaraciones</dt>
+            <dd className="text-right text-[9px] font-semibold text-slate-900">
+              {clarificationSummary}
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </aside>
   )
 }
