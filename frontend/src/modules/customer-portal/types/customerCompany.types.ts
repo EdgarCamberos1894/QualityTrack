@@ -63,3 +63,34 @@ export interface CreateCustomerInvitationPayload {
   email: string
   role: CustomerMembershipRole
 }
+
+
+export interface CustomerAddressDto {
+  id: number
+  customerId: number
+  label: string
+  address: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
+  contactName: string | null
+  contactPhone: string | null
+  deliveryInstructions: string | null
+  defaultAddress: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface SaveCustomerAddressPayload {
+  label: string
+  address: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
+  contactName?: string
+  contactPhone?: string
+  deliveryInstructions?: string
+  defaultAddress: boolean
+}
