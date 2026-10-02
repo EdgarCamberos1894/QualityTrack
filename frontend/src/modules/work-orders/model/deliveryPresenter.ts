@@ -3,14 +3,36 @@ import type { DeliveryDto, DeliveryStatus } from '../types/delivery.types'
 
 interface StatusPresentation {
   label: string
+  stage: string
+  description: string
   tone: BadgeProps['tone']
 }
 
 const statusPresentation: Record<DeliveryStatus, StatusPresentation> = {
-  PENDING: { label: 'Preparada', tone: 'warning' },
-  DISPATCHED: { label: 'En tránsito', tone: 'info' },
-  DELIVERED: { label: 'Entregada', tone: 'success' },
-  CANCELLED: { label: 'Cancelada', tone: 'danger' },
+  PENDING: {
+    label: 'Preparada',
+    stage: 'Preparación',
+    description: 'La entrega está preparada y pendiente de despacho.',
+    tone: 'warning',
+  },
+  DISPATCHED: {
+    label: 'En tránsito',
+    stage: 'Traslado',
+    description: 'La entrega ya salió y se encuentra en traslado al destino.',
+    tone: 'info',
+  },
+  DELIVERED: {
+    label: 'Entregada',
+    stage: 'Finalizada',
+    description: 'La entrega fue registrada como completada.',
+    tone: 'success',
+  },
+  CANCELLED: {
+    label: 'Cancelada',
+    stage: 'Cancelada',
+    description: 'Este movimiento fue cancelado y no cuenta como entrega comprometida.',
+    tone: 'danger',
+  },
 }
 
 export function getDeliveryStatusPresentation(
