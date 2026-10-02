@@ -169,46 +169,53 @@ export function WorkOrdersPage() {
         <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/55 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div>
             <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Bandeja operativa
+              Órdenes registradas
             </p>
             <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
-              Órdenes registradas
+              Seguimiento operativo
             </h2>
           </div>
           <p className="text-[8px] font-medium text-slate-400">
-            {filteredWorkOrders.length} de {workOrders.length} visibles
+            Ubica la orden y su etapa antes de entrar al detalle operativo.
           </p>
         </div>
 
         <WorkOrderFilters value={filters} onChange={setFilters} />
 
-        {hasFilters ? (
-          <div className="flex items-center justify-between gap-3 border-b border-slate-100 bg-white px-4 py-2 sm:px-5">
-            <p className="text-[8px] text-slate-400">
-              Filtros aplicados a la bandeja
+        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/65 px-4 py-2.5 sm:px-5">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+            <p className="text-[9px] font-semibold text-slate-700">
+              {filteredWorkOrders.length}{' '}
+              {filteredWorkOrders.length === 1
+                ? 'orden visible'
+                : 'órdenes visibles'}
             </p>
+          </div>
+
+          {hasFilters ? (
             <button
               type="button"
               onClick={() => setFilters(initialFilters)}
-              className="text-[8px] font-semibold text-blue-600 transition hover:text-blue-700"
+              className="text-[9px] font-semibold text-blue-600 transition hover:text-blue-700"
             >
               Limpiar filtros
             </button>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
 
-        {filteredWorkOrders.length > 0 ? (
-          <WorkOrderTable workOrders={filteredWorkOrders} />
-        ) : (
-          <div className="bg-slate-50/35 p-4">
+        <div className="bg-slate-50/40 p-3.5 sm:p-4">
+          {filteredWorkOrders.length > 0 ? (
+            <WorkOrderTable workOrders={filteredWorkOrders} />
+          ) : (
             <Card className="p-4 shadow-none">
               <EmptyState
                 title="No hay órdenes que coincidan"
                 description="Ajusta los filtros o la búsqueda para consultar otras órdenes de trabajo."
               />
             </Card>
-          </div>
-        )}
+          )}
+        </div>
       </section>
     </PageContainer>
   )
