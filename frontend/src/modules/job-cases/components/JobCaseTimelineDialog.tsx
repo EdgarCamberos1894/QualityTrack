@@ -62,7 +62,7 @@ export function JobCaseTimelineDialog({
               Todavía no hay eventos registrados.
             </p>
           ) : (
-            <JobCaseActivityList events={events} />
+            <JobCaseActivityList events={events} caseId={caseId} />
           )}
 
           {historyQuery.isFetchNextPageError ? (
