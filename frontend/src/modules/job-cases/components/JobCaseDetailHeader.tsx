@@ -2,7 +2,10 @@ import { useNavigate } from 'react-router-dom'
 import { CompactBackButton } from '@/shared/components/navigation/CompactBackButton'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge } from '@/shared/components/ui/Badge'
-import { getJobCaseStatusPresentation } from '../model/jobCasePresenter'
+import {
+  getJobCaseClarificationSummary,
+  getJobCaseStatusPresentation,
+} from '../model/jobCasePresenter'
 import type { JobCaseDetailDto } from '../types/jobCase.types'
 
 interface JobCaseDetailHeaderProps {
@@ -12,6 +15,9 @@ interface JobCaseDetailHeaderProps {
 export function JobCaseDetailHeader({ jobCase }: JobCaseDetailHeaderProps) {
   const navigate = useNavigate()
   const status = getJobCaseStatusPresentation(jobCase.status)
+  const clarificationSummary = getJobCaseClarificationSummary(
+    jobCase.informationRequests,
+  )
 
   return (
     <section className="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/70 shadow-[0_16px_44px_-36px_rgba(15,23,42,0.34)]">
@@ -62,13 +68,16 @@ export function JobCaseDetailHeader({ jobCase }: JobCaseDetailHeaderProps) {
           <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1">
             <p className="text-[8px] font-medium text-slate-400">Documentos</p>
             <p className="mt-0.5 text-[10px] font-semibold text-slate-800">
-              {jobCase.documents.length}
+              {jobCase.documents.length}{' '}
+              <span className="font-normal text-slate-400">
+                {jobCase.documents.length === 1 ? 'archivo' : 'archivos'}
+              </span>
             </p>
           </div>
           <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:pl-4 sm:py-1">
             <p className="text-[8px] font-medium text-slate-400">Aclaraciones</p>
-            <p className="mt-0.5 text-[10px] font-semibold text-slate-800">
-              {jobCase.informationRequests.length}
+            <p className="mt-0.5 truncate text-[10px] font-semibold text-slate-800">
+              {clarificationSummary}
             </p>
           </div>
         </div>
