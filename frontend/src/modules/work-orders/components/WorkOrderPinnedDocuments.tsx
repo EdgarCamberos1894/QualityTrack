@@ -95,24 +95,38 @@ export function WorkOrderPinnedDocuments({
                     </div>
 
                     <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center">
-                      <select
-                        aria-label={`Versión de ${document.name}`}
-                        value={selectedVersionId}
-                        disabled={!canEdit || saving}
-                        onChange={(event) =>
-                          setSelection((current) => ({
-                            ...current,
-                            [document.id]: Number(event.target.value),
-                          }))
-                        }
-                        className="h-8 min-w-[185px] rounded-lg border border-slate-300 bg-white px-2.5 text-[9px] text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100"
-                      >
-                        {availableVersions.map((version) => (
-                          <option key={version.id} value={version.id}>
-                            v{version.version} · {version.fileName}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="relative min-w-[170px]">
+                        <select
+                          aria-label={`Versión de ${document.name}`}
+                          value={selectedVersionId}
+                          disabled={!canEdit || saving}
+                          onChange={(event) =>
+                            setSelection((current) => ({
+                              ...current,
+                              [document.id]: Number(event.target.value),
+                            }))
+                          }
+                          className="h-7 w-full appearance-none rounded-lg border border-slate-300 bg-white px-2 pr-7 !text-[8px] !font-normal !leading-none text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 disabled:text-slate-500"
+                        >
+                          {availableVersions.map((version) => (
+                            <option
+                              key={version.id}
+                              value={version.id}
+                              className="text-[8px] font-normal"
+                            >
+                              v{version.version} · {version.fileName}
+                            </option>
+                          ))}
+                        </select>
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 20 20"
+                          className="pointer-events-none absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2 text-slate-400"
+                          fill="currentColor"
+                        >
+                          <path d="M5.22 7.47a.75.75 0 0 1 1.06 0L10 11.19l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 8.53a.75.75 0 0 1 0-1.06Z" />
+                        </svg>
+                      </div>
 
                       <Button
                         size="sm"
