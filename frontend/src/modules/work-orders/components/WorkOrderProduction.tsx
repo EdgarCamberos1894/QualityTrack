@@ -140,9 +140,8 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
     totalOperations > 0
       ? Math.round((completedOperations / totalOperations) * 100)
       : 0
-  const productionOpen =
-    data.workOrder.status === 'IN_PRODUCTION' &&
-    !data.production.productionCompleted
+  const materialRecordingOpen =
+    data.workOrder.status === 'IN_PRODUCTION'
   const latestConsumption = data.materials.at(-1)
 
   useEffect(() => {
@@ -400,6 +399,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
                   workOrderStatus={data.workOrder.status}
                   productionCompleted={data.production.productionCompleted}
                   canHandoff={canExecute}
+                  materialConsumptionCount={data.materials.length}
                   embedded
                 />
               </div>
@@ -450,7 +450,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
               </div>
 
               <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
-                {canExecute && productionOpen ? (
+                {canExecute && materialRecordingOpen ? (
                   <Button
                     size="sm"
                     className="!h-7 !px-2.5 !text-[7.5px]"
