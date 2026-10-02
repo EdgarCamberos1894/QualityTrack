@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 
 public record CreateDeliveryRequest(
         @NotNull @Positive Integer quantity,
-        @NotBlank @Size(max = 160) String destinationRecipientName,
+        @Size(max = 160) String destinationContactName,
         @NotBlank @Size(max = 300) String destinationAddress,
         @NotBlank @Size(max = 120) String destinationCity,
         @NotBlank @Size(max = 120) String destinationState,
