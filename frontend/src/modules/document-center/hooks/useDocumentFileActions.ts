@@ -40,7 +40,7 @@ export function useDocumentFileActions() {
   const [error, setError] = useState<unknown>(null)
 
   const openVersion = async (
-    document: DocumentCenterDto,
+    document: Pick<DocumentCenterDto, 'id'>,
     versionId: number,
   ) => {
     const previewWindow = window.open('', '_blank')
@@ -66,7 +66,7 @@ export function useDocumentFileActions() {
   }
 
   const downloadVersion = async (
-    document: DocumentCenterDto,
+    document: Pick<DocumentCenterDto, 'id'>,
     versionId: number,
     fileName: string,
   ) => {
