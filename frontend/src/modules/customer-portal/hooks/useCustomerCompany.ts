@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import {
+  getCustomerAddresses,
   getCustomerCompany,
   getCustomerInvitations,
   getCustomerMembers,
@@ -13,6 +14,8 @@ export const customerCompanyKeys = {
     [...customerCompanyKeys.all, 'members', customerId] as const,
   invitations: (customerId: number) =>
     [...customerCompanyKeys.all, 'invitations', customerId] as const,
+  addresses: (customerId: number) =>
+    [...customerCompanyKeys.all, 'addresses', customerId] as const,
 }
 
 export function useCustomerCompany(customerId: number) {
@@ -34,5 +37,13 @@ export function useCustomerInvitations(customerId: number, enabled: boolean) {
     queryKey: customerCompanyKeys.invitations(customerId),
     queryFn: () => getCustomerInvitations(customerId),
     enabled,
+  })
+}
+
+
+export function useCustomerAddresses(customerId: number) {
+  return useQuery({
+    queryKey: customerCompanyKeys.addresses(customerId),
+    queryFn: () => getCustomerAddresses(customerId),
   })
 }
