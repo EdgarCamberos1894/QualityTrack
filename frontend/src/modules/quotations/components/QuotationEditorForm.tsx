@@ -30,7 +30,8 @@ interface QuotationEditorFormProps {
   onSend: (
     payload: UpdateQuotationPayload,
     adjustmentResponse: string | null,
-  ) => Promise<void>
+    preview: QuotationPreviewData,
+  ) => Promise<void> | void
   onPreview: (preview: QuotationPreviewData) => void
   sidebarContent?: ReactNode
 }
@@ -89,6 +90,10 @@ export function QuotationEditorForm({
     await onSend(
       toUpdateQuotationPayload(values),
       values.adjustmentResponse.trim() || null,
+      {
+        ...values,
+        totals: calculateQuotationTotals(values),
+      },
     )
   })
 
