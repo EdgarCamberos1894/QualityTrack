@@ -59,8 +59,9 @@ export function getJobCaseCapabilities(
     completeBlockReason =
       'Espera la respuesta del cliente antes de completar la revisión.'
   } else if (canAttemptComplete && missingRequiredMaterial) {
-    completeBlockReason =
-      'Define la especificación técnica del material antes de completar.'
+    completeBlockReason = canDefineMaterial
+      ? 'Define la especificación técnica del material antes de completar.'
+      : 'Ingeniería debe definir la especificación técnica del material antes de completar.'
   }
 
   return {
