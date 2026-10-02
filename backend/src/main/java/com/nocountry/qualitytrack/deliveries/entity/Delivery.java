@@ -46,8 +46,8 @@ public class Delivery {
     @Column(nullable = false, length = 20)
     private DeliveryStatus status;
 
-    @Column(name = "destination_recipient_name", nullable = false, length = 160)
-    private String destinationRecipientName;
+    @Column(name = "destination_recipient_name", length = 160)
+    private String destinationContactName;
 
     @Column(name = "destination_address", nullable = false, length = 300)
     private String destinationAddress;
@@ -119,7 +119,7 @@ public class Delivery {
     private Delivery(
             WorkOrder workOrder,
             Integer quantity,
-            String destinationRecipientName,
+            String destinationContactName,
             String destinationAddress,
             String destinationCity,
             String destinationState,
@@ -136,7 +136,7 @@ public class Delivery {
             throw new IllegalArgumentException("La cantidad de la entrega debe ser mayor a cero.");
         }
         this.quantity = quantity;
-        this.destinationRecipientName = requireText(destinationRecipientName, "El destinatario es obligatorio.");
+        this.destinationContactName = normalizeOptional(destinationContactName);
         this.destinationAddress = requireText(destinationAddress, "La dirección de destino es obligatoria.");
         this.destinationCity = requireText(destinationCity, "La ciudad de destino es obligatoria.");
         this.destinationState = requireText(destinationState, "El estado de destino es obligatorio.");
@@ -150,7 +150,7 @@ public class Delivery {
     public static Delivery create(
             WorkOrder workOrder,
             Integer quantity,
-            String destinationRecipientName,
+            String destinationContactName,
             String destinationAddress,
             String destinationCity,
             String destinationState,
@@ -162,7 +162,7 @@ public class Delivery {
         return new Delivery(
                 workOrder,
                 quantity,
-                destinationRecipientName,
+                destinationContactName,
                 destinationAddress,
                 destinationCity,
                 destinationState,
