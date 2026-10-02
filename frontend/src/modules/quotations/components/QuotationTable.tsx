@@ -48,10 +48,10 @@ export function QuotationTable({ quotations }: QuotationTableProps) {
 
             <div className="col-span-2 min-w-0 md:col-span-1">
               <p className="truncate text-[9px] font-medium text-slate-700">
-                {quotation.customerName}
+                Para {quotation.customerName}
               </p>
               <p className="mt-0.5 truncate text-[7px] text-slate-400">
-                {quotation.requestNumber}
+                Solicitud {quotation.requestNumber}
               </p>
             </div>
 
@@ -60,14 +60,14 @@ export function QuotationTable({ quotations }: QuotationTableProps) {
                 {status.label}
               </Badge>
               <p className="mt-1 truncate text-[8px] font-semibold text-slate-900">
-                {formatQuotationMoney(quotation.total, quotation.currency)}
+                Monto · {formatQuotationMoney(quotation.total, quotation.currency)}
               </p>
             </div>
 
             <div className="col-span-2 grid grid-cols-2 gap-3 md:col-span-1 md:block">
               <div>
                 <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
-                  Vigencia
+                  Válida hasta
                 </p>
                 <p className="mt-1 text-[8px] font-medium text-slate-700">
                   {formatQuotationDate(quotation.validUntil)}
@@ -75,7 +75,7 @@ export function QuotationTable({ quotations }: QuotationTableProps) {
               </div>
               <div className="md:mt-1.5">
                 <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
-                  Entrega
+                  Entrega estimada
                 </p>
                 <p className="mt-1 text-[8px] font-medium text-slate-700">
                   {formatQuotationDate(quotation.estimatedDeliveryDate)}
@@ -95,7 +95,7 @@ function OpenAction({ to }: { to: string }) {
       to={to}
       className="inline-flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-[8px] font-semibold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
     >
-      Abrir
+      Ver cotización
       <svg
         viewBox="0 0 20 20"
         aria-hidden="true"
