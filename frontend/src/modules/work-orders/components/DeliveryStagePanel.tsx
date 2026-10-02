@@ -9,7 +9,7 @@ import type { DeliveryDto } from '../types/delivery.types'
 interface DeliveryStagePanelProps {
   delivery: DeliveryDto | null
   plannedQuantity: number
-  reservedQuantity: number
+  inProgressQuantity: number
   deliveredQuantity: number
   availableQuantity: number
   canManage: boolean
@@ -24,7 +24,7 @@ interface DeliveryStagePanelProps {
 export function DeliveryStagePanel({
   delivery,
   plannedQuantity,
-  reservedQuantity,
+  inProgressQuantity,
   deliveredQuantity,
   availableQuantity,
   canManage,
@@ -137,9 +137,9 @@ export function DeliveryStagePanel({
           </p>
         </div>
         <div className="px-2.5 py-2.5">
-          <p className="text-[7px] text-slate-400">Reservadas</p>
+          <p className="text-[7px] text-slate-400">En proceso</p>
           <p className="mt-0.5 text-[12px] font-bold text-slate-950">
-            {reservedQuantity}
+            {inProgressQuantity}
           </p>
         </div>
         <div className="px-2.5 py-2.5">
