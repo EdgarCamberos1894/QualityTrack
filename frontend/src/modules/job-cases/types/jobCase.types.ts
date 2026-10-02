@@ -56,7 +56,7 @@ export interface JobCaseFiltersValue {
   assignment: 'ALL' | 'ASSIGNED' | 'UNASSIGNED'
 }
 
-export interface RequestDocumentVersionDto {
+export interface JobCaseDocumentVersionDto {
   id: number
   version: number
   fileName: string
@@ -66,6 +66,9 @@ export interface RequestDocumentVersionDto {
   uploadedByUserId: number
   uploadedByName: string | null
   uploadedAt: string
+}
+
+export interface RequestDocumentVersionDto extends JobCaseDocumentVersionDto {
   contentUrl: string
   downloadUrl: string
 }
