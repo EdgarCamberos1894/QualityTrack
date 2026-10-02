@@ -12,7 +12,6 @@ interface JobCaseTabsProps {
 }
 
 const tabs: Array<{ id: JobCaseDetailTab; label: string }> = [
-  { id: 'summary', label: 'Resumen' },
   { id: 'documents', label: 'Documentos' },
   { id: 'clarifications', label: 'Aclaraciones' },
   { id: 'material', label: 'Material' },
