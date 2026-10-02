@@ -74,6 +74,7 @@ class InternalDashboardServiceTest {
                 caseCount(JobCaseStatus.UNDER_REVIEW, 3L),
                 caseCount(JobCaseStatus.WAITING_CUSTOMER_INFO, 1L),
                 caseCount(JobCaseStatus.READY_FOR_QUOTATION, 4L),
+                caseCount(JobCaseStatus.AWAITING_WORK_ORDER, 2L),
                 caseCount(JobCaseStatus.IN_PRODUCTION, 5L),
                 caseCount(JobCaseStatus.COMPLETED, 7L)
         );
@@ -114,18 +115,19 @@ class InternalDashboardServiceTest {
 
         var response = service.get(10L);
 
-        assertEquals(15L, response.overview().openCases());
+        assertEquals(17L, response.overview().openCases());
         assertEquals(6L, response.overview().activeProduction());
         assertEquals(3L, response.overview().qualityAttention());
         assertEquals(4L, response.overview().readyForDelivery());
 
         assertEquals(2L, response.pipeline().submitted());
         assertEquals(4L, response.pipeline().readyForQuotation());
+        assertEquals(2L, response.pipeline().awaitingWorkOrder());
         assertEquals(7L, response.pipeline().completed());
 
         assertEquals(2L, response.commercial().draftQuotations());
         assertEquals(3L, response.commercial().sentQuotations());
-        assertEquals(7, response.attention().size());
+        assertEquals(8, response.attention().size());
         assertEquals(1, response.recentActivity().size());
         assertEquals("QT-000020", response.recentActivity().get(0).caseNumber());
         assertEquals("Ana López", response.recentActivity().get(0).performedByName());
