@@ -208,6 +208,36 @@ class MaterialServiceTest {
     }
 
     @Test
+    void canRecordConsumptionAfterOperationsFinishBeforeQualityHandoff() {
+        workOrder.markProductionCompleted(
+                Instant.parse("2026-09-28T12:00:00Z")
+        );
+
+        when(accessPolicy.requireProductionActor(10L)).thenReturn(actor);
+        when(workOrderRepository.findByIdForUpdate(7L))
+                .thenReturn(Optional.of(workOrder));
+        when(materialLotRepository.findByIdForUpdate(40L))
+                .thenReturn(Optional.of(lot));
+        when(workOrderMaterialRepository.sumQuantityUsedByMaterialLotId(40L))
+                .thenReturn(BigDecimal.ZERO);
+        when(workOrderMaterialRepository.findByWorkOrderAndLotForUpdate(7L, 40L))
+                .thenReturn(Optional.empty());
+        when(workOrderMaterialRepository.saveAndFlush(any(WorkOrderMaterial.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = service.recordConsumption(
+                10L,
+                7L,
+                new RecordMaterialConsumptionRequest(
+                        40L,
+                        new BigDecimal("1.500")
+                )
+        );
+
+        assertEquals(new BigDecimal("1.500"), response.quantityUsed());
+    }
+
+    @Test
     void consumptionRequiresWorkOrderInProduction() {
         WorkOrder ready = WorkOrder.create(
                 jobCase,
