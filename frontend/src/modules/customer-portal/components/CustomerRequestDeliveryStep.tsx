@@ -39,11 +39,6 @@ const modes: {
     detail: 'Indica una dirección distinta sólo para este trabajo.',
   },
   {
-    value: 'CUSTOMER_PICKUP',
-    title: 'Recolección en planta',
-    detail: 'Tu empresa recogerá el pedido cuando esté listo.',
-  },
-  {
     value: 'DEFINE_LATER',
     title: 'Definir más adelante',
     detail: 'El destino se acordará con el equipo durante la revisión.',
@@ -290,12 +285,6 @@ export function CustomerRequestDeliveryStep({
             </p>
           ) : null}
 
-          {deliveryMode === 'CUSTOMER_PICKUP' ? (
-            <p className="mt-4 rounded-xl border border-blue-100 bg-blue-50/55 px-3 py-2.5 text-[8px] leading-4 text-blue-800">
-              Logística verá que el cliente recogerá el pedido y coordinará la
-              recepción en planta.
-            </p>
-          ) : null}
         </Card>
 
         <div className="shrink-0">{actions}</div>
