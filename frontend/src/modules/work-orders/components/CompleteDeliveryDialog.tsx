@@ -109,7 +109,7 @@ export function CompleteDeliveryDialog({
             Registrar recepción
           </h2>
           <p className="mt-1 text-[9px] leading-4 text-slate-500">
-            La OT cerrará solo cuando el acumulado entregado cubra la cantidad planificada.
+            Registra la recepción real. La OT se cerrará cuando el total entregado cubra la cantidad planificada.
           </p>
         </div>
 
@@ -133,7 +133,7 @@ export function CompleteDeliveryDialog({
 
           <div>
             <label htmlFor="delivery-evidence" className="mb-1.5 block text-[10px] font-semibold text-slate-800">
-              Evidencia POD (opcional)
+              Evidencia de entrega (opcional)
             </label>
             <select
               id="delivery-evidence"
