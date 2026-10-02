@@ -203,6 +203,39 @@ class QualityWorkflowServiceTest {
     }
 
     @Test
+    void failingPassFailCheckRejectsInspectionAndOpensNonConformity() {
+        QualityInspection inspection = startedInspection();
+        QualityCheck qualityCheck = QualityCheck.createPassFail(
+                inspection,
+                "Inspección visual de rebabas",
+                QualityCheckResult.FAIL,
+                "Se detectó rebaba visible en el extremo mecanizado."
+        );
+        ReflectionTestUtils.setField(qualityCheck, "id", 201L);
+
+        stubLockedInspection(inspection);
+        when(accessPolicy.requireAssignedQualityActor(10L, 10L)).thenReturn(actor);
+        when(checkRepository.findAllByQualityInspection_IdOrderByIdAsc(100L))
+                .thenReturn(List.of(qualityCheck));
+        when(nonConformityRepository.existsByQualityInspection_Id(100L)).thenReturn(false);
+        when(nonConformityReferenceGenerator.nextNumber()).thenReturn("NC-0002");
+        when(nonConformityRepository.saveAndFlush(any(NonConformity.class)))
+                .thenAnswer(invocation -> {
+                    NonConformity nonConformity = invocation.getArgument(0);
+                    ReflectionTestUtils.setField(nonConformity, "id", 301L);
+                    return nonConformity;
+                });
+        when(inspectionRepository.saveAndFlush(inspection)).thenReturn(inspection);
+
+        var response = service.complete(10L, 100L);
+
+        assertEquals(QualityInspectionStatus.REJECTED, response.status());
+        assertEquals(WorkOrderStatus.QUALITY_HOLD, workOrder.getStatus());
+        assertNotNull(response.nonConformity());
+        assertEquals("NC-0002", response.nonConformity().number());
+    }
+
+    @Test
     void updateCheckChecksQualityRoleBeforeLookingUpResources() {
         SaveQualityCheckRequest request = new SaveQualityCheckRequest(
                 QualityCheckType.NUMERIC_RANGE,
