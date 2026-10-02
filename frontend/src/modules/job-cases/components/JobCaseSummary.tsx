@@ -32,7 +32,10 @@ export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
   }
 
   return (
-    <div className="flex h-full flex-col rounded-xl border border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/25 p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+    <div
+      id="case-overview"
+      className="scroll-mt-24 flex h-full flex-col rounded-xl border border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/25 p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]"
+    >
       <div className="job-case-print-hidden mb-3 flex items-start justify-between gap-4">
         <div>
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
