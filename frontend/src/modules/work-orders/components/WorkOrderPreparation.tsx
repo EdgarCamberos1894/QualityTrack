@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { Button } from '@/shared/components/ui/Button'
@@ -72,6 +72,7 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
   const session = useSessionStore((state) => state.session)
   const location = useLocation()
   const mutations = useWorkOrderPreparationMutations(data.workOrder.id)
+  const routingPanelRef = useRef<HTMLDivElement | null>(null)
   const [detailPanel, setDetailPanel] = useState<DetailPanel>(() => {
     if (location.hash.startsWith('#routing-')) return 'routing'
     if (location.hash.startsWith('#document-')) return 'documents'
@@ -85,6 +86,19 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
       setDetailPanel('documents')
     }
   }, [location.hash])
+
+  useEffect(() => {
+    if (detailPanel !== 'routing') return
+
+    const frame = window.requestAnimationFrame(() => {
+      routingPanelRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [detailPanel])
   const roles = session?.user.roles ?? []
   const canPlan =
     roles.includes('ADMIN') ||
@@ -299,7 +313,13 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <section className="rounded-xl border border-slate-200 bg-slate-50/45 px-3.5 py-3">
+            <section
+              className={
+                detailPanel === 'documents'
+                  ? 'rounded-xl border border-blue-200 bg-blue-50/25 px-3.5 py-3 sm:col-span-2'
+                  : 'rounded-xl border border-slate-200 bg-slate-50/45 px-3.5 py-3'
+              }
+            >
               <p
                 className={
                   documentsReady
@@ -333,6 +353,19 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
                     ? 'Gestionar documento'
                     : 'Vincular documento'}
               </Button>
+
+              {detailPanel === 'documents' ? (
+                <div className="mt-3 border-t border-blue-100 pt-3">
+                  <WorkOrderPinnedDocuments
+                    documents={caseDocuments}
+                    pinnedDocuments={data.workOrder.pinnedDocuments}
+                    canEdit={documentsEditable}
+                    saving={mutations.pinDocument.isPending}
+                    error={mutations.pinDocument.error}
+                    onPin={pinDocument}
+                  />
+                </div>
+              ) : null}
             </section>
 
             <section className="rounded-xl border border-slate-200 bg-slate-50/45 px-3.5 py-3">
@@ -440,19 +473,9 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
         </aside>
       </div>
 
-      {detailPanel === 'documents' ? (
-        <WorkOrderPinnedDocuments
-          documents={caseDocuments}
-          pinnedDocuments={data.workOrder.pinnedDocuments}
-          canEdit={documentsEditable}
-          saving={mutations.pinDocument.isPending}
-          error={mutations.pinDocument.error}
-          onPin={pinDocument}
-        />
-      ) : null}
-
       {detailPanel === 'routing' ? (
-        <WorkOrderRoutingCard
+        <div ref={routingPanelRef} className="scroll-mt-20">
+          <WorkOrderRoutingCard
           routing={productionRouting}
           workOrderStatus={data.workOrder.status}
           pinnedDocumentCount={data.workOrder.pinnedDocuments.length}
@@ -477,6 +500,7 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
           onReopen={reopenRouting}
           onRelease={releaseRouting}
         />
+        </div>
       ) : null}
     </div>
   )
