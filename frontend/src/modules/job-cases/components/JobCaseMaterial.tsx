@@ -19,7 +19,7 @@ export function JobCaseMaterial({
   if (!specification) {
     if (request.materialRequirementType === 'SPECIFIED') {
       return (
-        <Card className="border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+        <Card className="h-full border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
               <SidebarNavIcon name="cases" className="h-[17px] w-[17px]" />
