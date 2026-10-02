@@ -5,6 +5,9 @@ ALTER TABLE quality_checks
     ADD COLUMN check_type TEXT NOT NULL DEFAULT 'NUMERIC_RANGE';
 
 ALTER TABLE quality_checks
+    ALTER COLUMN check_type DROP DEFAULT;
+
+ALTER TABLE quality_checks
     ALTER COLUMN nominal_value DROP NOT NULL,
     ALTER COLUMN lower_limit DROP NOT NULL,
     ALTER COLUMN upper_limit DROP NOT NULL,
