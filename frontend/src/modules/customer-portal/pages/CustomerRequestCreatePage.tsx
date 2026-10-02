@@ -6,6 +6,7 @@ import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
+import { CustomerRequestDeliveryStep } from '../components/CustomerRequestDeliveryStep'
 import { CustomerRequestDetailsStep } from '../components/CustomerRequestDetailsStep'
 import { LeaveCustomerRequestDialog } from '../components/LeaveCustomerRequestDialog'
 import { CustomerRequestRequirementsStep } from '../components/CustomerRequestRequirementsStep'
@@ -13,6 +14,7 @@ import { CustomerRequestReviewStep } from '../components/CustomerRequestReviewSt
 import { CustomerRequestStepActions } from '../components/CustomerRequestStepActions'
 import { CustomerRequestsBackButton } from '../components/CustomerRequestsBackButton'
 import { CustomerRequestWizardSteps } from '../components/CustomerRequestWizardSteps'
+import { useCustomerAddresses } from '../hooks/useCustomerCompany'
 import { useCustomerPortalContext } from '../hooks/useCustomerPortalContext'
 import { useSubmitCustomerRequest } from '../hooks/useCustomerRequestMutations'
 import {
@@ -25,6 +27,7 @@ export function CustomerRequestCreatePage() {
   const { customer } = useCustomerPortalContext()
   const navigate = useNavigate()
   const mutation = useSubmitCustomerRequest(customer.customerId)
+  const addressesQuery = useCustomerAddresses(customer.customerId)
   const [step, setStep] = useState(0)
   const [documents, setDocuments] = useState<RequestDocumentUpload[]>([])
   const [documentError, setDocumentError] = useState<string | null>(null)
@@ -48,12 +51,31 @@ export function CustomerRequestCreatePage() {
       customerReference: '',
       materialRequirementType: 'SPECIFIED',
       materialRequirement: '',
+      deliveryMode: 'DEFINE_LATER',
+      customerAddressId: '',
+      deliveryLabel: '',
+      deliveryAddress: '',
+      deliveryCity: '',
+      deliveryState: '',
+      deliveryPostalCode: '',
+      deliveryCountry: 'México',
+      deliveryContactName: '',
+      deliveryContactPhone: '',
+      deliveryInstructions: '',
     },
   })
 
   const materialRequirementType = useWatch({
     control,
     name: 'materialRequirementType',
+  })
+  const deliveryMode = useWatch({
+    control,
+    name: 'deliveryMode',
+  })
+  const selectedAddressId = useWatch({
+    control,
+    name: 'customerAddressId',
   })
   const canCreate = customer.role !== 'VIEWER'
   const requestsPath = `/portal/${customer.customerId}/requests`
@@ -97,13 +119,31 @@ export function CustomerRequestCreatePage() {
     if (valid) setStep(1)
   }
 
-  const goToReview = async () => {
+  const goToDelivery = async () => {
     const valid = await trigger([
       'materialRequirementType',
       'materialRequirement',
     ])
 
     if (valid) setStep(2)
+  }
+
+  const goToReview = async () => {
+    const valid = await trigger([
+      'deliveryMode',
+      'customerAddressId',
+      'deliveryLabel',
+      'deliveryAddress',
+      'deliveryCity',
+      'deliveryState',
+      'deliveryPostalCode',
+      'deliveryCountry',
+      'deliveryContactName',
+      'deliveryContactPhone',
+      'deliveryInstructions',
+    ])
+
+    if (valid) setStep(3)
   }
 
   const addFiles = (files: FileList | null) => {
@@ -139,10 +179,46 @@ export function CustomerRequestCreatePage() {
   const submit = handleSubmit(async (formValues) => {
     try {
       const request = await mutation.mutateAsync({
-        ...formValues,
+        title: formValues.title.trim(),
+        description: formValues.description.trim(),
+        quantity: formValues.quantity,
         customerReference: formValues.customerReference.trim() || undefined,
         requestedDeliveryDate:
           formValues.requestedDeliveryDate.trim() || undefined,
+        materialRequirementType: formValues.materialRequirementType,
+        materialRequirement: formValues.materialRequirement.trim(),
+        deliveryMode: formValues.deliveryMode,
+        ...(formValues.deliveryMode === 'SAVED_ADDRESS' &&
+        formValues.customerAddressId
+          ? { customerAddressId: Number(formValues.customerAddressId) }
+          : {}),
+        ...(formValues.deliveryLabel.trim()
+          ? { deliveryLabel: formValues.deliveryLabel.trim() }
+          : {}),
+        ...(formValues.deliveryAddress.trim()
+          ? { deliveryAddress: formValues.deliveryAddress.trim() }
+          : {}),
+        ...(formValues.deliveryCity.trim()
+          ? { deliveryCity: formValues.deliveryCity.trim() }
+          : {}),
+        ...(formValues.deliveryState.trim()
+          ? { deliveryState: formValues.deliveryState.trim() }
+          : {}),
+        ...(formValues.deliveryPostalCode.trim()
+          ? { deliveryPostalCode: formValues.deliveryPostalCode.trim() }
+          : {}),
+        ...(formValues.deliveryCountry.trim()
+          ? { deliveryCountry: formValues.deliveryCountry.trim() }
+          : {}),
+        ...(formValues.deliveryContactName.trim()
+          ? { deliveryContactName: formValues.deliveryContactName.trim() }
+          : {}),
+        ...(formValues.deliveryContactPhone.trim()
+          ? { deliveryContactPhone: formValues.deliveryContactPhone.trim() }
+          : {}),
+        ...(formValues.deliveryInstructions.trim()
+          ? { deliveryInstructions: formValues.deliveryInstructions.trim() }
+          : {}),
         documents,
       })
 
@@ -168,10 +244,10 @@ export function CustomerRequestCreatePage() {
               </p>
               <div className="mt-0.5 flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-0.5">
                 <h1 className="text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
-                  {step === 2 ? 'Revisar y enviar' : 'Nueva solicitud'}
+                  {step === 3 ? 'Revisar y enviar' : 'Nueva solicitud'}
                 </h1>
                 <p className="truncate text-[10px] text-slate-500">
-                  {step === 2
+                  {step === 3
                     ? 'Confirma la información antes de enviarla.'
                     : 'Completa la información necesaria para iniciar el trabajo.'}
                 </p>
@@ -202,7 +278,6 @@ export function CustomerRequestCreatePage() {
                     pending={mutation.isPending}
                     onBack={() => setStep((current) => current - 1)}
                     onContinue={() => void goToRequirements()}
-                    onReview={() => void goToReview()}
                   />
                 }
               />
@@ -236,26 +311,46 @@ export function CustomerRequestCreatePage() {
                     step={step}
                     pending={mutation.isPending}
                     onBack={() => setStep((current) => current - 1)}
-                    onContinue={() => void goToRequirements()}
-                    onReview={() => void goToReview()}
+                    onContinue={() => void goToDelivery()}
                   />
                 }
               />
             ) : null}
 
             {step === 2 ? (
-              <CustomerRequestReviewStep
-                values={getValues()}
-                documents={documents}
-                onEditDetails={() => setStep(0)}
-                onEditRequirements={() => setStep(1)}
+              <CustomerRequestDeliveryStep
+                register={register}
+                errors={errors}
+                setValue={setValue}
+                deliveryMode={deliveryMode}
+                selectedAddressId={selectedAddressId}
+                addresses={addressesQuery.data ?? []}
+                addressesPending={addressesQuery.isPending}
                 actions={
                   <CustomerRequestStepActions
                     step={step}
                     pending={mutation.isPending}
                     onBack={() => setStep((current) => current - 1)}
-                    onContinue={() => void goToRequirements()}
-                    onReview={() => void goToReview()}
+                    onContinue={() => void goToReview()}
+                  />
+                }
+              />
+            ) : null}
+
+            {step === 3 ? (
+              <CustomerRequestReviewStep
+                values={getValues()}
+                documents={documents}
+                onEditDetails={() => setStep(0)}
+                onEditRequirements={() => setStep(1)}
+                onEditDelivery={() => setStep(2)}
+                addresses={addressesQuery.data ?? []}
+                actions={
+                  <CustomerRequestStepActions
+                    step={step}
+                    pending={mutation.isPending}
+                    onBack={() => setStep((current) => current - 1)}
+                    onContinue={() => undefined}
                   />
                 }
               />
