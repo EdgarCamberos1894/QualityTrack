@@ -85,7 +85,7 @@ export function QuotationItemsEditor({
                 <input
                   disabled={!editable}
                   {...register(`items.${index}.description`)}
-                  className="mt-1 h-7 w-full min-w-0 rounded-md border border-slate-300 px-2 text-[9px] text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
+                  className="mt-1 h-7 w-full min-w-0 rounded-md border border-slate-300 px-2 text-[8px] font-medium text-slate-800 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
                 />
                 {errors.items?.[index]?.description?.message ? (
                   <p className="mt-1 text-[8px] text-red-600">
@@ -106,7 +106,7 @@ export function QuotationItemsEditor({
                   {...register(`items.${index}.quantity`, {
                     valueAsNumber: true,
                   })}
-                  className="mt-1 h-7 w-full min-w-0 rounded-md border border-slate-300 px-2 text-[9px] text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
+                  className="mt-1 h-7 w-full min-w-0 rounded-md border border-slate-300 px-2 text-[8px] font-medium text-slate-800 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
                 />
                 {errors.items?.[index]?.quantity?.message ? (
                   <p className="mt-1 text-[8px] text-red-600">
@@ -127,7 +127,7 @@ export function QuotationItemsEditor({
                   {...register(`items.${index}.unitPrice`, {
                     valueAsNumber: true,
                   })}
-                  className="mt-1 h-7 w-full min-w-0 rounded-md border border-slate-300 px-2 text-[9px] text-slate-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
+                  className="mt-1 h-7 w-full min-w-0 rounded-md border border-slate-300 px-2 text-[8px] font-medium text-slate-800 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-50 disabled:text-slate-500"
                 />
                 {errors.items?.[index]?.unitPrice?.message ? (
                   <p className="mt-1 text-[8px] text-red-600">
