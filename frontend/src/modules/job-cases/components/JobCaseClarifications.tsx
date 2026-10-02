@@ -1,5 +1,6 @@
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { Badge } from '@/shared/components/ui/Badge'
+import { formatJobCaseDateTime } from '../model/jobCasePresenter'
 import type { CaseInformationRequestDto } from '../types/jobCase.types'
 
 interface JobCaseClarificationsProps {
@@ -26,24 +27,30 @@ export function JobCaseClarifications({
         <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
           Comunicación con cliente
         </p>
-        <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
-          Aclaraciones del expediente
-        </h2>
+        <div className="mt-0.5 flex items-center justify-between gap-3">
+          <h2 className="text-[12px] font-semibold text-slate-950">
+            Aclaraciones del expediente
+          </h2>
+          <span className="text-[8px] text-slate-400">
+            {requests.filter((request) => request.open).length} pendientes
+          </span>
+        </div>
       </div>
 
       <div className="divide-y divide-slate-100">
         {requests.map((request) => (
-          <article key={request.id} className="px-4 py-3">
+          <article key={request.id} className="px-4 py-3.5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">
                   Aclaración #{request.id}
                 </p>
-                <h3 className="mt-0.5 text-[11px] font-semibold text-slate-950">
+                <h3 className="mt-0.5 text-[11px] font-semibold leading-5 text-slate-950">
                   {request.question}
                 </h3>
                 <p className="mt-1 text-[8px] text-slate-400">
-                  Solicitada por {request.requestedByName ?? 'Sistema'}
+                  Solicitada por {request.requestedByName ?? 'Sistema'} ·{' '}
+                  {formatJobCaseDateTime(request.requestedAt)}
                 </p>
               </div>
               <Badge
@@ -57,13 +64,21 @@ export function JobCaseClarifications({
             {request.response ? (
               <div className="mt-2.5 rounded-lg border border-slate-100 bg-slate-50/70 px-3 py-2.5">
                 <p className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">
-                  Respuesta
+                  Respuesta del cliente
                 </p>
                 <p className="mt-1 text-[10px] leading-4 text-slate-700">
                   {request.response}
                 </p>
+                <p className="mt-1.5 text-[7px] text-slate-400">
+                  Respondida por {request.respondedByName ?? 'Cliente'} ·{' '}
+                  {formatJobCaseDateTime(request.respondedAt)}
+                </p>
               </div>
-            ) : null}
+            ) : (
+              <p className="mt-2.5 rounded-lg border border-amber-100 bg-amber-50/60 px-3 py-2 text-[8px] leading-4 text-amber-800">
+                Esta aclaración sigue esperando respuesta y bloquea el cierre de la revisión.
+              </p>
+            )}
           </article>
         ))}
       </div>
