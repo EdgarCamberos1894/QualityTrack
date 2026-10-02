@@ -112,6 +112,9 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
         workOrderId: data.workOrder.id,
         payload: {
           quantity: values.quantity,
+          ...(values.destinationLabel.trim()
+            ? { destinationLabel: values.destinationLabel.trim() }
+            : {}),
           ...(values.destinationContactName.trim()
             ? { destinationContactName: values.destinationContactName.trim() }
             : {}),
@@ -120,6 +123,12 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
           destinationState: values.destinationState.trim(),
           destinationPostalCode: values.destinationPostalCode.trim(),
           destinationCountry: values.destinationCountry.trim(),
+          ...(values.destinationInstructions.trim()
+            ? {
+                destinationInstructions:
+                  values.destinationInstructions.trim(),
+              }
+            : {}),
           deliveryMethod: values.deliveryMethod.trim(),
         },
       })
