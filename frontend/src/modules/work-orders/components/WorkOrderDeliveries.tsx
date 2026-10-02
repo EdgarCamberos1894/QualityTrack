@@ -161,21 +161,34 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
     }
   }
 
-  const complete = async (values: CompleteDeliveryFormValues) => {
+  const complete = async (
+    values: CompleteDeliveryFormValues,
+    evidenceFile: File | null,
+  ) => {
     if (!target) return false
 
     try {
+      let evidenceDocumentVersionId = values.evidenceDocumentVersionId
+        ? Number(values.evidenceDocumentVersionId)
+        : undefined
+
+      if (evidenceFile) {
+        const updatedDelivery = await mutations.uploadEvidence.mutateAsync({
+          deliveryId: target.id,
+          file: evidenceFile,
+        })
+        evidenceDocumentVersionId =
+          updatedDelivery.evidenceDocumentVersionId ?? undefined
+        setTarget(updatedDelivery)
+      }
+
       await mutations.complete.mutateAsync({
         deliveryId: target.id,
         payload: {
           receivedByName: values.receivedByName.trim(),
           deliveredAt: new Date(values.deliveredAt).toISOString(),
-          ...(values.evidenceDocumentVersionId
-            ? {
-                evidenceDocumentVersionId: Number(
-                  values.evidenceDocumentVersionId,
-                ),
-              }
+          ...(evidenceDocumentVersionId
+            ? { evidenceDocumentVersionId }
             : {}),
         },
       })
@@ -376,9 +389,12 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
         delivery={dialog === 'complete' ? target : null}
         evidenceOptions={evidenceOptions}
         submitting={mutations.complete.isPending}
+        uploading={mutations.uploadEvidence.isPending}
         error={mutations.complete.error}
+        uploadError={mutations.uploadEvidence.error}
         onClose={() => {
           mutations.complete.reset()
+          mutations.uploadEvidence.reset()
           setTarget(null)
           setDialog(null)
         }}
