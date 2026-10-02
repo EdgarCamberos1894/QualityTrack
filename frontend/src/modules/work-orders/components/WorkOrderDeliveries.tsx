@@ -17,7 +17,7 @@ import { useDeliveryMutations } from '../hooks/useDeliveryMutations'
 import {
   getAvailableDeliveryQuantity,
   getDeliveredQuantity,
-  getReservedQuantity,
+  getOpenDeliveryQuantity,
 } from '../model/deliveryPresenter'
 import type {
   AttachDeliveryEvidenceFormValues,
@@ -83,7 +83,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
     priorityDelivery
 
   const plannedQuantity = data.workOrder.plannedQuantity ?? 0
-  const reservedQuantity = getReservedQuantity(deliveries)
+  const inProgressQuantity = getOpenDeliveryQuantity(deliveries)
   const deliveredQuantity = getDeliveredQuantity(deliveries)
   const availableQuantity = getAvailableDeliveryQuantity(
     data.workOrder.plannedQuantity,
@@ -281,7 +281,7 @@ export function WorkOrderDeliveries({ data }: WorkOrderDeliveriesProps) {
         <DeliveryStagePanel
           delivery={selectedDelivery}
           plannedQuantity={plannedQuantity}
-          reservedQuantity={reservedQuantity}
+          inProgressQuantity={inProgressQuantity}
           deliveredQuantity={deliveredQuantity}
           availableQuantity={availableQuantity}
           canManage={canManage}
