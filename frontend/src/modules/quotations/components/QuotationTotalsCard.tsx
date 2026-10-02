@@ -38,7 +38,7 @@ export function QuotationTotalsCard({
     currency.trim().length === 3 ? currency.toUpperCase() : 'MXN'
 
   return (
-    <aside className="h-fit overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+    <aside className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
       <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3">
         <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
           Resumen
@@ -48,7 +48,7 @@ export function QuotationTotalsCard({
         </h2>
       </div>
 
-      <div className="px-4 py-4">
+      <div className="flex min-h-0 flex-1 flex-col px-4 py-4">
         <dl className="space-y-3 text-[9px]">
           <div className="flex justify-between gap-4 text-slate-500">
             <dt>Subtotal</dt>
@@ -114,7 +114,7 @@ export function QuotationTotalsCard({
           </p>
         ) : null}
 
-        <div className="mt-4 space-y-2">
+        <div className="mt-auto space-y-2 pt-4">
           <Button
             size="sm"
             variant="secondary"
