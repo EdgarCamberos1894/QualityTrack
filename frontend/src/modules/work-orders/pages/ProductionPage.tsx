@@ -137,7 +137,7 @@ export function ProductionPage() {
           workOrders={queue}
           tab="production"
           emptyTitle="Sin trabajo pendiente de producción"
-          emptyDescription="Las órdenes aparecerán aquí cuando su routing de producción sea liberado."
+          emptyDescription="Las órdenes aparecerán aquí cuando su hoja de ruta de producción sea liberada."
           getActionLabel={(workOrder) =>
             workOrder.status === 'IN_PRODUCTION' ? 'Continuar' : 'Iniciar'
           }
