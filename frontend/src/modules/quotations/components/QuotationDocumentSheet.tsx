@@ -26,6 +26,7 @@ interface QuotationDocumentSheetProps {
   total: number
   items: QuotationDocumentSheetItem[]
   materialLabel?: string | null
+  compact?: boolean
   className?: string
 }
 
@@ -44,21 +45,36 @@ export function QuotationDocumentSheet({
   total,
   items,
   materialLabel,
+  compact = false,
   className = '',
 }: QuotationDocumentSheetProps) {
   return (
     <article
-      className={`customer-quotation-print-area quotation-document-sheet flex min-h-[620px] flex-col rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-[0_18px_50px_-32px_rgba(15,23,42,0.4)] sm:px-7 sm:py-6 ${className}`}
+      className={`customer-quotation-print-area quotation-document-sheet flex flex-col rounded-2xl border border-slate-200 bg-white shadow-[0_18px_50px_-32px_rgba(15,23,42,0.4)] ${
+        compact
+          ? 'min-h-0 px-4 py-4 sm:px-5 sm:py-4'
+          : 'min-h-[620px] px-5 py-5 sm:px-7 sm:py-6'
+      } ${className}`}
     >
-      <header className="quotation-sheet-header flex items-start justify-between gap-4 border-b border-slate-200 pb-4">
+      <header
+        className={`quotation-sheet-header flex items-start justify-between gap-4 border-b border-slate-200 ${
+          compact ? 'pb-3' : 'pb-4'
+        }`}
+      >
         <div className="flex items-center gap-3">
           <img
             src="/brand/qualitytrack-mark.svg"
             alt="QualityTrack"
-            className="h-12 w-12 shrink-0"
+            className={compact ? 'h-9 w-9 shrink-0' : 'h-12 w-12 shrink-0'}
           />
           <div>
-            <p className="text-[14px] font-bold tracking-tight text-slate-950">
+            <p
+              className={
+                compact
+                  ? 'text-[12px] font-bold tracking-tight text-slate-950'
+                  : 'text-[14px] font-bold tracking-tight text-slate-950'
+              }
+            >
               Quality<span className="text-blue-600">Track</span>
             </p>
             <p className="mt-0.5 text-[7px] uppercase tracking-[0.11em] text-slate-400">
@@ -77,7 +93,11 @@ export function QuotationDocumentSheet({
         </div>
       </header>
 
-      <div className="quotation-sheet-meta mt-5 grid gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 px-4 py-4 sm:grid-cols-[1.5fr_0.75fr_0.75fr]">
+      <div
+        className={`quotation-sheet-meta grid gap-3 rounded-2xl border border-slate-100 bg-slate-50/70 sm:grid-cols-[1.5fr_0.75fr_0.75fr] ${
+          compact ? 'mt-3 px-3.5 py-3' : 'mt-5 px-4 py-4'
+        }`}
+      >
         <div>
           <p className="text-[7px] font-bold uppercase tracking-[0.1em] text-slate-400">
             Cliente
@@ -109,9 +129,15 @@ export function QuotationDocumentSheet({
         </div>
       </div>
 
-      <section className="quotation-sheet-scope mt-7">
+      <section className={`quotation-sheet-scope ${compact ? 'mt-4' : 'mt-7'}`}>
         <div className="flex items-center justify-between gap-4">
-          <h3 className="text-[13px] font-semibold text-slate-950">
+          <h3
+            className={
+              compact
+                ? 'text-[11px] font-semibold text-slate-950'
+                : 'text-[13px] font-semibold text-slate-950'
+            }
+          >
             Alcance comercial
           </h3>
           <span className="text-[8px] font-medium text-slate-400">
@@ -119,7 +145,11 @@ export function QuotationDocumentSheet({
           </span>
         </div>
 
-        <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+        <div
+          className={`overflow-hidden rounded-2xl border border-slate-200 bg-white ${
+            compact ? 'mt-2' : 'mt-3'
+          }`}
+        >
           {items.length === 0 ? (
             <div className="bg-slate-50/70 px-4 py-5 text-center text-[9px] text-slate-400">
               Todavía no hay conceptos en esta revisión.
@@ -130,8 +160,12 @@ export function QuotationDocumentSheet({
                 key={item.key}
                 className={
                   index === 0
-                    ? 'grid gap-3 bg-slate-50/70 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_115px_120px]'
-                    : 'grid gap-3 border-t border-slate-200 px-4 py-4 sm:grid-cols-[minmax(0,1fr)_115px_120px]'
+                    ? `grid gap-3 bg-slate-50/70 sm:grid-cols-[minmax(0,1fr)_115px_120px] ${
+                        compact ? 'px-3.5 py-2.5' : 'px-4 py-4'
+                      }`
+                    : `grid gap-3 border-t border-slate-200 sm:grid-cols-[minmax(0,1fr)_115px_120px] ${
+                        compact ? 'px-3.5 py-2.5' : 'px-4 py-4'
+                      }`
                 }
               >
                 <div className="min-w-0">
@@ -159,12 +193,22 @@ export function QuotationDocumentSheet({
         </div>
       </section>
 
-      <div className="quotation-sheet-bottom mt-auto grid gap-6 pt-8 sm:grid-cols-[1fr_0.76fr]">
+      <div
+        className={`quotation-sheet-bottom mt-auto grid gap-5 sm:grid-cols-[1fr_0.76fr] ${
+          compact ? 'pt-5' : 'pt-8'
+        }`}
+      >
         <section>
           <p className="text-[7px] font-bold uppercase tracking-[0.1em] text-slate-400">
             Condiciones comerciales
           </p>
-          <ul className="mt-3 space-y-2 text-[8px] leading-4 text-slate-600">
+          <ul
+            className={
+              compact
+                ? 'mt-2 space-y-1 text-[7px] leading-3.5 text-slate-600'
+                : 'mt-3 space-y-2 text-[8px] leading-4 text-slate-600'
+            }
+          >
             <li>• Precios expresados en {currency}.</li>
             <li>• Vigencia hasta el {formatQuotationDate(validUntil)}.</li>
             <li>
@@ -177,7 +221,11 @@ export function QuotationDocumentSheet({
           </ul>
         </section>
 
-        <dl className="rounded-2xl border border-blue-100 bg-blue-50/45 px-4 py-3.5">
+        <dl
+          className={`rounded-2xl border border-blue-100 bg-blue-50/45 ${
+            compact ? 'px-3.5 py-3' : 'px-4 py-3.5'
+          }`}
+        >
           <div className="flex items-center justify-between gap-4">
             <dt className="text-[8px] text-slate-500">Subtotal</dt>
             <dd className="text-[10px] font-semibold text-slate-900">
@@ -203,7 +251,11 @@ export function QuotationDocumentSheet({
         </dl>
       </div>
 
-      <footer className="quotation-sheet-note mt-7 border-t border-slate-100 pt-4">
+      <footer
+        className={`quotation-sheet-note border-t border-slate-100 ${
+          compact ? 'mt-4 pt-3' : 'mt-7 pt-4'
+        }`}
+      >
         <div className="flex items-center justify-between gap-4">
           <p className="text-[7px] leading-4 text-slate-400">
             Documento representativo de la revisión vigente.
