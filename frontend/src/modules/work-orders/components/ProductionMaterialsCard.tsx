@@ -84,25 +84,39 @@ export function ProductionMaterialsCard({
             >
               Material
             </label>
-            <select
-              id="production-material"
-              value={materialId ?? ''}
-              disabled={materialsQuery.isPending || submitting}
-              onChange={(event) => {
-                setMaterialId(
-                  event.target.value ? Number(event.target.value) : null,
-                )
-                setLotId(null)
-              }}
-              className="h-8 w-full rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] text-slate-950 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
-            >
-              <option value="">Seleccionar material</option>
-              {(materialsQuery.data ?? []).map((material) => (
-                <option key={material.id} value={material.id}>
-                  {material.code} · {material.name} · {material.unit}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                id="production-material"
+                value={materialId ?? ''}
+                disabled={materialsQuery.isPending || submitting}
+                onChange={(event) => {
+                  setMaterialId(
+                    event.target.value ? Number(event.target.value) : null,
+                  )
+                  setLotId(null)
+                }}
+                className="h-7 w-full appearance-none rounded-lg border border-slate-300 bg-white px-2 pr-7 !text-[8px] !font-normal !leading-none text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 disabled:text-slate-500"
+              >
+                <option value="">Seleccionar material</option>
+                {(materialsQuery.data ?? []).map((material) => (
+                  <option
+                    key={material.id}
+                    value={material.id}
+                    className="text-[8px] font-normal"
+                  >
+                    {material.code} · {material.name} · {material.unit}
+                  </option>
+                ))}
+              </select>
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                className="pointer-events-none absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2 text-slate-400"
+                fill="currentColor"
+              >
+                <path d="M5.22 7.47a.75.75 0 0 1 1.06 0L10 11.19l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 8.53a.75.75 0 0 1 0-1.06Z" />
+              </svg>
+            </div>
           </div>
 
           <div>
@@ -112,24 +126,38 @@ export function ProductionMaterialsCard({
             >
               Lote
             </label>
-            <select
-              id="production-lot"
-              value={lotId ?? ''}
-              disabled={
-                materialId === null || lotsQuery.isPending || submitting
-              }
-              onChange={(event) =>
-                setLotId(event.target.value ? Number(event.target.value) : null)
-              }
-              className="h-8 w-full rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] text-slate-950 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100"
-            >
-              <option value="">Seleccionar lote</option>
-              {(lotsQuery.data ?? []).map((lot) => (
-                <option key={lot.id} value={lot.id}>
-                  {lot.lotNumber} · recibido {lot.quantityReceived}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                id="production-lot"
+                value={lotId ?? ''}
+                disabled={
+                  materialId === null || lotsQuery.isPending || submitting
+                }
+                onChange={(event) =>
+                  setLotId(event.target.value ? Number(event.target.value) : null)
+                }
+                className="h-7 w-full appearance-none rounded-lg border border-slate-300 bg-white px-2 pr-7 !text-[8px] !font-normal !leading-none text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 disabled:text-slate-500"
+              >
+                <option value="">Seleccionar lote</option>
+                {(lotsQuery.data ?? []).map((lot) => (
+                  <option
+                    key={lot.id}
+                    value={lot.id}
+                    className="text-[8px] font-normal"
+                  >
+                    {lot.lotNumber} · recibido {lot.quantityReceived}
+                  </option>
+                ))}
+              </select>
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 20 20"
+                className="pointer-events-none absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2 text-slate-400"
+                fill="currentColor"
+              >
+                <path d="M5.22 7.47a.75.75 0 0 1 1.06 0L10 11.19l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 8.53a.75.75 0 0 1 0-1.06Z" />
+              </svg>
+            </div>
           </div>
 
           <TextField
