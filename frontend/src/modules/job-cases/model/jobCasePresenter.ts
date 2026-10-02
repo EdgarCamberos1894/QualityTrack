@@ -19,6 +19,7 @@ const statusPresentation: Record<JobCaseStatus, StatusPresentation> = {
     tone: 'warning',
   },
   READY_FOR_QUOTATION: { label: 'Listo para cotizar', tone: 'success' },
+  AWAITING_WORK_ORDER: { label: 'Pendiente de OT', tone: 'warning' },
   IN_PRODUCTION: { label: 'En producción', tone: 'info' },
   COMPLETED: { label: 'Completado', tone: 'success' },
   CANCELLED: { label: 'Cancelado', tone: 'danger' },
