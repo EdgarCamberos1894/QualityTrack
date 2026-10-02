@@ -49,7 +49,7 @@ export function WorkOrderDocuments({ documents }: WorkOrderDocumentsProps) {
       <div className="flex items-center justify-between gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
         <div>
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-            Centro documental 360
+            Documentación relacionada
           </p>
           <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
             Documentos vinculados a la orden
