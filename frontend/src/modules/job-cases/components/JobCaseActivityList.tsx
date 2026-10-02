@@ -12,6 +12,7 @@ import type { JobCaseTimelineEventDto } from '../types/jobCase.types'
 interface JobCaseActivityListProps {
   events: JobCaseTimelineEventDto[]
   caseId: number
+  workOrderId?: number | null
 }
 
 function formatStatus(value: string | null): string {
@@ -26,17 +27,27 @@ function formatStatus(value: string | null): string {
 export function JobCaseActivityList({
   events,
   caseId,
+  workOrderId = null,
 }: JobCaseActivityListProps) {
   const navigate = useNavigate()
 
   return (
     <div className="relative space-y-2.5 pl-5 before:absolute before:bottom-3 before:left-[5px] before:top-3 before:w-px before:bg-slate-200">
       {events.map((event) => {
-        const primaryHref = getPrimaryJobCaseTraceabilityHref(event, caseId)
+        const primaryHref = getPrimaryJobCaseTraceabilityHref(
+          event,
+          caseId,
+          workOrderId,
+        )
         const actions = (event.actions ?? [])
           .map((action) => ({
             action,
-            href: getJobCaseTraceabilityActionHref(action, event, caseId),
+            href: getJobCaseTraceabilityActionHref(
+              action,
+              event,
+              caseId,
+              workOrderId,
+            ),
           }))
           .filter(
             (
