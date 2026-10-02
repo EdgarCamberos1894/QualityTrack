@@ -178,6 +178,8 @@ const detailLabels: Record<string, string> = {
   operationCode: 'Operación',
   operationName: 'Proceso',
   characteristic: 'Característica',
+  name: 'Control',
+  checkType: 'Tipo de control',
   measuredValue: 'Medición',
   result: 'Resultado',
   nonConformityNumber: 'NC',
@@ -304,16 +306,15 @@ export function getTraceabilityActionHref(
         'quality',
         `quality-inspection-${action.resourceId}`,
       )
-    case 'VIEW_QUALITY_MEASUREMENT': {
+    case 'VIEW_QUALITY_MEASUREMENT':
+    case 'VIEW_QUALITY_CHECK': {
       const inspection = data.qualityInspections.find((item) =>
-        item.measurements.some(
-          (measurement) => measurement.id === action.resourceId,
-        ),
+        item.checks.some((qualityCheck) => qualityCheck.id === action.resourceId),
       )
       return workOrderViewHref(
         data,
         'quality',
-        inspection ? `quality-measurement-${action.resourceId}` : undefined,
+        inspection ? `quality-check-${action.resourceId}` : undefined,
       )
     }
     case 'VIEW_NON_CONFORMITY':
