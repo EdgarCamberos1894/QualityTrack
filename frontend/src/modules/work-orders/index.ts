@@ -1,4 +1,3 @@
-export { WorkOrderCreationPanel } from './components/WorkOrderCreationPanel'
 export { useWorkOrders } from './hooks/useWorkOrders'
 export { DeliveriesPage } from './pages/DeliveriesPage'
 export { ProductionPage } from './pages/ProductionPage'
