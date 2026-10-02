@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import { Button } from '@/shared/components/ui/Button'
@@ -32,6 +32,7 @@ interface QuotationEditorFormProps {
     adjustmentResponse: string | null,
   ) => Promise<void>
   onPreview: (preview: QuotationPreviewData) => void
+  sidebarContent?: ReactNode
 }
 
 export function QuotationEditorForm({
@@ -42,6 +43,7 @@ export function QuotationEditorForm({
   onSave,
   onSend,
   onPreview,
+  sidebarContent,
 }: QuotationEditorFormProps) {
   const [actionError, setActionError] = useState<string | null>(null)
   const {
@@ -211,24 +213,28 @@ export function QuotationEditorForm({
         ) : null}
       </section>
 
-      <QuotationTotalsCard
-        totals={totals}
-        currency={currency}
-        taxRate={taxRate}
-        validUntil={validUntil}
-        estimatedDeliveryDate={estimatedDeliveryDate}
-        editable={editable}
-        saving={saving}
-        sending={sending}
-        actionError={actionError}
-        sendLabel={
-          quotation.adjustmentNotes
-            ? 'Revisar y enviar nueva revisión'
-            : 'Revisar y enviar'
-        }
-        onPreview={() => void preview()}
-        onSend={() => void send()}
-      />
+      <div className="space-y-3 lg:sticky lg:top-[88px]">
+        <QuotationTotalsCard
+          totals={totals}
+          currency={currency}
+          taxRate={taxRate}
+          validUntil={validUntil}
+          estimatedDeliveryDate={estimatedDeliveryDate}
+          editable={editable}
+          saving={saving}
+          sending={sending}
+          actionError={actionError}
+          sendLabel={
+            quotation.adjustmentNotes
+              ? 'Revisar y enviar nueva revisión'
+              : 'Revisar y enviar'
+          }
+          onPreview={() => void preview()}
+          onSend={() => void send()}
+        />
+
+        {sidebarContent}
+      </div>
     </form>
   )
 }
