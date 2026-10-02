@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
   formatJobCaseDateTime,
   getJobCaseTimelineEventLabel,
@@ -29,8 +29,6 @@ export function JobCaseActivityList({
   caseId,
   workOrderId = null,
 }: JobCaseActivityListProps) {
-  const navigate = useNavigate()
-
   return (
     <div className="relative space-y-2.5 pl-5 before:absolute before:bottom-3 before:left-[5px] before:top-3 before:w-px before:bg-slate-200">
       {events.map((event) => {
@@ -58,40 +56,27 @@ export function JobCaseActivityList({
             } => item.href !== null,
           )
 
+        const primaryAction =
+          actions.find(({ href }) => href === primaryHref) ?? actions.at(0)
+        const secondaryActions = primaryAction
+          ? actions.filter(
+              ({ action }) =>
+                !(
+                  action.type === primaryAction.action.type &&
+                  action.resourceId === primaryAction.action.resourceId
+                ),
+            )
+          : actions
+
         return (
           <article
             key={event.id}
-            role={primaryHref ? 'link' : undefined}
-            tabIndex={primaryHref ? 0 : undefined}
-            onClick={() => {
-              if (primaryHref) navigate(primaryHref)
-            }}
-            onKeyDown={(keyboardEvent) => {
-              if (
-                !primaryHref ||
-                keyboardEvent.currentTarget !== keyboardEvent.target
-              ) {
-                return
-              }
-
-              if (
-                keyboardEvent.key === 'Enter' ||
-                keyboardEvent.key === ' '
-              ) {
-                keyboardEvent.preventDefault()
-                navigate(primaryHref)
-              }
-            }}
-            className={
-              primaryHref
-                ? 'relative cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-2.5 transition hover:border-blue-200 hover:bg-blue-50/30 focus:outline-none focus:ring-2 focus:ring-blue-200'
-                : 'relative rounded-lg border border-slate-200 bg-white px-3 py-2.5'
-            }
+            className="relative rounded-lg border border-slate-200 bg-white px-3 py-2.5 transition hover:border-slate-300"
           >
             <span className="absolute -left-[19px] top-3.5 h-2.5 w-2.5 rounded-full bg-blue-500 ring-4 ring-white" />
 
             <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between">
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <h3 className="text-[10px] font-semibold text-slate-950">
                   {getJobCaseTimelineEventLabel(event.eventType)}
                 </h3>
@@ -106,20 +91,23 @@ export function JobCaseActivityList({
                   </p>
                 ) : null}
 
-                {primaryHref ? (
-                  <p className="mt-1.5 text-[8px] font-semibold text-blue-600">
-                    Abrir registro relacionado →
-                  </p>
-                ) : null}
+                {primaryAction ? (
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                    <Link
+                      to={primaryAction.href}
+                      className="inline-flex h-7 items-center justify-center rounded-lg bg-blue-600 px-2.5 text-[8px] font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                    >
+                      {primaryAction.action.label}
+                      <span aria-hidden="true" className="ml-1">
+                        →
+                      </span>
+                    </Link>
 
-                {actions.length > 0 ? (
-                  <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1">
-                    {actions.map(({ action, href }) => (
+                    {secondaryActions.map(({ action, href }) => (
                       <Link
                         key={`${action.type}-${action.resourceId}`}
                         to={href}
-                        onClick={(clickEvent) => clickEvent.stopPropagation()}
-                        className="text-[8px] font-semibold text-blue-600 hover:text-blue-800 hover:underline"
+                        className="inline-flex h-7 items-center justify-center rounded-lg border border-slate-200 bg-white px-2.5 text-[8px] font-semibold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
                       >
                         {action.label}
                       </Link>
