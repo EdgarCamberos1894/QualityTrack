@@ -33,8 +33,8 @@ export function QuotationItemsEditor({
     currency.trim().length === 3 ? currency.toUpperCase() : 'MXN'
 
   return (
-    <section className="flex min-h-[150px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-50/45 lg:h-[300px]">
-      <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-3.5 py-2.5">
+    <section className="flex min-h-[150px] flex-col overflow-hidden rounded-xl border border-slate-200 bg-slate-50/45 lg:h-[215px]">
+      <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-white px-3 py-2">
         <div>
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
             Partidas
@@ -48,7 +48,7 @@ export function QuotationItemsEditor({
           <Button
             size="sm"
             variant="secondary"
-            className="!h-7 !px-2.5 !text-[8px]"
+            className="!h-7 !px-2 !text-[7.5px]"
             onClick={() =>
               append({
                 description: '',
@@ -62,7 +62,7 @@ export function QuotationItemsEditor({
         ) : null}
       </div>
 
-      <div className="min-h-0 flex-1 space-y-2 overflow-x-hidden overflow-y-auto overscroll-contain p-2">
+      <div className="min-h-0 flex-1 space-y-1.5 overflow-x-hidden overflow-y-auto overscroll-contain p-1.5">
         {fields.length === 0 ? (
           <div className="rounded-lg border border-dashed border-slate-300 bg-white px-4 py-4 text-center text-[9px] text-slate-400">
             Todavía no hay conceptos en esta revisión.
@@ -76,7 +76,7 @@ export function QuotationItemsEditor({
           return (
             <div
               key={field.id}
-              className="grid min-w-0 gap-2 rounded-lg border border-slate-200 bg-white p-2 lg:grid-cols-[minmax(0,1fr)_72px_100px_82px_48px]"
+              className="grid min-w-0 gap-1.5 rounded-lg border border-slate-200 bg-white p-1.5 lg:grid-cols-[minmax(0,1fr)_68px_94px_78px_44px]"
             >
               <div className="min-w-0">
                 <label className="text-[7px] font-semibold uppercase tracking-wide text-slate-400">
