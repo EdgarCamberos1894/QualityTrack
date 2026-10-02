@@ -1,7 +1,7 @@
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import {
-  countMeasurementResults,
+  countQualityCheckResults,
   getNonConformityDispositionLabel,
   getQualityInspectionStatusPresentation,
 } from '../model/qualityPresenter'
@@ -39,7 +39,7 @@ export function QualityStagePanel({
   inspectionCount,
 }: QualityStagePanelProps) {
   const totals = inspection
-    ? countMeasurementResults(inspection.measurements)
+    ? countQualityCheckResults(inspection.checks)
     : { pass: 0, fail: 0 }
   const status = inspection
     ? getQualityInspectionStatusPresentation(inspection.status)
@@ -73,7 +73,7 @@ export function QualityStagePanel({
         eyebrow: 'Inspección pendiente',
         title: isReinspection ? 'Iniciar reinspección' : 'Iniciar inspección',
         description:
-          'El inspector debe tomar la inspección antes de registrar mediciones.',
+          'El inspector debe tomar la inspección antes de registrar controles.',
         tone: 'info' as const,
       }
     }
@@ -81,10 +81,10 @@ export function QualityStagePanel({
     if (inspection?.status === 'IN_PROGRESS') {
       return {
         eyebrow: 'Inspección en curso',
-        title: 'Completar mediciones',
+        title: 'Completar controles',
         description:
-          inspection.measurements.length === 0
-            ? 'Registra al menos una medición antes de poder cerrar la inspección.'
+          inspection.checks.length === 0
+            ? 'Registra al menos una control antes de poder cerrar la inspección.'
             : 'Revisa PASS y FAIL antes de finalizar. El resultado quedará histórico.',
         tone: 'info' as const,
       }
@@ -152,9 +152,9 @@ export function QualityStagePanel({
       {inspection ? (
         <div className="mt-4 grid grid-cols-3 divide-x divide-slate-100 rounded-xl border border-slate-200 bg-slate-50/45">
           <div className="px-2.5 py-2.5">
-            <p className="text-[7px] text-slate-400">Mediciones</p>
+            <p className="text-[7px] text-slate-400">Controles</p>
             <p className="mt-0.5 text-[12px] font-bold text-slate-950">
-              {inspection.measurements.length}
+              {inspection.checks.length}
             </p>
           </div>
           <div className="px-2.5 py-2.5">
@@ -236,7 +236,7 @@ export function QualityStagePanel({
           <Button
             className="!h-8 !w-full !justify-center !text-[8px]"
             onClick={onComplete}
-            disabled={!inspection || inspection.measurements.length === 0}
+            disabled={!inspection || inspection.checks.length === 0}
           >
             {isReinspection
               ? 'Revisar y finalizar reinspección'
