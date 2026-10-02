@@ -88,11 +88,7 @@ export function useJobCaseDocumentFileActions() {
     setError(null)
 
     try {
-      const blob = await getJobCaseDocumentContent(
-        documentId,
-        version.id,
-        true,
-      )
+      const blob = await getJobCaseDocumentContent(documentId, version.id, true)
       downloadBlob(blob, version.fileName)
     } catch (requestError) {
       setError(requestError)
