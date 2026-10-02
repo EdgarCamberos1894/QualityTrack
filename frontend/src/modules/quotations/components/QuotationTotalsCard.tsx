@@ -39,7 +39,7 @@ export function QuotationTotalsCard({
 
   return (
     <aside className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
-      <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3">
+      <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
         <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
           Resumen
         </p>
@@ -48,8 +48,8 @@ export function QuotationTotalsCard({
         </h2>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col px-4 py-4">
-        <dl className="space-y-3 text-[9px]">
+      <div className="flex min-h-0 flex-1 flex-col px-4 py-3.5">
+        <dl className="space-y-2.5 text-[8.5px]">
           <div className="flex justify-between gap-4 text-slate-500">
             <dt>Subtotal</dt>
             <dd className="font-semibold text-slate-900">
@@ -64,19 +64,19 @@ export function QuotationTotalsCard({
             </dd>
           </div>
 
-          <div className="border-t border-slate-200 pt-3">
+          <div className="border-t border-slate-200 pt-2.5">
             <div className="flex items-end justify-between gap-4">
               <dt className="font-semibold text-slate-900">Total</dt>
-              <dd className="text-right text-[16px] font-bold tracking-tight text-slate-950">
+              <dd className="text-right text-[15px] font-bold tracking-tight text-slate-950">
                 {formatQuotationMoney(totals.total, safeCurrency)}
               </dd>
             </div>
           </div>
         </dl>
 
-        <section className="mt-4 border-t border-slate-100 pt-4">
+        <section className="mt-3 border-t border-slate-100 pt-3">
           <p className="text-[8px] font-bold text-slate-900">Condiciones</p>
-          <ul className="mt-2 space-y-2 text-[8px] leading-4 text-slate-600">
+          <ul className="mt-1.5 space-y-1.5 text-[7.5px] leading-3.5 text-slate-600">
             <li>
               • Vigencia:{' '}
               {validUntil
@@ -94,7 +94,7 @@ export function QuotationTotalsCard({
         </section>
 
         {editable ? (
-          <div className="mt-4 rounded-xl border border-blue-100 bg-blue-50/50 px-3 py-2.5">
+          <div className="mt-3 rounded-xl border border-blue-100 bg-blue-50/50 px-3 py-2">
             <p className="text-[8px] font-semibold text-blue-900">
               ¿Todo listo?
             </p>
@@ -114,11 +114,11 @@ export function QuotationTotalsCard({
           </p>
         ) : null}
 
-        <div className="mt-auto space-y-2 pt-4">
+        <div className="mt-auto space-y-1.5 pt-3">
           <Button
             size="sm"
             variant="secondary"
-            className="!h-9 !w-full !justify-center !text-[8px]"
+            className="!h-8 !w-full !justify-center !text-[8px]"
             onClick={onPreview}
             disabled={saving || sending}
           >
@@ -128,7 +128,7 @@ export function QuotationTotalsCard({
           {editable ? (
             <Button
               size="sm"
-              className="!h-9 !w-full !justify-center !text-[8px]"
+              className="!h-8 !w-full !justify-center !text-[8px]"
               onClick={onSend}
               disabled={saving || sending}
             >
@@ -138,7 +138,7 @@ export function QuotationTotalsCard({
         </div>
       </div>
 
-      <p className="border-t border-slate-100 bg-slate-50/60 px-4 py-2 text-[7px] leading-3 text-slate-400">
+      <p className="border-t border-slate-100 bg-slate-50/60 px-4 py-1.5 text-[6.5px] leading-3 text-slate-400">
         Los importes se recalculan y validan en backend al guardar o enviar.
       </p>
     </aside>
