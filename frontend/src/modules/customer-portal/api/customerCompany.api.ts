@@ -3,9 +3,11 @@ import type { ApiResponse } from '@/shared/api/api.types'
 import type {
   CreateCustomerCompanyPayload,
   CreateCustomerInvitationPayload,
+  CustomerAddressDto,
   CustomerCompanyDto,
   CustomerInvitationDto,
   CustomerMemberDto,
+  SaveCustomerAddressPayload,
   UpdateCustomerCompanyPayload,
   UpdateCustomerMemberRolePayload,
 } from '../types/customerCompany.types'
@@ -100,4 +102,44 @@ export async function createCustomerInvitation(
   )
 
   return response.data.data
+}
+
+
+export async function getCustomerAddresses(
+  customerId: number,
+): Promise<CustomerAddressDto[]> {
+  const response = await apiClient.get<ApiResponse<CustomerAddressDto[]>>(
+    `/customers/${customerId}/addresses`,
+  )
+  return response.data.data
+}
+
+export async function createCustomerAddress(
+  customerId: number,
+  payload: SaveCustomerAddressPayload,
+): Promise<CustomerAddressDto> {
+  const response = await apiClient.post<ApiResponse<CustomerAddressDto>>(
+    `/customers/${customerId}/addresses`,
+    payload,
+  )
+  return response.data.data
+}
+
+export async function updateCustomerAddress(
+  customerId: number,
+  addressId: number,
+  payload: SaveCustomerAddressPayload,
+): Promise<CustomerAddressDto> {
+  const response = await apiClient.put<ApiResponse<CustomerAddressDto>>(
+    `/customers/${customerId}/addresses/${addressId}`,
+    payload,
+  )
+  return response.data.data
+}
+
+export async function deleteCustomerAddress(
+  customerId: number,
+  addressId: number,
+): Promise<void> {
+  await apiClient.delete(`/customers/${customerId}/addresses/${addressId}`)
 }
