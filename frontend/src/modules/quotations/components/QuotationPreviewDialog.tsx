@@ -43,7 +43,7 @@ export function QuotationPreviewDialog({
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 p-3 sm:p-4"
       onMouseDown={onClose}
     >
-      <div className="flex w-[min(78vw,820px)] max-h-[94vh] flex-col">
+      <div className="flex w-[min(90vw,880px)] max-h-[94vh] flex-col">
         <div className="mb-2 flex shrink-0 items-center justify-between px-1 text-white/80">
           <div>
             <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-200">
@@ -88,8 +88,7 @@ export function QuotationPreviewDialog({
               unitPrice: item.unitPrice,
               subtotal: item.quantity * item.unitPrice,
             }))}
-            compact
-            className="min-h-[min(85vh,720px)] rounded-2xl"
+            className="rounded-2xl"
           />
         </section>
       </div>
