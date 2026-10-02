@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   useLocation,
   useNavigate,
@@ -84,108 +84,6 @@ export function JobCaseDetailPage() {
     return () => window.cancelAnimationFrame(frame)
   }, [activeTab, detailQuery.data, location.hash])
 
-  const mutationError =
-    takeMutation.error ??
-    infoMutation.error ??
-    materialMutation.error ??
-    completeMutation.error ??
-    createQuotationMutation.error
-
-  const content = useMemo(() => {
-    if (!detailQuery.data) return null
-
-    if (activeTab === 'summary') {
-      return (
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-stretch">
-          <JobCaseSummary jobCase={detailQuery.data} />
-
-          <JobCaseActionBar
-            jobCase={detailQuery.data}
-            user={session.user}
-            taking={takeMutation.isPending}
-            completing={completeMutation.isPending}
-            creatingQuotation={createQuotationMutation.isPending}
-            quotationId={
-              quotationsQuery.data?.find(
-                (quotation) => quotation.caseId === validId,
-              )?.id ?? null
-            }
-            quotationLookupReady={
-              !canReadQuotationFlow ||
-              (!quotationsQuery.isPending && !quotationsQuery.isError)
-            }
-            onTake={() => takeMutation.mutate()}
-            onRequestInformation={() => setActionPanel('information')}
-            onDefineMaterial={() => setActionPanel('material')}
-            onComplete={() => completeMutation.mutate()}
-            onCreateQuotation={() => void createQuotation()}
-            onOpenQuotation={() => {
-              const quotation = quotationsQuery.data?.find(
-                (item) => item.caseId === validId,
-              )
-
-              if (quotation) {
-                navigate(`/quotations/${quotation.id}`)
-              }
-            }}
-          />
-        </div>
-      )
-    }
-
-    if (activeTab === 'documents') {
-      return <JobCaseDocuments documents={detailQuery.data.documents} />
-    }
-
-    if (activeTab === 'specification') {
-      return (
-        <JobCaseMaterial
-          specification={detailQuery.data.materialSpecification}
-          request={detailQuery.data.request}
-        />
-      )
-    }
-
-    if (timelineQuery.isPending) {
-      return <LoadingState label="Cargando actividad…" />
-    }
-
-    if (timelineQuery.isError) {
-      return (
-        <ErrorState
-          error={timelineQuery.error}
-          title="No pudimos cargar la actividad"
-        />
-      )
-    }
-
-    return (
-      <div className="space-y-3">
-        <JobCaseClarifications
-          requests={detailQuery.data.informationRequests}
-        />
-        <JobCaseTimeline events={timelineQuery.data} />
-      </div>
-    )
-  }, [
-    activeTab,
-    canReadQuotationFlow,
-    completeMutation,
-    createQuotationMutation,
-    detailQuery.data,
-    navigate,
-    quotationsQuery.data,
-    quotationsQuery.isError,
-    quotationsQuery.isPending,
-    session.user,
-    takeMutation,
-    timelineQuery.data,
-    timelineQuery.error,
-    timelineQuery.isError,
-    timelineQuery.isPending,
-    validId,
-  ])
-
   if (validId === null || !session) {
     return (
       <PageContainer className="py-4 lg:py-3">
@@ -216,6 +114,20 @@ export function JobCaseDetailPage() {
     )
   }
 
+  const jobCase = detailQuery.data
+  const currentQuotation =
+    quotationsQuery.data?.find((quotation) => quotation.caseId === validId) ??
+    null
+  const quotationLookupReady =
+    !canReadQuotationFlow ||
+    (!quotationsQuery.isPending && !quotationsQuery.isError)
+  const mutationError =
+    takeMutation.error ??
+    infoMutation.error ??
+    materialMutation.error ??
+    completeMutation.error ??
+    createQuotationMutation.error
+
   const submitInformation = async (values: { question: string }) => {
     await infoMutation.mutateAsync(values)
     setActionPanel(null)
@@ -235,24 +147,71 @@ export function JobCaseDetailPage() {
     navigate(`/quotations/${quotation.id}`)
   }
 
-  const timelineCount = timelineQuery.data?.length ?? 0
-  const currentQuotation =
-    quotationsQuery.data?.find((quotation) => quotation.caseId === validId) ??
-    null
-  const quotationLookupReady =
-    !canReadQuotationFlow ||
-    (!quotationsQuery.isPending && !quotationsQuery.isError)
+  let content
+
+  if (activeTab === 'summary') {
+    content = (
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-stretch">
+        <JobCaseSummary jobCase={jobCase} />
+
+        <JobCaseActionBar
+          jobCase={jobCase}
+          user={session.user}
+          taking={takeMutation.isPending}
+          completing={completeMutation.isPending}
+          creatingQuotation={createQuotationMutation.isPending}
+          quotationId={currentQuotation?.id ?? null}
+          quotationLookupReady={quotationLookupReady}
+          onTake={() => takeMutation.mutate()}
+          onRequestInformation={() => setActionPanel('information')}
+          onDefineMaterial={() => setActionPanel('material')}
+          onComplete={() => completeMutation.mutate()}
+          onCreateQuotation={() => void createQuotation()}
+          onOpenQuotation={() => {
+            if (currentQuotation) {
+              navigate(`/quotations/${currentQuotation.id}`)
+            }
+          }}
+        />
+      </div>
+    )
+  } else if (activeTab === 'documents') {
+    content = <JobCaseDocuments documents={jobCase.documents} />
+  } else if (activeTab === 'specification') {
+    content = (
+      <JobCaseMaterial
+        specification={jobCase.materialSpecification}
+        request={jobCase.request}
+      />
+    )
+  } else if (timelineQuery.isPending) {
+    content = <LoadingState label="Cargando actividad…" />
+  } else if (timelineQuery.isError) {
+    content = (
+      <ErrorState
+        error={timelineQuery.error}
+        title="No pudimos cargar la actividad"
+      />
+    )
+  } else {
+    content = (
+      <div className="space-y-3">
+        <JobCaseClarifications requests={jobCase.informationRequests} />
+        <JobCaseTimeline events={timelineQuery.data} />
+      </div>
+    )
+  }
 
   return (
     <PageContainer className="py-4 lg:py-3">
-      <JobCaseDetailHeader jobCase={detailQuery.data} />
+      <JobCaseDetailHeader jobCase={jobCase} />
 
       <div className="space-y-4">
-        <JobCaseFlowSteps status={detailQuery.data.status} />
+        <JobCaseFlowSteps status={jobCase.status} />
 
         <JobCaseTabs
           activeTab={activeTab}
-          documentCount={detailQuery.data.documents.length}
+          documentCount={jobCase.documents.length}
           onChange={(tab) =>
             setSearchParams(tab === 'summary' ? {} : { tab })
           }
@@ -268,7 +227,7 @@ export function JobCaseDetailPage() {
         ) : null}
 
         {canReadQuotationFlow &&
-        detailQuery.data.status === 'READY_FOR_QUOTATION' &&
+        jobCase.status === 'READY_FOR_QUOTATION' &&
         quotationsQuery.isError ? (
           <div className="rounded-lg border border-amber-200 bg-amber-50/70 px-3 py-2 text-[8px] leading-4 text-amber-800">
             No pudimos verificar si este expediente ya tiene una cotización.
@@ -287,7 +246,7 @@ export function JobCaseDetailPage() {
 
         {actionPanel === 'material' ? (
           <MaterialSpecificationForm
-            current={detailQuery.data.materialSpecification}
+            current={jobCase.materialSpecification}
             isSubmitting={materialMutation.isPending}
             onCancel={() => setActionPanel(null)}
             onSubmit={submitMaterial}
@@ -297,4 +256,5 @@ export function JobCaseDetailPage() {
         {content}
       </div>
     </PageContainer>
-  )}
+  )
+}
