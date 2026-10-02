@@ -69,6 +69,19 @@ export async function submitCustomerRequest(
   formData.append('materialRequirementType', input.materialRequirementType)
   formData.append('materialRequirement', input.materialRequirement.trim())
   appendOptional(formData, 'requestedDeliveryDate', input.requestedDeliveryDate)
+  formData.append('deliveryMode', input.deliveryMode)
+  if (input.customerAddressId !== undefined) {
+    formData.append('customerAddressId', String(input.customerAddressId))
+  }
+  appendOptional(formData, 'deliveryLabel', input.deliveryLabel)
+  appendOptional(formData, 'deliveryAddress', input.deliveryAddress)
+  appendOptional(formData, 'deliveryCity', input.deliveryCity)
+  appendOptional(formData, 'deliveryState', input.deliveryState)
+  appendOptional(formData, 'deliveryPostalCode', input.deliveryPostalCode)
+  appendOptional(formData, 'deliveryCountry', input.deliveryCountry)
+  appendOptional(formData, 'deliveryContactName', input.deliveryContactName)
+  appendOptional(formData, 'deliveryContactPhone', input.deliveryContactPhone)
+  appendOptional(formData, 'deliveryInstructions', input.deliveryInstructions)
 
   input.documents.forEach((document, index) =>
     appendDocument(formData, `documents[${index}]`, document),
