@@ -4,6 +4,7 @@ import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
+import { DocumentPreviewDialog } from '@/shared/components/documents/DocumentPreviewDialog'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { DocumentCenterFilters } from '../components/DocumentCenterFilters'
 import { DocumentCenterRow } from '../components/DocumentCenterRow'
@@ -27,6 +28,8 @@ export function DocumentCenterPage() {
   const {
     busyVersionId,
     error: fileError,
+    preview,
+    closePreview,
     openVersion,
     downloadVersion,
   } = useDocumentFileActions()
@@ -191,7 +194,11 @@ export function DocumentCenterPage() {
               document={document}
               busy={busyVersionId === document.currentVersion.id}
               onOpen={() =>
-                void openVersion(document, document.currentVersion.id)
+                void openVersion(
+                  document,
+                  document.currentVersion.id,
+                  document.currentVersion.fileName,
+                )
               }
               onHistory={() => setHistoryDocument(document)}
             />
@@ -208,9 +215,9 @@ export function DocumentCenterPage() {
         document={historyDocument}
         busyVersionId={busyVersionId}
         onClose={() => setHistoryDocument(null)}
-        onOpenVersion={(versionId) => {
+        onOpenVersion={(versionId, fileName) => {
           if (historyDocument) {
-            void openVersion(historyDocument, versionId)
+            void openVersion(historyDocument, versionId, fileName)
           }
         }}
         onDownloadVersion={(versionId, fileName) => {
@@ -219,6 +226,8 @@ export function DocumentCenterPage() {
           }
         }}
       />
+
+      <DocumentPreviewDialog preview={preview} onClose={closePreview} />
     </PageContainer>
   )
 }

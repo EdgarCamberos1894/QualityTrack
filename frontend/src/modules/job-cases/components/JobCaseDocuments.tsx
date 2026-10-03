@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
+import { DocumentPreviewDialog } from '@/shared/components/documents/DocumentPreviewDialog'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Button } from '@/shared/components/ui/Button'
 import { Card } from '@/shared/components/ui/Card'
@@ -167,6 +168,11 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
         onDownloadVersion={(documentId, version) =>
           void files.downloadVersion(documentId, version)
         }
+      />
+
+      <DocumentPreviewDialog
+        preview={files.preview}
+        onClose={files.closePreview}
       />
     </>
   )

@@ -13,7 +13,7 @@ interface DocumentHistoryDialogProps {
   document: DocumentCenterDto | null
   busyVersionId: number | null
   onClose: () => void
-  onOpenVersion: (versionId: number) => void
+  onOpenVersion: (versionId: number, fileName: string) => void
   onDownloadVersion: (versionId: number, fileName: string) => void
 }
 
@@ -85,7 +85,9 @@ export function DocumentHistoryDialog({
                       variant="secondary"
                       className="!h-7 !px-2 !text-[8px]"
                       disabled={busyVersionId === version.id}
-                      onClick={() => onOpenVersion(version.id)}
+                      onClick={() =>
+                        onOpenVersion(version.id, version.fileName)
+                      }
                     >
                       Ver
                     </Button>

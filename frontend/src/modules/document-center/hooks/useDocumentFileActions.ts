@@ -1,10 +1,7 @@
 import { useState } from 'react'
+import { useBlobPreview } from '@/shared/hooks/useBlobPreview'
 import { getDocumentContent } from '../api/documentCenter.api'
 import type { DocumentCenterDto } from '../types/documentCenter.types'
-
-function scheduleUrlRelease(url: string) {
-  window.setTimeout(() => URL.revokeObjectURL(url), 60_000)
-}
 
 function downloadBlob(blob: Blob, fileName: string) {
   const url = URL.createObjectURL(blob)
@@ -17,48 +14,23 @@ function downloadBlob(blob: Blob, fileName: string) {
   URL.revokeObjectURL(url)
 }
 
-function openBlob(blob: Blob, previewWindow: Window | null) {
-  const url = URL.createObjectURL(blob)
-
-  if (previewWindow) {
-    previewWindow.location.replace(url)
-  } else {
-    const anchor = document.createElement('a')
-    anchor.href = url
-    anchor.target = '_blank'
-    anchor.rel = 'noopener noreferrer'
-    document.body.appendChild(anchor)
-    anchor.click()
-    anchor.remove()
-  }
-
-  scheduleUrlRelease(url)
-}
-
 export function useDocumentFileActions() {
   const [busyVersionId, setBusyVersionId] = useState<number | null>(null)
   const [error, setError] = useState<unknown>(null)
+  const preview = useBlobPreview()
 
   const openVersion = async (
     document: Pick<DocumentCenterDto, 'id'>,
     versionId: number,
+    fileName: string,
   ) => {
-    const previewWindow = window.open('', '_blank')
-
-    if (previewWindow) {
-      previewWindow.opener = null
-      previewWindow.document.title = 'Cargando documento…'
-      previewWindow.document.body.textContent = 'Cargando documento…'
-    }
-
     setBusyVersionId(versionId)
     setError(null)
 
     try {
       const blob = await getDocumentContent(document, versionId, false)
-      openBlob(blob, previewWindow)
+      preview.openPreview(blob, fileName)
     } catch (requestError) {
-      previewWindow?.close()
       setError(requestError)
     } finally {
       setBusyVersionId(null)
@@ -86,6 +58,8 @@ export function useDocumentFileActions() {
   return {
     busyVersionId,
     error,
+    preview: preview.preview,
+    closePreview: preview.closePreview,
     openVersion,
     downloadVersion,
   }

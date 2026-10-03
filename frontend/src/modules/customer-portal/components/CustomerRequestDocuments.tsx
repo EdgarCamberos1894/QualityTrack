@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { DocumentPreviewDialog } from '@/shared/components/documents/DocumentPreviewDialog'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Button } from '@/shared/components/ui/Button'
 import { Card } from '@/shared/components/ui/Card'
@@ -260,6 +261,11 @@ export function CustomerRequestDocuments({
         onDownloadVersion={(version) => {
           if (history) void files.downloadVersion(history.id, version)
         }}
+      />
+
+      <DocumentPreviewDialog
+        preview={files.preview}
+        onClose={files.closePreview}
       />
     </>
   )
