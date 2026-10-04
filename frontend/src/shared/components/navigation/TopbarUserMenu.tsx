@@ -6,6 +6,7 @@ interface TopbarUserMenuProps {
   roleLabel: string
   accountLabel: string
   detailLabel?: string
+  onProfile?: () => void
   onLogout: () => void
 }
 
@@ -20,6 +21,7 @@ export function TopbarUserMenu({
   roleLabel,
   accountLabel,
   detailLabel,
+  onProfile,
   onLogout,
 }: TopbarUserMenuProps) {
   const [open, setOpen] = useState(false)
@@ -97,6 +99,21 @@ export function TopbarUserMenu({
           </div>
 
           <div className="p-2">
+            {onProfile ? (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => {
+                  setOpen(false)
+                  onProfile()
+                }}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:bg-blue-50 focus-visible:text-blue-700"
+              >
+                <TopbarActionIcon name="user" className="h-[18px] w-[18px]" />
+                Mi perfil
+              </button>
+            ) : null}
+
             <button
               type="button"
               role="menuitem"
@@ -104,7 +121,7 @@ export function TopbarUserMenu({
                 setOpen(false)
                 onLogout()
               }}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-semibold text-slate-700 transition hover:bg-red-50 hover:text-red-700 focus:outline-none focus-visible:bg-red-50 focus-visible:text-red-700"
+              className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-semibold text-slate-700 transition hover:bg-red-50 hover:text-red-700 focus:outline-none focus-visible:bg-red-50 focus-visible:text-red-700"
             >
               <TopbarActionIcon name="logout" className="h-[18px] w-[18px]" />
               Cerrar sesión
