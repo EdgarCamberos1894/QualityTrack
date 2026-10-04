@@ -10,6 +10,7 @@ import {
   removeWorkOrderMaterialPlan,
   upsertWorkOrderMaterialPlan,
   uploadMaterialLotCertificate,
+  uploadMaterialTechnicalSheet,
 } from '../api/materials.api'
 import type {
   CreateMaterialLotPayload,
@@ -87,6 +88,17 @@ export function useMaterialMutations() {
     },
   })
 
+  const uploadTechnicalSheet = useMutation({
+    mutationFn: ({ materialId, file }: { materialId: number; file: File }) =>
+      uploadMaterialTechnicalSheet(materialId, file),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: materialKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: ['document-center'] }),
+      ])
+    },
+  })
+
   const createLot = useMutation({
     mutationFn: ({
       materialId,
@@ -122,7 +134,7 @@ export function useMaterialMutations() {
     },
   })
 
-  return { create, createLot, uploadCertificate }
+  return { create, uploadTechnicalSheet, createLot, uploadCertificate }
 }
 
 function scheduleUrlRelease(url: string) {
