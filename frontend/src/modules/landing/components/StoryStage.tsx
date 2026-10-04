@@ -15,11 +15,9 @@ const accentClasses = {
 } as const
 
 export function StoryStage({ stage, active }: StoryStageProps) {
-  const align = stage.side === 'right' ? 'lg:ml-auto' : 'lg:mr-auto'
-
   return (
     <article
-      className={`qt-story-copy pointer-events-auto w-full max-w-[560px] ${align} ${active ? 'qt-story-copy-active' : ''}`}
+      className={`qt-story-copy pointer-events-auto w-full max-w-[620px] !pt-0 ${active ? 'qt-story-copy-active' : ''}`}
       aria-current={active ? 'step' : undefined}
     >
       <div className="flex items-center gap-2.5">
@@ -32,7 +30,7 @@ export function StoryStage({ stage, active }: StoryStageProps) {
       </div>
 
       <h1
-        className={`${stage.hero ? 'mt-5 max-w-[720px] text-[clamp(2.35rem,6vw,5.6rem)]' : 'mt-4 text-[clamp(2rem,4.4vw,4.2rem)]'} font-semibold leading-[0.94] tracking-[-0.055em] text-white`}
+        className={`${stage.hero ? 'mt-5 max-w-[620px] text-[clamp(2.35rem,5.4vw,4.9rem)]' : 'mt-4 text-[clamp(2rem,3.8vw,3.8rem)]'} font-semibold leading-[0.96] tracking-[-0.05em] text-white`}
       >
         {stage.title}
       </h1>
@@ -41,7 +39,7 @@ export function StoryStage({ stage, active }: StoryStageProps) {
         {stage.description}
       </p>
 
-      <div className="mt-5 flex max-w-lg items-start gap-3 rounded-2xl border border-white/8 bg-slate-950/45 p-3.5 backdrop-blur-md">
+      <div className="mt-5 flex max-w-[500px] items-start gap-3 rounded-2xl border border-white/8 bg-slate-950/55 p-3.5 backdrop-blur-md">
         <span className="mt-1 flex h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.75)]" />
         <div>
           <p className="text-[9px] font-bold uppercase tracking-[0.11em] text-white">
