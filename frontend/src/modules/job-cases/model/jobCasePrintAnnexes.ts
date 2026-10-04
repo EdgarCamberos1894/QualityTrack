@@ -108,10 +108,10 @@ function isCanvasVisuallyBlank(
   const totalPixels = sampleWidth * sampleHeight
 
   for (let index = 0; index < pixels.length; index += 4) {
-    const red = pixels[index]
-    const green = pixels[index + 1]
-    const blue = pixels[index + 2]
-    const alpha = pixels[index + 3]
+    const red = pixels[index]!
+    const green = pixels[index + 1]!
+    const blue = pixels[index + 2]!
+    const alpha = pixels[index + 3]!
 
     if (alpha > 16 && (red < 245 || green < 245 || blue < 245)) {
       nonWhitePixels += 1
