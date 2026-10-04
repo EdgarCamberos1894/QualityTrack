@@ -24,6 +24,8 @@ export function ScrollStory() {
   const reducedMotion = useReducedMotion()
   const intro = landingStory[0]
 
+  if (!intro) return null
+
   return (
     <section
       id={intro.id}
