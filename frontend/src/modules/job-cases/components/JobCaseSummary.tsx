@@ -1,33 +1,82 @@
+import { useState } from 'react'
+import { flushSync } from 'react-dom'
 import {
   formatJobCaseDateTime,
   getJobCaseClarificationSummary,
   getJobCaseMaterialSummary,
   getJobCaseStatusPresentation,
 } from '../model/jobCasePresenter'
+import {
+  prepareJobCasePrintAnnexes,
+  type JobCasePrintAnnexBundle,
+} from '../model/jobCasePrintAnnexes'
 import type { JobCaseDetailDto } from '../types/jobCase.types'
+import { JobCasePrintAnnexes } from './JobCasePrintAnnexes'
 
 interface JobCaseSummaryProps {
   jobCase: JobCaseDetailDto
 }
 
+function waitForPrintImages(): Promise<void> {
+  return new Promise((resolve) => {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(async () => {
+        const images = Array.from(
+          document.querySelectorAll<HTMLImageElement>('.job-case-annex-image'),
+        )
+
+        await Promise.all(
+          images.map(async (image) => {
+            try {
+              await image.decode()
+            } catch {
+              // If the browser cannot decode it, printing still proceeds with
+              // the annex metadata instead of blocking the whole expediente.
+            }
+          }),
+        )
+
+        resolve()
+      })
+    })
+  })
+}
+
+function annexSheetLabel(firstSheet: number, lastSheet: number) {
+  return firstSheet === lastSheet
+    ? `Hoja de anexo ${firstSheet}`
+    : `Hojas de anexo ${firstSheet}–${lastSheet}`
+}
+
 export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
+  const [printAnnexes, setPrintAnnexes] =
+    useState<JobCasePrintAnnexBundle | null>(null)
+  const [preparingPrint, setPreparingPrint] = useState(false)
   const clarificationSummary = getJobCaseClarificationSummary(
     jobCase.informationRequests,
   )
   const materialSummary = getJobCaseMaterialSummary(jobCase)
   const status = getJobCaseStatusPresentation(jobCase.status)
 
-  const printJobCase = () => {
-    const previousTitle = document.title
+  const printJobCase = async () => {
+    if (preparingPrint) return
 
-    document.title = `${jobCase.caseNumber}-Expediente`
-    document.body.classList.add('printing-job-case')
+    const previousTitle = document.title
+    setPreparingPrint(true)
 
     try {
+      const annexes = await prepareJobCasePrintAnnexes(jobCase.documents)
+      flushSync(() => setPrintAnnexes(annexes))
+
+      document.title = `${jobCase.caseNumber}-Expediente`
+      document.body.classList.add('printing-job-case')
+      await waitForPrintImages()
       window.print()
     } finally {
       document.body.classList.remove('printing-job-case')
       document.title = previousTitle
+      setPrintAnnexes(null)
+      setPreparingPrint(false)
     }
   }
 
@@ -52,8 +101,9 @@ export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
 
         <button
           type="button"
-          onClick={printJobCase}
-          className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-2.5 text-[8px] font-semibold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100"
+          onClick={() => void printJobCase()}
+          disabled={preparingPrint}
+          className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-2.5 text-[8px] font-semibold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 disabled:cursor-wait disabled:opacity-60"
         >
           <svg
             viewBox="0 0 24 24"
@@ -70,7 +120,7 @@ export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
             <path d="M5 17H3V10a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v7h-2" />
             <path d="M17 11h.01" />
           </svg>
-          Imprimir
+          {preparingPrint ? 'Preparando anexos…' : 'Imprimir'}
         </button>
       </div>
 
@@ -247,10 +297,17 @@ export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
           </div>
 
           <div className="job-case-sheet-print-documents mt-5">
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-[9px] font-semibold text-slate-950">
-                Documentos relacionados
-              </p>
+            <div className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-[9px] font-semibold text-slate-950">
+                  Documentos relacionados
+                </p>
+                {jobCase.documents.length > 0 ? (
+                  <p className="mt-0.5 text-[6.5px] leading-3.5 text-slate-400">
+                    Cada archivo se incorpora al final del expediente y se referencia por su hoja de anexo.
+                  </p>
+                ) : null}
+              </div>
               <span className="text-[6.5px] text-slate-400">
                 {jobCase.documents.length} archivo
                 {jobCase.documents.length === 1 ? '' : 's'}
@@ -263,28 +320,44 @@ export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
                   Sin documentos asociados.
                 </p>
               ) : (
-                jobCase.documents.map((document, index) => (
-                  <div
-                    key={document.id}
-                    className={
-                      index === 0
-                        ? 'grid gap-2 bg-slate-50/70 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_90px]'
-                        : 'grid gap-2 border-t border-slate-200 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_90px]'
-                    }
-                  >
-                    <div className="min-w-0">
-                      <p className="text-[8px] font-semibold text-slate-900">
-                        {document.name}
-                      </p>
-                      <p className="mt-0.5 text-[6.5px] text-slate-400">
-                        {document.currentVersion.fileName}
-                      </p>
+                jobCase.documents.map((document, index) => {
+                  const reference = printAnnexes?.references.find(
+                    (item) => item.documentId === document.id,
+                  )
+
+                  return (
+                    <div
+                      key={document.id}
+                      className={
+                        index === 0
+                          ? 'grid gap-2 bg-slate-50/70 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_130px]'
+                          : 'grid gap-2 border-t border-slate-200 px-3 py-2.5 sm:grid-cols-[minmax(0,1fr)_130px]'
+                      }
+                    >
+                      <div className="min-w-0">
+                        <p className="text-[8px] font-semibold text-slate-900">
+                          {document.name}
+                        </p>
+                        <p className="mt-0.5 text-[6.5px] text-slate-400">
+                          {document.documentType} · {document.currentVersion.fileName}
+                        </p>
+                      </div>
+                      <div className="self-center text-right">
+                        <p className="text-[7px] font-semibold text-blue-700">
+                          {reference ? `Anexo ${reference.annexLabel}` : 'Anexo'}
+                        </p>
+                        <p className="mt-0.5 text-[6.5px] font-medium text-slate-500">
+                          {reference
+                            ? annexSheetLabel(
+                                reference.firstSheet,
+                                reference.lastSheet,
+                              )
+                            : `v${document.currentVersion.version}`}
+                        </p>
+                      </div>
                     </div>
-                    <p className="self-center text-right text-[7px] font-medium text-slate-600">
-                      v{document.currentVersion.version}
-                    </p>
-                  </div>
-                ))
+                  )
+                })
               )}
             </div>
           </div>
@@ -355,6 +428,11 @@ export function JobCaseSummary({ jobCase }: JobCaseSummaryProps) {
             </p>
           </div>
         </footer>
+
+        <JobCasePrintAnnexes
+          caseNumber={jobCase.caseNumber}
+          bundle={printAnnexes}
+        />
       </article>
     </div>
   )
