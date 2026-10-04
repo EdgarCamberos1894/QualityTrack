@@ -1,6 +1,5 @@
 package com.nocountry.qualitytrack.users.service;
 
-import com.nocountry.qualitytrack.auth.service.TokenCleanupService;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.users.dto.request.ChangeOwnPasswordRequest;
@@ -17,7 +16,6 @@ import com.nocountry.qualitytrack.users.enums.UserStatus;
 import com.nocountry.qualitytrack.users.repository.UserRepository;
 import com.nocountry.qualitytrack.users.repository.UserSystemRoleRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +34,11 @@ public class InternalUserService {
 
     private final UserRepository userRepository;
     private final UserSystemRoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final TokenCleanupService tokenCleanupService;
+    private final OwnAccountService ownAccountService;
 
     @Transactional(readOnly = true)
     public InternalUserResponse getOwnProfile(Long currentUserId) {
-        User user = requireActiveInternalUser(currentUserId);
+        User user = ownAccountService.getActiveUser(currentUserId, AccountType.INTERNAL);
         return InternalUserResponse.from(user, rolesFor(user.getId()));
     }
 
@@ -50,17 +47,11 @@ public class InternalUserService {
             Long currentUserId,
             UpdateOwnProfileRequest request
     ) {
-        User user = requireInternalUserForUpdate(currentUserId);
-        requireActiveInternal(user);
-
-        String firstName = request.firstName().trim();
-        String lastName = request.lastName().trim();
-
-        if (!firstName.equals(user.getFirstName()) || !lastName.equals(user.getLastName())) {
-            user.updateProfile(firstName, lastName);
-            userRepository.saveAndFlush(user);
-        }
-
+        User user = ownAccountService.updateProfile(
+                currentUserId,
+                AccountType.INTERNAL,
+                request
+        );
         return InternalUserResponse.from(user, rolesFor(user.getId()));
     }
 
@@ -69,26 +60,7 @@ public class InternalUserService {
             Long currentUserId,
             ChangeOwnPasswordRequest request
     ) {
-        User user = requireInternalUserForUpdate(currentUserId);
-        requireActiveInternal(user);
-
-        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
-            throw new BusinessException(
-                    ApiErrorCode.INVALID_CREDENTIALS,
-                    "La contraseña actual no es correcta."
-            );
-        }
-
-        if (passwordEncoder.matches(request.newPassword(), user.getPasswordHash())) {
-            throw new BusinessException(
-                    ApiErrorCode.DATA_CONFLICT,
-                    "La nueva contraseña debe ser diferente a la actual."
-            );
-        }
-
-        user.changePassword(passwordEncoder.encode(request.newPassword()));
-        userRepository.saveAndFlush(user);
-        tokenCleanupService.deletePasswordResetToken(user.getId());
+        ownAccountService.changePassword(currentUserId, AccountType.INTERNAL, request);
     }
 
     @Transactional(readOnly = true)
@@ -224,21 +196,6 @@ public class InternalUserService {
         }
 
         return user;
-    }
-
-    private User requireActiveInternalUser(Long currentUserId) {
-        User user = requireInternalUser(currentUserId);
-        requireActiveInternal(user);
-        return user;
-    }
-
-    private void requireActiveInternal(User user) {
-        if (user.getStatus() != UserStatus.ACTIVE) {
-            throw new BusinessException(
-                    ApiErrorCode.ACCESS_DENIED,
-                    "Solo una cuenta interna activa puede consultar o actualizar su perfil."
-            );
-        }
     }
 
     private User requireInternalUser(Long userId) {
