@@ -14,7 +14,7 @@ interface ProductionCurrentOperationPanelProps {
   operation: RoutingOperationDto | null
   executions: OperationExecutionDto[]
   unlocked: boolean
-  isCurrentOperation: boolean
+  pendingPrerequisiteCodes: string[]
   canExecute: boolean
   productionCompleted: boolean
   workOrderStatus: WorkOrderStatus
@@ -27,7 +27,7 @@ export function ProductionCurrentOperationPanel({
   operation,
   executions,
   unlocked,
-  isCurrentOperation,
+  pendingPrerequisiteCodes,
   canExecute,
   productionCompleted,
   workOrderStatus,
@@ -60,7 +60,6 @@ export function ProductionCurrentOperationPanel({
     workOrderStatus === 'IN_PRODUCTION'
   const canStart =
     canExecute &&
-    isCurrentOperation &&
     unlocked &&
     productionOpen &&
     !productionCompleted &&
@@ -79,16 +78,16 @@ export function ProductionCurrentOperationPanel({
     : completed
       ? 'Completada'
       : !unlocked
-        ? 'Bloqueada'
-        : isCurrentOperation
-          ? 'Lista para iniciar'
-          : 'Pendiente'
+        ? 'Esperando dependencias'
+        : cancelledCount > 0
+          ? 'Lista para reintentar'
+          : 'Lista para iniciar'
 
   return (
     <div className="space-y-3">
       <div>
         <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-          {isCurrentOperation ? 'Operación actual' : 'Detalle de operación'}
+          {inProgress ? 'Operación en ejecución' : 'Detalle de operación'}
         </p>
         <div className="mt-1 flex flex-wrap items-center gap-2">
           <h3 className="text-[13px] font-semibold text-slate-950">
@@ -179,16 +178,19 @@ export function ProductionCurrentOperationPanel({
           </div>
         </div>
       ) : !unlocked ? (
-        <div className="rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2.5">
-          <p className="text-[8px] leading-4 text-slate-500">
-            Completa la operación anterior para habilitar este paso.
+        <div className="rounded-xl border border-amber-200 bg-amber-50/60 px-3 py-2.5">
+          <p className="text-[8px] font-semibold text-amber-900">
+            Esta operación todavía no puede iniciar.
+          </p>
+          <p className="mt-1 text-[7.5px] leading-4 text-amber-700">
+            {pendingPrerequisiteCodes.length > 0
+              ? `Espera a que finalice: ${pendingPrerequisiteCodes.join(' + ')}.`
+              : 'La hoja de ruta debe estar liberada para Producción.'}
           </p>
         </div>
-      ) : !isCurrentOperation ? (
-        <div className="rounded-xl border border-slate-200 bg-slate-50/60 px-3 py-2.5">
-          <p className="text-[8px] leading-4 text-slate-500">
-            Esta operación puede consultarse, pero la ejecución continúa desde la operación actual.
-          </p>
+      ) : operation.prerequisiteOperationIds.length === 0 ? (
+        <div className="rounded-xl border border-emerald-100 bg-emerald-50/45 px-3 py-2.5 text-[7.5px] text-emerald-700">
+          Operación independiente: puede iniciar sin esperar otro paso de la ruta.
         </div>
       ) : null}
 
