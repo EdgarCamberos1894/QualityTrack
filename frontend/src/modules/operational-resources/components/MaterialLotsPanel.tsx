@@ -33,6 +33,9 @@ export function MaterialLotsPanel({
   const mutations = useMaterialMutations()
   const certificateFile = useMaterialCertificateFileActions()
   const [createOpen, setCreateOpen] = useState(false)
+  const [createdLotIdForRetry, setCreatedLotIdForRetry] = useState<number | null>(
+    null,
+  )
   const [certificateLot, setCertificateLot] = useState<MaterialLotDto | null>(
     null,
   )
@@ -67,23 +70,49 @@ export function MaterialLotsPanel({
     )
   }
 
-  const createLot = async (values: CreateMaterialLotFormValues) => {
+  const createLot = async (
+    values: CreateMaterialLotFormValues,
+    certificate: File | null,
+  ) => {
+    let lotId = createdLotIdForRetry
+
     try {
-      await mutations.createLot.mutateAsync({
-        materialId: material.id,
-        payload: {
-          lotNumber: values.lotNumber.trim(),
-          supplier: values.supplier.trim() || undefined,
-          receivedAt: values.receivedAt
-            ? new Date(values.receivedAt).toISOString()
-            : undefined,
-          quantityReceived: values.quantityReceived,
-        },
-      })
+      if (!lotId) {
+        const created = await mutations.createLot.mutateAsync({
+          materialId: material.id,
+          payload: {
+            lotNumber: values.lotNumber.trim(),
+            supplier: values.supplier.trim() || undefined,
+            receivedAt: values.receivedAt
+              ? new Date(values.receivedAt).toISOString()
+              : undefined,
+            quantityReceived: values.quantityReceived,
+          },
+        })
+        lotId = created.id
+        setCreatedLotIdForRetry(created.id)
+      }
+
+      if (certificate) {
+        await mutations.uploadCertificate.mutateAsync({
+          materialId: material.id,
+          lotId,
+          file: certificate,
+        })
+      }
+
+      setCreatedLotIdForRetry(null)
       return true
     } catch {
       return false
     }
+  }
+
+  const closeCreate = () => {
+    mutations.createLot.reset()
+    mutations.uploadCertificate.reset()
+    setCreatedLotIdForRetry(null)
+    setCreateOpen(false)
   }
 
   const uploadCertificate = async (file: File) => {
@@ -115,6 +144,38 @@ export function MaterialLotsPanel({
           <p className="mt-0.5 line-clamp-2 text-[8px] leading-4 text-slate-400">
             {material.specification ?? 'Sin especificación adicional'}
           </p>
+          <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            {material.technicalSheetDocumentVersionId ? (
+              <>
+                <Badge tone="success" className="px-2 py-0.5 text-[7px]">
+                  Ficha técnica
+                </Badge>
+                {material.technicalSheetDocumentId ? (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="!h-6 !px-2 !text-[7px]"
+                    disabled={certificateFile.busyLotId === material.id}
+                    onClick={() =>
+                      void certificateFile.open(
+                        material.id,
+                        material.technicalSheetDocumentId as number,
+                        material.technicalSheetDocumentVersionId as number,
+                      )
+                    }
+                  >
+                    {certificateFile.busyLotId === material.id
+                      ? 'Abriendo…'
+                      : 'Ver ficha'}
+                  </Button>
+                ) : null}
+              </>
+            ) : (
+              <Badge tone="neutral" className="px-2 py-0.5 text-[7px]">
+                Sin ficha técnica
+              </Badge>
+            )}
+          </div>
         </div>
 
         {canManage ? (
@@ -123,6 +184,8 @@ export function MaterialLotsPanel({
             className="!h-7 !px-2.5 !text-[8px]"
             onClick={() => {
               mutations.createLot.reset()
+              mutations.uploadCertificate.reset()
+              setCreatedLotIdForRetry(null)
               setCreateOpen(true)
             }}
           >
@@ -261,12 +324,11 @@ export function MaterialLotsPanel({
 
       <CreateMaterialLotDialog
         material={createOpen ? material : null}
-        submitting={mutations.createLot.isPending}
-        error={mutations.createLot.error}
-        onClose={() => {
-          mutations.createLot.reset()
-          setCreateOpen(false)
-        }}
+        submitting={
+          mutations.createLot.isPending || mutations.uploadCertificate.isPending
+        }
+        error={mutations.createLot.error ?? mutations.uploadCertificate.error}
+        onClose={closeCreate}
         onSubmit={createLot}
       />
 
