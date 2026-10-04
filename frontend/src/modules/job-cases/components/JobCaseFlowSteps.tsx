@@ -4,13 +4,17 @@ import type { JobCaseStatus } from '../types/jobCase.types'
 interface JobCaseFlowStepsProps {
   status: JobCaseStatus
   quotationId?: number | null
+  quotationNumber?: string | null
+  quotationRevision?: number | null
   workOrderId?: number | null
+  workOrderNumber?: string | null
   workOrderStatus?: string | null
 }
 
 function workOrderStep(status?: string | null): number {
   switch (status) {
     case 'CREATED':
+    case 'CANCELLED':
       return 2
     case 'READY_FOR_PRODUCTION':
     case 'IN_PRODUCTION':
@@ -49,11 +53,23 @@ function activeStep(status: JobCaseStatus, workOrderStatus?: string | null): num
 export function JobCaseFlowSteps({
   status,
   quotationId = null,
+  quotationNumber = null,
+  quotationRevision = null,
   workOrderId = null,
+  workOrderNumber = null,
   workOrderStatus = null,
 }: JobCaseFlowStepsProps) {
+  const currentStep = activeStep(status, workOrderStatus)
   const stepHrefs: Partial<Record<number, string>> = {
     0: '#request-source',
+  }
+  const stepDetails: Partial<Record<number, string>> = {
+    0: 'Ver solicitud de origen',
+    1:
+      quotationNumber && quotationRevision !== null
+        ? `${quotationNumber} · Rev. ${quotationRevision}`
+        : 'Cotización pendiente',
+    2: workOrderNumber ?? 'Orden pendiente',
   }
 
   if (quotationId !== null) {
@@ -62,19 +78,32 @@ export function JobCaseFlowSteps({
 
   if (workOrderId !== null) {
     stepHrefs[2] = `/work-orders/${workOrderId}`
-    stepHrefs[3] = `/work-orders/${workOrderId}?view=production`
-    stepHrefs[4] = `/work-orders/${workOrderId}?view=quality`
-    stepHrefs[5] = `/work-orders/${workOrderId}?view=delivery`
+
+    if (currentStep >= 3) {
+      stepHrefs[3] = `/work-orders/${workOrderId}?view=production`
+      stepDetails[3] = 'Abrir en la OT'
+    }
+
+    if (currentStep >= 4) {
+      stepHrefs[4] = `/work-orders/${workOrderId}?view=quality`
+      stepDetails[4] = 'Abrir en la OT'
+    }
+
+    if (currentStep >= 5) {
+      stepHrefs[5] = `/work-orders/${workOrderId}?view=delivery`
+      stepDetails[5] = 'Abrir en la OT'
+    }
   }
 
   return (
     <WorkProgressSteps
-      currentStep={activeStep(status, workOrderStatus)}
+      currentStep={currentStep}
       cancelled={status === 'CANCELLED'}
       deliveryComplete={
         status === 'COMPLETED' || workOrderStatus === 'DELIVERED'
       }
       stepHrefs={stepHrefs}
+      stepDetails={stepDetails}
     />
   )
 }

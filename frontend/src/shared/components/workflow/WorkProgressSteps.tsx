@@ -7,6 +7,7 @@ interface WorkProgressStepsProps {
   deliveryComplete?: boolean
   variant?: 'light' | 'dark'
   stepHrefs?: Partial<Record<number, string>>
+  stepDetails?: Partial<Record<number, string>>
 }
 
 const steps = [
@@ -24,6 +25,7 @@ export function WorkProgressSteps({
   deliveryComplete = false,
   variant = 'light',
   stepHrefs = {},
+  stepDetails = {},
 }: WorkProgressStepsProps) {
   const current = Math.max(0, Math.min(currentStep, steps.length - 1))
   const currentLabel = cancelled ? 'Cancelada' : steps[current]
@@ -63,7 +65,7 @@ export function WorkProgressSteps({
               dark ? 'text-slate-300' : 'text-slate-500',
             )}
           >
-            Solicitud a entrega
+            Selecciona una etapa disponible para abrir su proceso.
           </p>
         </div>
 
@@ -92,7 +94,7 @@ export function WorkProgressSteps({
       </div>
 
       <div className={cn('overflow-x-auto', dark ? 'pt-3' : 'pb-0.5')}>
-        <div className="flex min-w-[760px] items-start">
+        <div className="flex min-w-[800px] items-start">
           {steps.map((step, index) => {
             const completeDelivery = index === 5 && deliveryComplete
             const complete =
@@ -100,6 +102,8 @@ export function WorkProgressSteps({
             const active = !cancelled && index === current && !completeDelivery
             const cancelledStep = cancelled && index === 0
             const href = stepHrefs[index]
+            const detail = stepDetails[index]
+            const navigable = Boolean(href) && !cancelled
 
             const marker = (
               <>
@@ -123,37 +127,61 @@ export function WorkProgressSteps({
                   {complete ? '✓' : index + 1}
                 </span>
 
-                <span
-                  className={cn(
-                    'whitespace-nowrap text-[9px]',
-                    active
-                      ? dark
-                        ? 'font-semibold text-blue-200'
-                        : 'font-semibold text-blue-700'
-                      : complete
+                <span className="min-w-0">
+                  <span
+                    className={cn(
+                      'block whitespace-nowrap text-[9px]',
+                      active
                         ? dark
-                          ? 'font-medium text-slate-300'
-                          : 'font-medium text-slate-700'
-                        : cancelledStep
+                          ? 'font-semibold text-blue-200'
+                          : 'font-semibold text-blue-700'
+                        : complete
                           ? dark
-                            ? 'font-semibold text-red-300'
-                            : 'font-semibold text-red-700'
+                            ? 'font-medium text-slate-300'
+                            : 'font-medium text-slate-700'
+                          : cancelledStep
+                            ? dark
+                              ? 'font-semibold text-red-300'
+                              : 'font-semibold text-red-700'
+                            : dark
+                              ? 'font-medium text-slate-500'
+                              : 'font-medium text-slate-500',
+                    )}
+                  >
+                    {step}
+                  </span>
+                  {detail || navigable ? (
+                    <span
+                      className={cn(
+                        'mt-0.5 block max-w-[122px] truncate text-[6.5px]',
+                        navigable
+                          ? dark
+                            ? 'text-blue-300/80'
+                            : 'text-blue-600'
                           : dark
-                            ? 'font-medium text-slate-500'
-                            : 'font-medium text-slate-500',
-                  )}
-                >
-                  {step}
+                            ? 'text-slate-600'
+                            : 'text-slate-400',
+                      )}
+                    >
+                      {detail ?? 'Abrir etapa'}
+                      {navigable ? ' ↗' : ''}
+                    </span>
+                  ) : null}
                 </span>
               </>
             )
 
             return (
               <div key={step} className="flex min-w-0 flex-1 items-start">
-                {href && !cancelled ? (
+                {navigable && href ? (
                   <Link
                     to={href}
-                    className="flex min-w-0 shrink-0 items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
+                    className={cn(
+                      '-m-1.5 flex min-w-0 shrink-0 items-center gap-2 rounded-lg p-1.5 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200',
+                      dark
+                        ? 'hover:bg-white/[0.06]'
+                        : 'hover:bg-blue-50 hover:ring-1 hover:ring-blue-100',
+                    )}
                     title={`Abrir ${step.toLocaleLowerCase('es-MX')}`}
                   >
                     {marker}

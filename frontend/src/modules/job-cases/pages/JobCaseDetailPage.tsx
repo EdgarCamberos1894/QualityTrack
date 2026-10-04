@@ -20,7 +20,6 @@ import { JobCaseDetailHeader } from '../components/JobCaseDetailHeader'
 import { JobCaseDocuments } from '../components/JobCaseDocuments'
 import { JobCaseFlowSteps } from '../components/JobCaseFlowSteps'
 import { JobCaseMaterial } from '../components/JobCaseMaterial'
-import { JobCaseProcessMap } from '../components/JobCaseProcessMap'
 import { JobCaseRecentActivity } from '../components/JobCaseRecentActivity'
 import { JobCaseSourceCard } from '../components/JobCaseSourceCard'
 import { JobCaseSummary } from '../components/JobCaseSummary'
@@ -161,14 +160,11 @@ export function JobCaseDetailPage() {
         <JobCaseFlowSteps
           status={jobCase.status}
           quotationId={currentQuotation?.id ?? null}
+          quotationNumber={currentQuotation?.quotationNumber ?? null}
+          quotationRevision={currentQuotation?.revision ?? null}
           workOrderId={workOrderId}
+          workOrderNumber={currentWorkOrder?.workOrderNumber ?? null}
           workOrderStatus={currentWorkOrder?.status ?? null}
-        />
-
-        <JobCaseProcessMap
-          requestNumber={jobCase.request.requestNumber}
-          quotation={currentQuotation}
-          workOrder={currentWorkOrder}
         />
 
         <JobCaseSourceCard jobCase={jobCase} />
