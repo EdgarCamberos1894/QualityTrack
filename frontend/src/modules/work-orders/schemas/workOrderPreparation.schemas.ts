@@ -27,6 +27,7 @@ export const routingOperationSchema = z.object({
     .int('El tiempo debe ser un entero.')
     .positive('El tiempo estimado debe ser mayor a cero.'),
   prerequisiteOperationIds: z.array(z.number().int().positive()),
+  resequenceOperations: z.boolean(),
 })
 
 export const reopenRoutingSchema = z.object({
