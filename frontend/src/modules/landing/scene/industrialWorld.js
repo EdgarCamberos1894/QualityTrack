@@ -1,3 +1,9 @@
+import {
+  boundaryProgress,
+  stageIndex,
+  stageLocalProgress,
+} from './storyTimeline.js'
+
 export function buildIndustrialWorld(THREE, scene) {
   const root = new THREE.Group()
   root.position.x = 0.2
@@ -339,73 +345,61 @@ export function buildIndustrialWorld(THREE, scene) {
 }
 
 export function updateIndustrialWorld(THREE, world, progress, idleBlend, time) {
-  const intro = 1 - THREE.MathUtils.smoothstep(progress, 0.075, 0.125)
-  const machineReturn =
-    THREE.MathUtils.smoothstep(progress, 0.47, 0.56) *
-    (1 - THREE.MathUtils.smoothstep(progress, 0.72, 0.79))
-  const prodStart = THREE.MathUtils.smoothstep(progress, 0.53, 0.62)
-  const prodEnd = THREE.MathUtils.smoothstep(progress, 0.70, 0.78)
-  const production = prodStart * (1 - prodEnd)
-  const quality =
-    THREE.MathUtils.smoothstep(progress, 0.70, 0.80) *
-    (1 - THREE.MathUtils.smoothstep(progress, 0.91, 0.98))
-  const delivery = THREE.MathUtils.smoothstep(progress, 0.84, 0.96)
-  const overview = THREE.MathUtils.smoothstep(progress, 0.94, 0.995)
+  const currentStage = stageIndex(progress)
+  const introActive = currentStage === 0
+  const productionActive = currentStage === 5
+  const qualityActive = currentStage === 6
+  const deliveryActive = currentStage === 7
 
-  world.machine.visible = intro > 0.02 || machineReturn > 0.02
+  world.machine.visible = introActive || productionActive
   world.floor.visible =
-    intro > 0.02 || machineReturn > 0.02 || quality > 0.02 || delivery > 0.02
+    introActive || productionActive || qualityActive || deliveryActive
   world.grid.visible = world.floor.visible
 
-  const flowVisible = intro > 0.02 || overview > 0.02
-  world.processLine.visible = flowVisible
-  world.processMaterial.opacity = Math.max(intro, overview * 0.8) * 0.82
+  world.processLine.visible = introActive
+  world.processMaterial.opacity = introActive ? 0.82 : 0
   world.dataDots.forEach((dot) => {
-    dot.visible = flowVisible
+    dot.visible = introActive
   })
 
-  let x = THREE.MathUtils.lerp(
-    -0.2,
-    0.55,
-    THREE.MathUtils.smoothstep(progress, 0.46, 0.58),
-  )
-  x = THREE.MathUtils.lerp(
-    x,
-    4.45,
-    THREE.MathUtils.smoothstep(progress, 0.69, 0.80),
-  )
-  x = THREE.MathUtils.lerp(
-    x,
-    7.2,
-    THREE.MathUtils.smoothstep(progress, 0.86, 0.96),
-  )
+  const toProduction = boundaryProgress(progress, 4)
+  const toQuality = boundaryProgress(progress, 5)
+  const toDelivery = boundaryProgress(progress, 6)
+  let x = THREE.MathUtils.lerp(-0.2, 0.55, toProduction)
+  x = THREE.MathUtils.lerp(x, 4.45, toQuality)
+  x = THREE.MathUtils.lerp(x, 7.2, toDelivery)
 
-  const floating = 1 - THREE.MathUtils.smoothstep(progress, 0.43, 0.52)
+  const floating = currentStage <= 4 ? 1 : 0
   world.workpieceGroup.position.set(
     x,
     0.18 + Math.sin(time * 0.85) * 0.08 * floating * idleBlend,
     0.1,
   )
-  world.workpieceGroup.rotation.x += 0.0035 + production * 0.18
 
-  const toolBase = THREE.MathUtils.lerp(0.95, 0.05, prodStart)
+  const productionLocal = stageLocalProgress(progress, 5)
+  const production = productionActive
+    ? THREE.MathUtils.smoothstep(productionLocal, 0.08, 0.32)
+    : 0
+  world.workpieceGroup.rotation.x +=
+    0.0035 + (productionActive ? 0.16 + idleBlend * 0.025 : 0)
+
+  const toolBase = THREE.MathUtils.lerp(0.95, 0.05, production)
   world.head.position.y =
     toolBase + Math.sin(time * 3) * 0.025 * production * idleBlend
   world.chuckLeft.rotation.y += 0.005 + production * 0.22
   world.chuckRight.rotation.y -= 0.005 + production * 0.22
 
-  world.tower.green.emissiveIntensity = 0.8 + Math.sin(time * 2.2) * 0.25
-  world.tower.amber.emissiveIntensity =
-    0.12 + (Math.sin(time * 1.1) + 1) * 0.12
-  world.tower.red.emissiveIntensity =
-    0.05 + (Math.sin(time * 0.7) + 1) * 0.03
+  if (world.machine.visible) {
+    world.tower.green.emissiveIntensity = 0.8 + Math.sin(time * 2.2) * 0.25
+    world.tower.amber.emissiveIntensity =
+      0.12 + (Math.sin(time * 1.1) + 1) * 0.12
+    world.tower.red.emissiveIntensity =
+      0.05 + (Math.sin(time * 0.7) + 1) * 0.03
+  }
 
   world.dataDots.forEach((dot, index) => {
     const t =
-      (time * (0.06 + idleBlend * 0.035) +
-        index / world.dataDots.length +
-        progress * 0.28) %
-      1
+      (time * (0.06 + idleBlend * 0.035) + index / world.dataDots.length) % 1
     dot.position.set(
       -2.25 + t * 10.1,
       -0.58 + Math.sin(time * 1.4 + index) * 0.02,
@@ -414,21 +408,23 @@ export function updateIndustrialWorld(THREE, world, progress, idleBlend, time) {
     dot.scale.setScalar(0.75 + Math.sin(time * 2.2 + index) * 0.15)
   })
 
-  world.laser.position.z = THREE.MathUtils.lerp(
-    THREE.MathUtils.lerp(
-      -0.65,
-      0.65,
-      THREE.MathUtils.smoothstep(progress, 0.76, 0.87),
-    ),
-    Math.sin(time * 1.35) * 0.68,
-    idleBlend * quality,
-  )
-  world.laser.material.opacity = 0.08 + quality * 0.34
-  world.quality.visible = progress > 0.62
-  world.delivery.visible = progress > 0.79
+  world.quality.visible = qualityActive
+  world.delivery.visible = deliveryActive
 
-  const sparkOpacity = production * (0.55 + idleBlend * 0.4)
-  world.sparksMaterial.opacity = sparkOpacity
+  const qualityLocal = stageLocalProgress(progress, 6)
+  world.laser.position.z = qualityActive
+    ? THREE.MathUtils.lerp(
+        THREE.MathUtils.lerp(-0.65, 0.65, qualityLocal),
+        Math.sin(time * 1.35) * 0.68,
+        idleBlend,
+      )
+    : 0
+  world.laser.material.opacity = qualityActive ? 0.34 : 0
+
+  world.sparks.visible = productionActive
+  world.sparksMaterial.opacity = productionActive
+    ? production * (0.55 + idleBlend * 0.4)
+    : 0
   const positions = world.sparkPositions
   for (let index = 0; index < positions.length / 3; index += 1) {
     const phase = time * (2.1 + index * 0.015) + index * 0.71
@@ -440,17 +436,14 @@ export function updateIndustrialWorld(THREE, world, progress, idleBlend, time) {
   }
   world.sparks.geometry.attributes.position.needsUpdate = true
 
-  if (world.monitorContext && Math.floor(time * 3) !== world.lastMonitorTick) {
+  if (
+    world.machine.visible &&
+    world.monitorContext &&
+    Math.floor(time * 3) !== world.lastMonitorTick
+  ) {
     world.lastMonitorTick = Math.floor(time * 3)
     const ctx = world.monitorContext
-    const status =
-      production > 0.15
-        ? 'RUNNING'
-        : quality > 0.15
-          ? 'QC CHECK'
-          : delivery > 0.15
-            ? 'DELIVERY'
-            : 'READY'
+    const status = productionActive ? 'RUNNING' : 'READY'
     const rpm = Math.round(620 + production * 1280 + Math.sin(time) * 35)
     const load = Math.round(
       24 + production * 58 + (Math.sin(time * 1.7) + 1) * 4,
@@ -460,7 +453,7 @@ export function updateIndustrialWorld(THREE, world, progress, idleBlend, time) {
     ctx.fillStyle = '#4fd5ff'
     ctx.font = '700 34px system-ui'
     ctx.fillText('QUALITYTRACK · CNC-01', 38, 58)
-    ctx.fillStyle = status === 'RUNNING' ? '#45e29a' : '#8ab4ff'
+    ctx.fillStyle = productionActive ? '#45e29a' : '#8ab4ff'
     ctx.font = '800 54px system-ui'
     ctx.fillText(status, 38, 130)
     ctx.fillStyle = '#9db0c5'
@@ -471,7 +464,7 @@ export function updateIndustrialWorld(THREE, world, progress, idleBlend, time) {
     ctx.fillStyle = '#15324e'
     ctx.fillRect(40, 334, 620, 24)
     ctx.fillStyle = '#2385ff'
-    ctx.fillRect(40, 334, 620 * Math.min(1, progress + 0.08), 24)
+    ctx.fillRect(40, 334, 620 * (productionActive ? production : 0.12), 24)
     world.monitorTexture.needsUpdate = true
   }
 }
