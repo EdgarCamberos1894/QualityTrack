@@ -44,6 +44,7 @@ import {
   QuotationDetailPage,
   QuotationsPage,
 } from '@/modules/quotations'
+import { InternalProfilePage } from '@/modules/user-profile'
 import {
   DeliveriesPage,
   ProductionPage,
@@ -82,6 +83,7 @@ export const router = createBrowserRouter([
             element: <AppShell />,
             children: [
               { path: '/', element: <HomePage /> },
+              { path: '/profile', element: <InternalProfilePage /> },
               { path: '/job-cases', element: <JobCasesPage /> },
               {
                 path: '/job-cases/:caseId',
