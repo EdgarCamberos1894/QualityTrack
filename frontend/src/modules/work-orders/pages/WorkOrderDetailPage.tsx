@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react'
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
@@ -15,48 +10,40 @@ import { WorkOrderAuthorizedOrigin } from '../components/WorkOrderAuthorizedOrig
 import { WorkOrderDeliveries } from '../components/WorkOrderDeliveries'
 import { WorkOrderDetailHeader } from '../components/WorkOrderDetailHeader'
 import { WorkOrderDocuments } from '../components/WorkOrderDocuments'
-import { WorkOrderFlowSteps } from '../components/WorkOrderFlowSteps'
+import {
+  canOpenWorkOrderView,
+  getCurrentWorkOrderView,
+  WorkOrderFlowSteps,
+  type WorkOrderWorkspaceView,
+} from '../components/WorkOrderFlowSteps'
 import { WorkOrderPreparation } from '../components/WorkOrderPreparation'
 import { WorkOrderProduction } from '../components/WorkOrderProduction'
 import { WorkOrderQuality } from '../components/WorkOrderQuality'
 import { WorkOrderSecondaryDialog } from '../components/WorkOrderSecondaryDialog'
 import { WorkOrderSummary } from '../components/WorkOrderSummary'
+import { WorkOrderTraceability } from '../components/WorkOrderTraceability'
 import { useCancelWorkOrder } from '../hooks/useCancelWorkOrder'
 import { useWorkOrder360 } from '../hooks/useWorkOrder360'
 import type { CancelWorkOrderFormValues } from '../schemas/workOrderCancellation.schema'
-import type { WorkOrderStatus } from '../types/workOrder.types'
 
-type OperationalView = 'preparation' | 'production' | 'quality' | 'delivery'
-type SecondaryView = 'documents'
-
-const operationalViews: OperationalView[] = [
+const workspaceViews: WorkOrderWorkspaceView[] = [
+  'summary',
   'preparation',
   'production',
   'quality',
   'delivery',
+  'traceability',
 ]
 
-function getCurrentOperationalView(status: WorkOrderStatus): OperationalView {
-  if (status === 'CREATED') return 'preparation'
+const operationalViews = [
+  'preparation',
+  'production',
+  'quality',
+  'delivery',
+] as const
 
-  if (status === 'READY_FOR_PRODUCTION' || status === 'IN_PRODUCTION') {
-    return 'production'
-  }
-
-  if (
-    status === 'QUALITY_PENDING' ||
-    status === 'QUALITY_HOLD' ||
-    status === 'REWORK_IN_PROGRESS'
-  ) {
-    return 'quality'
-  }
-
-  if (status === 'READY_FOR_DELIVERY' || status === 'DELIVERED') {
-    return 'delivery'
-  }
-
-  return 'preparation'
-}
+type OperationalView = (typeof operationalViews)[number]
+type SecondaryView = 'documents'
 
 const viewLabels: Record<OperationalView, string> = {
   preparation: 'Preparación',
@@ -65,12 +52,15 @@ const viewLabels: Record<OperationalView, string> = {
   delivery: 'Entrega',
 }
 
+function isOperationalView(view: WorkOrderWorkspaceView): view is OperationalView {
+  return operationalViews.includes(view as OperationalView)
+}
+
 export function WorkOrderDetailPage() {
   const { workOrderId } = useParams()
   const session = useSessionStore((state) => state.session)
   const [cancelOpen, setCancelOpen] = useState(false)
   const location = useLocation()
-  const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const numericId = Number(workOrderId)
   const validId =
@@ -79,10 +69,10 @@ export function WorkOrderDetailPage() {
   const cancelMutation = useCancelWorkOrder(validId ?? 0)
 
   const requestedView = searchParams.get('view')
-  const requestedOperationalView = operationalViews.includes(
-    requestedView as OperationalView,
+  const requestedWorkspaceView = workspaceViews.includes(
+    requestedView as WorkOrderWorkspaceView,
   )
-    ? (requestedView as OperationalView)
+    ? (requestedView as WorkOrderWorkspaceView)
     : null
   const secondaryView: SecondaryView | null =
     requestedView === 'documents' ? 'documents' : null
@@ -100,15 +90,6 @@ export function WorkOrderDetailPage() {
 
     return () => window.cancelAnimationFrame(frame)
   }, [location.hash, query.data, requestedView])
-
-  useEffect(() => {
-    if (!query.data || requestedView !== 'traceability') return
-
-    navigate(
-      `/job-cases/${query.data.workOrder.source.caseId}?view=traceability`,
-      { replace: true },
-    )
-  }, [navigate, query.data, requestedView])
 
   const cancel = async (values: CancelWorkOrderFormValues) => {
     try {
@@ -156,13 +137,22 @@ export function WorkOrderDetailPage() {
   const canCancel =
     data.workOrder.status === 'CREATED' &&
     (roles.includes('ADMIN') || roles.includes('PRODUCTION'))
-  const currentView = getCurrentOperationalView(data.workOrder.status)
-  const activeView = requestedOperationalView ?? currentView
+  const currentView = getCurrentWorkOrderView(data.workOrder.status)
+  const activeView =
+    requestedWorkspaceView &&
+    canOpenWorkOrderView(data.workOrder.status, requestedWorkspaceView)
+      ? requestedWorkspaceView
+      : currentView
   const viewingHistoricalStage =
-    requestedOperationalView !== null && requestedOperationalView !== currentView
+    isOperationalView(activeView) && activeView !== currentView
 
-  const renderOperationalContent = () => {
-    if (data.workOrder.status === 'CANCELLED') {
+  const selectWorkspaceView = (view: WorkOrderWorkspaceView) => {
+    if (!canOpenWorkOrderView(data.workOrder.status, view)) return
+    setSearchParams({ view })
+  }
+
+  const renderWorkspaceContent = () => {
+    if (activeView === 'summary') {
       return <WorkOrderSummary data={data} />
     }
 
@@ -178,11 +168,15 @@ export function WorkOrderDetailPage() {
       return <WorkOrderDeliveries data={data} />
     }
 
+    if (activeView === 'traceability') {
+      return <WorkOrderTraceability data={data} />
+    }
+
     return <WorkOrderPreparation data={data} />
   }
 
   const closeSecondaryView = () => {
-    setSearchParams({})
+    setSearchParams({ view: currentView })
   }
 
   return (
@@ -195,15 +189,16 @@ export function WorkOrderDetailPage() {
           setCancelOpen(true)
         }}
         onOpenDocuments={() => setSearchParams({ view: 'documents' })}
-        onOpenTraceability={() =>
-          navigate(
-            `/job-cases/${data.workOrder.source.caseId}?view=traceability`,
-          )
-        }
+        onOpenTraceability={() => setSearchParams({ view: 'traceability' })}
       />
 
       <div className="space-y-3">
-        <WorkOrderFlowSteps status={data.workOrder.status} />
+        <WorkOrderFlowSteps
+          status={data.workOrder.status}
+          activeView={activeView}
+          onSelect={selectWorkspaceView}
+        />
+
         <WorkOrderAuthorizedOrigin workOrder={data.workOrder} />
 
         {data.workOrder.status === 'CANCELLED' ? (
@@ -226,21 +221,21 @@ export function WorkOrderDetailPage() {
           <section className="flex flex-col gap-2 rounded-xl border border-blue-100 bg-blue-50/45 px-3.5 py-2.5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-[8px] leading-4 text-blue-900">
               Estás consultando <strong>{viewLabels[activeView]}</strong> como
-              referencia histórica. La etapa actual es{' '}
-              <strong>{viewLabels[currentView]}</strong>.
+              referencia histórica. La etapa ya no es editable y el proceso se
+              encuentra en <strong>{viewLabels[currentView]}</strong>.
             </p>
             <Button
               size="sm"
               variant="secondary"
               className="!h-7 !px-2.5 !text-[8px]"
-              onClick={() => setSearchParams({})}
+              onClick={() => setSearchParams({ view: currentView })}
             >
               Volver a etapa actual
             </Button>
           </section>
         ) : null}
 
-        {renderOperationalContent()}
+        {renderWorkspaceContent()}
       </div>
 
       <WorkOrderSecondaryDialog
