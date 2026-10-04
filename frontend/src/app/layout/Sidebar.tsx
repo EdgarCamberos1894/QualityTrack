@@ -28,15 +28,6 @@ function isNavigationItemActive(
   const params = new URLSearchParams(search)
   const workOrderTab = params.get('tab')
 
-  if (item.resourceTab) {
-    if (pathname !== '/resources') return false
-
-    const resourceTab = params.get('tab')
-    return item.resourceTab === 'machines'
-      ? resourceTab === null || resourceTab === 'machines'
-      : resourceTab === item.resourceTab
-  }
-
   if (item.workOrderTab) {
     return (
       pathname === itemPath ||
