@@ -169,7 +169,7 @@ export interface RoutingOperationDto {
   name: string
   instructions: string | null
   estimatedMinutes: number
-  prerequisiteOperationIds: number[]
+  prerequisiteOperationIds?: number[]
   createdAt: string
   updatedAt: string
 }
