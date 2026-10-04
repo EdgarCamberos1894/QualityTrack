@@ -147,6 +147,11 @@ button:disabled {
     overflow: visible !important;
   }
 
+  body.printing-job-case #root
+    *:not(:has(.job-case-print-area)):not(.job-case-print-area):not(.job-case-print-area *) {
+    display: none !important;
+  }
+
   body.printing-job-case * {
     visibility: hidden !important;
   }
@@ -216,8 +221,7 @@ button:disabled {
   }
 
   body.printing-job-case .job-case-print-annexes {
-    margin: 0 !important;
-    padding: 0 !important;
+    display: contents !important;
   }
 
   body.printing-job-case .job-case-annex-page {
@@ -237,8 +241,8 @@ button:disabled {
   }
 
   body.printing-job-case .job-case-annex-page:last-child {
-    break-after: avoid-page !important;
-    page-break-after: avoid !important;
+    break-after: auto !important;
+    page-break-after: auto !important;
   }
 
   body.printing-job-case .job-case-annex-content {
