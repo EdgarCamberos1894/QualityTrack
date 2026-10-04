@@ -6,7 +6,6 @@ export interface NavigationItem {
   href: string
   icon: SidebarNavIconName
   workOrderTab?: 'production' | 'quality' | 'delivery'
-  resourceTab?: 'machines' | 'materials'
   requiredRole?: SystemRole
 }
 
@@ -56,18 +55,8 @@ export const navigationGroups: NavigationGroup[] = [
   {
     label: 'Catálogos',
     items: [
-      {
-        label: 'Máquinas',
-        href: '/resources?tab=machines',
-        icon: 'machines',
-        resourceTab: 'machines',
-      },
-      {
-        label: 'Materiales',
-        href: '/resources?tab=materials',
-        icon: 'materials',
-        resourceTab: 'materials',
-      },
+      { label: 'Máquinas', href: '/machines', icon: 'machines' },
+      { label: 'Materiales', href: '/materials', icon: 'materials' },
     ],
   },
   {
