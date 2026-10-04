@@ -94,7 +94,7 @@ export function ScrollStory() {
         </div>
       </div>
 
-      <div className="pointer-events-none absolute left-[42%] top-[61%] z-[12] hidden w-[286px] lg:block xl:left-[43%] xl:top-[62%]">
+      <div className="pointer-events-none absolute left-[58%] top-[64%] z-[12] hidden w-[264px] lg:block xl:left-[60%] xl:top-[63%]">
         <div className="relative overflow-hidden rounded-2xl border border-cyan-300/15 bg-slate-950/55 px-4 py-3.5 shadow-[0_24px_80px_-32px_rgba(14,165,233,0.8)] backdrop-blur-xl">
           <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-cyan-300/70 to-transparent" />
           <div className="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-cyan-400/10 blur-2xl" />
