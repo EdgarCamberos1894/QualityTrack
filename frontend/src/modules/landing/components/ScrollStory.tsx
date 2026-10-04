@@ -89,7 +89,7 @@ export function ScrollStory() {
               <animate
                 attributeName="stroke-dashoffset"
                 from="0"
-                to="-180"
+                to="180"
                 dur="7s"
                 repeatCount="indefinite"
               />
@@ -107,14 +107,14 @@ export function ScrollStory() {
                 <animateMotion
                   dur="5.2s"
                   repeatCount="indefinite"
-                  path="M 22 252 C 178 252, 205 94, 392 110 S 565 182, 698 118"
+                  path="M 698 118 C 565 182, 499 94, 392 110 S 178 252, 22 252"
                 />
               </circle>
               <circle r="3.5" fill="#a5f3fc" opacity="0.95">
                 <animateMotion
                   dur="5.2s"
                   repeatCount="indefinite"
-                  path="M 22 252 C 178 252, 205 94, 392 110 S 565 182, 698 118"
+                  path="M 698 118 C 565 182, 499 94, 392 110 S 178 252, 22 252"
                 />
               </circle>
             </>
