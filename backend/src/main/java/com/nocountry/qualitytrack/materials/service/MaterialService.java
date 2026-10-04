@@ -45,6 +45,7 @@ public class MaterialService {
     private final MaterialLotRepository materialLotRepository;
     private final WorkOrderMaterialRepository workOrderMaterialRepository;
     private final DocumentService documentService;
+    private final MaterialReferenceDocumentService materialReferenceDocumentService;
     private final WorkOrderRepository workOrderRepository;
     private final WorkOrderAccessPolicy accessPolicy;
     private final TraceabilityService traceabilityService;
@@ -65,6 +66,33 @@ public class MaterialService {
                     request.specification(),
                     request.unit()
             );
+        } catch (IllegalArgumentException exception) {
+            conflict(exception.getMessage());
+            throw exception;
+        }
+
+        return MaterialResponse.from(materialRepository.saveAndFlush(material));
+    }
+
+    @Transactional
+    public MaterialResponse attachTechnicalSheet(
+            Long currentUserId,
+            Long materialId,
+            MultipartFile file
+    ) {
+        accessPolicy.requireProductionActor(currentUserId);
+
+        Material material = materialRepository.findById(materialId)
+                .orElseThrow(() -> notFound("No se encontró el material."));
+
+        DocumentVersion technicalSheet = materialReferenceDocumentService.upsertTechnicalSheet(
+                currentUserId,
+                material,
+                file
+        );
+
+        try {
+            material.attachTechnicalSheet(technicalSheet);
         } catch (IllegalArgumentException exception) {
             conflict(exception.getMessage());
             throw exception;
