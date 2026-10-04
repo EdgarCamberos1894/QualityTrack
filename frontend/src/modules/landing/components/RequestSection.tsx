@@ -46,6 +46,9 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
       : `opacity 620ms ease ${delay}ms, transform 720ms cubic-bezier(.2,.75,.2,1) ${delay}ms`,
   })
 
+  const requestTracePath =
+    'M 550 0 C 550 64, 532 91, 486 121 C 433 156, 391 203, 326 231 C 276 253, 236 262, 202 284'
+
   return (
     <section
       ref={sectionRef}
@@ -59,58 +62,83 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
 
       <div className="pointer-events-none absolute inset-0 z-[3] hidden lg:block" aria-hidden="true">
         <svg
-          viewBox="0 0 920 430"
-          className="absolute -top-2 left-[4%] h-[48%] w-[69%] overflow-visible"
+          viewBox="0 0 1000 430"
+          className="absolute left-0 top-0 h-[48%] w-full overflow-visible"
           preserveAspectRatio="none"
         >
           <defs>
-            <linearGradient id="qtRequestTrace" x1="1" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#67e8f9" stopOpacity="0" />
-              <stop offset="22%" stopColor="#22d3ee" stopOpacity="0.56" />
+            <linearGradient id="qtRequestTrace" x1="0.55" y1="0" x2="0.2" y2="0.7">
+              <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.16" />
+              <stop offset="22%" stopColor="#22d3ee" stopOpacity="0.62" />
               <stop offset="70%" stopColor="#60a5fa" stopOpacity="0.48" />
               <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.05" />
             </linearGradient>
             <filter id="qtRequestTraceGlow" x="-60%" y="-60%" width="220%" height="220%">
               <feGaussianBlur stdDeviation="7" />
             </filter>
+            <filter id="qtRequestTravelerGlow" x="-200%" y="-200%" width="500%" height="500%">
+              <feGaussianBlur stdDeviation="5" />
+            </filter>
           </defs>
 
           <path
-            d="M 895 4 C 826 74, 774 72, 706 117 C 613 178, 566 244, 430 254 C 337 260, 272 239, 202 284"
+            d={requestTracePath}
             fill="none"
             stroke="url(#qtRequestTrace)"
-            strokeWidth="11"
-            opacity={active ? 0.14 : 0}
+            strokeWidth="12"
+            opacity={active ? 0.16 : 0}
             filter="url(#qtRequestTraceGlow)"
           />
           <path
-            d="M 895 4 C 826 74, 774 72, 706 117 C 613 178, 566 244, 430 254 C 337 260, 272 239, 202 284"
+            d={requestTracePath}
             fill="none"
             stroke="url(#qtRequestTrace)"
             strokeWidth="1.5"
-            strokeDasharray="7 11"
-            opacity={active ? 0.9 : 0}
+            strokeDasharray="8 10"
+            opacity={active ? 0.92 : 0}
           >
             {!reducedMotion && active ? (
               <animate
                 attributeName="stroke-dashoffset"
                 from="0"
                 to="180"
-                dur="8s"
+                dur="7s"
                 repeatCount="indefinite"
               />
             ) : null}
           </path>
 
           {!reducedMotion && active ? (
-            <circle r="3.5" fill="#a5f3fc" opacity="0.95">
-              <animateMotion
-                dur="5.4s"
-                repeatCount="indefinite"
-                path="M 895 4 C 826 74, 774 72, 706 117 C 613 178, 566 244, 430 254 C 337 260, 272 239, 202 284"
-              />
-            </circle>
+            <>
+              <circle
+                r="10"
+                fill="#67e8f9"
+                opacity="0.16"
+                filter="url(#qtRequestTravelerGlow)"
+              >
+                <animateMotion
+                  dur="5.2s"
+                  repeatCount="indefinite"
+                  path={requestTracePath}
+                />
+              </circle>
+              <circle r="3.5" fill="#a5f3fc" opacity="0.95">
+                <animateMotion
+                  dur="5.2s"
+                  repeatCount="indefinite"
+                  path={requestTracePath}
+                />
+              </circle>
+            </>
           ) : null}
+
+          <circle
+            cx="550"
+            cy="0"
+            r="3"
+            fill="#67e8f9"
+            opacity={active ? 0.92 : 0}
+          />
         </svg>
       </div>
 
