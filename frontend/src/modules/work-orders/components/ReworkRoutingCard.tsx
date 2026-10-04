@@ -69,6 +69,7 @@ export function ReworkRoutingCard({
       name: values.name.trim(),
       instructions: values.instructions.trim(),
       estimatedMinutes: values.estimatedMinutes,
+      prerequisiteOperationIds: values.prerequisiteOperationIds,
     }
 
     try {
@@ -224,6 +225,7 @@ export function ReworkRoutingCard({
       <RoutingOperationDialog
         open={operationDialogOpen}
         operation={operation}
+        operations={routing.operations}
         nextSequence={nextSequence}
         submitting={
           mutations.addOperation.isPending ||
