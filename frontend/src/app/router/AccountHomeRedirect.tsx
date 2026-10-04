@@ -6,7 +6,7 @@ export function AccountHomeRedirect() {
 
   return (
     <Navigate
-      to={session?.user.accountType === 'CUSTOMER' ? '/portal' : '/'}
+      to={session?.user.accountType === 'CUSTOMER' ? '/portal' : '/dashboard'}
       replace
     />
   )

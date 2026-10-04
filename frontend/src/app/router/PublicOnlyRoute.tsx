@@ -7,7 +7,7 @@ export function PublicOnlyRoute() {
   if (session && isSessionActive(session)) {
     return (
       <Navigate
-        to={session.user.accountType === 'CUSTOMER' ? '/portal' : '/'}
+        to={session.user.accountType === 'CUSTOMER' ? '/portal' : '/dashboard'}
         replace
       />
     )

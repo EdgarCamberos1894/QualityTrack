@@ -33,6 +33,7 @@ import {
   InternalCustomersPage,
 } from '@/modules/internal-customers'
 import { InternalUsersPage } from '@/modules/internal-users'
+import { LandingPage } from '@/modules/landing'
 import {
   MachinesPage,
   MaterialsPage,
@@ -54,6 +55,7 @@ import {
 } from '@/modules/work-orders'
 
 export const router = createBrowserRouter([
+  { path: '/', element: <LandingPage /> },
   { path: '/verify-email', element: <VerifyEmailPage /> },
   { path: '/reset-password', element: <ResetPasswordPage /> },
   {
@@ -76,13 +78,14 @@ export const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
+      { path: '/account', element: <AccountHomeRedirect /> },
       {
         element: <InternalOnlyRoute />,
         children: [
           {
             element: <AppShell />,
             children: [
-              { path: '/', element: <HomePage /> },
+              { path: '/dashboard', element: <HomePage /> },
               { path: '/profile', element: <InternalProfilePage /> },
               { path: '/job-cases', element: <JobCasesPage /> },
               {
@@ -166,5 +169,5 @@ export const router = createBrowserRouter([
       { path: '*', element: <AccountHomeRedirect /> },
     ],
   },
-  { path: '*', element: <Navigate to="/login" replace /> },
+  { path: '*', element: <Navigate to="/" replace /> },
 ])

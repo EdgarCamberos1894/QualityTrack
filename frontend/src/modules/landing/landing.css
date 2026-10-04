@@ -1,0 +1,141 @@
+html {
+  scroll-behavior: smooth;
+}
+
+.qt-story {
+  min-height: 800vh;
+}
+
+.qt-story-backdrop {
+  background:
+    radial-gradient(circle at 68% 45%, rgba(37, 99, 235, 0.17), transparent 30%),
+    radial-gradient(circle at 52% 70%, rgba(14, 165, 233, 0.08), transparent 26%),
+    linear-gradient(180deg, #020617 0%, #071127 48%, #020617 100%);
+}
+
+.qt-story-backdrop::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+  opacity: 0.2;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(circle at 62% 52%, black 0%, transparent 72%);
+}
+
+.qt-story-copy {
+  opacity: 0.18;
+  transform: translate3d(0, 28px, 0) scale(0.985);
+  filter: blur(1.2px);
+  transition:
+    opacity 420ms ease,
+    transform 520ms cubic-bezier(0.2, 0.75, 0.2, 1),
+    filter 420ms ease;
+}
+
+.qt-story-copy-active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: blur(0);
+}
+
+.qt-capability-card {
+  transform: translateZ(0);
+  transition:
+    transform 380ms cubic-bezier(0.2, 0.75, 0.2, 1),
+    border-color 300ms ease,
+    box-shadow 380ms ease;
+}
+
+.qt-capability-card:hover {
+  transform: translateY(-5px) perspective(900px) rotateX(1deg);
+  border-color: rgba(96, 165, 250, 0.35);
+  box-shadow: 0 28px 70px -48px rgba(37, 99, 235, 0.55);
+}
+
+.qt-final-glow {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.16), transparent 36%),
+    radial-gradient(circle at 15% 80%, rgba(14, 165, 233, 0.08), transparent 25%);
+}
+
+.qt-scene-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.qt-scene-fallback-core {
+  display: grid;
+  width: 94px;
+  height: 94px;
+  place-items: center;
+  border: 1px solid rgba(96, 165, 250, 0.28);
+  border-radius: 28px;
+  background: rgba(37, 99, 235, 0.12);
+  color: #bfdbfe;
+  font-size: 22px;
+  font-weight: 800;
+  box-shadow: 0 0 70px rgba(37, 99, 235, 0.18);
+}
+
+.qt-scene-fallback-orbit {
+  position: absolute;
+  width: min(48vw, 540px);
+  aspect-ratio: 1;
+  border: 1px solid rgba(96, 165, 250, 0.13);
+  border-radius: 999px;
+  animation: qt-orbit 14s linear infinite;
+}
+
+.qt-scene-fallback-orbit-b {
+  width: min(35vw, 390px);
+  border-color: rgba(52, 211, 153, 0.1);
+  animation-direction: reverse;
+  animation-duration: 9s;
+}
+
+.qt-scene-fallback-orbit::after {
+  position: absolute;
+  top: 48%;
+  left: -4px;
+  width: 8px;
+  height: 8px;
+  content: '';
+  border-radius: 50%;
+  background: #60a5fa;
+  box-shadow: 0 0 18px rgba(96, 165, 250, 0.8);
+}
+
+@keyframes qt-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1023px) {
+  .qt-story-backdrop::before {
+    background-size: 52px 52px;
+  }
+
+  .qt-story-copy {
+    max-width: min(88vw, 540px);
+    padding-top: 34vh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .qt-story-copy,
+  .qt-capability-card,
+  .qt-scene-fallback-orbit {
+    transition: none;
+    animation: none;
+  }
+}

@@ -14,7 +14,7 @@ function getDestination(state: unknown): string {
   const pathname = candidate?.from?.pathname
 
   if (!pathname || !pathname.startsWith('/') || pathname.startsWith('//')) {
-    return '/'
+    return '/account'
   }
 
   return `${pathname}${candidate?.from?.search ?? ''}`

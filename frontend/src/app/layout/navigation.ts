@@ -17,7 +17,7 @@ export interface NavigationGroup {
 export const navigationGroups: NavigationGroup[] = [
   {
     label: 'Principal',
-    items: [{ label: 'Panel', href: '/', icon: 'panel' }],
+    items: [{ label: 'Panel', href: '/dashboard', icon: 'panel' }],
   },
   {
     label: 'Comercial',
