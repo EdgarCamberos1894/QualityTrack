@@ -1,5 +1,5 @@
 interface TopbarActionIconProps {
-  name: 'menu' | 'logout' | 'search' | 'chevron-down'
+  name: 'menu' | 'logout' | 'search' | 'chevron-down' | 'user'
   className?: string
 }
 
@@ -43,6 +43,13 @@ export function TopbarActionIcon({
       ) : null}
 
       {name === 'chevron-down' ? <path d="m7 9.5 5 5 5-5" /> : null}
+
+      {name === 'user' ? (
+        <>
+          <circle cx="12" cy="8" r="3.5" />
+          <path d="M5 20a7 7 0 0 1 14 0" />
+        </>
+      ) : null}
     </svg>
   )
 }
