@@ -169,6 +169,7 @@ export interface RoutingOperationDto {
   name: string
   instructions: string | null
   estimatedMinutes: number
+  prerequisiteOperationIds: number[]
   createdAt: string
   updatedAt: string
 }
@@ -256,6 +257,7 @@ export interface RoutingOperationPayload {
   name: string
   instructions: string
   estimatedMinutes: number
+  prerequisiteOperationIds: number[]
 }
 
 export interface ReopenRoutingSheetPayload {
