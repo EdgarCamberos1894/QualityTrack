@@ -19,16 +19,16 @@ export function ScrollStory() {
       className="qt-story relative isolate bg-[#020617]"
     >
       <div className="sticky top-0 h-screen overflow-hidden">
-        <div className="absolute inset-0 qt-story-backdrop" />
-        <div className="absolute inset-0 opacity-90">
+        <div className="qt-story-backdrop absolute inset-0 z-0" />
+        <div className="absolute inset-0 z-[1] opacity-100">
           <QualityTrackScene
             progressRef={progressRef}
             scrollingRef={scrollingRef}
             reducedMotion={reducedMotion}
           />
         </div>
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(2,6,23,0.92)_0%,rgba(2,6,23,0.58)_34%,rgba(2,6,23,0.08)_62%,rgba(2,6,23,0.45)_100%)] lg:bg-[linear-gradient(90deg,rgba(2,6,23,0.9)_0%,rgba(2,6,23,0.55)_30%,rgba(2,6,23,0.02)_57%,rgba(2,6,23,0.35)_100%)]" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#020617] to-transparent" />
+        <div className="pointer-events-none absolute inset-0 z-[2] bg-[linear-gradient(90deg,rgba(2,6,23,0.86)_0%,rgba(2,6,23,0.44)_34%,rgba(2,6,23,0.02)_62%,rgba(2,6,23,0.26)_100%)] lg:bg-[linear-gradient(90deg,rgba(2,6,23,0.84)_0%,rgba(2,6,23,0.42)_30%,rgba(2,6,23,0.01)_57%,rgba(2,6,23,0.22)_100%)]" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-40 bg-gradient-to-t from-[#020617] to-transparent" />
 
         <div className="absolute bottom-6 left-5 z-20 hidden items-center gap-2 rounded-full border border-white/8 bg-slate-950/45 px-3 py-1.5 backdrop-blur sm:flex lg:left-8">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.75)]" />
