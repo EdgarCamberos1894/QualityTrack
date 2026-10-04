@@ -51,16 +51,9 @@ export function StoryStage({ stage, active }: StoryStageProps) {
 
       {stage.hero ? (
         <div className="mt-7 flex flex-wrap items-center gap-2.5">
-          <a
-            href="#solicitud"
-            className="inline-flex h-10 items-center justify-center rounded-xl bg-blue-500 px-4 text-[10px] font-bold text-white shadow-[0_18px_50px_-18px_rgba(59,130,246,0.9)] transition hover:bg-blue-400"
-          >
-            Recorrer el proceso
-            <span aria-hidden="true" className="ml-2 text-sm">↓</span>
-          </a>
           <Link
             to="/login"
-            className="inline-flex h-10 items-center justify-center rounded-xl border border-white/12 bg-white/5 px-4 text-[10px] font-bold text-slate-100 backdrop-blur transition hover:border-white/20 hover:bg-white/10"
+            className="inline-flex h-10 items-center justify-center rounded-xl bg-blue-500 px-4 text-[10px] font-bold text-white shadow-[0_18px_50px_-18px_rgba(59,130,246,0.9)] transition hover:bg-blue-400"
           >
             Entrar a QualityTrack
           </Link>
