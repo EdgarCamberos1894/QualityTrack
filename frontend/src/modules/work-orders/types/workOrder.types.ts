@@ -258,6 +258,7 @@ export interface RoutingOperationPayload {
   instructions: string
   estimatedMinutes: number
   prerequisiteOperationIds: number[]
+  resequenceOperations: boolean
 }
 
 export interface ReopenRoutingSheetPayload {
