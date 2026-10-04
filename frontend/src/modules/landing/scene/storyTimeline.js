@@ -1,6 +1,7 @@
 export const STORY_STAGE_COUNT = 8
 export const STORY_LAST_STAGE = STORY_STAGE_COUNT - 1
 export const STORY_TRANSITION = 0.012
+export const STORY_SCENE_TRAVEL = 5.2
 
 function clamp01(value) {
   return Math.min(1, Math.max(0, value))
@@ -30,24 +31,47 @@ export function stageBounds(index) {
   }
 }
 
-export function stageOpacity(progress, index, transition = STORY_TRANSITION) {
-  const { start, end } = stageBounds(index)
-  const fadeIn =
-    index === 0
-      ? 1
-      : smoothstep(progress, start - transition, start + transition)
-  const fadeOut =
-    index === STORY_LAST_STAGE
-      ? 1
-      : 1 - smoothstep(progress, end - transition, end + transition)
-  return fadeIn * fadeOut
-}
-
 export function stageLocalProgress(progress, index) {
   const { start, end } = stageBounds(index)
   return clamp01((progress - start) / Math.max(end - start, 0.0001))
 }
 
+export function stageDirection(index) {
+  return index % 2 === 0 ? 1 : -1
+}
+
+export function stageSceneMotion(progress, index, travel = STORY_SCENE_TRAVEL) {
+  const local = stageLocalProgress(progress, index)
+  const direction = stageDirection(index)
+  const active = stageIndex(progress) === index
+
+  if (!active) {
+    return {
+      active: false,
+      local,
+      opacity: 0,
+      offset: direction * travel,
+    }
+  }
+
+  const enter = index === 0 ? 1 : smoothstep(local, 0, 0.14)
+  const exit =
+    index === STORY_LAST_STAGE ? 1 : 1 - smoothstep(local, 0.86, 1)
+
+  return {
+    active: true,
+    local,
+    opacity: enter * exit,
+    offset: direction * travel * ((1 - enter) + (1 - exit)),
+  }
+}
+
+export function stageOpacity(progress, index) {
+  return stageSceneMotion(progress, index).opacity
+}
+
+// Kept for the legacy world renderer. New scene choreography must not use this
+// to carry an object from one chapter into the next.
 export function boundaryProgress(
   progress,
   leftStage,
@@ -62,25 +86,5 @@ export function boundaryProgress(
 }
 
 export function sampleStageVector(THREE, points, progress) {
-  const currentStage = stageIndex(progress)
-
-  for (let index = 0; index < STORY_LAST_STAGE; index += 1) {
-    const boundary = stageBoundary(index)
-    if (
-      progress >= boundary - STORY_TRANSITION &&
-      progress <= boundary + STORY_TRANSITION
-    ) {
-      const blend = smoothstep(
-        progress,
-        boundary - STORY_TRANSITION,
-        boundary + STORY_TRANSITION,
-      )
-      return new THREE.Vector3(...points[index]).lerp(
-        new THREE.Vector3(...points[index + 1]),
-        blend,
-      )
-    }
-  }
-
-  return new THREE.Vector3(...points[currentStage])
+  return new THREE.Vector3(...points[stageIndex(progress)])
 }

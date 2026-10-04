@@ -207,6 +207,17 @@ export function buildIndustrialStory(THREE, root) {
   measure.rotation.y = -0.25
   root.add(measure)
 
+  const deliveryCard = card(
+    THREE,
+    'Entrega',
+    'DEL-2026-014',
+    ['Transportista asignado', 'Evidencia adjunta', 'ENTREGA CONFIRMADA'],
+    '#25c8f7',
+  )
+  deliveryCard.position.set(6.15, 1.05, -0.5)
+  deliveryCard.rotation.y = -0.24
+  root.add(deliveryCard)
+
   const stageLabels = [
     ['Solicitud', -2.5, '#25c8f7'],
     ['Cotización', -0.9, '#ffad35'],
@@ -227,6 +238,7 @@ export function buildIndustrialStory(THREE, root) {
   setFade(quotation, 0)
   setFade(workOrder, 0)
   setFade(measure, 0)
+  setFade(deliveryCard, 0)
 
   return {
     request,
@@ -241,6 +253,7 @@ export function buildIndustrialStory(THREE, root) {
     quotation,
     workOrder,
     measure,
+    deliveryCard,
     stageLabels,
   }
 }
@@ -308,14 +321,44 @@ export function updateIndustrialStory(THREE, story, progress, time) {
   setFade(story.expediente, fileAlpha)
 
   const quotationAlpha = stageOpacity(progress, 3)
+  const quotationLocal = stageLocalProgress(progress, 3)
+  const quotationSettle = THREE.MathUtils.smoothstep(quotationLocal, 0.08, 0.72)
+  story.quotation.position.x = THREE.MathUtils.lerp(-2.75, -1.7, quotationSettle)
+  story.quotation.position.y =
+    THREE.MathUtils.lerp(0.72, 0.95, quotationSettle) + Math.sin(time * 0.75) * 0.035
+  story.quotation.rotation.y = THREE.MathUtils.lerp(0.34, 0.18, quotationSettle)
+  story.quotation.scale.setScalar(THREE.MathUtils.lerp(0.82, 1, quotationSettle))
   setFade(story.quotation, quotationAlpha)
-  story.quotation.position.y = 0.95 + Math.sin(time * 0.75) * 0.035
 
   const workOrderAlpha = stageOpacity(progress, 4)
+  const workOrderLocal = stageLocalProgress(progress, 4)
+  const workOrderSettle = THREE.MathUtils.smoothstep(workOrderLocal, 0.08, 0.68)
+  story.workOrder.position.x = THREE.MathUtils.lerp(2.85, 1.75, workOrderSettle)
+  story.workOrder.position.y =
+    THREE.MathUtils.lerp(0.76, 1.05, workOrderSettle) + Math.sin(time * 0.68) * 0.026
+  story.workOrder.rotation.y = THREE.MathUtils.lerp(-0.42, -0.28, workOrderSettle)
+  story.workOrder.scale.setScalar(THREE.MathUtils.lerp(0.84, 1, workOrderSettle))
   setFade(story.workOrder, workOrderAlpha)
 
   const measureAlpha = stageOpacity(progress, 6)
+  const measureLocal = stageLocalProgress(progress, 6)
+  const measureSettle = THREE.MathUtils.smoothstep(measureLocal, 0.12, 0.64)
+  story.measure.position.x = THREE.MathUtils.lerp(5.9, 5.05, measureSettle)
+  story.measure.position.y =
+    THREE.MathUtils.lerp(0.78, 1.05, measureSettle) + Math.sin(time * 0.8) * 0.025
+  story.measure.rotation.y = THREE.MathUtils.lerp(-0.4, -0.25, measureSettle)
+  story.measure.scale.setScalar(THREE.MathUtils.lerp(0.84, 1, measureSettle))
   setFade(story.measure, measureAlpha)
+
+  const deliveryAlpha = stageOpacity(progress, 7)
+  const deliveryLocal = stageLocalProgress(progress, 7)
+  const deliverySettle = THREE.MathUtils.smoothstep(deliveryLocal, 0.14, 0.68)
+  story.deliveryCard.position.x = THREE.MathUtils.lerp(7.05, 6.15, deliverySettle)
+  story.deliveryCard.position.y =
+    THREE.MathUtils.lerp(0.8, 1.05, deliverySettle) + Math.sin(time * 0.72) * 0.024
+  story.deliveryCard.rotation.y = THREE.MathUtils.lerp(-0.4, -0.24, deliverySettle)
+  story.deliveryCard.scale.setScalar(THREE.MathUtils.lerp(0.84, 1, deliverySettle))
+  setFade(story.deliveryCard, deliveryAlpha)
 
   story.stageLabels.forEach((label) => setFade(label, 0))
 

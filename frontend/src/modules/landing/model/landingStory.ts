@@ -34,7 +34,7 @@ export const landingStory: LandingStoryStage[] = [
       'El cliente documenta qué necesita, adjunta archivos y define información de entrega. La solicitud entra al flujo con una referencia única desde el primer minuto.',
     signal: 'Solicitud recibida',
     detail: 'Requisitos, documentos y destino quedan vinculados desde origen.',
-    side: 'left',
+    side: 'right',
     accent: 'cyan',
   },
   {
@@ -46,7 +46,7 @@ export const landingStory: LandingStoryStage[] = [
       'La revisión interna, documentos, aclaraciones y eventos se reúnen alrededor del mismo expediente. La trazabilidad acompaña al proceso sin convertirse en otra pantalla aislada.',
     signal: 'Contexto consolidado',
     detail: 'Una historia operativa que crece con el trabajo real.',
-    side: 'right',
+    side: 'left',
     accent: 'blue',
   },
   {
@@ -58,7 +58,7 @@ export const landingStory: LandingStoryStage[] = [
       'Conceptos, tiempos y ajustes se preparan sin romper la continuidad del caso. El cliente revisa la propuesta y su aprobación habilita el siguiente movimiento.',
     signal: 'Cotización aprobada',
     detail: 'Versiones y ajustes permanecen ligados a la solicitud original.',
-    side: 'left',
+    side: 'right',
     accent: 'amber',
   },
   {
@@ -70,7 +70,7 @@ export const landingStory: LandingStoryStage[] = [
       'La orden concentra planeación, materiales, documentos y hoja de ruta. Las operaciones se encadenan para que cada equipo sepa qué sigue y qué debe estar listo antes.',
     signal: 'Ruta liberada',
     detail: 'Máquinas, materiales y operaciones quedan preparados para piso.',
-    side: 'right',
+    side: 'left',
     accent: 'violet',
   },
   {
@@ -82,7 +82,7 @@ export const landingStory: LandingStoryStage[] = [
       'Las operaciones se inician y completan en secuencia, registrando consumo de material y ejecución. El avance deja de depender de memoria, chats o hojas paralelas.',
     signal: 'Operación en curso',
     detail: 'Ejecución, lotes y progreso permanecen conectados a la orden.',
-    side: 'left',
+    side: 'right',
     accent: 'blue',
   },
   {
@@ -94,7 +94,7 @@ export const landingStory: LandingStoryStage[] = [
       'Las inspecciones pueden adaptarse al trabajo real. Mediciones, verificaciones y no conformidades quedan registradas antes de permitir que la pieza continúe.',
     signal: 'Inspección conforme',
     detail: 'Resultados y decisiones quedan dentro de la misma trazabilidad.',
-    side: 'right',
+    side: 'left',
     accent: 'emerald',
   },
   {
@@ -106,7 +106,7 @@ export const landingStory: LandingStoryStage[] = [
       'La entrega conserva destino, transportista y evidencia. Al cerrar el caso, QualityTrack puede reconstruir el recorrido completo desde la solicitud hasta el producto entregado.',
     signal: 'Entrega confirmada',
     detail: 'Una sola línea de tiempo para cliente y equipo interno.',
-    side: 'left',
+    side: 'right',
     accent: 'cyan',
   },
 ]
