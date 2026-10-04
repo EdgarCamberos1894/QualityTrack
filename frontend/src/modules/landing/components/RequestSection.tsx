@@ -47,7 +47,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
   })
 
   const requestTracePath =
-    'M 550 0 C 550 64, 532 91, 486 121 C 433 156, 391 203, 326 231 C 276 253, 236 262, 202 284'
+    'M 343 0 C 343 58, 342 87, 326 118 C 307 156, 281 202, 246 236 C 229 252, 214 270, 202 284'
 
   return (
     <section
@@ -67,7 +67,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
           preserveAspectRatio="none"
         >
           <defs>
-            <linearGradient id="qtRequestTrace" x1="0.55" y1="0" x2="0.2" y2="0.7">
+            <linearGradient id="qtRequestTrace" x1="0.343" y1="0" x2="0.2" y2="0.7">
               <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.16" />
               <stop offset="22%" stopColor="#22d3ee" stopOpacity="0.62" />
               <stop offset="70%" stopColor="#60a5fa" stopOpacity="0.48" />
@@ -133,7 +133,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
           ) : null}
 
           <circle
-            cx="550"
+            cx="343"
             cy="0"
             r="3"
             fill="#67e8f9"
