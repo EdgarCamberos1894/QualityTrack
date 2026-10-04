@@ -12,25 +12,25 @@ interface QualityTrackRendererOptions {
 }
 
 const cameraPositions: Vec3[] = [
-  [5.3, 3.1, 7.4],
-  [4.4, 2.6, 6.6],
-  [3.1, 2.5, 6.4],
-  [3.5, 2.25, 5.8],
-  [3.0, 2.15, 5.2],
-  [2.7, 1.75, 4.4],
-  [5.6, 2.0, 4.7],
-  [8.3, 3.35, 6.8],
+  [4.1, 2.35, 5.25],
+  [3.25, 2.0, 4.55],
+  [2.65, 2.05, 4.05],
+  [2.35, 2.15, 3.9],
+  [2.55, 1.9, 3.75],
+  [2.0, 1.48, 3.2],
+  [5.8, 1.72, 3.65],
+  [9.35, 3.55, 7.65],
 ]
 
 const cameraTargets: Vec3[] = [
-  [-2.0, 0.25, 0],
-  [-2.25, 0.35, 0],
-  [-1.8, 0.35, 0],
-  [-1.0, 0.25, 0],
-  [0.0, 0.3, 0],
-  [0.15, 0.2, 0],
-  [3.2, 0.3, 0],
-  [3.0, 0.15, 0],
+  [-0.1, 0.32, 0],
+  [-0.72, 0.48, 0],
+  [-0.85, 0.62, 0],
+  [-0.55, 0.62, 0],
+  [0.05, 0.36, 0],
+  [0.08, 0.18, 0],
+  [3.35, 0.28, 0],
+  [2.0, 0.18, 0],
 ]
 
 export class QualityTrackRenderer {
@@ -107,21 +107,21 @@ export class QualityTrackRenderer {
           : 1
       const blendSpeed = 1 - Math.exp(-delta * 4.5)
       this.idleBlend += (idleTarget - this.idleBlend) * blendSpeed
-      this.ambientSpin += delta * (0.28 + this.idleBlend * 2.2)
+      this.ambientSpin += delta * (0.25 + this.idleBlend * 1.7)
 
       const camera = sampleVec3(cameraPositions, progress)
       const target = sampleVec3(cameraTargets, progress)
       if (!this.reducedMotion) {
-        const drift = this.idleBlend * 0.06
-        camera[0] += Math.sin(now * 0.00036) * drift
-        camera[1] += Math.cos(now * 0.00028) * drift
+        const drift = this.idleBlend * 0.055
+        camera[0] += Math.sin(now * 0.00031) * drift
+        camera[1] += Math.cos(now * 0.00026) * drift
       }
 
       const aspect = Math.max(
         this.canvas.width / Math.max(this.canvas.height, 1),
         0.2,
       )
-      const projection = perspective(Math.PI / 4.2, aspect, 0.1, 60)
+      const projection = perspective(Math.PI / 4.6, aspect, 0.1, 70)
       const view = lookAt(camera, target)
 
       this.painter.begin(projection, view)
