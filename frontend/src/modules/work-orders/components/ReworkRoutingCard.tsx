@@ -70,6 +70,7 @@ export function ReworkRoutingCard({
       instructions: values.instructions.trim(),
       estimatedMinutes: values.estimatedMinutes,
       prerequisiteOperationIds: values.prerequisiteOperationIds,
+      resequenceOperations: values.resequenceOperations,
     }
 
     try {
