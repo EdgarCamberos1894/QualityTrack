@@ -1,11 +1,5 @@
 import { Link } from 'react-router-dom'
 
-const navItems = [
-  { label: 'Flujo', href: '#solicitud' },
-  { label: 'Capacidades', href: '#capacidades' },
-  { label: 'Para quién', href: '#usuarios' },
-]
-
 export function LandingHeader() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 sm:px-6 lg:px-8">
@@ -25,18 +19,6 @@ export function LandingHeader() {
             </p>
           </div>
         </a>
-
-        <nav className="hidden items-center gap-1 md:flex" aria-label="Navegación de la landing">
-          {navItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="rounded-lg px-3 py-2 text-[10px] font-semibold text-slate-300 transition hover:bg-white/5 hover:text-white"
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
 
         <Link
           to="/login"
