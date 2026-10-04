@@ -26,6 +26,20 @@ export async function createMaterial(
   return response.data.data
 }
 
+export async function uploadMaterialTechnicalSheet(
+  materialId: number,
+  file: File,
+): Promise<MaterialDto> {
+  const form = new FormData()
+  form.append('file', file)
+
+  const response = await apiClient.post<ApiResponse<MaterialDto>>(
+    `/materials/${materialId}/technical-sheet`,
+    form,
+  )
+  return response.data.data
+}
+
 export async function getMaterialLots(
   materialId: number,
 ): Promise<MaterialLotDto[]> {
