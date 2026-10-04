@@ -1,16 +1,8 @@
 import { buildIndustrialStory, updateIndustrialStory } from './industrialStory.js'
 import { buildIndustrialWorld, updateIndustrialWorld } from './industrialWorld.js'
+import { sampleStageVector } from './storyTimeline.js'
 
 const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js'
-
-function sampleVector(THREE, points, progress) {
-  const scaled = THREE.MathUtils.clamp(progress, 0, 1) * (points.length - 1)
-  const index = Math.min(points.length - 2, Math.floor(scaled))
-  return new THREE.Vector3(...points[index]).lerp(
-    new THREE.Vector3(...points[index + 1]),
-    scaled - index,
-  )
-}
 
 export async function createIndustrialThreeScene(canvas, options) {
   const THREE = await import(/* @vite-ignore */ THREE_URL)
@@ -107,8 +99,8 @@ export async function createIndustrialThreeScene(canvas, options) {
     updateIndustrialWorld(THREE, world, progress, idleBlend, time)
     updateIndustrialStory(THREE, story, progress, time)
 
-    const desiredCamera = sampleVector(THREE, cameraPositions, progress)
-    const desiredTarget = sampleVector(THREE, cameraTargets, progress)
+    const desiredCamera = sampleStageVector(THREE, cameraPositions, progress)
+    const desiredTarget = sampleStageVector(THREE, cameraTargets, progress)
     if (!options.reducedMotion) {
       desiredCamera.x += Math.sin(time * 0.28) * 0.045 * idleBlend
       desiredCamera.y += Math.cos(time * 0.23) * 0.032 * idleBlend
