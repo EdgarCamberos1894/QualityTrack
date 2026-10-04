@@ -14,6 +14,13 @@ public interface DocumentStorage {
             InputStream inputStream
     );
 
+    StoredDocumentFile storeMaterial(
+            Long materialId,
+            Integer version,
+            String fileName,
+            InputStream inputStream
+    );
+
     StoredDocumentFile storeMaterialLot(
             Long materialId,
             Long materialLotId,
