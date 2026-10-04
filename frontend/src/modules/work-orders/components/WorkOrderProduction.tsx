@@ -31,6 +31,10 @@ interface WorkOrderProductionProps {
   data: WorkOrder360Dto
 }
 
+function dependencyIds(operation: RoutingOperationDto) {
+  return operation.prerequisiteOperationIds ?? []
+}
+
 export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
   const session = useSessionStore((state) => state.session)
   const location = useLocation()
@@ -108,9 +112,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
     (operation) =>
       !completedOperationIds.has(operation.id) &&
       !inProgressOperationIds.has(operation.id) &&
-      operation.prerequisiteOperationIds.every((id) =>
-        completedOperationIds.has(id),
-      ),
+      dependencyIds(operation).every((id) => completedOperationIds.has(id)),
   )
   const firstPendingOperation = operations.find(
     (operation) => !completedOperationIds.has(operation.id),
@@ -132,7 +134,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
     : []
 
   const selectedPendingPrerequisites = selectedOperation
-    ? selectedOperation.prerequisiteOperationIds
+    ? dependencyIds(selectedOperation)
         .filter((id) => !completedOperationIds.has(id))
         .map((id) => operations.find((operation) => operation.id === id)?.code)
         .filter((code): code is string => Boolean(code))
