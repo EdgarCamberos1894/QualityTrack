@@ -4,6 +4,9 @@ export interface MaterialDto {
   name: string
   specification: string | null
   unit: string
+  technicalSheetDocumentId: number | null
+  technicalSheetDocumentVersionId: number | null
+  technicalSheetFileName: string | null
   createdAt: string
   updatedAt: string
 }
