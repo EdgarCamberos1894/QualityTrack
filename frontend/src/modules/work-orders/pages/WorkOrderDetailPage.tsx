@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
@@ -143,8 +143,11 @@ export function WorkOrderDetailPage() {
     canOpenWorkOrderView(data.workOrder.status, requestedWorkspaceView)
       ? requestedWorkspaceView
       : currentView
+  const historicalViewLabel = isOperationalView(activeView)
+    ? viewLabels[activeView]
+    : null
   const viewingHistoricalStage =
-    isOperationalView(activeView) && activeView !== currentView
+    historicalViewLabel !== null && activeView !== currentView
 
   const selectWorkspaceView = (view: WorkOrderWorkspaceView) => {
     if (!canOpenWorkOrderView(data.workOrder.status, view)) return
@@ -217,10 +220,10 @@ export function WorkOrderDetailPage() {
           </section>
         ) : null}
 
-        {viewingHistoricalStage ? (
+        {viewingHistoricalStage && historicalViewLabel ? (
           <section className="flex flex-col gap-2 rounded-xl border border-blue-100 bg-blue-50/45 px-3.5 py-2.5 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-[8px] leading-4 text-blue-900">
-              Estás consultando <strong>{viewLabels[activeView]}</strong> como
+              Estás consultando <strong>{historicalViewLabel}</strong> como
               referencia histórica. La etapa ya no es editable y el proceso se
               encuentra en <strong>{viewLabels[currentView]}</strong>.
             </p>
