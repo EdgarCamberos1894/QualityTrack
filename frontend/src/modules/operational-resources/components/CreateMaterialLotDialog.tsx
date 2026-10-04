@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import type { MaterialDto } from '@/modules/materials'
@@ -9,12 +10,17 @@ import {
   type CreateMaterialLotFormValues,
 } from '../schemas/resource.schemas'
 
+const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024
+
 interface CreateMaterialLotDialogProps {
   material: MaterialDto | null
   submitting: boolean
   error: unknown
   onClose: () => void
-  onSubmit: (values: CreateMaterialLotFormValues) => Promise<boolean>
+  onSubmit: (
+    values: CreateMaterialLotFormValues,
+    certificate: File | null,
+  ) => Promise<boolean>
 }
 
 export function CreateMaterialLotDialog({
@@ -24,6 +30,8 @@ export function CreateMaterialLotDialog({
   onClose,
   onSubmit,
 }: CreateMaterialLotDialogProps) {
+  const [certificate, setCertificate] = useState<File | null>(null)
+  const [fileError, setFileError] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
@@ -41,14 +49,20 @@ export function CreateMaterialLotDialog({
 
   if (!material) return null
 
-  const close = () => {
+  const clear = () => {
     reset()
+    setCertificate(null)
+    setFileError(null)
+  }
+
+  const close = () => {
+    clear()
     onClose()
   }
 
   const submit = handleSubmit(async (values) => {
-    if (await onSubmit(values)) {
-      reset()
+    if (await onSubmit(values, certificate)) {
+      clear()
       onClose()
     }
   })
@@ -59,7 +73,7 @@ export function CreateMaterialLotDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-material-lot-title"
-        className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+        className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl"
         onSubmit={(event) => void submit(event)}
       >
         <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/60 px-4 py-3.5">
@@ -125,6 +139,46 @@ export function CreateMaterialLotDialog({
             {...register('receivedAt')}
           />
 
+          <div className="sm:col-span-2 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[9px] font-semibold text-slate-800">
+                  Certificado del lote
+                </p>
+                <p className="mt-0.5 text-[7px] leading-3.5 text-slate-500">
+                  Opcional. Se adjuntará automáticamente al lote al registrarlo. Máximo 25 MB.
+                </p>
+              </div>
+              <label className="inline-flex h-7 cursor-pointer items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 text-[8px] font-semibold text-slate-700 transition hover:bg-slate-50">
+                {certificate ? 'Cambiar archivo' : 'Seleccionar archivo'}
+                <input
+                  type="file"
+                  className="sr-only"
+                  disabled={submitting}
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] ?? null
+                    if (file && file.size > MAX_FILE_SIZE_BYTES) {
+                      setCertificate(null)
+                      setFileError('El archivo no puede superar 25 MB.')
+                      event.target.value = ''
+                      return
+                    }
+                    setCertificate(file)
+                    setFileError(null)
+                  }}
+                />
+              </label>
+            </div>
+            {certificate ? (
+              <p className="mt-2 truncate text-[8px] font-medium text-blue-700">
+                {certificate.name}
+              </p>
+            ) : null}
+            {fileError ? (
+              <p className="mt-2 text-[8px] text-red-700">{fileError}</p>
+            ) : null}
+          </div>
+
           {error ? (
             <p
               role="alert"
@@ -147,9 +201,9 @@ export function CreateMaterialLotDialog({
           <Button
             type="submit"
             className="!h-7 !px-2.5 !text-[8px]"
-            disabled={submitting}
+            disabled={submitting || Boolean(fileError)}
           >
-            {submitting ? 'Registrando…' : 'Registrar lote'}
+            {submitting ? 'Guardando…' : 'Registrar lote'}
           </Button>
         </div>
       </form>
