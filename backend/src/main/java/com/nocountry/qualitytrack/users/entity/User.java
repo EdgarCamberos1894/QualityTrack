@@ -140,6 +140,11 @@ public class User {
         this.emailVerifiedAt = verifiedAt;
     }
 
+    public void updateProfile(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public void changePassword(String passwordHash) {
         this.passwordHash = passwordHash;
     }
