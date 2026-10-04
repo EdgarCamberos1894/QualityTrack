@@ -73,6 +73,8 @@ export function ScrollStory() {
   const copyOpacity = reducedMotion ? 1 : 1 - introExitProgress * 0.62
   const traceOpacity = reducedMotion ? 1 : 0.72 + introExitProgress * 0.28
   const bridgeOpacity = reducedMotion ? 1 : 0.2 + introExitProgress * 0.8
+  const introBridgePath =
+    'M 343 622 C 305 622, 305 666, 344 694 C 383 722, 390 766, 350 800 C 311 833, 316 878, 354 908 C 382 931, 365 972, 343 1000'
 
   return (
     <>
@@ -256,13 +258,82 @@ export function ScrollStory() {
           </div>
 
           <div
-            className="pointer-events-none absolute bottom-0 left-[55%] z-[14] hidden h-32 w-px bg-gradient-to-b from-transparent via-cyan-300/60 to-cyan-300/10 lg:block"
+            className="pointer-events-none absolute inset-0 z-[14] hidden lg:block"
             style={{ opacity: bridgeOpacity }}
             aria-hidden="true"
           >
-            {!reducedMotion ? (
-              <span className="qt-intro-exit-pulse absolute left-[-2px] top-0 h-1 w-1 rounded-full bg-cyan-100 shadow-[0_0_14px_rgba(103,232,249,0.9)]" />
-            ) : null}
+            <svg
+              viewBox="0 0 1000 1000"
+              className="absolute inset-0 h-full w-full overflow-visible"
+              preserveAspectRatio="none"
+            >
+              <defs>
+                <linearGradient id="qtIntroBridgeTrace" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.12" />
+                  <stop offset="36%" stopColor="#22d3ee" stopOpacity="0.72" />
+                  <stop offset="100%" stopColor="#67e8f9" stopOpacity="0.18" />
+                </linearGradient>
+                <filter id="qtIntroBridgeGlow" x="-100%" y="-40%" width="300%" height="180%">
+                  <feGaussianBlur stdDeviation="6" />
+                </filter>
+                <filter id="qtIntroBridgeTravelerGlow" x="-200%" y="-200%" width="500%" height="500%">
+                  <feGaussianBlur stdDeviation="5" />
+                </filter>
+              </defs>
+
+              <path
+                d={introBridgePath}
+                fill="none"
+                stroke="url(#qtIntroBridgeTrace)"
+                strokeWidth="11"
+                opacity="0.14"
+                filter="url(#qtIntroBridgeGlow)"
+              />
+              <path
+                d={introBridgePath}
+                fill="none"
+                stroke="url(#qtIntroBridgeTrace)"
+                strokeWidth="1.5"
+                strokeDasharray="8 10"
+              >
+                {!reducedMotion ? (
+                  <animate
+                    attributeName="stroke-dashoffset"
+                    from="0"
+                    to="180"
+                    dur="7s"
+                    repeatCount="indefinite"
+                  />
+                ) : null}
+              </path>
+
+              {!reducedMotion ? (
+                <>
+                  <circle
+                    r="10"
+                    fill="#67e8f9"
+                    opacity="0.15"
+                    filter="url(#qtIntroBridgeTravelerGlow)"
+                  >
+                    <animateMotion
+                      dur="5.2s"
+                      repeatCount="indefinite"
+                      path={introBridgePath}
+                    />
+                  </circle>
+                  <circle r="3.5" fill="#a5f3fc" opacity="0.95">
+                    <animateMotion
+                      dur="5.2s"
+                      repeatCount="indefinite"
+                      path={introBridgePath}
+                    />
+                  </circle>
+                </>
+              ) : null}
+
+              <circle cx="343" cy="622" r="3" fill="#67e8f9" opacity="0.92" />
+              <circle cx="343" cy="1000" r="2.5" fill="#67e8f9" opacity="0.72" />
+            </svg>
           </div>
         </div>
       </section>
