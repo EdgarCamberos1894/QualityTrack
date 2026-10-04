@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type MutableRefObject } from 'react'
+import { createIndustrialThreeScene, type IndustrialThreeSceneHandle } from './industrialThreeScene.js'
 import { QualityTrackFallbackScene } from './QualityTrackFallbackScene'
 import { QualityTrackRenderer } from './QualityTrackRenderer'
 
@@ -8,7 +9,7 @@ interface QualityTrackSceneProps {
   reducedMotion: boolean
 }
 
-type SceneStatus = 'loading' | 'ready' | 'fallback'
+type SceneStatus = 'loading' | 'three' | 'fallback' | 'css'
 
 export function QualityTrackScene({
   progressRef,
@@ -23,27 +24,43 @@ export function QualityTrackScene({
     if (!canvas) return
 
     let mounted = true
-    let renderer: QualityTrackRenderer | null = null
+    let threeScene: IndustrialThreeSceneHandle | null = null
+    let fallbackRenderer: QualityTrackRenderer | null = null
 
-    try {
-      renderer = new QualityTrackRenderer(canvas, {
-        progressRef,
-        scrollingRef,
-        reducedMotion,
-        onReady: () => {
-          if (mounted) setStatus('ready')
-        },
-        onRenderFailure: () => {
-          if (mounted) setStatus('fallback')
-        },
-      })
-    } catch {
-      setStatus('fallback')
+    const startFallback = () => {
+      if (!mounted) return
+      try {
+        fallbackRenderer = new QualityTrackRenderer(canvas, {
+          progressRef,
+          scrollingRef,
+          reducedMotion,
+          onReady: () => mounted && setStatus('fallback'),
+          onRenderFailure: () => mounted && setStatus('css'),
+        })
+      } catch {
+        setStatus('css')
+      }
     }
+
+    void createIndustrialThreeScene(canvas, {
+      progressRef,
+      scrollingRef,
+      reducedMotion,
+    })
+      .then((scene) => {
+        if (!mounted) {
+          scene.dispose()
+          return
+        }
+        threeScene = scene
+        setStatus('three')
+      })
+      .catch(startFallback)
 
     return () => {
       mounted = false
-      renderer?.dispose()
+      threeScene?.dispose()
+      fallbackRenderer?.dispose()
     }
   }, [progressRef, reducedMotion, scrollingRef])
 
@@ -51,11 +68,15 @@ export function QualityTrackScene({
     <div className="relative h-full w-full">
       <canvas
         ref={canvasRef}
-        className={`block h-full w-full transition-opacity duration-300 ${status === 'fallback' ? 'opacity-0' : 'opacity-100'}`}
-        aria-label="Visualización 3D del flujo operativo de QualityTrack"
+        className={`block h-full w-full transition-opacity duration-300 ${status === 'css' ? 'opacity-0' : 'opacity-100'}`}
+        aria-label="Celda industrial 3D de QualityTrack"
       />
 
-      {status === 'fallback' ? (
+      {status === 'loading' ? (
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_65%_45%,rgba(37,99,235,0.12),transparent_28%)]" />
+      ) : null}
+
+      {status === 'css' ? (
         <QualityTrackFallbackScene progressRef={progressRef} />
       ) : null}
     </div>
