@@ -7,6 +7,8 @@ interface QualityTrackRendererOptions {
   progressRef: MutableRefObject<number>
   scrollingRef: MutableRefObject<boolean>
   reducedMotion: boolean
+  onReady?: () => void
+  onRenderFailure?: () => void
 }
 
 const cameraPositions: Vec3[] = [
@@ -37,11 +39,16 @@ export class QualityTrackRenderer {
   private readonly progressRef: MutableRefObject<number>
   private readonly scrollingRef: MutableRefObject<boolean>
   private readonly reducedMotion: boolean
+  private readonly onReady?: () => void
+  private readonly onRenderFailure?: () => void
   private animationFrame = 0
   private resizeObserver: ResizeObserver | null = null
   private lastTime = performance.now()
   private idleBlend = 0
   private ambientSpin = 0
+  private verificationFrames = 0
+  private verified = false
+  private failed = false
   private disposed = false
 
   constructor(canvas: HTMLCanvasElement, options: QualityTrackRendererOptions) {
@@ -49,6 +56,8 @@ export class QualityTrackRenderer {
     this.progressRef = options.progressRef
     this.scrollingRef = options.scrollingRef
     this.reducedMotion = options.reducedMotion
+    this.onReady = options.onReady
+    this.onRenderFailure = options.onRenderFailure
     this.painter = new ScenePainter(canvas)
     this.resizeObserver = new ResizeObserver(() => this.resize())
     this.resizeObserver.observe(canvas)
@@ -62,45 +71,77 @@ export class QualityTrackRenderer {
     this.painter.resize(rect.width, rect.height, dpr)
   }
 
+  private fail() {
+    if (this.failed || this.disposed) return
+    this.failed = true
+    this.onRenderFailure?.()
+    this.dispose()
+  }
+
+  private verifyVisibleFrame() {
+    if (this.verified || this.canvas.width < 64 || this.canvas.height < 64) return
+
+    this.verificationFrames += 1
+    if (this.painter.hasVisiblePixels()) {
+      this.verified = true
+      this.onReady?.()
+      return
+    }
+
+    if (this.verificationFrames >= 24) {
+      throw new Error('La escena WebGL no produjo píxeles visibles.')
+    }
+  }
+
   private render = (now: number) => {
     if (this.disposed) return
 
-    const delta = Math.min((now - this.lastTime) / 1000, 0.05)
-    this.lastTime = now
-    const progress = this.reducedMotion ? 0.12 : this.progressRef.current
-    const idleTarget = this.reducedMotion
-      ? 0
-      : this.scrollingRef.current
-        ? 0.12
-        : 1
-    const blendSpeed = 1 - Math.exp(-delta * 4.5)
-    this.idleBlend += (idleTarget - this.idleBlend) * blendSpeed
-    this.ambientSpin += delta * (0.28 + this.idleBlend * 2.2)
+    try {
+      const delta = Math.min((now - this.lastTime) / 1000, 0.05)
+      this.lastTime = now
+      const progress = this.reducedMotion ? 0.12 : this.progressRef.current
+      const idleTarget = this.reducedMotion
+        ? 0
+        : this.scrollingRef.current
+          ? 0.12
+          : 1
+      const blendSpeed = 1 - Math.exp(-delta * 4.5)
+      this.idleBlend += (idleTarget - this.idleBlend) * blendSpeed
+      this.ambientSpin += delta * (0.28 + this.idleBlend * 2.2)
 
-    const camera = sampleVec3(cameraPositions, progress)
-    const target = sampleVec3(cameraTargets, progress)
-    if (!this.reducedMotion) {
-      const drift = this.idleBlend * 0.06
-      camera[0] += Math.sin(now * 0.00036) * drift
-      camera[1] += Math.cos(now * 0.00028) * drift
+      const camera = sampleVec3(cameraPositions, progress)
+      const target = sampleVec3(cameraTargets, progress)
+      if (!this.reducedMotion) {
+        const drift = this.idleBlend * 0.06
+        camera[0] += Math.sin(now * 0.00036) * drift
+        camera[1] += Math.cos(now * 0.00028) * drift
+      }
+
+      const aspect = Math.max(
+        this.canvas.width / Math.max(this.canvas.height, 1),
+        0.2,
+      )
+      const projection = perspective(Math.PI / 4.2, aspect, 0.1, 60)
+      const view = lookAt(camera, target)
+
+      this.painter.begin(projection, view)
+      renderQualityTrackFrame(this.painter, {
+        progress,
+        time: now / 1000,
+        idleBlend: this.idleBlend,
+        ambientSpin: this.ambientSpin,
+      })
+      this.verifyVisibleFrame()
+    } catch {
+      this.fail()
+      return
     }
-
-    const aspect = Math.max(this.canvas.width / Math.max(this.canvas.height, 1), 0.2)
-    const projection = perspective(Math.PI / 4.2, aspect, 0.1, 60)
-    const view = lookAt(camera, target)
-
-    this.painter.begin(projection, view)
-    renderQualityTrackFrame(this.painter, {
-      progress,
-      time: now / 1000,
-      idleBlend: this.idleBlend,
-      ambientSpin: this.ambientSpin,
-    })
 
     this.animationFrame = window.requestAnimationFrame(this.render)
   }
 
   dispose() {
+    if (this.disposed) return
     this.disposed = true
     window.cancelAnimationFrame(this.animationFrame)
     this.resizeObserver?.disconnect()
