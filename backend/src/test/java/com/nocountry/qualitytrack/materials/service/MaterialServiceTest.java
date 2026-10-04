@@ -122,13 +122,14 @@ class MaterialServiceTest {
         );
         ReflectionTestUtils.setField(document, "id", 101L);
 
-        DocumentVersion version = DocumentVersion.create(
+        DocumentVersion version = DocumentVersion.upload(
                 document,
                 1,
                 "certificado.pdf",
+                "storage-key",
                 "application/pdf",
                 100L,
-                "storage-key",
+                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 actor
         );
         ReflectionTestUtils.setField(version, "id", 201L);
@@ -203,8 +204,8 @@ class MaterialServiceTest {
                 )
         );
 
-        assertEquals(new BigDecimal("10.500"), response.quantityUsed());
-        verify(traceabilityService).appendEvent(
+        assertEquals(0, response.quantityUsed().compareTo(new BigDecimal("10.500")));
+        verify(traceabilityService).record(
                 any(),
                 any(),
                 any(),
