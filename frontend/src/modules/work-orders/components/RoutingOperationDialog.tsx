@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/shared/components/ui/Button'
@@ -21,6 +21,11 @@ interface RoutingOperationDialogProps {
   onSubmit: (values: RoutingOperationFormValues) => Promise<boolean>
 }
 
+function suggestOperationCode(sequenceNumber: number) {
+  if (!Number.isInteger(sequenceNumber) || sequenceNumber <= 0) return ''
+  return `OP-${sequenceNumber * 10}`
+}
+
 export function RoutingOperationDialog({
   open,
   operation,
@@ -30,16 +35,19 @@ export function RoutingOperationDialog({
   onClose,
   onSubmit,
 }: RoutingOperationDialogProps) {
+  const codeManuallyEditedRef = useRef(false)
+  const initialSequence = operation?.sequenceNumber ?? nextSequence
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<RoutingOperationFormValues>({
     resolver: zodResolver(routingOperationSchema),
     defaultValues: {
-      sequenceNumber: operation?.sequenceNumber ?? nextSequence,
-      code: operation?.code ?? '',
+      sequenceNumber: initialSequence,
+      code: operation?.code ?? suggestOperationCode(initialSequence),
       name: operation?.name ?? '',
       instructions: operation?.instructions ?? '',
       estimatedMinutes: operation?.estimatedMinutes ?? 30,
@@ -47,9 +55,17 @@ export function RoutingOperationDialog({
   })
 
   useEffect(() => {
+    const sequenceNumber = operation?.sequenceNumber ?? nextSequence
+    const suggestedCode = suggestOperationCode(sequenceNumber)
+    const existingCode = operation?.code ?? suggestedCode
+
+    codeManuallyEditedRef.current = Boolean(
+      operation && existingCode !== suggestedCode,
+    )
+
     reset({
-      sequenceNumber: operation?.sequenceNumber ?? nextSequence,
-      code: operation?.code ?? '',
+      sequenceNumber,
+      code: existingCode,
       name: operation?.name ?? '',
       instructions: operation?.instructions ?? '',
       estimatedMinutes: operation?.estimatedMinutes ?? 30,
@@ -57,6 +73,9 @@ export function RoutingOperationDialog({
   }, [nextSequence, operation, reset])
 
   if (!open) return null
+
+  const sequenceField = register('sequenceNumber', { valueAsNumber: true })
+  const codeField = register('code')
 
   const submit = handleSubmit(async (values) => {
     if (await onSubmit(values)) {
@@ -97,25 +116,45 @@ export function RoutingOperationDialog({
             labelClassName="!mb-1.5 !text-[10px]"
             className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
             error={errors.sequenceNumber?.message}
-            {...register('sequenceNumber', { valueAsNumber: true })}
+            {...sequenceField}
+            onChange={(event) => {
+              void sequenceField.onChange(event)
+
+              if (!codeManuallyEditedRef.current) {
+                setValue(
+                  'code',
+                  suggestOperationCode(event.currentTarget.valueAsNumber),
+                  { shouldDirty: true, shouldValidate: true },
+                )
+              }
+            }}
           />
-          <TextField
-            label="Código"
-            maxLength={40}
-            placeholder="OP-010"
-            labelClassName="!mb-1.5 !text-[10px]"
-            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
-            error={errors.code?.message}
-            {...register('code')}
-          />
+          <div>
+            <TextField
+              label="Código"
+              maxLength={40}
+              placeholder="OP-10"
+              labelClassName="!mb-1.5 !text-[10px]"
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              error={errors.code?.message}
+              {...codeField}
+              onChange={(event) => {
+                codeManuallyEditedRef.current = true
+                void codeField.onChange(event)
+              }}
+            />
+            <p className="mt-1 text-[7px] leading-3 text-slate-400">
+              Se sugiere según la secuencia, pero puedes editarlo.
+            </p>
+          </div>
           <div className="sm:col-span-2">
             <TextField
               label="Nombre"
               maxLength={150}
               placeholder="Torneado exterior"
               labelClassName="!mb-1.5 !text-[10px]"
-            className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
-            error={errors.name?.message}
+              className="!h-8 !rounded-lg !px-2.5 !text-[10px] !shadow-none"
+              error={errors.name?.message}
               {...register('name')}
             />
           </div>
@@ -147,10 +186,19 @@ export function RoutingOperationDialog({
         </div>
 
         <div className="flex justify-end gap-1.5 border-t border-slate-100 bg-slate-50/60 px-4 py-2.5">
-          <Button variant="secondary" className="!h-7 !px-2.5 !text-[8px]" onClick={onClose} disabled={submitting}>
+          <Button
+            variant="secondary"
+            className="!h-7 !px-2.5 !text-[8px]"
+            onClick={onClose}
+            disabled={submitting}
+          >
             Cancelar
           </Button>
-          <Button type="submit" className="!h-7 !px-2.5 !text-[8px]" disabled={submitting}>
+          <Button
+            type="submit"
+            className="!h-7 !px-2.5 !text-[8px]"
+            disabled={submitting}
+          >
             {submitting
               ? 'Guardando…'
               : operation
