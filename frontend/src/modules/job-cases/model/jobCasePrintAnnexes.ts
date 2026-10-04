@@ -37,6 +37,12 @@ export interface JobCasePrintAnnexBundle {
   references: JobCasePrintAnnexReference[]
 }
 
+interface RenderedPdfPage {
+  imageDataUrl: string
+  sourcePageNumber: number
+  blank: boolean
+}
+
 function isPdf(mimeType: string, fileName: string) {
   return (
     mimeType.toLowerCase().includes('pdf') ||
@@ -66,17 +72,66 @@ function blobToDataUrl(blob: Blob): Promise<string> {
   })
 }
 
-async function renderPdfPages(blob: Blob): Promise<string[]> {
+function isCanvasVisuallyBlank(
+  context: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+) {
+  const sampleWidth = Math.min(width, 180)
+  const sampleHeight = Math.min(height, 240)
+  const probe = document.createElement('canvas')
+  const probeContext = probe.getContext('2d', { willReadFrequently: true })
+
+  if (!probeContext) return false
+
+  probe.width = sampleWidth
+  probe.height = sampleHeight
+  probeContext.drawImage(
+    context.canvas,
+    0,
+    0,
+    width,
+    height,
+    0,
+    0,
+    sampleWidth,
+    sampleHeight,
+  )
+
+  const pixels = probeContext.getImageData(
+    0,
+    0,
+    sampleWidth,
+    sampleHeight,
+  ).data
+  let nonWhitePixels = 0
+  const totalPixels = sampleWidth * sampleHeight
+
+  for (let index = 0; index < pixels.length; index += 4) {
+    const red = pixels[index]
+    const green = pixels[index + 1]
+    const blue = pixels[index + 2]
+    const alpha = pixels[index + 3]
+
+    if (alpha > 16 && (red < 245 || green < 245 || blue < 245)) {
+      nonWhitePixels += 1
+    }
+  }
+
+  return nonWhitePixels / totalPixels < 0.0008
+}
+
+async function renderPdfPages(blob: Blob): Promise<RenderedPdfPage[]> {
   const loadingTask = pdfjs.getDocument({ data: await blob.arrayBuffer() })
   const pdf = await loadingTask.promise
-  const pages: string[] = []
+  const pages: RenderedPdfPage[] = []
 
   try {
     for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
       const page = await pdf.getPage(pageNumber)
       const viewport = page.getViewport({ scale: 1.8 })
       const canvas = document.createElement('canvas')
-      const context = canvas.getContext('2d')
+      const context = canvas.getContext('2d', { willReadFrequently: true })
 
       if (!context) {
         throw new Error('No fue posible crear el lienzo para el PDF.')
@@ -84,13 +139,23 @@ async function renderPdfPages(blob: Blob): Promise<string[]> {
 
       canvas.width = Math.ceil(viewport.width)
       canvas.height = Math.ceil(viewport.height)
+      context.fillStyle = '#ffffff'
+      context.fillRect(0, 0, canvas.width, canvas.height)
 
       await page.render({ canvas, canvasContext: context, viewport }).promise
-      pages.push(canvas.toDataURL('image/jpeg', 0.94))
+      pages.push({
+        imageDataUrl: canvas.toDataURL('image/jpeg', 0.94),
+        sourcePageNumber: pageNumber,
+        blank: isCanvasVisuallyBlank(context, canvas.width, canvas.height),
+      })
       page.cleanup()
     }
   } finally {
     await pdf.destroy()
+  }
+
+  while (pages.length > 0 && pages.at(-1)?.blank) {
+    pages.pop()
   }
 
   return pages
@@ -154,16 +219,16 @@ export async function prepareJobCasePrintAnnexes(
         if (renderedPages.length === 0) {
           pages.push(
             annexPage(document, annexLabel, sheetNumber, {
-              note: 'El PDF no contiene páginas imprimibles.',
+              note: 'El PDF no contiene páginas con contenido imprimible.',
             }),
           )
           sheetNumber += 1
         } else {
-          for (const [pageIndex, imageDataUrl] of renderedPages.entries()) {
+          for (const renderedPage of renderedPages) {
             pages.push(
               annexPage(document, annexLabel, sheetNumber, {
-                imageDataUrl,
-                sourcePageNumber: pageIndex + 1,
+                imageDataUrl: renderedPage.imageDataUrl,
+                sourcePageNumber: renderedPage.sourcePageNumber,
                 sourcePageCount: renderedPages.length,
               }),
             )
