@@ -33,10 +33,13 @@ export function ProductionRouteList({
       .filter((execution) => execution.status === 'COMPLETED')
       .map((execution) => execution.routingOperationId),
   )
+  const operationById = new Map(
+    operations.map((operation) => [operation.id, operation]),
+  )
 
   return (
     <div className="divide-y divide-slate-100">
-      {operations.map((operation, index) => {
+      {operations.map((operation) => {
         const attempts = executions
           .filter(
             (execution) => execution.routingOperationId === operation.id,
@@ -51,18 +54,18 @@ export function ProductionRouteList({
         const cancelledCount = attempts.filter(
           (execution) => execution.status === 'CANCELLED',
         ).length
-        const unlocked =
-          routingReleased &&
-          operations
-            .slice(0, index)
-            .every((previous) => completedIds.has(previous.id))
+        const pendingDependencies = operation.prerequisiteOperationIds
+          .filter((id) => !completedIds.has(id))
+          .map((id) => operationById.get(id))
+          .filter((item): item is RoutingOperationDto => Boolean(item))
+        const unlocked = routingReleased && pendingDependencies.length === 0
         const selected = selectedOperationId === operation.id
 
         const tone = inProgress
           ? 'warning'
           : completed
             ? 'success'
-            : cancelledCount > 0
+            : cancelledCount > 0 && unlocked
               ? 'danger'
               : 'neutral'
         const label = inProgress
@@ -70,7 +73,7 @@ export function ProductionRouteList({
           : completed
             ? 'Completada'
             : !unlocked
-              ? 'Bloqueada'
+              ? 'Esperando dependencias'
               : cancelledCount > 0
                 ? 'Lista para reintentar'
                 : 'Lista'
@@ -120,6 +123,15 @@ export function ProductionRouteList({
                     ? ` · ${attempts.length} intento${attempts.length === 1 ? '' : 's'}`
                     : ''}
                 </p>
+                {pendingDependencies.length > 0 ? (
+                  <p className="mt-1 text-[7px] font-medium text-amber-700">
+                    Espera: {pendingDependencies.map((item) => item.code).join(' + ')}
+                  </p>
+                ) : operation.prerequisiteOperationIds.length === 0 ? (
+                  <p className="mt-1 text-[7px] text-emerald-600">
+                    Inicio independiente
+                  </p>
+                ) : null}
               </div>
 
               <span className="text-[11px] text-slate-300">›</span>
