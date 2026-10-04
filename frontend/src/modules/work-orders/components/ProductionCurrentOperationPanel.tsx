@@ -43,6 +43,7 @@ export function ProductionCurrentOperationPanel({
     )
   }
 
+  const prerequisiteOperationIds = operation.prerequisiteOperationIds ?? []
   const orderedAttempts = [...executions].sort(
     (left, right) => left.attemptNumber - right.attemptNumber,
   )
@@ -188,7 +189,7 @@ export function ProductionCurrentOperationPanel({
               : 'La hoja de ruta debe estar liberada para Producción.'}
           </p>
         </div>
-      ) : operation.prerequisiteOperationIds.length === 0 ? (
+      ) : prerequisiteOperationIds.length === 0 ? (
         <div className="rounded-xl border border-emerald-100 bg-emerald-50/45 px-3 py-2.5 text-[7.5px] text-emerald-700">
           Operación independiente: puede iniciar sin esperar otro paso de la ruta.
         </div>
