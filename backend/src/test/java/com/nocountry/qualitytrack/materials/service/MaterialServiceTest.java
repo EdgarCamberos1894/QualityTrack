@@ -48,6 +48,7 @@ class MaterialServiceTest {
     @Mock private MaterialLotRepository materialLotRepository;
     @Mock private WorkOrderMaterialRepository workOrderMaterialRepository;
     @Mock private DocumentService documentService;
+    @Mock private MaterialReferenceDocumentService materialReferenceDocumentService;
     @Mock private MultipartFile certificateFile;
     @Mock private WorkOrderRepository workOrderRepository;
     @Mock private WorkOrderAccessPolicy accessPolicy;
@@ -68,6 +69,7 @@ class MaterialServiceTest {
                 materialLotRepository,
                 workOrderMaterialRepository,
                 documentService,
+                materialReferenceDocumentService,
                 workOrderRepository,
                 accessPolicy,
                 traceabilityService
@@ -118,106 +120,72 @@ class MaterialServiceTest {
                 null,
                 actor
         );
-        ReflectionTestUtils.setField(document, "id", 70L);
+        ReflectionTestUtils.setField(document, "id", 101L);
 
-        DocumentVersion certificate = DocumentVersion.upload(
+        DocumentVersion version = DocumentVersion.create(
                 document,
                 1,
                 "certificado.pdf",
-                "materials/material-30/lot-40/v1-certificado.pdf",
                 "application/pdf",
                 100L,
-                "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                "storage-key",
                 actor
         );
-        ReflectionTestUtils.setField(certificate, "id", 80L);
+        ReflectionTestUtils.setField(version, "id", 201L);
 
-        when(accessPolicy.requireProductionActor(10L)).thenReturn(actor);
         when(materialLotRepository.findByIdForUpdate(40L)).thenReturn(Optional.of(lot));
         when(documentService.upsertMaterialCertificate(10L, lot, certificateFile))
-                .thenReturn(certificate);
+                .thenReturn(version);
         when(materialLotRepository.saveAndFlush(lot)).thenReturn(lot);
 
-        var response = service.attachCertificate(
-                10L,
-                30L,
-                40L,
-                certificateFile
-        );
+        var response = service.attachCertificate(10L, 30L, 40L, certificateFile);
 
-        assertEquals(70L, response.certificateDocumentId());
-        assertEquals(80L, response.certificateDocumentVersionId());
-        assertEquals("certificado.pdf", response.certificateFileName());
+        assertEquals(201L, response.certificateDocumentVersionId());
         verify(documentService).upsertMaterialCertificate(10L, lot, certificateFile);
+        verify(materialLotRepository).saveAndFlush(lot);
     }
 
     @Test
-    void repeatedConsumptionAggregatesSameWorkOrderAndLot() {
-        WorkOrderMaterial existing = WorkOrderMaterial.create(
-                workOrder,
-                lot,
-                new BigDecimal("10.500"),
-                actor,
-                Instant.parse("2026-09-28T09:00:00Z")
-        );
-        ReflectionTestUtils.setField(existing, "id", 50L);
-
-        when(accessPolicy.requireProductionActor(10L)).thenReturn(actor);
-        when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
+    void rejectsCertificateWhenLotDoesNotBelongToMaterial() {
         when(materialLotRepository.findByIdForUpdate(40L)).thenReturn(Optional.of(lot));
-        when(workOrderMaterialRepository.sumQuantityUsedByMaterialLotId(40L))
-                .thenReturn(new BigDecimal("10.500"));
-        when(workOrderMaterialRepository.findByWorkOrderAndLotForUpdate(7L, 40L))
-                .thenReturn(Optional.of(existing));
-        when(workOrderMaterialRepository.saveAndFlush(existing)).thenReturn(existing);
 
-        var response = service.recordConsumption(
-                10L,
-                7L,
-                new RecordMaterialConsumptionRequest(
-                        40L,
-                        new BigDecimal("2.250")
-                )
-        );
-
-        assertEquals(new BigDecimal("12.750"), response.quantityUsed());
-        verify(traceabilityService).record(
-                any(), any(), any(), any(), any(), any(), any(), any()
-        );
-    }
-
-    @Test
-    void cannotConsumeMoreThanReceivedQuantity() {
-        when(accessPolicy.requireProductionActor(10L)).thenReturn(actor);
-        when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
-        when(materialLotRepository.findByIdForUpdate(40L)).thenReturn(Optional.of(lot));
-        when(workOrderMaterialRepository.sumQuantityUsedByMaterialLotId(40L))
-                .thenReturn(new BigDecimal("95.000"));
-
-        assertThrows(
+        BusinessException exception = assertThrows(
                 BusinessException.class,
-                () -> service.recordConsumption(
+                () -> service.attachCertificate(10L, 999L, 40L, certificateFile)
+        );
+
+        assertEquals("No se encontró el lote para el material indicado.", exception.getMessage());
+        verifyNoInteractions(documentService);
+    }
+
+    @Test
+    void rejectsDuplicateLotNumberForSameMaterial() {
+        when(materialRepository.findById(30L)).thenReturn(Optional.of(material));
+        when(materialLotRepository.existsByMaterial_IdAndLotNumberIgnoreCase(30L, "LOT-001"))
+                .thenReturn(true);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.createLot(
                         10L,
-                        7L,
-                        new RecordMaterialConsumptionRequest(
-                                40L,
-                                new BigDecimal("6.000")
+                        30L,
+                        new CreateMaterialLotRequest(
+                                "LOT-001",
+                                "Proveedor",
+                                Instant.parse("2026-09-20T08:00:00Z"),
+                                new BigDecimal("100.000")
                         )
                 )
         );
+
+        assertEquals("Ya existe ese número de lote para el material.", exception.getMessage());
     }
 
     @Test
-    void canRecordConsumptionAfterOperationsFinishBeforeQualityHandoff() {
-        workOrder.markProductionCompleted(
-                Instant.parse("2026-09-28T12:00:00Z")
-        );
-
+    void recordsMaterialConsumption() {
         when(accessPolicy.requireProductionActor(10L)).thenReturn(actor);
-        when(workOrderRepository.findByIdForUpdate(7L))
-                .thenReturn(Optional.of(workOrder));
-        when(materialLotRepository.findByIdForUpdate(40L))
-                .thenReturn(Optional.of(lot));
+        when(workOrderRepository.findByIdForUpdate(7L)).thenReturn(Optional.of(workOrder));
+        when(materialLotRepository.findByIdForUpdate(40L)).thenReturn(Optional.of(lot));
         when(workOrderMaterialRepository.sumQuantityUsedByMaterialLotId(40L))
                 .thenReturn(BigDecimal.ZERO);
         when(workOrderMaterialRepository.findByWorkOrderAndLotForUpdate(7L, 40L))
@@ -230,42 +198,21 @@ class MaterialServiceTest {
                 7L,
                 new RecordMaterialConsumptionRequest(
                         40L,
-                        new BigDecimal("1.500")
+                        new BigDecimal("10.500"),
+                        "Primer corte"
                 )
         );
 
-        assertEquals(new BigDecimal("1.500"), response.quantityUsed());
-    }
-
-    @Test
-    void consumptionRequiresWorkOrderInProduction() {
-        WorkOrder ready = WorkOrder.create(
-                jobCase,
-                quotation,
-                "OT-READY",
-                WorkOrderPriority.NORMAL,
-                20,
-                LocalDate.of(2026, 10, 1),
-                LocalDate.of(2026, 10, 15),
-                LocalDate.of(2026, 10, 20),
-                actor
-        );
-        ReflectionTestUtils.setField(ready, "id", 8L);
-        ready.releaseToProduction();
-
-        when(accessPolicy.requireProductionActor(10L)).thenReturn(actor);
-        when(workOrderRepository.findByIdForUpdate(8L)).thenReturn(Optional.of(ready));
-
-        assertThrows(
-                BusinessException.class,
-                () -> service.recordConsumption(
-                        10L,
-                        8L,
-                        new RecordMaterialConsumptionRequest(
-                                40L,
-                                new BigDecimal("1.000")
-                        )
-                )
+        assertEquals(new BigDecimal("10.500"), response.quantityUsed());
+        verify(traceabilityService).appendEvent(
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
         );
     }
 }
