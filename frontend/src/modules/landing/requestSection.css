@@ -11,9 +11,22 @@
   animation: qt-request-float 5.4s ease-in-out infinite;
 }
 
-.qt-intro-exit-pulse,
+.qt-intro-exit-pulse {
+  animation: qt-intro-trace-drop 3.4s linear infinite;
+}
+
 .qt-request-exit-pulse {
   animation: qt-trace-drop 2.8s linear infinite;
+}
+
+@media (min-width: 1024px) {
+  #inicio > .sticky > div[aria-hidden='true']:last-child {
+    top: 62.2% !important;
+    right: auto !important;
+    bottom: 0 !important;
+    left: 34.3% !important;
+    height: auto !important;
+  }
 }
 
 @keyframes qt-request-float {
@@ -23,6 +36,23 @@
   }
   50% {
     translate: 0 -5px;
+  }
+}
+
+@keyframes qt-intro-trace-drop {
+  0% {
+    translate: 0 0;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    translate: 0 37.8vh;
+    opacity: 0;
   }
 }
 
