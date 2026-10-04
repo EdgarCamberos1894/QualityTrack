@@ -22,7 +22,7 @@ export function JobCaseDetailHeader({ jobCase }: JobCaseDetailHeaderProps) {
 
         <div className="min-w-0">
           <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-600">
-            Gestión de expedientes
+            Expediente 360
           </p>
 
           <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
@@ -35,7 +35,7 @@ export function JobCaseDetailHeader({ jobCase }: JobCaseDetailHeaderProps) {
           </div>
 
           <p className="mt-0.5 truncate text-[10px] text-slate-500">
-            {jobCase.request.title} · {jobCase.request.customerName}
+            {jobCase.request.title} · {jobCase.request.customerName} · historial y contexto del caso
           </p>
         </div>
       </div>

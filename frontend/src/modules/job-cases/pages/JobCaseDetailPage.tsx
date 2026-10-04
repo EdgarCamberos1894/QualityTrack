@@ -20,6 +20,7 @@ import { JobCaseDetailHeader } from '../components/JobCaseDetailHeader'
 import { JobCaseDocuments } from '../components/JobCaseDocuments'
 import { JobCaseFlowSteps } from '../components/JobCaseFlowSteps'
 import { JobCaseMaterial } from '../components/JobCaseMaterial'
+import { JobCaseProcessMap } from '../components/JobCaseProcessMap'
 import { JobCaseRecentActivity } from '../components/JobCaseRecentActivity'
 import { JobCaseSourceCard } from '../components/JobCaseSourceCard'
 import { JobCaseSummary } from '../components/JobCaseSummary'
@@ -107,11 +108,13 @@ export function JobCaseDetailPage() {
 
   const jobCase = detailQuery.data
   const currentQuotation =
-    quotationsQuery.data?.find((quotation) => quotation.caseId === validId) ??
+    quotationsQuery.data
+      ?.filter((quotation) => quotation.caseId === validId)
+      .sort((left, right) => right.revision - left.revision)[0] ?? null
+  const currentWorkOrder =
+    workOrdersQuery.data?.find((workOrder) => workOrder.caseId === validId) ??
     null
-  const workOrderId =
-    workOrdersQuery.data?.find((workOrder) => workOrder.caseId === validId)
-      ?.id ?? null
+  const workOrderId = currentWorkOrder?.id ?? null
   const quotationLookupReady =
     !canReadQuotationFlow ||
     (!quotationsQuery.isPending && !quotationsQuery.isError)
@@ -155,7 +158,18 @@ export function JobCaseDetailPage() {
       <JobCaseDetailHeader jobCase={jobCase} />
 
       <div className="space-y-4">
-        <JobCaseFlowSteps status={jobCase.status} />
+        <JobCaseFlowSteps
+          status={jobCase.status}
+          quotationId={currentQuotation?.id ?? null}
+          workOrderId={workOrderId}
+          workOrderStatus={currentWorkOrder?.status ?? null}
+        />
+
+        <JobCaseProcessMap
+          requestNumber={jobCase.request.requestNumber}
+          quotation={currentQuotation}
+          workOrder={currentWorkOrder}
+        />
 
         <JobCaseSourceCard jobCase={jobCase} />
 

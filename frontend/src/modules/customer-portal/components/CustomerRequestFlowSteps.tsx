@@ -12,13 +12,13 @@ function activeStep(status: CustomerRequestStatus): number {
     case 'SUBMITTED':
     case 'UNDER_REVIEW':
     case 'WAITING_CUSTOMER_INFO':
-      return 1
+      return 0
     case 'READY_FOR_QUOTATION':
-      return 2
+      return 1
     case 'IN_PRODUCTION':
       return 3
     case 'COMPLETED':
-      return 4
+      return 5
     case 'CANCELLED':
       return 0
   }
@@ -31,7 +31,7 @@ export function CustomerRequestFlowSteps({
 }: CustomerRequestFlowStepsProps) {
   return (
     <WorkProgressSteps
-      currentStep={deliveryProgress ? 4 : activeStep(status)}
+      currentStep={deliveryProgress ? 5 : activeStep(status)}
       cancelled={status === 'CANCELLED'}
       deliveryComplete={deliveryProgress === 'DELIVERED'}
       variant={variant}

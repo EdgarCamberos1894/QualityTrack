@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { cn } from '@/shared/lib/cn'
 
 interface WorkProgressStepsProps {
@@ -5,15 +6,24 @@ interface WorkProgressStepsProps {
   cancelled?: boolean
   deliveryComplete?: boolean
   variant?: 'light' | 'dark'
+  stepHrefs?: Partial<Record<number, string>>
 }
 
-const steps = ['Solicitud', 'Revisión', 'Cotización', 'Producción', 'Entrega']
+const steps = [
+  'Solicitud',
+  'Cotización',
+  'Orden de trabajo',
+  'Producción',
+  'Calidad',
+  'Entrega',
+]
 
 export function WorkProgressSteps({
   currentStep,
   cancelled = false,
   deliveryComplete = false,
   variant = 'light',
+  stepHrefs = {},
 }: WorkProgressStepsProps) {
   const current = Math.max(0, Math.min(currentStep, steps.length - 1))
   const currentLabel = cancelled ? 'Cancelada' : steps[current]
@@ -82,60 +92,77 @@ export function WorkProgressSteps({
       </div>
 
       <div className={cn('overflow-x-auto', dark ? 'pt-3' : 'pb-0.5')}>
-        <div className="flex min-w-[560px] items-start">
+        <div className="flex min-w-[760px] items-start">
           {steps.map((step, index) => {
-            const completeDelivery = index === 4 && deliveryComplete
+            const completeDelivery = index === 5 && deliveryComplete
             const complete =
               !cancelled && (index < current || completeDelivery)
             const active = !cancelled && index === current && !completeDelivery
             const cancelledStep = cancelled && index === 0
+            const href = stepHrefs[index]
+
+            const marker = (
+              <>
+                <span
+                  className={cn(
+                    'flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full text-[8px] font-bold',
+                    complete && 'bg-emerald-600 text-white',
+                    active &&
+                      (dark
+                        ? 'bg-blue-500 text-white shadow-sm shadow-blue-950/40 ring-2 ring-slate-950'
+                        : 'bg-blue-600 text-white shadow-sm shadow-blue-200 ring-2 ring-white'),
+                    !complete &&
+                      !active &&
+                      !cancelledStep &&
+                      (dark
+                        ? 'border border-white/15 bg-white/[0.045] text-slate-500'
+                        : 'border border-slate-300 bg-white/80 text-slate-500'),
+                    cancelledStep && 'bg-red-500 text-white',
+                  )}
+                >
+                  {complete ? '✓' : index + 1}
+                </span>
+
+                <span
+                  className={cn(
+                    'whitespace-nowrap text-[9px]',
+                    active
+                      ? dark
+                        ? 'font-semibold text-blue-200'
+                        : 'font-semibold text-blue-700'
+                      : complete
+                        ? dark
+                          ? 'font-medium text-slate-300'
+                          : 'font-medium text-slate-700'
+                        : cancelledStep
+                          ? dark
+                            ? 'font-semibold text-red-300'
+                            : 'font-semibold text-red-700'
+                          : dark
+                            ? 'font-medium text-slate-500'
+                            : 'font-medium text-slate-500',
+                  )}
+                >
+                  {step}
+                </span>
+              </>
+            )
 
             return (
               <div key={step} className="flex min-w-0 flex-1 items-start">
-                <div className="flex min-w-0 shrink-0 items-center gap-2">
-                  <span
-                    className={cn(
-                      'flex h-5.5 w-5.5 shrink-0 items-center justify-center rounded-full text-[8px] font-bold',
-                      complete && 'bg-emerald-600 text-white',
-                      active &&
-                        (dark
-                          ? 'bg-blue-500 text-white shadow-sm shadow-blue-950/40 ring-2 ring-slate-950'
-                          : 'bg-blue-600 text-white shadow-sm shadow-blue-200 ring-2 ring-white'),
-                      !complete &&
-                        !active &&
-                        !cancelledStep &&
-                        (dark
-                          ? 'border border-white/15 bg-white/[0.045] text-slate-500'
-                          : 'border border-slate-300 bg-white/80 text-slate-500'),
-                      cancelledStep && 'bg-red-500 text-white',
-                    )}
+                {href && !cancelled ? (
+                  <Link
+                    to={href}
+                    className="flex min-w-0 shrink-0 items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200"
+                    title={`Abrir ${step.toLocaleLowerCase('es-MX')}`}
                   >
-                    {complete ? '✓' : index + 1}
-                  </span>
-
-                  <span
-                    className={cn(
-                      'whitespace-nowrap text-[9px]',
-                      active
-                        ? dark
-                          ? 'font-semibold text-blue-200'
-                          : 'font-semibold text-blue-700'
-                        : complete
-                          ? dark
-                            ? 'font-medium text-slate-300'
-                            : 'font-medium text-slate-700'
-                          : cancelledStep
-                            ? dark
-                              ? 'font-semibold text-red-300'
-                              : 'font-semibold text-red-700'
-                            : dark
-                              ? 'font-medium text-slate-500'
-                              : 'font-medium text-slate-500',
-                    )}
-                  >
-                    {step}
-                  </span>
-                </div>
+                    {marker}
+                  </Link>
+                ) : (
+                  <div className="flex min-w-0 shrink-0 items-center gap-2">
+                    {marker}
+                  </div>
+                )}
 
                 {index < steps.length - 1 ? (
                   <div
