@@ -189,7 +189,7 @@ function drawMachine(painter: ScenePainter, state: SceneFrameState) {
 
 function drawQualityStation(painter: ScenePainter, state: SceneFrameState) {
   const { progress, time, idleBlend } = state
-  const visibility = segment(progress, 0.69, 0.78) * (1 - segment(progress, 0.95, 0.995))
+  const visibility = segment(progress, 0.69, 0.78) * (1 - segment(progress, 0.95, 0.995) * 0.55)
   if (visibility <= 0.01) return
 
   ;[-0.84, 0.84].forEach((z) => {
