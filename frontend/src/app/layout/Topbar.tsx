@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { getSystemRoleLabel, type AuthenticatedUser } from '@/modules/auth'
 import { GlobalSearch } from '@/modules/global-search'
 import { TopbarActionIcon } from '@/shared/components/navigation/TopbarActionIcon'
@@ -20,6 +20,10 @@ function getShiftLabel(): string {
 }
 
 function getBreadcrumb(pathname: string, search: string): string {
+  if (pathname === '/profile') {
+    return 'Cuenta / Mi perfil'
+  }
+
   if (pathname === '/production') {
     return 'Operación / Producción'
   }
@@ -98,6 +102,7 @@ function getBreadcrumb(pathname: string, search: string): string {
 
 export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
   const location = useLocation()
+  const navigate = useNavigate()
   const roleLabel =
     user.roles.length > 0
       ? user.roles.map(getSystemRoleLabel).join(' · ')
@@ -134,6 +139,7 @@ export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
           roleLabel={roleLabel}
           accountLabel="Cuenta interna"
           detailLabel={getShiftLabel()}
+          onProfile={() => navigate('/profile')}
           onLogout={onLogout}
         />
       </div>
