@@ -50,6 +50,22 @@ public class LocalDocumentStorage implements DocumentStorage {
     }
 
     @Override
+    public StoredDocumentFile storeMaterial(
+            Long materialId,
+            Integer version,
+            String fileName,
+            InputStream inputStream
+    ) {
+        Path directory = root
+                .resolve("materials")
+                .resolve("material-" + materialId)
+                .resolve("reference")
+                .normalize();
+
+        return storeIn(directory, version, inputStream);
+    }
+
+    @Override
     public StoredDocumentFile storeMaterialLot(
             Long materialId,
             Long materialLotId,
