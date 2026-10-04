@@ -40,20 +40,24 @@ export async function createIndustrialThreeScene(canvas, options) {
 
   const rim = new THREE.SpotLight(0x38cfff, 22, 14, Math.PI / 4.6, 0.42, 1.8)
   rim.position.set(-3.8, 3.9, -3.2)
-  rim.target.position.set(0.2, 0.6, 0)
+  rim.target.position.set(-0.05, 0.55, 0)
   scene.add(rim, rim.target)
 
   const enclosureFill = new THREE.PointLight(0x1b8cff, 10, 7.5, 2)
-  enclosureFill.position.set(0.35, 1.25, 1.2)
+  enclosureFill.position.set(0.18, 1.25, 1.2)
   scene.add(enclosureFill)
 
   const cyanAccent = new THREE.PointLight(0x35e6ff, 7, 5.5, 2)
-  cyanAccent.position.set(-1.35, 0.55, 1.3)
+  cyanAccent.position.set(-1.55, 0.55, 1.3)
   scene.add(cyanAccent)
 
   const warmFill = new THREE.PointLight(0xffc36c, 2.4, 4.2, 2)
   warmFill.position.set(2.8, 0.4, 2.1)
   scene.add(warmFill)
+
+  const bridgeLight = new THREE.PointLight(0x5ddcff, 3.8, 4.8, 2)
+  bridgeLight.position.set(-2.05, 0.72, 1.7)
+  scene.add(bridgeLight)
 
   const world = buildIndustrialWorld(THREE, scene)
 
@@ -63,8 +67,8 @@ export async function createIndustrialThreeScene(canvas, options) {
   let idleBlend = 1
   let resizeObserver = null
 
-  const cameraBase = new THREE.Vector3(4.75, 2.42, 7.35)
-  const targetBase = new THREE.Vector3(0.2, 0.48, 0.02)
+  const cameraBase = new THREE.Vector3(4.5, 2.36, 7.18)
+  const targetBase = new THREE.Vector3(-0.18, 0.44, 0.04)
   camera.position.copy(cameraBase)
 
   const resize = () => {
@@ -92,11 +96,12 @@ export async function createIndustrialThreeScene(canvas, options) {
     const desiredTarget = targetBase.clone()
 
     if (!options.reducedMotion) {
-      desiredCamera.x += Math.sin(time * 0.18) * 0.055 * idleBlend
-      desiredCamera.y += Math.cos(time * 0.14) * 0.038 * idleBlend
-      desiredCamera.z += Math.sin(time * 0.11) * 0.028 * idleBlend
-      desiredTarget.x += Math.sin(time * 0.12) * 0.025 * idleBlend
-      desiredTarget.y += Math.cos(time * 0.16) * 0.015 * idleBlend
+      desiredCamera.x += Math.sin(time * 0.18) * 0.05 * idleBlend
+      desiredCamera.y += Math.cos(time * 0.14) * 0.035 * idleBlend
+      desiredCamera.z += Math.sin(time * 0.11) * 0.025 * idleBlend
+      desiredTarget.x += Math.sin(time * 0.12) * 0.022 * idleBlend
+      desiredTarget.y += Math.cos(time * 0.16) * 0.014 * idleBlend
+      bridgeLight.intensity = 3.5 + (Math.sin(time * 1.15) + 1) * 0.35
     }
 
     camera.position.lerp(desiredCamera, 1 - Math.exp(-delta * 3.8))
