@@ -335,17 +335,21 @@ public class RoutingService {
         List<RoutingOperation> resolved = new ArrayList<>();
         for (Long prerequisiteId : requestedIds) {
             if (prerequisiteId == null || !uniqueIds.add(prerequisiteId)) {
-                conflict("Las dependencias de la operación contienen valores inválidos o repetidos.");
+                throw new IllegalArgumentException(
+                        "Las dependencias de la operación contienen valores inválidos o repetidos."
+                );
             }
 
             RoutingOperation prerequisite = routingSheet.findOperation(prerequisiteId)
-                    .orElseThrow(() -> notFound(
+                    .orElseThrow(() -> new IllegalArgumentException(
                             "No se encontró una de las operaciones requeridas dentro de la hoja de ruta."
                     ));
 
             if (prerequisite == operation
                     || prerequisite.getSequenceNumber() >= operation.getSequenceNumber()) {
-                conflict("Una operación solo puede esperar a secuencias anteriores.");
+                throw new IllegalArgumentException(
+                        "Una operación solo puede esperar a secuencias anteriores."
+                );
             }
             resolved.add(prerequisite);
         }
