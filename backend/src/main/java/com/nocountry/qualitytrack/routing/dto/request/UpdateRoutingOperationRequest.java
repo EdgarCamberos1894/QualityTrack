@@ -26,6 +26,26 @@ public record UpdateRoutingOperationRequest(
         @Positive(message = "El tiempo estimado debe ser mayor a cero.")
         Integer estimatedMinutes,
 
-        List<Long> prerequisiteOperationIds
+        List<Long> prerequisiteOperationIds,
+
+        Boolean resequenceOperations
 ) {
+    public UpdateRoutingOperationRequest(
+            Integer sequenceNumber,
+            String code,
+            String name,
+            String instructions,
+            Integer estimatedMinutes,
+            List<Long> prerequisiteOperationIds
+    ) {
+        this(
+                sequenceNumber,
+                code,
+                name,
+                instructions,
+                estimatedMinutes,
+                prerequisiteOperationIds,
+                false
+        );
+    }
 }
