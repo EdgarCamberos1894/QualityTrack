@@ -9,6 +9,7 @@ interface CustomerPortalTopbarProps {
   customer: CustomerContextDto
   user: AuthenticatedUser
   onOpenMenu: () => void
+  onProfile: () => void
   onLogout: () => void
 }
 
@@ -19,6 +20,10 @@ const roleLabels = {
 } as const
 
 function breadcrumb(pathname: string): string {
+  if (pathname.endsWith('/profile')) {
+    return 'Cuenta / Mi perfil'
+  }
+
   if (pathname.endsWith('/members')) {
     return 'Empresa / Miembros'
   }
@@ -54,6 +59,7 @@ export function CustomerPortalTopbar({
   customer,
   user,
   onOpenMenu,
+  onProfile,
   onLogout,
 }: CustomerPortalTopbarProps) {
   const location = useLocation()
@@ -79,6 +85,7 @@ export function CustomerPortalTopbar({
           roleLabel={roleLabels[customer.role]}
           accountLabel="Portal de cliente"
           detailLabel={customer.customerName}
+          onProfile={onProfile}
           onLogout={onLogout}
         />
       </div>
