@@ -48,6 +48,46 @@ function defaultPrerequisites(
   return immediate ? [immediate.id] : []
 }
 
+function impactedByResequence(
+  operations: RoutingOperationDto[],
+  targetSequence: number,
+  current?: RoutingOperationDto,
+) {
+  if (!Number.isInteger(targetSequence) || targetSequence <= 0) return []
+
+  if (!current) {
+    return operations
+      .filter((item) => item.sequenceNumber >= targetSequence)
+      .sort((left, right) => left.sequenceNumber - right.sequenceNumber)
+      .map((item) => ({
+        operation: item,
+        nextSequence: item.sequenceNumber + 1,
+      }))
+  }
+
+  if (targetSequence < current.sequenceNumber) {
+    return operations
+      .filter((item) => item.id !== current.id)
+      .filter((item) => item.sequenceNumber >= targetSequence)
+      .filter((item) => item.sequenceNumber < current.sequenceNumber)
+      .sort((left, right) => left.sequenceNumber - right.sequenceNumber)
+      .map((item) => ({
+        operation: item,
+        nextSequence: item.sequenceNumber + 1,
+      }))
+  }
+
+  return operations
+    .filter((item) => item.id !== current.id)
+    .filter((item) => item.sequenceNumber > current.sequenceNumber)
+    .filter((item) => item.sequenceNumber <= targetSequence)
+    .sort((left, right) => left.sequenceNumber - right.sequenceNumber)
+    .map((item) => ({
+      operation: item,
+      nextSequence: item.sequenceNumber - 1,
+    }))
+}
+
 export function RoutingOperationDialog({
   open,
   operation,
@@ -79,15 +119,44 @@ export function RoutingOperationDialog({
       prerequisiteOperationIds:
         operation?.prerequisiteOperationIds ??
         defaultPrerequisites(operations, initialSequence),
+      resequenceOperations: false,
     },
   })
 
   const sequenceNumber = watch('sequenceNumber')
   const selectedPrerequisiteIds = watch('prerequisiteOperationIds') ?? []
+  const resequenceOperations = watch('resequenceOperations')
   const availablePrerequisites = useMemo(
     () => previousOperations(operations, sequenceNumber, operation?.id),
     [operation?.id, operations, sequenceNumber],
   )
+  const conflictingOperation = useMemo(
+    () =>
+      operations.find(
+        (item) =>
+          item.id !== operation?.id && item.sequenceNumber === sequenceNumber,
+      ) ?? null,
+    [operation?.id, operations, sequenceNumber],
+  )
+  const impactedOperations = useMemo(
+    () =>
+      conflictingOperation
+        ? impactedByResequence(operations, sequenceNumber, operation)
+        : [],
+    [conflictingOperation, operation, operations, sequenceNumber],
+  )
+  const blockingDependents = useMemo(() => {
+    if (!operation || sequenceNumber <= operation.sequenceNumber) return []
+
+    return operations
+      .filter((item) => item.id !== operation.id)
+      .filter((item) => item.sequenceNumber > operation.sequenceNumber)
+      .filter((item) => item.sequenceNumber <= sequenceNumber)
+      .filter((item) =>
+        (item.prerequisiteOperationIds ?? []).includes(operation.id),
+      )
+      .sort((left, right) => left.sequenceNumber - right.sequenceNumber)
+  }, [operation, operations, sequenceNumber])
 
   useEffect(() => {
     const nextOperationSequence = operation?.sequenceNumber ?? nextSequence
@@ -108,6 +177,7 @@ export function RoutingOperationDialog({
       prerequisiteOperationIds:
         operation?.prerequisiteOperationIds ??
         defaultPrerequisites(operations, nextOperationSequence),
+      resequenceOperations: false,
     })
   }, [nextSequence, operation, operations, reset])
 
@@ -115,14 +185,22 @@ export function RoutingOperationDialog({
 
   const sequenceField = register('sequenceNumber', { valueAsNumber: true })
   const codeField = register('code')
+  const sequenceConflict = Boolean(conflictingOperation)
+  const cannotMoveBecauseOfDependencies = blockingDependents.length > 0
+  const submitBlocked =
+    cannotMoveBecauseOfDependencies ||
+    (sequenceConflict && !resequenceOperations)
 
   const submit = handleSubmit(async (values) => {
+    if (submitBlocked) return
     if (await onSubmit(values)) {
       reset()
     }
   })
 
   const changeSequence = (value: number) => {
+    setValue('resequenceOperations', false, { shouldDirty: true })
+
     if (!codeManuallyEditedRef.current) {
       setValue('code', suggestOperationCode(value), {
         shouldDirty: true,
@@ -181,7 +259,7 @@ export function RoutingOperationDialog({
             {operation ? 'Editar operación' : 'Agregar operación'}
           </h2>
           <p className="mt-1 text-[9px] leading-4 text-slate-500">
-            Define la operación y qué pasos deben terminar antes de que pueda iniciar.
+            Define la operación, su posición y qué pasos deben terminar antes de que pueda iniciar.
           </p>
         </div>
 
@@ -217,6 +295,67 @@ export function RoutingOperationDialog({
               Se sugiere según la secuencia, pero puedes editarlo.
             </p>
           </div>
+
+          {cannotMoveBecauseOfDependencies ? (
+            <div className="sm:col-span-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5">
+              <p className="text-[9px] font-semibold text-red-800">
+                Esta operación no puede moverse todavía a esa posición
+              </p>
+              <p className="mt-1 text-[8px] leading-4 text-red-700">
+                {blockingDependents.map((item) => item.code).join(', ')}{' '}
+                {blockingDependents.length === 1 ? 'depende' : 'dependen'} de{' '}
+                {operation?.code}. Ajusta primero esas dependencias para no invertir el flujo de fabricación.
+              </p>
+            </div>
+          ) : sequenceConflict && conflictingOperation ? (
+            <div className="sm:col-span-2 rounded-xl border border-amber-200 bg-amber-50/80 px-3 py-2.5">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-[9px] font-semibold text-amber-900">
+                    La secuencia {sequenceNumber} ya está ocupada por {conflictingOperation.code}
+                  </p>
+                  <p className="mt-1 text-[8px] leading-4 text-amber-800">
+                    {operation
+                      ? `Al mover ${operation.code} aquí, QualityTrack recorrerá las operaciones afectadas y conservará sus dependencias por operación.`
+                      : 'Puedes insertar la nueva operación aquí y recorrer automáticamente las operaciones posteriores.'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  className={
+                    resequenceOperations
+                      ? 'shrink-0 rounded-lg border border-amber-400 bg-white px-2.5 py-1.5 text-[7.5px] font-semibold text-amber-900 ring-2 ring-amber-100'
+                      : 'shrink-0 rounded-lg border border-amber-300 bg-white/80 px-2.5 py-1.5 text-[7.5px] font-semibold text-amber-800 hover:bg-white'
+                  }
+                  onClick={() =>
+                    setValue('resequenceOperations', !resequenceOperations, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    })
+                  }
+                >
+                  {resequenceOperations ? '✓ Recorrer secuencias' : 'Confirmar recorrido'}
+                </button>
+              </div>
+
+              {impactedOperations.length > 0 ? (
+                <div className="mt-2.5 flex flex-wrap gap-1.5">
+                  {impactedOperations.map(({ operation: item, nextSequence }) => (
+                    <span
+                      key={item.id}
+                      className="rounded-full border border-amber-200 bg-white px-2 py-1 text-[7px] font-medium text-amber-800"
+                    >
+                      {item.code} · {item.sequenceNumber} → {nextSequence}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+              <p className="mt-2 text-[7px] leading-3.5 text-amber-700">
+                Los códigos OP generados automáticamente se ajustarán a su nueva secuencia; los códigos personalizados se conservarán.
+              </p>
+            </div>
+          ) : null}
+
           <div className="sm:col-span-2">
             <TextField
               label="Nombre"
@@ -348,13 +487,15 @@ export function RoutingOperationDialog({
           <Button
             type="submit"
             className="!h-7 !px-2.5 !text-[8px]"
-            disabled={submitting}
+            disabled={submitting || submitBlocked}
           >
             {submitting
               ? 'Guardando…'
-              : operation
-                ? 'Guardar cambios'
-                : 'Agregar operación'}
+              : sequenceConflict && !resequenceOperations
+                ? 'Confirma el recorrido'
+                : operation
+                  ? 'Guardar cambios'
+                  : 'Agregar operación'}
           </Button>
         </div>
       </form>
