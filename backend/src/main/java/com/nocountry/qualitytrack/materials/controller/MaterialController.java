@@ -52,6 +52,23 @@ public class MaterialController {
                 ));
     }
 
+    @Operation(summary = "Subir o actualizar la ficha técnica de un material")
+    @PostMapping(
+            value = "/{materialId}/technical-sheet",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<ApiResponse<MaterialResponse>> attachTechnicalSheet(
+            @CurrentUserId Long currentUserId,
+            @PathVariable Long materialId,
+            @RequestPart("file") MultipartFile file
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.MATERIAL_CREATED,
+                "Ficha técnica del material guardada correctamente.",
+                materialService.attachTechnicalSheet(currentUserId, materialId, file)
+        ));
+    }
+
     @ListMaterialsApiDocs
     @GetMapping
     public ResponseEntity<ApiResponse<List<MaterialResponse>>> listMaterials(
