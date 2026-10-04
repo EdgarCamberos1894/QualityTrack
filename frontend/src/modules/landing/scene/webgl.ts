@@ -1,5 +1,9 @@
 import { compose, type Mat4, type Vec3 } from './math'
-import { createCubeGeometry, createCylinderGeometry, type GeometryData } from './geometry'
+import {
+  createCubeGeometry,
+  createCylinderGeometry,
+  type GeometryData,
+} from './geometry'
 
 export interface DrawOptions {
   position: Vec3
@@ -44,7 +48,7 @@ void main() {
   float diffuse = max(dot(normalize(vNormal), lightDirection), 0.0);
   float rim = pow(1.0 - abs(dot(normalize(vNormal), normalize(vec3(0.2, 0.3, 1.0)))), 2.0);
   float heightGlow = clamp((vWorldPosition.y + 1.0) * 0.08, 0.0, 0.18);
-  vec3 lit = uColor * (0.34 + diffuse * 0.72 + rim * 0.16 + heightGlow);
+  vec3 lit = uColor * (0.52 + diffuse * 0.78 + rim * 0.24 + heightGlow);
   lit += uColor * uEmissive;
   gl_FragColor = vec4(lit, uAlpha);
 }
@@ -60,7 +64,9 @@ function compileShader(
   gl.shaderSource(shader, source)
   gl.compileShader(shader)
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    throw new Error(gl.getShaderInfoLog(shader) ?? 'Error al compilar shader WebGL.')
+    throw new Error(
+      gl.getShaderInfoLog(shader) ?? 'Error al compilar shader WebGL.',
+    )
   }
   return shader
 }
@@ -68,8 +74,14 @@ function compileShader(
 function createProgram(gl: WebGLRenderingContext): WebGLProgram {
   const program = gl.createProgram()
   if (!program) throw new Error('No se pudo crear el programa WebGL.')
-  gl.attachShader(program, compileShader(gl, gl.VERTEX_SHADER, vertexShaderSource))
-  gl.attachShader(program, compileShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource))
+  gl.attachShader(
+    program,
+    compileShader(gl, gl.VERTEX_SHADER, vertexShaderSource),
+  )
+  gl.attachShader(
+    program,
+    compileShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource),
+  )
   gl.linkProgram(program)
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
     throw new Error(gl.getProgramInfoLog(program) ?? 'Error al enlazar WebGL.')
@@ -83,6 +95,34 @@ function createMesh(gl: WebGLRenderingContext, geometry: GeometryData): Mesh {
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
   gl.bufferData(gl.ARRAY_BUFFER, geometry.vertices, gl.STATIC_DRAW)
   return { buffer, count: geometry.count }
+}
+
+function createContext(canvas: HTMLCanvasElement): WebGLRenderingContext {
+  const options: WebGLContextAttributes = {
+    alpha: true,
+    antialias: true,
+    depth: true,
+    premultipliedAlpha: false,
+    powerPreference: 'high-performance',
+  }
+
+  const primary = canvas.getContext('webgl', options)
+  if (primary) return primary
+
+  const compatible = canvas.getContext('webgl', {
+    alpha: true,
+    antialias: false,
+    depth: true,
+  })
+  if (compatible) return compatible
+
+  const legacy = canvas.getContext(
+    'experimental-webgl',
+    options,
+  ) as WebGLRenderingContext | null
+  if (legacy) return legacy
+
+  throw new Error('WebGL no está disponible en este navegador.')
 }
 
 export class ScenePainter {
@@ -100,12 +140,7 @@ export class ScenePainter {
   private readonly alphaLocation: WebGLUniformLocation
 
   constructor(canvas: HTMLCanvasElement) {
-    const gl = canvas.getContext('webgl', {
-      alpha: true,
-      antialias: true,
-      powerPreference: 'high-performance',
-    })
-    if (!gl) throw new Error('WebGL no está disponible en este navegador.')
+    const gl = createContext(canvas)
 
     this.gl = gl
     this.program = createProgram(gl)
@@ -113,6 +148,10 @@ export class ScenePainter {
     this.cylinder = createMesh(gl, createCylinderGeometry())
     this.positionLocation = gl.getAttribLocation(this.program, 'aPosition')
     this.normalLocation = gl.getAttribLocation(this.program, 'aNormal')
+
+    if (this.positionLocation < 0 || this.normalLocation < 0) {
+      throw new Error('No se pudieron preparar los atributos de la escena 3D.')
+    }
 
     const uniform = (name: string) => {
       const location = gl.getUniformLocation(this.program, name)
@@ -128,6 +167,7 @@ export class ScenePainter {
     this.alphaLocation = uniform('uAlpha')
 
     gl.enable(gl.DEPTH_TEST)
+    gl.depthFunc(gl.LEQUAL)
     gl.enable(gl.BLEND)
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
     gl.clearColor(0.015, 0.027, 0.06, 0)
@@ -135,6 +175,10 @@ export class ScenePainter {
 
   begin(projection: Mat4, view: Mat4) {
     const { gl } = this
+    if (gl.isContextLost()) {
+      throw new Error('El contexto WebGL se perdió durante la animación.')
+    }
+
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
     gl.useProgram(this.program)
     gl.uniformMatrix4fv(this.projectionLocation, false, projection)
@@ -168,6 +212,40 @@ export class ScenePainter {
     gl.uniform1f(this.emissiveLocation, emissive)
     gl.uniform1f(this.alphaLocation, alpha)
     gl.drawArrays(gl.TRIANGLES, 0, mesh.count)
+  }
+
+  hasVisiblePixels(): boolean {
+    const { gl } = this
+    if (gl.isContextLost()) return false
+
+    const width = gl.drawingBufferWidth
+    const height = gl.drawingBufferHeight
+    if (width < 8 || height < 8) return false
+
+    const sampleSize = 9
+    const startX = Math.max(0, Math.floor(width / 2 - sampleSize / 2))
+    const startY = Math.max(0, Math.floor(height / 2 - sampleSize / 2))
+    const pixels = new Uint8Array(sampleSize * sampleSize * 4)
+
+    gl.readPixels(
+      startX,
+      startY,
+      sampleSize,
+      sampleSize,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      pixels,
+    )
+
+    for (let index = 0; index < pixels.length; index += 4) {
+      const red = pixels[index] ?? 0
+      const green = pixels[index + 1] ?? 0
+      const blue = pixels[index + 2] ?? 0
+      const alpha = pixels[index + 3] ?? 0
+      if (alpha > 8 && red + green + blue > 20) return true
+    }
+
+    return false
   }
 
   resize(width: number, height: number, dpr: number) {
