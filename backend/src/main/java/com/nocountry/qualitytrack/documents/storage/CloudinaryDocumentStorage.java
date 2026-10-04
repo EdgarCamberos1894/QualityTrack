@@ -72,6 +72,27 @@ public class CloudinaryDocumentStorage implements DocumentStorage {
     }
 
     @Override
+    public StoredDocumentFile storeMaterial(
+            Long materialId,
+            Integer version,
+            String fileName,
+            InputStream inputStream
+    ) {
+        if (materialId == null) {
+            throw new DocumentStorageException(
+                    "El documento técnico debe pertenecer a un material."
+            );
+        }
+
+        return storeIn(
+                "qualitytrack/materials/material-" + materialId + "/reference",
+                version,
+                fileName,
+                inputStream
+        );
+    }
+
+    @Override
     public StoredDocumentFile storeMaterialLot(
             Long materialId,
             Long materialLotId,
