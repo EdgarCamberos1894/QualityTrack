@@ -47,7 +47,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
   })
 
   const requestTracePath =
-    'M 343 0 C 343 58, 342 87, 326 118 C 307 156, 281 202, 246 236 C 229 252, 214 270, 202 284'
+    'M 343 0 C 321 28, 326 65, 358 88 C 390 112, 378 151, 345 176 C 313 200, 272 235, 202 284'
 
   return (
     <section
