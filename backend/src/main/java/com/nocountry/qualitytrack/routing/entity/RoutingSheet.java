@@ -159,6 +159,15 @@ public class RoutingSheet {
                 instructions,
                 estimatedMinutes
         );
+
+        operations.stream()
+                .filter(previous -> previous.getSequenceNumber() < sequenceNumber)
+                .max((left, right) -> Integer.compare(
+                        left.getSequenceNumber(),
+                        right.getSequenceNumber()
+                ))
+                .ifPresent(previous -> operation.replacePrerequisites(List.of(previous)));
+
         operations.add(operation);
         touch();
         return operation;
