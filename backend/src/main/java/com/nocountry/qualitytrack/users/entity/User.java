@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.users.entity;
 
 import com.nocountry.qualitytrack.users.enums.AccountType;
 import com.nocountry.qualitytrack.users.enums.UserStatus;
+import com.nocountry.qualitytrack.users.util.PersonNameNormalizer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -61,8 +62,8 @@ public class User {
 
     private User(String firstName, String lastName, String email, String passwordHash,
                  AccountType accountType, UserStatus status) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.firstName = PersonNameNormalizer.normalize(firstName);
+        this.lastName = PersonNameNormalizer.normalize(lastName);
         this.email = email;
         this.passwordHash = passwordHash;
         this.accountType = accountType;
@@ -107,8 +108,8 @@ public class User {
             throw new IllegalStateException("Solo una cuenta interna pendiente puede volver a invitarse.");
         }
 
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.firstName = PersonNameNormalizer.normalize(firstName);
+        this.lastName = PersonNameNormalizer.normalize(lastName);
     }
 
     public void activateInternal(String passwordHash, Instant activatedAt) {
@@ -141,8 +142,8 @@ public class User {
     }
 
     public void updateProfile(String firstName, String lastName) {
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.firstName = PersonNameNormalizer.normalize(firstName);
+        this.lastName = PersonNameNormalizer.normalize(lastName);
     }
 
     public void changePassword(String passwordHash) {
