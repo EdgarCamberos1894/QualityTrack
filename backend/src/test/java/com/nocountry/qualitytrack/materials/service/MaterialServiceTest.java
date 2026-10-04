@@ -199,8 +199,7 @@ class MaterialServiceTest {
                 7L,
                 new RecordMaterialConsumptionRequest(
                         40L,
-                        new BigDecimal("10.500"),
-                        "Primer corte"
+                        new BigDecimal("10.500")
                 )
         );
 
