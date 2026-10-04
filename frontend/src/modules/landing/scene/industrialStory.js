@@ -1,3 +1,9 @@
+import {
+  stageIndex,
+  stageLocalProgress,
+  stageOpacity,
+} from './storyTimeline.js'
+
 function makeCanvasTexture(THREE, eyebrow, title, rows, accent) {
   const canvas = document.createElement('canvas')
   canvas.width = 920
@@ -240,10 +246,11 @@ export function buildIndustrialStory(THREE, root) {
 }
 
 export function updateIndustrialStory(THREE, story, progress, time) {
-  const requestIn = THREE.MathUtils.smoothstep(progress, 0.065, 0.115)
-  const requestOut = THREE.MathUtils.smoothstep(progress, 0.205, 0.25)
-  const requestAlpha = requestIn * (1 - requestOut)
-  const requestTravel = THREE.MathUtils.smoothstep(progress, 0.09, 0.19)
+  const currentStage = stageIndex(progress)
+
+  const requestAlpha = stageOpacity(progress, 1)
+  const requestLocal = stageLocalProgress(progress, 1)
+  const requestTravel = THREE.MathUtils.smoothstep(requestLocal, 0.08, 0.82)
   story.request.position.x = THREE.MathUtils.lerp(-3.25, -1.18, requestTravel)
   story.request.position.y =
     THREE.MathUtils.lerp(0.95, 0.7, requestTravel) + Math.sin(time * 0.8) * 0.035
@@ -251,7 +258,8 @@ export function updateIndustrialStory(THREE, story, progress, time) {
   story.request.rotation.y = THREE.MathUtils.lerp(0.24, 0.05, requestTravel)
   setFade(story.request, requestAlpha)
 
-  const nodeAlpha = requestAlpha * THREE.MathUtils.smoothstep(progress, 0.08, 0.13)
+  const nodeAlpha =
+    requestAlpha * THREE.MathUtils.smoothstep(requestLocal, 0.18, 0.32)
   story.nodeMaterial.opacity = nodeAlpha
   story.nodeMaterial.emissiveIntensity = 0.9 + Math.sin(time * 2.4) * 0.35
   story.requestNode.visible = nodeAlpha > 0.01
@@ -269,10 +277,9 @@ export function updateIndustrialStory(THREE, story, progress, time) {
     nodeAlpha * 0.65,
   )
 
-  const fileIn = THREE.MathUtils.smoothstep(progress, 0.18, 0.235)
-  const fileOut = THREE.MathUtils.smoothstep(progress, 0.355, 0.42)
-  const fileAlpha = fileIn * (1 - fileOut)
-  const spread = THREE.MathUtils.smoothstep(progress, 0.205, 0.3)
+  const fileAlpha = stageOpacity(progress, 2)
+  const fileLocal = stageLocalProgress(progress, 2)
+  const spread = THREE.MathUtils.smoothstep(fileLocal, 0.08, 0.72)
   const targets = [
     [-1.72, 1.22, -0.48, -0.2],
     [0.48, 1.4, -0.72, 0.16],
@@ -300,21 +307,20 @@ export function updateIndustrialStory(THREE, story, progress, time) {
   })
   setFade(story.expediente, fileAlpha)
 
-  const quoteIn = THREE.MathUtils.smoothstep(progress, 0.30, 0.37)
-  const quoteOut = THREE.MathUtils.smoothstep(progress, 0.45, 0.53)
-  setFade(story.quotation, quoteIn * (1 - quoteOut))
+  const quotationAlpha = stageOpacity(progress, 3)
+  setFade(story.quotation, quotationAlpha)
   story.quotation.position.y = 0.95 + Math.sin(time * 0.75) * 0.035
 
-  const woIn = THREE.MathUtils.smoothstep(progress, 0.42, 0.49)
-  const woOut = THREE.MathUtils.smoothstep(progress, 0.58, 0.66)
-  setFade(story.workOrder, woIn * (1 - woOut))
+  const workOrderAlpha = stageOpacity(progress, 4)
+  setFade(story.workOrder, workOrderAlpha)
 
-  const measureIn = THREE.MathUtils.smoothstep(progress, 0.72, 0.79)
-  const measureOut = THREE.MathUtils.smoothstep(progress, 0.89, 0.96)
-  setFade(story.measure, measureIn * (1 - measureOut))
+  const measureAlpha = stageOpacity(progress, 6)
+  setFade(story.measure, measureAlpha)
 
-  const overview = THREE.MathUtils.smoothstep(progress, 0.94, 0.995)
-  story.stageLabels.forEach((label, index) => {
-    setFade(label, overview * (0.62 + index * 0.07))
-  })
+  story.stageLabels.forEach((label) => setFade(label, 0))
+
+  if (currentStage !== 1) {
+    updateConnector(story.requestLink, [0, 0, 0], [0, 0, 0], 0)
+    updateConnector(story.pieceLink, [0, 0, 0], [0, 0, 0], 0)
+  }
 }
