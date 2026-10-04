@@ -12,6 +12,7 @@ import { ProductionMaterialsCard } from './ProductionMaterialsCard'
 import { RecordMaterialConsumptionDialog } from './RecordMaterialConsumptionDialog'
 import { ProductionRouteList } from './ProductionRouteList'
 import { QualityHandoffPanel } from './QualityHandoffPanel'
+import { RoutingFlowView } from './RoutingFlowView'
 import { StartOperationDialog } from './StartOperationDialog'
 import { useProductionMutations } from '../hooks/useProductionMutations'
 import { formatProductionDateTime } from '../model/productionPresenter'
@@ -55,6 +56,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
   const [expandedOperationId, setExpandedOperationId] = useState<number | null>(
     null,
   )
+  const [routeView, setRouteView] = useState<'flow' | 'list'>('flow')
   const [materialsOpen, setMaterialsOpen] = useState(() =>
     location.hash.startsWith('#material-lot-'),
   )
@@ -89,31 +91,36 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
     [productionExecutions],
   )
 
-  const inProgressExecution = productionExecutions.find(
-    (execution) => execution.status === 'IN_PROGRESS',
+  const inProgressOperationIds = useMemo(
+    () =>
+      new Set(
+        productionExecutions
+          .filter((execution) => execution.status === 'IN_PROGRESS')
+          .map((execution) => execution.routingOperationId),
+      ),
+    [productionExecutions],
   )
-  const inProgressOperation = inProgressExecution
-    ? operations.find(
-        (operation) => operation.id === inProgressExecution.routingOperationId,
-      )
-    : undefined
 
-  const nextOperation = operations.find((operation, index) => {
-    if (completedOperationIds.has(operation.id)) return false
-
-    return operations
-      .slice(0, index)
-      .every((previous) => completedOperationIds.has(previous.id))
-  })
-
-  const currentOperation =
-    inProgressOperation ?? nextOperation ?? (data.production.productionCompleted
-      ? null
-      : operations.at(0) ?? null)
+  const firstInProgressOperation = operations.find((operation) =>
+    inProgressOperationIds.has(operation.id),
+  )
+  const nextReadyOperation = operations.find(
+    (operation) =>
+      !completedOperationIds.has(operation.id) &&
+      !inProgressOperationIds.has(operation.id) &&
+      operation.prerequisiteOperationIds.every((id) =>
+        completedOperationIds.has(id),
+      ),
+  )
+  const firstPendingOperation = operations.find(
+    (operation) => !completedOperationIds.has(operation.id),
+  )
 
   const selectedOperation =
     operations.find((operation) => operation.id === selectedOperationId) ??
-    currentOperation ??
+    firstInProgressOperation ??
+    nextReadyOperation ??
+    firstPendingOperation ??
     operations.at(-1) ??
     null
 
@@ -124,15 +131,16 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
       )
     : []
 
-  const selectedIndex = selectedOperation
-    ? operations.findIndex((operation) => operation.id === selectedOperation.id)
-    : -1
+  const selectedPendingPrerequisites = selectedOperation
+    ? selectedOperation.prerequisiteOperationIds
+        .filter((id) => !completedOperationIds.has(id))
+        .map((id) => operations.find((operation) => operation.id === id)?.code)
+        .filter((code): code is string => Boolean(code))
+    : []
   const selectedUnlocked =
-    selectedIndex >= 0 &&
+    selectedOperation !== null &&
     routingReleased === true &&
-    operations
-      .slice(0, selectedIndex)
-      .every((previous) => completedOperationIds.has(previous.id))
+    selectedPendingPrerequisites.length === 0
 
   const completedOperations = completedOperationIds.size
   const totalOperations = operations.length
@@ -140,8 +148,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
     totalOperations > 0
       ? Math.round((completedOperations / totalOperations) * 100)
       : 0
-  const materialRecordingOpen =
-    data.workOrder.status === 'IN_PRODUCTION'
+  const materialRecordingOpen = data.workOrder.status === 'IN_PRODUCTION'
   const latestConsumption = data.materials.at(-1)
 
   useEffect(() => {
@@ -323,7 +330,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
                   Ruta activa de fabricación
                 </h2>
                 <p className="mt-1 text-[8px] leading-4 text-slate-500">
-                  Ejecuta las operaciones en secuencia y registra el resultado real de cada paso.
+                  Las ramas pueden avanzar en paralelo cuando sus dependencias estén completas.
                 </p>
               </div>
 
@@ -360,19 +367,63 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
           </div>
 
           {operations.length > 0 ? (
-            <ProductionRouteList
-              operations={operations}
-              executions={productionExecutions}
-              routingReleased={routingReleased === true}
-              selectedOperationId={selectedOperation?.id ?? null}
-              expandedOperationId={expandedOperationId}
-              onSelect={setSelectedOperationId}
-              onToggleAttempts={(operationId) =>
-                setExpandedOperationId((current) =>
-                  current === operationId ? null : operationId,
-                )
-              }
-            />
+            <div>
+              <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-3 py-2">
+                <p className="text-[7px] text-slate-400">
+                  Selecciona una operación para ver sus acciones y estado.
+                </p>
+                <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setRouteView('flow')}
+                    className={
+                      routeView === 'flow'
+                        ? 'rounded-md bg-white px-2.5 py-1.5 text-[7.5px] font-semibold text-blue-700 shadow-sm'
+                        : 'rounded-md px-2.5 py-1.5 text-[7.5px] font-semibold text-slate-500'
+                    }
+                  >
+                    Flujo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRouteView('list')}
+                    className={
+                      routeView === 'list'
+                        ? 'rounded-md bg-white px-2.5 py-1.5 text-[7.5px] font-semibold text-blue-700 shadow-sm'
+                        : 'rounded-md px-2.5 py-1.5 text-[7.5px] font-semibold text-slate-500'
+                    }
+                  >
+                    Lista
+                  </button>
+                </div>
+              </div>
+
+              {routeView === 'flow' ? (
+                <div className="p-3">
+                  <RoutingFlowView
+                    operations={operations}
+                    executions={productionExecutions}
+                    routingReleased={routingReleased === true}
+                    selectedOperationId={selectedOperation?.id ?? null}
+                    onSelect={setSelectedOperationId}
+                  />
+                </div>
+              ) : (
+                <ProductionRouteList
+                  operations={operations}
+                  executions={productionExecutions}
+                  routingReleased={routingReleased === true}
+                  selectedOperationId={selectedOperation?.id ?? null}
+                  expandedOperationId={expandedOperationId}
+                  onSelect={setSelectedOperationId}
+                  onToggleAttempts={(operationId) =>
+                    setExpandedOperationId((current) =>
+                      current === operationId ? null : operationId,
+                    )
+                  }
+                />
+              )}
+            </div>
           ) : productionRouting ? (
             <div className="p-4">
               <ProductionBlocker text="La hoja de ruta no contiene operaciones ejecutables." />
@@ -409,10 +460,7 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
               operation={selectedOperation}
               executions={selectedExecutions}
               unlocked={selectedUnlocked}
-              isCurrentOperation={
-                selectedOperation !== null &&
-                selectedOperation.id === currentOperation?.id
-              }
+              pendingPrerequisiteCodes={selectedPendingPrerequisites}
               canExecute={canExecute}
               productionCompleted={data.production.productionCompleted}
               workOrderStatus={data.workOrder.status}
