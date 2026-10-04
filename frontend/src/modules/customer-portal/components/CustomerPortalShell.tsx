@@ -89,6 +89,7 @@ export function CustomerPortalShell() {
             customer={customer}
             user={session.user}
             onOpenMenu={() => setSidebarOpen(true)}
+            onProfile={() => navigate(`/portal/${customer.customerId}/profile`)}
             onLogout={logout}
           />
           <main className="min-h-[calc(100vh-76px)]">
