@@ -1,3 +1,4 @@
+import { enhanceIndustrialEnclosure } from './industrialEnclosureEnhancements.js'
 import { buildIndustrialWorld, updateIndustrialWorld } from './industrialWorld.js'
 
 const THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js'
@@ -60,6 +61,7 @@ export async function createIndustrialThreeScene(canvas, options) {
   scene.add(bridgeLight)
 
   const world = buildIndustrialWorld(THREE, scene)
+  enhanceIndustrialEnclosure(THREE, world)
 
   let disposed = false
   let animationFrame = 0
