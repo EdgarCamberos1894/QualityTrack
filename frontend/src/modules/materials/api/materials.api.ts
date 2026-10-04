@@ -6,7 +6,9 @@ import type {
   MaterialDto,
   MaterialLotDto,
   RecordMaterialConsumptionPayload,
+  UpsertWorkOrderMaterialPlanPayload,
   WorkOrderMaterialDto,
+  WorkOrderMaterialPlanDto,
 } from '../types/material.types'
 
 export async function getMaterials(): Promise<MaterialDto[]> {
@@ -73,6 +75,33 @@ export async function getMaterialCertificateContent(
   )
 
   return response.data
+}
+
+export async function getWorkOrderMaterialPlans(
+  workOrderId: number,
+): Promise<WorkOrderMaterialPlanDto[]> {
+  const response = await apiClient.get<ApiResponse<WorkOrderMaterialPlanDto[]>>(
+    `/work-orders/${workOrderId}/material-plan`,
+  )
+  return response.data.data
+}
+
+export async function upsertWorkOrderMaterialPlan(
+  workOrderId: number,
+  payload: UpsertWorkOrderMaterialPlanPayload,
+): Promise<WorkOrderMaterialPlanDto> {
+  const response = await apiClient.post<ApiResponse<WorkOrderMaterialPlanDto>>(
+    `/work-orders/${workOrderId}/material-plan`,
+    payload,
+  )
+  return response.data.data
+}
+
+export async function removeWorkOrderMaterialPlan(
+  workOrderId: number,
+  planId: number,
+): Promise<void> {
+  await apiClient.delete(`/work-orders/${workOrderId}/material-plan/${planId}`)
 }
 
 export async function recordMaterialConsumption(

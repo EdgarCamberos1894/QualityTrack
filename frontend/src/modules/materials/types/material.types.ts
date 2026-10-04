@@ -37,6 +37,25 @@ export interface CreateMaterialLotPayload {
   quantityReceived: number
 }
 
+export interface WorkOrderMaterialPlanDto {
+  id: number
+  workOrderId: number
+  materialId: number
+  materialCode: string
+  materialName: string
+  plannedQuantity: number
+  unit: string
+  plannedByUserId: number
+  plannedByName: string | null
+  plannedAt: string
+  updatedAt: string
+}
+
+export interface UpsertWorkOrderMaterialPlanPayload {
+  materialId: number
+  plannedQuantity: number
+}
+
 export interface WorkOrderMaterialDto {
   id: number
   workOrderId: number

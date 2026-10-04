@@ -13,6 +13,7 @@ import {
   getWorkOrderPriorityLabel,
 } from '../model/workOrderPresenter'
 import type { WorkOrderDetailDto } from '../types/workOrder.types'
+import { WorkOrderMaterialPlanCard } from './WorkOrderMaterialPlanCard'
 
 interface WorkOrderPlanningCardProps {
   workOrder: WorkOrderDetailDto
@@ -178,13 +179,33 @@ export function WorkOrderPlanningCard({
         </form>
       ) : (
         <dl className="grid gap-3 px-4 py-3.5 sm:grid-cols-2 lg:grid-cols-5">
-          <DataItem label="Cantidad planeada" value={workOrder.plannedQuantity ?? 'Sin definir'} />
-          <DataItem label="Prioridad" value={getWorkOrderPriorityLabel(workOrder.priority)} />
-          <DataItem label="Inicio planeado" value={formatWorkOrderDate(workOrder.plannedStartDate)} />
-          <DataItem label="Fin planeado" value={formatWorkOrderDate(workOrder.plannedEndDate)} />
-          <DataItem label="Entrega comprometida" value={formatWorkOrderDate(workOrder.agreedDeliveryDate)} />
+          <DataItem
+            label="Cantidad planeada"
+            value={workOrder.plannedQuantity ?? 'Sin definir'}
+          />
+          <DataItem
+            label="Prioridad"
+            value={getWorkOrderPriorityLabel(workOrder.priority)}
+          />
+          <DataItem
+            label="Inicio planeado"
+            value={formatWorkOrderDate(workOrder.plannedStartDate)}
+          />
+          <DataItem
+            label="Fin planeado"
+            value={formatWorkOrderDate(workOrder.plannedEndDate)}
+          />
+          <DataItem
+            label="Entrega comprometida"
+            value={formatWorkOrderDate(workOrder.agreedDeliveryDate)}
+          />
         </dl>
       )}
+
+      <WorkOrderMaterialPlanCard
+        workOrderId={workOrder.id}
+        workOrderStatus={workOrder.status}
+      />
     </section>
   )
 }

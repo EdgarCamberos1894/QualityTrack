@@ -6,11 +6,15 @@ import {
   getMaterialCertificateContent,
   getMaterialLots,
   getMaterials,
+  getWorkOrderMaterialPlans,
+  removeWorkOrderMaterialPlan,
+  upsertWorkOrderMaterialPlan,
   uploadMaterialLotCertificate,
 } from '../api/materials.api'
 import type {
   CreateMaterialLotPayload,
   CreateMaterialPayload,
+  UpsertWorkOrderMaterialPlanPayload,
 } from '../types/material.types'
 
 export const materialKeys = {
@@ -18,6 +22,8 @@ export const materialKeys = {
   list: () => [...materialKeys.all, 'list'] as const,
   lots: (materialId: number | null) =>
     [...materialKeys.all, 'lots', materialId] as const,
+  workOrderPlan: (workOrderId: number) =>
+    [...materialKeys.all, 'work-order-plan', workOrderId] as const,
 }
 
 export function useMaterials(enabled = true) {
@@ -34,6 +40,41 @@ export function useMaterialLots(materialId: number | null) {
     queryFn: () => getMaterialLots(materialId as number),
     enabled: materialId !== null,
   })
+}
+
+export function useWorkOrderMaterialPlans(
+  workOrderId: number,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: materialKeys.workOrderPlan(workOrderId),
+    queryFn: () => getWorkOrderMaterialPlans(workOrderId),
+    enabled,
+  })
+}
+
+export function useWorkOrderMaterialPlanMutations(workOrderId: number) {
+  const queryClient = useQueryClient()
+
+  const invalidatePlan = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: materialKeys.workOrderPlan(workOrderId),
+    })
+  }
+
+  const upsert = useMutation({
+    mutationFn: (payload: UpsertWorkOrderMaterialPlanPayload) =>
+      upsertWorkOrderMaterialPlan(workOrderId, payload),
+    onSuccess: invalidatePlan,
+  })
+
+  const remove = useMutation({
+    mutationFn: (planId: number) =>
+      removeWorkOrderMaterialPlan(workOrderId, planId),
+    onSuccess: invalidatePlan,
+  })
+
+  return { upsert, remove }
 }
 
 export function useMaterialMutations() {

@@ -5,6 +5,8 @@ export {
   useMaterialLots,
   useMaterialMutations,
   useMaterials,
+  useWorkOrderMaterialPlanMutations,
+  useWorkOrderMaterialPlans,
 } from './hooks/useMaterials'
 export type {
   CreateMaterialLotPayload,
@@ -12,5 +14,7 @@ export type {
   MaterialDto,
   MaterialLotDto,
   RecordMaterialConsumptionPayload,
+  UpsertWorkOrderMaterialPlanPayload,
   WorkOrderMaterialDto,
+  WorkOrderMaterialPlanDto,
 } from './types/material.types'
