@@ -4,6 +4,7 @@ import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.users.dto.request.UpdateInternalUserRolesRequest;
 import com.nocountry.qualitytrack.users.dto.request.UpdateInternalUserStatusRequest;
+import com.nocountry.qualitytrack.users.dto.request.UpdateOwnProfileRequest;
 import com.nocountry.qualitytrack.users.dto.response.InternalUserResponse;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.users.entity.UserSystemRole;
@@ -32,6 +33,31 @@ public class InternalUserService {
 
     private final UserRepository userRepository;
     private final UserSystemRoleRepository roleRepository;
+
+    @Transactional(readOnly = true)
+    public InternalUserResponse getOwnProfile(Long currentUserId) {
+        User user = requireActiveInternalUser(currentUserId);
+        return InternalUserResponse.from(user, rolesFor(user.getId()));
+    }
+
+    @Transactional
+    public InternalUserResponse updateOwnProfile(
+            Long currentUserId,
+            UpdateOwnProfileRequest request
+    ) {
+        User user = requireInternalUserForUpdate(currentUserId);
+        requireActiveInternal(user);
+
+        String firstName = request.firstName().trim();
+        String lastName = request.lastName().trim();
+
+        if (!firstName.equals(user.getFirstName()) || !lastName.equals(user.getLastName())) {
+            user.updateProfile(firstName, lastName);
+            userRepository.saveAndFlush(user);
+        }
+
+        return InternalUserResponse.from(user, rolesFor(user.getId()));
+    }
 
     @Transactional(readOnly = true)
     public List<InternalUserResponse> list(Long currentUserId) {
@@ -166,6 +192,21 @@ public class InternalUserService {
         }
 
         return user;
+    }
+
+    private User requireActiveInternalUser(Long currentUserId) {
+        User user = requireInternalUser(currentUserId);
+        requireActiveInternal(user);
+        return user;
+    }
+
+    private void requireActiveInternal(User user) {
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new BusinessException(
+                    ApiErrorCode.ACCESS_DENIED,
+                    "Solo una cuenta interna activa puede consultar o actualizar su perfil."
+            );
+        }
     }
 
     private User requireInternalUser(Long userId) {
