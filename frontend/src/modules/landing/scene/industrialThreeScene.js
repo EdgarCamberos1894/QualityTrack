@@ -30,7 +30,7 @@ export async function createIndustrialThreeScene(canvas, options) {
 
   const scene = new THREE.Scene()
   scene.fog = new THREE.FogExp2(0x020617, 0.035)
-  const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 80)
+  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 80)
 
   const hemi = new THREE.HemisphereLight(0xcfe7ff, 0x07111f, 1.35)
   scene.add(hemi)
@@ -60,24 +60,24 @@ export async function createIndustrialThreeScene(canvas, options) {
   const story = buildIndustrialStory(THREE, world.root)
 
   const cameraPositions = [
-    [5.2, 2.7, 7.6],
-    [4.1, 2.15, 6.0],
-    [3.5, 2.1, 5.4],
-    [3.15, 1.95, 5.0],
-    [3.9, 1.8, 4.6],
-    [3.45, 1.45, 4.0],
-    [7.45, 1.8, 4.7],
-    [11.6, 4.25, 9.3],
+    [4.6, 2.55, 7.15],
+    [3.35, 1.95, 5.3],
+    [2.95, 2.08, 4.95],
+    [2.85, 2.0, 4.8],
+    [3.65, 1.82, 4.65],
+    [3.35, 1.48, 4.05],
+    [7.15, 1.82, 4.75],
+    [10.5, 3.45, 7.55],
   ]
   const cameraTargets = [
-    [1.15, 0.22, 0.05],
-    [-0.45, 0.62, 0.05],
-    [-0.35, 0.72, 0],
-    [-0.1, 0.65, 0],
-    [2.05, 0.38, 0],
-    [1.35, 0.12, 0],
-    [5.25, 0.2, 0],
-    [4.15, 0.2, 0],
+    [0.7, 0.35, 0.05],
+    [-0.82, 0.62, 0.04],
+    [-0.52, 0.7, 0],
+    [-0.72, 0.72, 0],
+    [1.0, 0.48, 0],
+    [0.75, 0.16, 0],
+    [4.45, 0.25, 0],
+    [5.15, 0.14, 0],
   ]
 
   let disposed = false
@@ -110,8 +110,8 @@ export async function createIndustrialThreeScene(canvas, options) {
     const desiredCamera = sampleVector(THREE, cameraPositions, progress)
     const desiredTarget = sampleVector(THREE, cameraTargets, progress)
     if (!options.reducedMotion) {
-      desiredCamera.x += Math.sin(time * 0.28) * 0.055 * idleBlend
-      desiredCamera.y += Math.cos(time * 0.23) * 0.04 * idleBlend
+      desiredCamera.x += Math.sin(time * 0.28) * 0.045 * idleBlend
+      desiredCamera.y += Math.cos(time * 0.23) * 0.032 * idleBlend
     }
     camera.position.lerp(desiredCamera, 1 - Math.exp(-delta * 5.5))
     camera.lookAt(desiredTarget)
