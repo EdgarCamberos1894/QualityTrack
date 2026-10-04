@@ -23,15 +23,21 @@ interface NodePosition {
   y: number
 }
 
+function prerequisiteIds(operation: RoutingOperationDto) {
+  return operation.prerequisiteOperationIds ?? []
+}
+
 function nodePresentation(
   operation: RoutingOperationDto,
   executions: OperationExecutionDto[] | undefined,
   completedIds: Set<number>,
   routingReleased: boolean | undefined,
 ) {
+  const dependencies = prerequisiteIds(operation)
+
   if (!executions) {
     return {
-      label: operation.prerequisiteOperationIds.length === 0 ? 'Inicio libre' : 'Definida',
+      label: dependencies.length === 0 ? 'Inicio libre' : 'Definida',
       card: 'border-slate-200 bg-white',
       badge: 'bg-slate-100 text-slate-600',
       dot: 'bg-slate-400',
@@ -48,7 +54,7 @@ function nodePresentation(
   const cancelled = attempts.some((execution) => execution.status === 'CANCELLED')
   const unlocked =
     routingReleased === true &&
-    operation.prerequisiteOperationIds.every((id) => completedIds.has(id))
+    dependencies.every((id) => completedIds.has(id))
 
   if (completed) {
     return {
@@ -107,7 +113,7 @@ export function RoutingFlowView({
     const levels = new Map<number, number>()
 
     for (const operation of sortedOperations) {
-      const prerequisiteLevels = operation.prerequisiteOperationIds
+      const prerequisiteLevels = prerequisiteIds(operation)
         .map((id) => levels.get(id))
         .filter((level): level is number => level !== undefined)
       levels.set(
@@ -193,7 +199,7 @@ export function RoutingFlowView({
             const target = layout.positions.get(operation.id)
             if (!target) return []
 
-            return operation.prerequisiteOperationIds.map((prerequisiteId) => {
+            return prerequisiteIds(operation).map((prerequisiteId) => {
               const source = layout.positions.get(prerequisiteId)
               if (!source) return null
 
@@ -228,7 +234,7 @@ export function RoutingFlowView({
             routingReleased,
           )
           const selected = selectedOperationId === operation.id
-          const prerequisites = operation.prerequisiteOperationIds
+          const prerequisites = prerequisiteIds(operation)
             .map((id) => layout.byId.get(id))
             .filter((item): item is RoutingOperationDto => Boolean(item))
           const pendingPrerequisites = prerequisites.filter(
