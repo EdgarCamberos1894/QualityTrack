@@ -159,13 +159,12 @@ button:disabled {
   body.printing-job-case .job-case-print-area {
     position: absolute !important;
     inset: 0 auto auto 0 !important;
-    display: flex !important;
+    display: block !important;
     min-height: 0 !important;
     width: 100% !important;
     max-width: none !important;
-    flex-direction: column !important;
     margin: 0 !important;
-    padding: 10mm 11mm 8mm !important;
+    padding: 10mm 11mm 0 !important;
     border: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
@@ -217,7 +216,8 @@ button:disabled {
   }
 
   body.printing-job-case .job-case-print-annexes {
-    margin-top: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   body.printing-job-case .job-case-annex-page {
@@ -231,7 +231,14 @@ button:disabled {
     page-break-before: always;
     break-inside: avoid;
     page-break-inside: avoid;
+    break-after: auto;
+    page-break-after: auto;
     background: #fff !important;
+  }
+
+  body.printing-job-case .job-case-annex-page:last-child {
+    break-after: avoid-page !important;
+    page-break-after: avoid !important;
   }
 
   body.printing-job-case .job-case-annex-content {
