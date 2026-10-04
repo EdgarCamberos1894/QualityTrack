@@ -40,6 +40,7 @@ export function ProductionRouteList({
   return (
     <div className="divide-y divide-slate-100">
       {operations.map((operation) => {
+        const dependencyIds = operation.prerequisiteOperationIds ?? []
         const attempts = executions
           .filter(
             (execution) => execution.routingOperationId === operation.id,
@@ -54,7 +55,7 @@ export function ProductionRouteList({
         const cancelledCount = attempts.filter(
           (execution) => execution.status === 'CANCELLED',
         ).length
-        const pendingDependencies = operation.prerequisiteOperationIds
+        const pendingDependencies = dependencyIds
           .filter((id) => !completedIds.has(id))
           .map((id) => operationById.get(id))
           .filter((item): item is RoutingOperationDto => Boolean(item))
@@ -127,7 +128,7 @@ export function ProductionRouteList({
                   <p className="mt-1 text-[7px] font-medium text-amber-700">
                     Espera: {pendingDependencies.map((item) => item.code).join(' + ')}
                   </p>
-                ) : operation.prerequisiteOperationIds.length === 0 ? (
+                ) : dependencyIds.length === 0 ? (
                   <p className="mt-1 text-[7px] text-emerald-600">
                     Inicio independiente
                   </p>
