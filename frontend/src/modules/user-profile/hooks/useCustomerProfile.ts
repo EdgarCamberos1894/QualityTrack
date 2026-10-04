@@ -29,7 +29,7 @@ export function useCustomerProfileMutations() {
       updateOwnCustomerProfile(payload),
     onSuccess: (profile) => {
       queryClient.setQueryData(customerProfileKeys.detail(), profile)
-      void queryClient.invalidateQueries({ queryKey: ['customer-contexts'] })
+      void queryClient.invalidateQueries({ queryKey: ['customer-portal'] })
     },
   })
 
