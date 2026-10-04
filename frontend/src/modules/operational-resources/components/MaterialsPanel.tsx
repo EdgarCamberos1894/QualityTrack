@@ -27,6 +27,9 @@ export function MaterialsPanel({
   const mutations = useMaterialMutations()
   const [search, setSearch] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
+  const [createdMaterialIdForRetry, setCreatedMaterialIdForRetry] = useState<
+    number | null
+  >(null)
 
   const materials = useMemo(() => query.data ?? [], [query.data])
 
@@ -63,19 +66,44 @@ export function MaterialsPanel({
     )
   }
 
-  const createMaterial = async (values: CreateMaterialFormValues) => {
+  const createMaterial = async (
+    values: CreateMaterialFormValues,
+    technicalSheet: File | null,
+  ) => {
+    let materialId = createdMaterialIdForRetry
+
     try {
-      const created = await mutations.create.mutateAsync({
-        code: values.code.trim(),
-        name: values.name.trim(),
-        specification: values.specification.trim() || undefined,
-        unit: values.unit.trim(),
-      })
-      onSelectMaterial(created.id)
+      if (!materialId) {
+        const created = await mutations.create.mutateAsync({
+          code: values.code.trim(),
+          name: values.name.trim(),
+          specification: values.specification.trim() || undefined,
+          unit: values.unit.trim(),
+        })
+        materialId = created.id
+        setCreatedMaterialIdForRetry(created.id)
+      }
+
+      if (technicalSheet) {
+        await mutations.uploadTechnicalSheet.mutateAsync({
+          materialId,
+          file: technicalSheet,
+        })
+      }
+
+      onSelectMaterial(materialId)
+      setCreatedMaterialIdForRetry(null)
       return true
     } catch {
       return false
     }
+  }
+
+  const closeCreate = () => {
+    mutations.create.reset()
+    mutations.uploadTechnicalSheet.reset()
+    setCreatedMaterialIdForRetry(null)
+    setCreateOpen(false)
   }
 
   return (
@@ -101,6 +129,8 @@ export function MaterialsPanel({
                 className="!h-7 !px-2.5 !text-[8px]"
                 onClick={() => {
                   mutations.create.reset()
+                  mutations.uploadTechnicalSheet.reset()
+                  setCreatedMaterialIdForRetry(null)
                   setCreateOpen(true)
                 }}
               >
@@ -199,12 +229,11 @@ export function MaterialsPanel({
 
       <CreateMaterialDialog
         open={createOpen}
-        submitting={mutations.create.isPending}
-        error={mutations.create.error}
-        onClose={() => {
-          mutations.create.reset()
-          setCreateOpen(false)
-        }}
+        submitting={
+          mutations.create.isPending || mutations.uploadTechnicalSheet.isPending
+        }
+        error={mutations.create.error ?? mutations.uploadTechnicalSheet.error}
+        onClose={closeCreate}
         onSubmit={createMaterial}
       />
     </>
