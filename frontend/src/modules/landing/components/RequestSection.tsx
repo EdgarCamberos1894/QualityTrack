@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { LandingStoryStage } from '../model/landingStory'
+import '../requestSection.css'
 
 interface RequestSectionProps {
   stage: LandingStoryStage
