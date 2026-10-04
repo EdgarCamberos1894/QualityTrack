@@ -122,6 +122,7 @@ public class RoutingService {
         LockedRouting locked = lockWorkOrderThenRouting(routingSheetId);
         RoutingSheet routingSheet = locked.routingSheet();
         RoutingOperation operation;
+        boolean resequenceOperations = Boolean.TRUE.equals(input.resequenceOperations());
 
         try {
             operation = routingSheet.addOperation(
@@ -129,7 +130,8 @@ public class RoutingService {
                     input.code(),
                     input.name(),
                     input.instructions(),
-                    input.estimatedMinutes()
+                    input.estimatedMinutes(),
+                    resequenceOperations
             );
             operation.replacePrerequisites(resolvePrerequisites(
                     routingSheet,
@@ -137,6 +139,7 @@ public class RoutingService {
                     input.prerequisiteOperationIds(),
                     true
             ));
+            routingSheet.validateDependencyOrder();
         } catch (IllegalArgumentException | IllegalStateException exception) {
             conflict(exception.getMessage());
             throw exception;
@@ -158,7 +161,8 @@ public class RoutingService {
                         "sequenceNumber", input.sequenceNumber(),
                         "code", input.code(),
                         "estimatedMinutes", input.estimatedMinutes(),
-                        "prerequisiteOperationIds", prerequisiteIds(operation)
+                        "prerequisiteOperationIds", prerequisiteIds(operation),
+                        "resequenceOperations", resequenceOperations
                 )
         );
 
@@ -190,6 +194,7 @@ public class RoutingService {
         );
         List<Long> previousPrerequisiteIds = prerequisiteIds(previousOperation);
         RoutingOperation operation;
+        boolean resequenceOperations = Boolean.TRUE.equals(input.resequenceOperations());
 
         try {
             operation = routingSheet.updateOperation(
@@ -198,7 +203,8 @@ public class RoutingService {
                     input.code(),
                     input.name(),
                     input.instructions(),
-                    input.estimatedMinutes()
+                    input.estimatedMinutes(),
+                    resequenceOperations
             );
 
             if (input.prerequisiteOperationIds() == null) {
@@ -211,6 +217,7 @@ public class RoutingService {
                         false
                 ));
             }
+            routingSheet.validateDependencyOrder();
         } catch (IllegalArgumentException | IllegalStateException exception) {
             conflict(exception.getMessage());
             throw exception;
@@ -239,7 +246,8 @@ public class RoutingService {
                         "name", input.name(),
                         "instructions", input.instructions(),
                         "estimatedMinutes", input.estimatedMinutes(),
-                        "prerequisiteOperationIds", prerequisiteIds(operation)
+                        "prerequisiteOperationIds", prerequisiteIds(operation),
+                        "resequenceOperations", resequenceOperations
                 )
         );
 
