@@ -21,6 +21,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "jobCase.customerRequest.customer",
             "materialLot",
             "materialLot.material",
+            "material",
             "createdBy"
     })
     @Query("""
@@ -30,7 +31,8 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             left join jobCase.customerRequest request
             left join request.customer customer
             left join document.materialLot materialLot
-            left join materialLot.material material
+            left join materialLot.material lotMaterial
+            left join document.material material
             where document.status = :status
               and (
                     lower(document.name) like :pattern
@@ -40,7 +42,9 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
                     or lower(coalesce(request.requestNumber, '')) like :pattern
                     or lower(coalesce(customer.name, '')) like :pattern
                     or lower(coalesce(materialLot.lotNumber, '')) like :pattern
+                    or lower(coalesce(lotMaterial.code, '')) like :pattern
                     or lower(coalesce(material.code, '')) like :pattern
+                    or lower(coalesce(material.name, '')) like :pattern
                     or exists (
                         select version.id
                         from DocumentVersion version
@@ -63,6 +67,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "jobCase.customerRequest.customer",
             "materialLot",
             "materialLot.material",
+            "material",
             "createdBy",
             "removedBy"
     })
@@ -93,6 +98,7 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             "jobCase",
             "jobCase.customerRequest",
             "jobCase.customerRequest.customer",
+            "material",
             "createdBy"
     })
     @Query("""
@@ -167,6 +173,22 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
             Long materialLotId,
             String documentType,
             DocumentStatus status
+    );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            select d
+            from Document d
+            join fetch d.material material
+            join fetch d.createdBy
+            where material.id = :materialId
+              and d.documentType = :documentType
+              and d.status = :status
+            """)
+    Optional<Document> findByMaterialAndTypeAndStatusForUpdate(
+            @Param("materialId") Long materialId,
+            @Param("documentType") String documentType,
+            @Param("status") DocumentStatus status
     );
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
