@@ -33,7 +33,11 @@ import {
   InternalCustomersPage,
 } from '@/modules/internal-customers'
 import { InternalUsersPage } from '@/modules/internal-users'
-import { OperationalResourcesPage } from '@/modules/operational-resources'
+import {
+  MachinesPage,
+  MaterialsPage,
+  OperationalResourcesPage,
+} from '@/modules/operational-resources'
 import {
   CustomerQuotationDetailPage,
   CustomerQuotationsPage,
@@ -94,6 +98,8 @@ export const router = createBrowserRouter([
                 element: <WorkOrderDetailPage />,
               },
               { path: '/production', element: <ProductionPage /> },
+              { path: '/machines', element: <MachinesPage /> },
+              { path: '/materials', element: <MaterialsPage /> },
               { path: '/resources', element: <OperationalResourcesPage /> },
               { path: '/quality', element: <QualityPage /> },
               { path: '/deliveries', element: <DeliveriesPage /> },
