@@ -91,7 +91,6 @@ class TraceabilityServiceTest {
     void returnsNewestTimelinePageWithOpaqueCursor() {
         Instant newestAt = Instant.parse("2026-10-01T18:00:00Z");
         stubEvent(newestEvent, 20L, newestAt, TraceabilityEventType.JOB_CASE_REVIEW_STARTED);
-        stubEvent(olderEvent, 19L, Instant.parse("2026-10-01T17:00:00Z"), TraceabilityEventType.JOB_CASE_CREATED);
 
         when(traceabilityEventRepository
                 .findByJobCase_IdOrderByOccurredAtDescIdDesc(
