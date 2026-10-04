@@ -24,6 +24,6 @@ jobs:
           java-version: '17'
           cache: maven
       - name: Compile
-        run: ./mvnw -DskipTests compile
+        run: mvn -DskipTests compile
       - name: Production workflow tests
-        run: ./mvnw -Dtest=ProductionWorkflowServiceTest test
+        run: mvn -Dtest=ProductionWorkflowServiceTest test
