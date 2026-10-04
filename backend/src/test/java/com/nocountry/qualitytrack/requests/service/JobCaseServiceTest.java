@@ -176,6 +176,8 @@ class JobCaseServiceTest {
         when(traceabilityService.timeline(12L, 20, null)).thenReturn(page);
         when(traceabilityActionResolver.resolve(traceabilityEventResponse))
                 .thenReturn(List.of());
+        when(traceabilityEventResponse.withActions(List.of()))
+                .thenReturn(traceabilityEventResponse);
 
         var response = service.timeline(10L, 12L, 20, null);
 
