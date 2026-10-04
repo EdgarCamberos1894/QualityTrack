@@ -4,8 +4,10 @@ import com.nocountry.qualitytrack.auth.security.CurrentUserId;
 import com.nocountry.qualitytrack.shared.response.ApiResponse;
 import com.nocountry.qualitytrack.shared.response.ApiSuccessCode;
 import com.nocountry.qualitytrack.users.documentation.InternalUserManagementApiDocs;
+import com.nocountry.qualitytrack.users.dto.request.ChangeOwnPasswordRequest;
 import com.nocountry.qualitytrack.users.dto.request.UpdateInternalUserRolesRequest;
 import com.nocountry.qualitytrack.users.dto.request.UpdateInternalUserStatusRequest;
+import com.nocountry.qualitytrack.users.dto.request.UpdateOwnProfileRequest;
 import com.nocountry.qualitytrack.users.dto.response.InternalUserResponse;
 import com.nocountry.qualitytrack.users.service.InternalUserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +31,54 @@ import java.util.List;
 public class InternalUserController {
 
     private final InternalUserService internalUserService;
+
+    @GetMapping("/me")
+    @Operation(
+            summary = "Consultar mi perfil interno",
+            description = "Devuelve los datos personales, estado y roles de la cuenta interna autenticada."
+    )
+    public ResponseEntity<ApiResponse<InternalUserResponse>> getOwnProfile(
+            @CurrentUserId Long currentUserId
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.INTERNAL_PROFILE_RETRIEVED,
+                "Perfil consultado correctamente.",
+                internalUserService.getOwnProfile(currentUserId)
+        ));
+    }
+
+    @PutMapping("/me")
+    @Operation(
+            summary = "Actualizar mi perfil interno",
+            description = "Permite modificar únicamente nombre y apellido. El correo, estado y roles no pueden modificarse desde el perfil propio."
+    )
+    public ResponseEntity<ApiResponse<InternalUserResponse>> updateOwnProfile(
+            @CurrentUserId Long currentUserId,
+            @Valid @RequestBody UpdateOwnProfileRequest request
+    ) {
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.INTERNAL_PROFILE_UPDATED,
+                "Perfil actualizado correctamente.",
+                internalUserService.updateOwnProfile(currentUserId, request)
+        ));
+    }
+
+    @PutMapping("/me/password")
+    @Operation(
+            summary = "Cambiar mi contraseña",
+            description = "Cambia la contraseña de la cuenta interna autenticada después de validar la contraseña actual."
+    )
+    public ResponseEntity<ApiResponse<Void>> changeOwnPassword(
+            @CurrentUserId Long currentUserId,
+            @Valid @RequestBody ChangeOwnPasswordRequest request
+    ) {
+        internalUserService.changeOwnPassword(currentUserId, request);
+        return ResponseEntity.ok(ApiResponse.success(
+                ApiSuccessCode.INTERNAL_PASSWORD_UPDATED,
+                "Contraseña actualizada correctamente.",
+                null
+        ));
+    }
 
     @GetMapping
     @Operation(
