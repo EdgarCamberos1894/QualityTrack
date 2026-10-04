@@ -45,11 +45,15 @@ class InternalUserServiceTest {
 
     @BeforeEach
     void setUp() {
+        OwnAccountService ownAccountService = new OwnAccountService(
+                userRepository,
+                passwordEncoder,
+                tokenCleanupService
+        );
         service = new InternalUserService(
                 userRepository,
                 roleRepository,
-                passwordEncoder,
-                tokenCleanupService
+                ownAccountService
         );
     }
 
@@ -63,7 +67,7 @@ class InternalUserServiceTest {
 
         var response = service.updateOwnProfile(
                 1L,
-                new UpdateOwnProfileRequest("Edgar Ulises", "Camberos Arreola")
+                new UpdateOwnProfileRequest("  edgar   ulises ", "CAMBEROS arreola")
         );
 
         assertEquals("Edgar Ulises", response.firstName());
