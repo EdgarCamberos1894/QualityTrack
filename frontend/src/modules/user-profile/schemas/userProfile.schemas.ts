@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const internalProfileSchema = z.object({
+export const ownProfileSchema = z.object({
   firstName: z
     .string()
     .trim()
@@ -12,6 +12,8 @@ export const internalProfileSchema = z.object({
     .min(1, 'El apellido es obligatorio.')
     .max(100, 'El apellido no puede exceder los 100 caracteres.'),
 })
+
+export const internalProfileSchema = ownProfileSchema
 
 export const changePasswordSchema = z
   .object({
@@ -28,5 +30,6 @@ export const changePasswordSchema = z
     path: ['confirmPassword'],
   })
 
-export type InternalProfileFormValues = z.infer<typeof internalProfileSchema>
+export type OwnProfileFormValues = z.infer<typeof ownProfileSchema>
+export type InternalProfileFormValues = OwnProfileFormValues
 export type ChangePasswordFormValues = z.infer<typeof changePasswordSchema>
