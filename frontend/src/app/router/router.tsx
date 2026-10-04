@@ -44,7 +44,7 @@ import {
   QuotationDetailPage,
   QuotationsPage,
 } from '@/modules/quotations'
-import { InternalProfilePage } from '@/modules/user-profile'
+import { CustomerProfilePage, InternalProfilePage } from '@/modules/user-profile'
 import {
   DeliveriesPage,
   ProductionPage,
@@ -126,6 +126,10 @@ export const router = createBrowserRouter([
               {
                 path: '/portal/:customerId',
                 element: <CustomerPortalHomePage />,
+              },
+              {
+                path: '/portal/:customerId/profile',
+                element: <CustomerProfilePage />,
               },
               {
                 path: '/portal/:customerId/requests',
