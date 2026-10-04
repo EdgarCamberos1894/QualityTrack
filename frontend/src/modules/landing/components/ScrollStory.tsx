@@ -66,6 +66,9 @@ export function ScrollStory() {
             <filter id="qtHeroTraceGlow" x="-40%" y="-40%" width="180%" height="180%">
               <feGaussianBlur stdDeviation="7" />
             </filter>
+            <filter id="qtHeroTravelerGlow" x="-200%" y="-200%" width="500%" height="500%">
+              <feGaussianBlur stdDeviation="5" />
+            </filter>
           </defs>
           <path
             d="M 22 252 C 178 252, 205 94, 392 110 S 565 182, 698 118"
@@ -81,7 +84,42 @@ export function ScrollStory() {
             stroke="url(#qtHeroTrace)"
             strokeWidth="1.5"
             strokeDasharray="8 10"
-          />
+          >
+            {!reducedMotion ? (
+              <animate
+                attributeName="stroke-dashoffset"
+                from="0"
+                to="-180"
+                dur="7s"
+                repeatCount="indefinite"
+              />
+            ) : null}
+          </path>
+
+          {!reducedMotion ? (
+            <>
+              <circle
+                r="10"
+                fill="#67e8f9"
+                opacity="0.16"
+                filter="url(#qtHeroTravelerGlow)"
+              >
+                <animateMotion
+                  dur="5.2s"
+                  repeatCount="indefinite"
+                  path="M 22 252 C 178 252, 205 94, 392 110 S 565 182, 698 118"
+                />
+              </circle>
+              <circle r="3.5" fill="#a5f3fc" opacity="0.95">
+                <animateMotion
+                  dur="5.2s"
+                  repeatCount="indefinite"
+                  path="M 22 252 C 178 252, 205 94, 392 110 S 565 182, 698 118"
+                />
+              </circle>
+            </>
+          ) : null}
+
           <circle cx="395" cy="110" r="4" fill="#67e8f9" className="animate-pulse" />
           <circle cx="698" cy="118" r="3" fill="#93c5fd" className="animate-pulse" />
         </svg>
@@ -94,7 +132,7 @@ export function ScrollStory() {
         </div>
       </div>
 
-      <div className="pointer-events-none absolute left-[58%] top-[64%] z-[12] hidden w-[264px] lg:block xl:left-[60%] xl:top-[63%]">
+      <div className="pointer-events-none absolute left-[54%] top-[70%] z-[12] hidden w-[252px] lg:block xl:left-[56%] xl:top-[69%]">
         <div className="relative overflow-hidden rounded-2xl border border-cyan-300/15 bg-slate-950/55 px-4 py-3.5 shadow-[0_24px_80px_-32px_rgba(14,165,233,0.8)] backdrop-blur-xl">
           <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-cyan-300/70 to-transparent" />
           <div className="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-cyan-400/10 blur-2xl" />
