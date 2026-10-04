@@ -12,6 +12,7 @@ import type {
   RoutingOperationFormValues,
 } from '../schemas/workOrderPreparation.schemas'
 import { ReopenRoutingDialog } from './ReopenRoutingDialog'
+import { RoutingFlowView } from './RoutingFlowView'
 import { RoutingOperationDialog } from './RoutingOperationDialog'
 import { RoutingOperationsList } from './RoutingOperationsList'
 
@@ -74,6 +75,7 @@ export function WorkOrderRoutingCard({
   const [operation, setOperation] = useState<RoutingOperationDto | null>(null)
   const [operationDialogOpen, setOperationDialogOpen] = useState(false)
   const [reopenDialogOpen, setReopenDialogOpen] = useState(false)
+  const [viewMode, setViewMode] = useState<'flow' | 'list'>('flow')
 
   const nextSequence = useMemo(() => {
     if (!routing || routing.operations.length === 0) return 1
@@ -193,13 +195,54 @@ export function WorkOrderRoutingCard({
           </p>
         ) : null}
 
-        <RoutingOperationsList
-          operations={routing.operations}
-          editable={editable}
-          removing={pending.operation}
-          onEdit={openEditOperation}
-          onRemove={onRemove}
-        />
+        {routing.operations.length > 0 ? (
+          <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[8px] font-semibold text-slate-800">
+                Flujo de fabricación
+              </p>
+              <p className="mt-0.5 text-[7px] text-slate-400">
+                Las conexiones muestran qué operaciones deben terminar antes de habilitar la siguiente.
+              </p>
+            </div>
+            <div className="inline-flex w-fit rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+              <button
+                type="button"
+                onClick={() => setViewMode('flow')}
+                className={
+                  viewMode === 'flow'
+                    ? 'rounded-md bg-white px-2.5 py-1.5 text-[7.5px] font-semibold text-blue-700 shadow-sm'
+                    : 'rounded-md px-2.5 py-1.5 text-[7.5px] font-semibold text-slate-500 hover:text-slate-800'
+                }
+              >
+                Flujo
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('list')}
+                className={
+                  viewMode === 'list'
+                    ? 'rounded-md bg-white px-2.5 py-1.5 text-[7.5px] font-semibold text-blue-700 shadow-sm'
+                    : 'rounded-md px-2.5 py-1.5 text-[7.5px] font-semibold text-slate-500 hover:text-slate-800'
+                }
+              >
+                Lista
+              </button>
+            </div>
+          </div>
+        ) : null}
+
+        {viewMode === 'flow' && routing.operations.length > 0 ? (
+          <RoutingFlowView operations={routing.operations} />
+        ) : (
+          <RoutingOperationsList
+            operations={routing.operations}
+            editable={editable}
+            removing={pending.operation}
+            onEdit={openEditOperation}
+            onRemove={onRemove}
+          />
+        )}
 
         {routing.status === 'DRAFT' ? (
           <div className="mt-3 flex flex-col gap-2.5 rounded-lg border border-amber-200 bg-amber-50/65 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
@@ -208,7 +251,7 @@ export function WorkOrderRoutingCard({
                 Revisión en preparación
               </p>
               <p className="mt-0.5 text-[8px] leading-4 text-amber-700">
-                Aprobar congela operaciones y versiones documentales fijadas.
+                Aprobar congela operaciones, dependencias y versiones documentales fijadas.
               </p>
             </div>
             {canDesign ? (
@@ -276,6 +319,7 @@ export function WorkOrderRoutingCard({
       <RoutingOperationDialog
         open={operationDialogOpen}
         operation={operation ?? undefined}
+        operations={routing.operations}
         nextSequence={nextSequence}
         submitting={pending.operation}
         error={error}
