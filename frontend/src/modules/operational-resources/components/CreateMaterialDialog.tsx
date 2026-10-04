@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Button } from '@/shared/components/ui/Button'
@@ -9,12 +10,17 @@ import {
   type CreateMaterialFormValues,
 } from '../schemas/resource.schemas'
 
+const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024
+
 interface CreateMaterialDialogProps {
   open: boolean
   submitting: boolean
   error: unknown
   onClose: () => void
-  onSubmit: (values: CreateMaterialFormValues) => Promise<boolean>
+  onSubmit: (
+    values: CreateMaterialFormValues,
+    technicalSheet: File | null,
+  ) => Promise<boolean>
 }
 
 export function CreateMaterialDialog({
@@ -24,6 +30,8 @@ export function CreateMaterialDialog({
   onClose,
   onSubmit,
 }: CreateMaterialDialogProps) {
+  const [technicalSheet, setTechnicalSheet] = useState<File | null>(null)
+  const [fileError, setFileError] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
@@ -36,14 +44,20 @@ export function CreateMaterialDialog({
 
   if (!open) return null
 
-  const close = () => {
+  const clear = () => {
     reset()
+    setTechnicalSheet(null)
+    setFileError(null)
+  }
+
+  const close = () => {
+    clear()
     onClose()
   }
 
   const submit = handleSubmit(async (values) => {
-    if (await onSubmit(values)) {
-      reset()
+    if (await onSubmit(values, technicalSheet)) {
+      clear()
       onClose()
     }
   })
@@ -54,12 +68,12 @@ export function CreateMaterialDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-material-title"
-        className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+        className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-2xl"
         onSubmit={(event) => void submit(event)}
       >
         <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/60 px-4 py-3.5">
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-            Recursos · Materiales
+            Materiales
           </p>
           <h2
             id="create-material-title"
@@ -68,7 +82,7 @@ export function CreateMaterialDialog({
             Registrar material
           </h2>
           <p className="mt-1 text-[9px] leading-4 text-slate-500">
-            Crea la referencia base. Las entradas físicas se registran después como lotes.
+            Crea la referencia base y, si ya la tienes, adjunta su ficha técnica en el mismo registro.
           </p>
         </div>
 
@@ -118,6 +132,46 @@ export function CreateMaterialDialog({
             />
           </div>
 
+          <div className="sm:col-span-2 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[9px] font-semibold text-slate-800">
+                  Ficha técnica o documento de referencia
+                </p>
+                <p className="mt-0.5 text-[7px] leading-3.5 text-slate-500">
+                  Opcional. Se adjuntará automáticamente al material al registrarlo. Máximo 25 MB.
+                </p>
+              </div>
+              <label className="inline-flex h-7 cursor-pointer items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 text-[8px] font-semibold text-slate-700 transition hover:bg-slate-50">
+                {technicalSheet ? 'Cambiar archivo' : 'Seleccionar archivo'}
+                <input
+                  type="file"
+                  className="sr-only"
+                  disabled={submitting}
+                  onChange={(event) => {
+                    const file = event.target.files?.[0] ?? null
+                    if (file && file.size > MAX_FILE_SIZE_BYTES) {
+                      setTechnicalSheet(null)
+                      setFileError('El archivo no puede superar 25 MB.')
+                      event.target.value = ''
+                      return
+                    }
+                    setTechnicalSheet(file)
+                    setFileError(null)
+                  }}
+                />
+              </label>
+            </div>
+            {technicalSheet ? (
+              <p className="mt-2 truncate text-[8px] font-medium text-blue-700">
+                {technicalSheet.name}
+              </p>
+            ) : null}
+            {fileError ? (
+              <p className="mt-2 text-[8px] text-red-700">{fileError}</p>
+            ) : null}
+          </div>
+
           {error ? (
             <p
               role="alert"
@@ -140,9 +194,9 @@ export function CreateMaterialDialog({
           <Button
             type="submit"
             className="!h-7 !px-2.5 !text-[8px]"
-            disabled={submitting}
+            disabled={submitting || Boolean(fileError)}
           >
-            {submitting ? 'Registrando…' : 'Registrar material'}
+            {submitting ? 'Guardando…' : 'Registrar material'}
           </Button>
         </div>
       </form>
