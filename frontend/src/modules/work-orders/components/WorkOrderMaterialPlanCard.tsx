@@ -210,7 +210,7 @@ export function WorkOrderMaterialPlanCard({
 
       {formOpen ? (
         <div className="mt-3 rounded-lg border border-blue-100 bg-blue-50/35 p-3">
-          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_160px]">
+          <div className="grid gap-3 sm:grid-cols-[minmax(260px,420px)_160px] sm:justify-start">
             <div>
               <label
                 htmlFor="planned-material"
