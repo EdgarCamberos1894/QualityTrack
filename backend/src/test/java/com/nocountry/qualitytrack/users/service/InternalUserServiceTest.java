@@ -1,9 +1,12 @@
 package com.nocountry.qualitytrack.users.service;
 
+import com.nocountry.qualitytrack.auth.service.TokenCleanupService;
 import com.nocountry.qualitytrack.shared.exception.ApiErrorCode;
 import com.nocountry.qualitytrack.shared.exception.BusinessException;
+import com.nocountry.qualitytrack.users.dto.request.ChangeOwnPasswordRequest;
 import com.nocountry.qualitytrack.users.dto.request.UpdateInternalUserRolesRequest;
 import com.nocountry.qualitytrack.users.dto.request.UpdateInternalUserStatusRequest;
+import com.nocountry.qualitytrack.users.dto.request.UpdateOwnProfileRequest;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.users.entity.UserSystemRole;
 import com.nocountry.qualitytrack.users.enums.AccountType;
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -34,12 +38,72 @@ class InternalUserServiceTest {
 
     @Mock private UserRepository userRepository;
     @Mock private UserSystemRoleRepository roleRepository;
+    @Mock private PasswordEncoder passwordEncoder;
+    @Mock private TokenCleanupService tokenCleanupService;
 
     private InternalUserService service;
 
     @BeforeEach
     void setUp() {
-        service = new InternalUserService(userRepository, roleRepository);
+        service = new InternalUserService(
+                userRepository,
+                roleRepository,
+                passwordEncoder,
+                tokenCleanupService
+        );
+    }
+
+    @Test
+    void activeInternalUserCanUpdateOwnProfile() {
+        User user = internal("Edgar", "Camberos", "edgar@qualitytrack.local", 1L);
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(user));
+        when(roleRepository.findAllByIdUserId(1L)).thenReturn(List.of(
+                new UserSystemRole(user, SystemRole.PRODUCTION, user)
+        ));
+
+        var response = service.updateOwnProfile(
+                1L,
+                new UpdateOwnProfileRequest("Edgar Ulises", "Camberos Arreola")
+        );
+
+        assertEquals("Edgar Ulises", response.firstName());
+        assertEquals("Camberos Arreola", response.lastName());
+        verify(userRepository).saveAndFlush(user);
+    }
+
+    @Test
+    void passwordChangeRejectsWrongCurrentPassword() {
+        User user = internal("Edgar", "Camberos", "edgar@qualitytrack.local", 1L);
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("incorrecta", "hash")).thenReturn(false);
+
+        BusinessException exception = assertThrows(
+                BusinessException.class,
+                () -> service.changeOwnPassword(
+                        1L,
+                        new ChangeOwnPasswordRequest("incorrecta", "NuevaClave123")
+                )
+        );
+
+        assertEquals(ApiErrorCode.INVALID_CREDENTIALS, exception.getCode());
+    }
+
+    @Test
+    void activeInternalUserCanChangeOwnPassword() {
+        User user = internal("Edgar", "Camberos", "edgar@qualitytrack.local", 1L);
+        when(userRepository.findByIdForUpdate(1L)).thenReturn(Optional.of(user));
+        when(passwordEncoder.matches("actual123", "hash")).thenReturn(true);
+        when(passwordEncoder.matches("NuevaClave123", "hash")).thenReturn(false);
+        when(passwordEncoder.encode("NuevaClave123")).thenReturn("new-hash");
+
+        service.changeOwnPassword(
+                1L,
+                new ChangeOwnPasswordRequest("actual123", "NuevaClave123")
+        );
+
+        assertEquals("new-hash", user.getPasswordHash());
+        verify(userRepository).saveAndFlush(user);
+        verify(tokenCleanupService).deletePasswordResetToken(1L);
     }
 
     @Test
