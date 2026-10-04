@@ -1,6 +1,3 @@
-import { LandingAudiences } from '../components/LandingAudiences'
-import { LandingCapabilities } from '../components/LandingCapabilities'
-import { LandingFinalCta } from '../components/LandingFinalCta'
 import { LandingHeader } from '../components/LandingHeader'
 import { ScrollStory } from '../components/ScrollStory'
 import '../landing.css'
@@ -11,9 +8,6 @@ export function LandingPage() {
       <LandingHeader />
       <main>
         <ScrollStory />
-        <LandingCapabilities />
-        <LandingAudiences />
-        <LandingFinalCta />
       </main>
     </div>
   )
