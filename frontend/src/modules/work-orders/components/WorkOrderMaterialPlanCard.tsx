@@ -223,7 +223,7 @@ export function WorkOrderMaterialPlanCard({
                 value={materialId}
                 disabled={editingPlan !== null || materialsQuery.isLoading}
                 onChange={(event) => setMaterialId(event.target.value)}
-                className="h-8 w-full rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] text-slate-950 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100"
+                className="h-8 w-full rounded-lg border border-slate-300 bg-white px-2.5 text-[9px] font-normal text-slate-950 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 [&>option]:text-[9px]"
               >
                 <option value="">Selecciona un material</option>
                 {(materialsQuery.data ?? []).map((material) => (
