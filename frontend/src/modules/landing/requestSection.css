@@ -1,0 +1,59 @@
+.qt-request-card {
+  transform: perspective(1200px) rotateY(-3.5deg) rotateX(1.2deg);
+  transform-origin: 50% 50%;
+}
+
+.qt-request-document {
+  transform: perspective(900px) rotateY(7deg) rotateZ(-2.5deg);
+}
+
+.qt-request-result {
+  animation: qt-request-float 5.4s ease-in-out infinite;
+}
+
+.qt-intro-exit-pulse,
+.qt-request-exit-pulse {
+  animation: qt-trace-drop 2.8s linear infinite;
+}
+
+@keyframes qt-request-float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -5px;
+  }
+}
+
+@keyframes qt-trace-drop {
+  0% {
+    translate: 0 0;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    translate: 0 112px;
+    opacity: 0;
+  }
+}
+
+@media (max-width: 1023px) {
+  .qt-request-card,
+  .qt-request-document {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qt-request-result,
+  .qt-intro-exit-pulse,
+  .qt-request-exit-pulse {
+    animation: none;
+  }
+}
