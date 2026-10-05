@@ -1,12 +1,11 @@
 import { useNavigate, useParams } from 'react-router-dom'
-import { JobCaseTable } from '@/modules/job-cases'
-import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { CompactBackButton } from '@/shared/components/navigation/CompactBackButton'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge } from '@/shared/components/ui/Badge'
+import { InternalCustomerCasesPanel } from '../components/InternalCustomerCasesPanel'
 import { InternalCustomerMembers } from '../components/InternalCustomerMembers'
 import { useInternalCustomer } from '../hooks/useInternalCustomers'
 import {
@@ -188,32 +187,7 @@ export function InternalCustomerDetailPage() {
         <InternalCustomerMembers members={members} />
       </div>
 
-      <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
-        <div className="flex items-center justify-between gap-4 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/55 px-4 py-3 sm:px-5">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Flujo comercial
-            </p>
-            <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
-              Expedientes de la empresa
-            </h2>
-          </div>
-          <span className="text-[8px] font-medium text-slate-400">
-            {jobCases.length} en total
-          </span>
-        </div>
-
-        {jobCases.length > 0 ? (
-          <JobCaseTable jobCases={jobCases} />
-        ) : (
-          <div className="bg-slate-50/35 p-4">
-            <EmptyState
-              title="Sin expedientes"
-              description="Esta empresa todavía no tiene solicitudes convertidas en expediente."
-            />
-          </div>
-        )}
-      </section>
+      <InternalCustomerCasesPanel jobCases={jobCases} />
     </PageContainer>
   )
 }
