@@ -42,6 +42,7 @@ export function LoginPage() {
         </span>
       }
       immersive
+      lockViewport
     >
       <LoginForm
         onAuthenticated={() => navigate(destination, { replace: true })}
