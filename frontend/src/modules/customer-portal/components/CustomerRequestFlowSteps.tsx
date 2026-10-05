@@ -51,16 +51,16 @@ export function CustomerRequestFlowSteps({
 
   const stepHrefs: Partial<Record<number, string>> = {}
   const stepDetails: Partial<Record<number, string>> = {
-    0: 'Origen del trabajo',
+    0: 'Solicitud de origen',
     2: 'Preparación interna',
     3: 'Fabricación',
     4: 'Inspección',
-    5: deliveryProgress ? 'Seguimiento visible abajo' : 'Cierre del trabajo',
+    5: deliveryProgress ? 'Seguimiento visible abajo' : 'Cierre de la solicitud',
   }
 
   if (relatedQuotation) {
     stepHrefs[1] = `/portal/${customer.customerId}/quotations/${relatedQuotation.id}`
-    stepDetails[1] = 'Abrir propuesta'
+    stepDetails[1] = 'Abrir cotización'
   } else {
     stepDetails[1] = 'Propuesta comercial'
   }
@@ -71,6 +71,7 @@ export function CustomerRequestFlowSteps({
       cancelled={status === 'CANCELLED'}
       deliveryComplete={deliveryProgress === 'DELIVERED'}
       variant={variant}
+      heading="Seguimiento de la solicitud"
       stepHrefs={stepHrefs}
       stepDetails={stepDetails}
     />
