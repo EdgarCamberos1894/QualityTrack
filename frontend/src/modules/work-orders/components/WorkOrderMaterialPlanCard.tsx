@@ -6,6 +6,7 @@ import {
   useWorkOrderMaterialPlans,
   type WorkOrderMaterialPlanDto,
 } from '@/modules/materials'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Button } from '@/shared/components/ui/Button'
 import { TextField } from '@/shared/components/ui/TextField'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -37,6 +38,7 @@ export function WorkOrderMaterialPlanCard({
   const [formOpen, setFormOpen] = useState(false)
   const [editingPlan, setEditingPlan] =
     useState<WorkOrderMaterialPlanDto | null>(null)
+  const [removeCandidateId, setRemoveCandidateId] = useState<number | null>(null)
   const [materialId, setMaterialId] = useState('')
   const [plannedQuantity, setPlannedQuantity] = useState('')
   const [validationError, setValidationError] = useState<string | null>(null)
@@ -110,16 +112,9 @@ export function WorkOrderMaterialPlanCard({
   }
 
   const remove = async (plan: WorkOrderMaterialPlanDto) => {
-    if (
-      !window.confirm(
-        `¿Quitar ${plan.materialCode} del material previsto para esta orden?`,
-      )
-    ) {
-      return
-    }
-
     try {
       await mutations.remove.mutateAsync(plan.id)
+      setRemoveCandidateId(null)
       if (editingPlan?.id === plan.id) closeForm()
     } catch {
       // The normalized request error is rendered below.
@@ -183,24 +178,43 @@ export function WorkOrderMaterialPlanCard({
               </div>
 
               {canEdit ? (
-                <div className="flex gap-1.5">
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="!h-7 !px-2.5 !text-[7.5px]"
+                <div className="flex items-center gap-1.5">
+                  <ActionIconButton
+                    icon="edit"
+                    label={`Editar material previsto ${plan.materialCode}`}
+                    tone="primary"
                     onClick={() => openEdit(plan)}
-                  >
-                    Editar
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="!h-7 !px-2.5 !text-[7.5px]"
-                    disabled={mutations.remove.isPending}
-                    onClick={() => void remove(plan)}
-                  >
-                    Quitar
-                  </Button>
+                  />
+                  {removeCandidateId === plan.id ? (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        className="!h-[26px] !px-2 !text-[7.5px]"
+                        disabled={mutations.remove.isPending}
+                        onClick={() => void remove(plan)}
+                      >
+                        Confirmar
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="!h-[26px] !px-2 !text-[7.5px]"
+                        disabled={mutations.remove.isPending}
+                        onClick={() => setRemoveCandidateId(null)}
+                      >
+                        Cancelar
+                      </Button>
+                    </>
+                  ) : (
+                    <ActionIconButton
+                      icon="delete"
+                      label={`Quitar material previsto ${plan.materialCode}`}
+                      tone="danger"
+                      disabled={mutations.remove.isPending}
+                      onClick={() => setRemoveCandidateId(plan.id)}
+                    />
+                  )}
                 </div>
               ) : null}
             </article>
