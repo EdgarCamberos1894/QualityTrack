@@ -1,5 +1,5 @@
 import { lerp, segment, type Vec3 } from './math'
-import { ScenePainter } from './webgl'
+import type { ScenePainter } from './webgl'
 import type { SceneFrameState } from './sceneDocuments'
 
 const navy: [number, number, number] = [0.045, 0.09, 0.16]
@@ -36,7 +36,8 @@ function drawPlatform(painter: ScenePainter, state: SceneFrameState) {
 
   const packets = 7
   for (let index = 0; index < packets; index += 1) {
-    const travel = (time * (0.08 + idleBlend * 0.06) + index / packets + progress * 0.35) % 1
+    const travel =
+      (time * (0.08 + idleBlend * 0.06) + index / packets + progress * 0.35) % 1
     const x = lerp(-3.6, 6.45, travel)
     painter.draw({
       position: [x, -0.73, 0],
@@ -77,9 +78,11 @@ function partPosition(progress: number): Vec3 {
 function drawWorkpiece(painter: ScenePainter, state: SceneFrameState) {
   const { progress, time, idleBlend, ambientSpin } = state
   const [x, y, z] = partPosition(progress)
-  const production = segment(progress, 0.56, 0.68) * (1 - segment(progress, 0.72, 0.78))
+  const production =
+    segment(progress, 0.56, 0.68) * (1 - segment(progress, 0.72, 0.78))
   const spin = ambientSpin * (0.16 + production * 2.8) + progress * 8
-  const float = (1 - segment(progress, 0.42, 0.5)) * Math.sin(time * 0.9) * 0.075
+  const float =
+    (1 - segment(progress, 0.42, 0.5)) * Math.sin(time * 0.9) * 0.075
   const py = y + float
 
   painter.draw({
@@ -95,7 +98,11 @@ function drawWorkpiece(painter: ScenePainter, state: SceneFrameState) {
     painter.draw({
       position: [x + offset, py, z],
       rotation: [0, spin, Math.PI / 2],
-      scale: [index === 0 || index === 3 ? 0.46 : 0.4, 0.095, index === 0 || index === 3 ? 0.46 : 0.4],
+      scale: [
+        index === 0 || index === 3 ? 0.46 : 0.4,
+        0.095,
+        index === 0 || index === 3 ? 0.46 : 0.4,
+      ],
       color: index % 2 === 0 ? [0.36, 0.49, 0.64] : [0.42, 0.56, 0.7],
       shape: 'cylinder',
     })
@@ -103,7 +110,11 @@ function drawWorkpiece(painter: ScenePainter, state: SceneFrameState) {
 
   const markerAngle = spin + time * 0.35 * idleBlend
   painter.draw({
-    position: [x + 0.05, py + Math.cos(markerAngle) * 0.39, z + Math.sin(markerAngle) * 0.39],
+    position: [
+      x + 0.05,
+      py + Math.cos(markerAngle) * 0.39,
+      z + Math.sin(markerAngle) * 0.39,
+    ],
     scale: [0.21, 0.034, 0.034],
     color: cyan,
     emissive: 1.05,
@@ -116,13 +127,38 @@ function drawMachine(painter: ScenePainter, state: SceneFrameState) {
   const production = segment(progress, 0.55, 0.64)
   const running = production * (1 - segment(progress, 0.73, 0.79))
 
-  painter.draw({ position: [0.12, -0.62, 0], scale: [1.72, 0.18, 1.24], color: navy, alpha: reveal })
-  ;[-1.42, 1.42].forEach((x) => {
-    painter.draw({ position: [x, 0.52, 0.62], scale: [0.18, 1.12, 0.2], color: slate, alpha: reveal })
-    painter.draw({ position: [x, 0.52, -0.62], scale: [0.18, 1.12, 0.2], color: slate, alpha: reveal })
+  painter.draw({
+    position: [0.12, -0.62, 0],
+    scale: [1.72, 0.18, 1.24],
+    color: navy,
+    alpha: reveal,
   })
-  painter.draw({ position: [0.0, 1.64, 0], scale: [1.52, 0.16, 0.78], color: [0.09, 0.18, 0.31], alpha: reveal })
-  painter.draw({ position: [0.0, 0.58, -0.86], scale: [1.5, 0.84, 0.06], color: [0.035, 0.08, 0.13], alpha: reveal * 0.72 })
+  ;[-1.42, 1.42].forEach((x) => {
+    painter.draw({
+      position: [x, 0.52, 0.62],
+      scale: [0.18, 1.12, 0.2],
+      color: slate,
+      alpha: reveal,
+    })
+    painter.draw({
+      position: [x, 0.52, -0.62],
+      scale: [0.18, 1.12, 0.2],
+      color: slate,
+      alpha: reveal,
+    })
+  })
+  painter.draw({
+    position: [0.0, 1.64, 0],
+    scale: [1.52, 0.16, 0.78],
+    color: [0.09, 0.18, 0.31],
+    alpha: reveal,
+  })
+  painter.draw({
+    position: [0.0, 0.58, -0.86],
+    scale: [1.5, 0.84, 0.06],
+    color: [0.035, 0.08, 0.13],
+    alpha: reveal * 0.72,
+  })
 
   const toolPulse = Math.sin(time * 2.5) * 0.035 * idleBlend * running
   const toolY = 1.22 - production * 0.92 + toolPulse
@@ -189,14 +225,30 @@ function drawMachine(painter: ScenePainter, state: SceneFrameState) {
 
 function drawQualityStation(painter: ScenePainter, state: SceneFrameState) {
   const { progress, time, idleBlend } = state
-  const visibility = segment(progress, 0.69, 0.78) * (1 - segment(progress, 0.95, 0.995) * 0.55)
+  const visibility =
+    segment(progress, 0.69, 0.78) * (1 - segment(progress, 0.95, 0.995) * 0.55)
   if (visibility <= 0.01) return
 
   ;[-0.84, 0.84].forEach((z) => {
-    painter.draw({ position: [3.35, 0.55, z], scale: [0.13, 1.22, 0.13], color: [0.08, 0.34, 0.32], alpha: visibility })
+    painter.draw({
+      position: [3.35, 0.55, z],
+      scale: [0.13, 1.22, 0.13],
+      color: [0.08, 0.34, 0.32],
+      alpha: visibility,
+    })
   })
-  painter.draw({ position: [3.35, 1.68, 0], scale: [0.14, 0.14, 0.94], color: [0.08, 0.34, 0.32], alpha: visibility })
-  painter.draw({ position: [3.35, -0.54, 0], scale: [0.88, 0.1, 0.82], color: navy, alpha: visibility })
+  painter.draw({
+    position: [3.35, 1.68, 0],
+    scale: [0.14, 0.14, 0.94],
+    color: [0.08, 0.34, 0.32],
+    alpha: visibility,
+  })
+  painter.draw({
+    position: [3.35, -0.54, 0],
+    scale: [0.88, 0.1, 0.82],
+    color: navy,
+    alpha: visibility,
+  })
 
   const scrollScan = lerp(-0.68, 0.68, segment(progress, 0.75, 0.87))
   const idleScan = Math.sin(time * 1.55) * 0.68
@@ -241,7 +293,12 @@ function drawDeliveryStation(painter: ScenePainter, state: SceneFrameState) {
   const visibility = segment(progress, 0.82, 0.9)
   if (visibility <= 0.01) return
 
-  painter.draw({ position: [5.9, -0.52, 0], scale: [1.52, 0.13, 0.88], color: navy, alpha: visibility })
+  painter.draw({
+    position: [5.9, -0.52, 0],
+    scale: [1.52, 0.13, 0.88],
+    color: navy,
+    alpha: visibility,
+  })
   for (let index = -4; index <= 4; index += 1) {
     painter.draw({
       position: [5.9 + index * 0.3, -0.31, 0],
@@ -296,7 +353,10 @@ function drawCellBeacons(painter: ScenePainter, state: SceneFrameState) {
   })
 }
 
-export function drawFactoryWorld(painter: ScenePainter, state: SceneFrameState) {
+export function drawFactoryWorld(
+  painter: ScenePainter,
+  state: SceneFrameState,
+) {
   drawPlatform(painter, state)
   drawCellBeacons(painter, state)
   drawMachine(painter, state)

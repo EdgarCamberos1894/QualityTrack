@@ -1,4 +1,4 @@
-import { ScenePainter } from './webgl'
+import type { ScenePainter } from './webgl'
 import { drawStoryDocuments, type SceneFrameState } from './sceneDocuments'
 import { drawFactoryWorld } from './sceneFactory'
 

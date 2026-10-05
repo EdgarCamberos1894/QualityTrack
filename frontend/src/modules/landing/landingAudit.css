@@ -1,0 +1,53 @@
+/* Responsive and motion guardrails shared by the complete landing story. */
+@media (max-width: 1023px) {
+  .qt-landing-root #solicitud > .sticky,
+  .qt-landing-root .qt-case-pinned,
+  .qt-landing-root .qt-quote-pinned,
+  .qt-landing-root .qt-work-order-pinned,
+  .qt-landing-root .qt-production-pinned,
+  .qt-landing-root .qt-quality-pinned,
+  .qt-landing-root .qt-delivery-pinned {
+    top: 72px !important;
+    height: calc(100svh - 72px) !important;
+    min-height: calc(100svh - 72px) !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 820px) {
+  .qt-case-pinned > .relative.z-10,
+  .qt-quote-pinned > .relative.z-10,
+  .qt-work-order-pinned > .relative.z-10,
+  .qt-production-pinned > .relative.z-10,
+  .qt-quality-pinned > .relative.z-10,
+  .qt-delivery-pinned > .relative.z-10 {
+    padding-top: 1.25rem !important;
+    padding-bottom: 1.25rem !important;
+  }
+
+  .qt-quote-pinned [class*='lg:min-h-[610px]'] {
+    min-height: min(610px, calc(100svh - 112px)) !important;
+  }
+
+  .qt-case-pinned [class*='lg:min-h-[620px]'],
+  .qt-work-order-pinned [class*='lg:min-h-[620px]'],
+  .qt-quality-pinned [class*='lg:min-h-[620px]'],
+  .qt-delivery-pinned [class*='lg:min-h-[620px]'] {
+    min-height: min(620px, calc(100svh - 112px)) !important;
+  }
+
+  .qt-production-pinned [class*='lg:min-h-[630px]'] {
+    min-height: min(630px, calc(100svh - 112px)) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qt-landing-root *,
+  .qt-landing-root *::before,
+  .qt-landing-root *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

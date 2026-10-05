@@ -20,7 +20,8 @@ export const landingStory: LandingStoryStage[] = [
     description:
       'QualityTrack conecta el trabajo comercial, operativo y de calidad en un solo recorrido. Desplázate y sigue una pieza desde la necesidad del cliente hasta la evidencia de entrega.',
     signal: 'Sistema en vivo',
-    detail: 'Solicitud · Expediente · Cotización · Producción · Calidad · Entrega',
+    detail:
+      'Solicitud · Expediente · Cotización · Producción · Calidad · Entrega',
     side: 'left',
     accent: 'blue',
     hero: true,
@@ -41,11 +42,12 @@ export const landingStory: LandingStoryStage[] = [
     id: 'expediente',
     step: '02',
     eyebrow: 'Expediente 360',
-    title: 'Cada decisión deja rastro mientras el caso avanza.',
+    title:
+      'La solicitud deja de ser un formulario. Se convierte en una historia.',
     description:
-      'La revisión interna, documentos, aclaraciones y eventos se reúnen alrededor del mismo expediente. La trazabilidad acompaña al proceso sin convertirse en otra pantalla aislada.',
+      'Documentos, revisiones, aclaraciones y decisiones crecen alrededor del mismo expediente, sin perder el vínculo con su origen.',
     signal: 'Contexto consolidado',
-    detail: 'Una historia operativa que crece con el trabajo real.',
+    detail: 'Una historia operativa navegable que crece con el trabajo real.',
     side: 'left',
     accent: 'blue',
   },
@@ -53,11 +55,12 @@ export const landingStory: LandingStoryStage[] = [
     id: 'cotizacion',
     step: '03',
     eyebrow: 'Cotización',
-    title: 'La propuesta comercial nace del mismo contexto técnico.',
+    title: 'El contexto técnico se convierte en una decisión comercial.',
     description:
-      'Conceptos, tiempos y ajustes se preparan sin romper la continuidad del caso. El cliente revisa la propuesta y su aprobación habilita el siguiente movimiento.',
+      'Conceptos, cantidades, plazo y condiciones se construyen desde el expediente. La propuesta se revisa y, al aprobarse, libera el siguiente paso de ejecución.',
     signal: 'Cotización aprobada',
-    detail: 'Versiones y ajustes permanecen ligados a la solicitud original.',
+    detail:
+      'Importe, plazo y aprobación permanecen ligados al caso que los originó.',
     side: 'right',
     accent: 'amber',
   },
@@ -77,11 +80,12 @@ export const landingStory: LandingStoryStage[] = [
     id: 'produccion',
     step: '05',
     eyebrow: 'Producción',
-    title: 'La ruta empieza a moverse y la pieza gana historia.',
+    title: 'La ruta deja de ser un plan y empieza a moverse.',
     description:
-      'Las operaciones se inician y completan en secuencia, registrando consumo de material y ejecución. El avance deja de depender de memoria, chats o hojas paralelas.',
+      'La pieza avanza operación por operación mientras QualityTrack conserva lote, material, máquina y progreso dentro de la misma trazabilidad.',
     signal: 'Operación en curso',
-    detail: 'Ejecución, lotes y progreso permanecen conectados a la orden.',
+    detail:
+      'Cada paso deja evidencia y prepara el siguiente sin perder el origen.',
     side: 'right',
     accent: 'blue',
   },
@@ -89,11 +93,12 @@ export const landingStory: LandingStoryStage[] = [
     id: 'calidad',
     step: '06',
     eyebrow: 'Calidad',
-    title: 'La calidad decide el siguiente paso con evidencia.',
+    title: 'La pieza ya existe. Ahora hay que demostrar que cumple.',
     description:
-      'Las inspecciones pueden adaptarse al trabajo real. Mediciones, verificaciones y no conformidades quedan registradas antes de permitir que la pieza continúe.',
+      'Dimensión, acabado y evidencia se verifican sobre la misma pieza. Cada resultado queda ligado al lote antes de liberarla para el siguiente movimiento.',
     signal: 'Inspección conforme',
-    detail: 'Resultados y decisiones quedan dentro de la misma trazabilidad.',
+    detail:
+      'Tres verificaciones, una decisión y la misma trazabilidad de origen.',
     side: 'left',
     accent: 'emerald',
   },
@@ -101,11 +106,11 @@ export const landingStory: LandingStoryStage[] = [
     id: 'entrega',
     step: '07',
     eyebrow: 'Entrega',
-    title: 'El proceso termina completo, no cuando la pieza sale de planta.',
+    title: 'La pieza termina su recorrido. La trazabilidad no.',
     description:
-      'La entrega conserva destino, transportista y evidencia. Al cerrar el caso, QualityTrack puede reconstruir el recorrido completo desde la solicitud hasta el producto entregado.',
+      'Destino, transportista, recepción y evidencia cierran la entrega. Al confirmar el último movimiento, QualityTrack reconstruye el caso completo desde la solicitud hasta el producto recibido.',
     signal: 'Entrega confirmada',
-    detail: 'Una sola línea de tiempo para cliente y equipo interno.',
+    detail: 'Siete etapas, una sola historia y evidencia de principio a fin.',
     side: 'right',
     accent: 'cyan',
   },
@@ -115,19 +120,22 @@ export const operationalCapabilities = [
   {
     title: 'Solicitudes',
     eyebrow: 'Entrada ordenada',
-    description: 'Requisitos, archivos y destino llegan con estructura desde el portal.',
+    description:
+      'Requisitos, archivos y destino llegan con estructura desde el portal.',
     glyph: '01',
   },
   {
     title: 'Expediente 360',
     eyebrow: 'Contexto compartido',
-    description: 'Revisión, documentos y trazabilidad reunidos alrededor del mismo caso.',
+    description:
+      'Revisión, documentos y trazabilidad reunidos alrededor del mismo caso.',
     glyph: '02',
   },
   {
     title: 'Cotizaciones',
     eyebrow: 'Decisión comercial',
-    description: 'Versiones, conceptos, ajustes y aprobación sin perder el origen.',
+    description:
+      'Conceptos, condiciones y aprobación sin perder el origen técnico.',
     glyph: '03',
   },
   {
@@ -139,25 +147,29 @@ export const operationalCapabilities = [
   {
     title: 'Producción',
     eyebrow: 'Ejecución visible',
-    description: 'Operaciones encadenadas, consumo de material y avance en contexto.',
+    description:
+      'Operaciones encadenadas, consumo de material y avance en contexto.',
     glyph: '05',
   },
   {
     title: 'Calidad',
     eyebrow: 'Evidencia antes de avanzar',
-    description: 'Inspecciones flexibles, mediciones y decisiones sobre no conformidades.',
+    description:
+      'Inspecciones flexibles, mediciones y decisiones sobre no conformidades.',
     glyph: '06',
   },
   {
     title: 'Entregas',
     eyebrow: 'Cierre verificable',
-    description: 'Destino, transportista y evidencia forman parte del caso, no un apéndice.',
+    description:
+      'Destino, transportista y evidencia forman parte del caso, no un apéndice.',
     glyph: '07',
   },
   {
     title: 'Trazabilidad',
     eyebrow: 'Hilo transversal',
-    description: 'Los eventos conectan cada etapa para reconstruir qué pasó y cuándo.',
+    description:
+      'Los eventos conectan cada etapa para reconstruir qué pasó y cuándo.',
     glyph: '∞',
   },
 ] as const
