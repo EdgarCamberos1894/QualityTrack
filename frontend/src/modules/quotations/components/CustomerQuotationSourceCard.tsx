@@ -42,7 +42,7 @@ export function CustomerQuotationSourceCard({
           </span>
           <div className="min-w-0">
             <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-blue-600">
-              Origen del trabajo
+              Solicitud de origen
             </p>
             <p className="mt-0.5 text-[9px] font-medium text-slate-500">
               {caseNumber} · {requestNumber}
@@ -56,13 +56,13 @@ export function CustomerQuotationSourceCard({
             className="inline-flex h-7 shrink-0 items-center gap-1.5 rounded-lg border border-blue-100 bg-white px-2.5 text-[8px] font-semibold text-blue-700 transition hover:border-blue-200 hover:bg-blue-50"
           >
             <span aria-hidden="true">←</span>
-            Abrir trabajo
+            Abrir solicitud
           </Link>
         ) : null}
       </div>
 
       <dl className="mt-3 grid gap-x-4 gap-y-2.5 border-t border-blue-100/70 pt-3 sm:grid-cols-2 xl:grid-cols-4">
-        <Item label="Trabajo" value={source.title} />
+        <Item label="Solicitud" value={source.title} />
         <Item label="Cantidad" value={`${source.quantity} piezas`} />
         <Item label="Material" value={material} />
         <Item
