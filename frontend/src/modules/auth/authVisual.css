@@ -46,8 +46,11 @@
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.72);
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(245, 249, 255, 0.965));
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.99),
+    rgba(245, 249, 255, 0.965)
+  );
   box-shadow:
     0 28px 90px -42px rgba(2, 6, 23, 0.9),
     0 0 0 1px rgba(103, 232, 249, 0.035),
@@ -122,19 +125,6 @@
   color: rgb(148 163 184);
 }
 
-.qt-auth-back-link {
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  background: rgba(255, 255, 255, 0.025);
-  color: rgb(148 163 184) !important;
-  backdrop-filter: blur(12px);
-}
-
-.qt-auth-back-link:hover {
-  border-color: rgba(103, 232, 249, 0.2);
-  background: rgba(34, 211, 238, 0.045);
-  color: rgb(207 250 254) !important;
-}
-
 .qt-auth-brand-panel {
   position: relative;
   isolation: isolate;
@@ -160,39 +150,16 @@
 
 .qt-auth-brand-panel::after {
   position: absolute;
-  top: 16%;
-  left: 18%;
+  right: 8%;
+  bottom: 18%;
   z-index: -1;
-  width: 1px;
-  height: 68%;
+  width: 240px;
+  height: 240px;
   content: '';
   pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgba(103, 232, 249, 0.48) 18%,
-    rgba(59, 130, 246, 0.34) 68%,
-    transparent
-  );
-  box-shadow: 0 0 18px rgba(34, 211, 238, 0.12);
-}
-
-.qt-auth-trace-step {
-  position: relative;
-  padding-left: 28px;
-}
-
-.qt-auth-trace-step::before {
-  position: absolute;
-  top: 7px;
-  left: 0;
-  width: 7px;
-  height: 7px;
-  content: '';
-  border: 1px solid rgba(165, 243, 252, 0.5);
   border-radius: 999px;
-  background: #06111d;
-  box-shadow: 0 0 14px rgba(34, 211, 238, 0.24);
+  background: rgba(34, 211, 238, 0.045);
+  filter: blur(72px);
 }
 
 @media (max-width: 1023px) {
