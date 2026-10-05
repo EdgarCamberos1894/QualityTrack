@@ -11,7 +11,7 @@ export function QuotationFlowSteps({
 }: QuotationFlowStepsProps) {
   const stepHrefs: Partial<Record<number, string>> = {}
   const stepDetails: Partial<Record<number, string>> = {
-    0: requestHref ? 'Volver al trabajo' : 'Solicitud de origen',
+    0: requestHref ? 'Volver a la solicitud' : 'Solicitud de origen',
     1: 'Propuesta comercial',
     2: 'Preparación interna',
     3: 'Fabricación',
@@ -24,6 +24,7 @@ export function QuotationFlowSteps({
   return (
     <WorkProgressSteps
       currentStep={currentStep}
+      heading="Seguimiento de la solicitud"
       stepHrefs={stepHrefs}
       stepDetails={stepDetails}
     />
