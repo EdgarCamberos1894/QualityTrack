@@ -33,8 +33,8 @@ export function DeliverySection({ stage, reducedMotion }: DeliverySectionProps) 
 
   useEffect(() => {
     if (reducedMotion) {
-      setScrollProgress(1)
-      return
+      const reducedMotionFrame = window.requestAnimationFrame(() => setScrollProgress(1))
+      return () => window.cancelAnimationFrame(reducedMotionFrame)
     }
 
     let frame = 0
@@ -346,7 +346,7 @@ export function DeliverySection({ stage, reducedMotion }: DeliverySectionProps) 
 
               <div className="absolute inset-0 hidden place-items-center lg:grid" style={{ opacity: closeProgress }}>
                 <div className="relative text-center" style={{ transform: `scale(${0.9 + closeProgress * 0.1})` }}>
-                  <div className={`qt-delivery-close-ring absolute left-1/2 top-1/2 h-[310px] w-[310px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/12 ${reducedMotion ? '' : ''}`} />
+                  <div className="qt-delivery-close-ring absolute left-1/2 top-1/2 h-[310px] w-[310px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-cyan-200/12" />
                   <div className="absolute left-1/2 top-1/2 h-[235px] w-[235px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-emerald-300/10" />
                   <div className="relative z-10 mx-auto grid h-[180px] w-[180px] place-items-center rounded-full border border-cyan-200/14 bg-[#06131d]/92 shadow-[0_0_90px_rgba(34,211,238,0.1)] backdrop-blur-xl">
                     <div>
