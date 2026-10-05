@@ -38,7 +38,7 @@ export function CustomerQuotationHeader({
 
         <div className="min-w-0">
           <p className="text-[8px] font-bold uppercase tracking-[0.14em] text-blue-600">
-            Trabajo · Cotización
+            Solicitud · Cotización
           </p>
 
           <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
@@ -57,7 +57,7 @@ export function CustomerQuotationHeader({
       </div>
 
       <CompactBackButton
-        label={requestHref ? 'Volver al trabajo' : 'Volver a cotizaciones'}
+        label={requestHref ? 'Volver a la solicitud' : 'Volver a cotizaciones'}
         onClick={() =>
           navigate(requestHref ?? `/portal/${customerId}/quotations`)
         }
