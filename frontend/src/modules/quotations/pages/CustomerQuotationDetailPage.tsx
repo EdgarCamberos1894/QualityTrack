@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useCustomerPortalContext } from '@/modules/customer-portal'
+import {
+  useCustomerPortalContext,
+  useCustomerRequests,
+  type CustomerRequestStatus,
+} from '@/modules/customer-portal'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
@@ -28,6 +32,23 @@ import type {
 
 type Dialog = 'approve' | 'adjust' | 'reject' | null
 
+function getCustomerWorkStep(status: CustomerRequestStatus): number {
+  switch (status) {
+    case 'SUBMITTED':
+    case 'UNDER_REVIEW':
+    case 'WAITING_CUSTOMER_INFO':
+      return 0
+    case 'READY_FOR_QUOTATION':
+      return 1
+    case 'IN_PRODUCTION':
+      return 3
+    case 'COMPLETED':
+      return 5
+    case 'CANCELLED':
+      return 0
+  }
+}
+
 export function CustomerQuotationDetailPage() {
   const { quotationId } = useParams()
   const { customer } = useCustomerPortalContext()
@@ -40,6 +61,7 @@ export function CustomerQuotationDetailPage() {
     customer.customerId,
     validId,
   )
+  const requestsQuery = useCustomerRequests(customer.customerId)
   const approveMutation = useApproveCustomerQuotation(
     customer.customerId,
     validId ?? 0,
@@ -84,6 +106,15 @@ export function CustomerQuotationDetailPage() {
   }
 
   const quotation = detailQuery.data
+  const relatedRequest = requestsQuery.data?.find(
+    (request) => request.requestNumber === quotation.requestNumber,
+  )
+  const requestHref = relatedRequest
+    ? `/portal/${customer.customerId}/requests/${relatedRequest.id}`
+    : undefined
+  const currentWorkStep = relatedRequest
+    ? getCustomerWorkStep(relatedRequest.jobCase.status)
+    : 1
   const canDecide =
     customer.role !== 'VIEWER' && quotation.customerStatus === 'SENT'
   const mutationPending =
@@ -144,14 +175,19 @@ export function CustomerQuotationDetailPage() {
         customerId={customer.customerId}
         quotation={quotation}
         customerName={customer.customerName}
+        requestHref={requestHref}
       />
 
       <div className="space-y-4">
-        <QuotationFlowSteps />
+        <QuotationFlowSteps
+          currentStep={currentWorkStep}
+          requestHref={requestHref}
+        />
         <CustomerQuotationSourceCard
           source={quotation.source}
           caseNumber={quotation.caseNumber}
           requestNumber={quotation.requestNumber}
+          requestHref={requestHref}
         />
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-stretch">
