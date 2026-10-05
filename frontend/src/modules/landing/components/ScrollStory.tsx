@@ -72,9 +72,13 @@ export function ScrollStory() {
   const sceneOpacity = reducedMotion ? 1 : 1 - introExitProgress * 0.92
   const copyOpacity = reducedMotion ? 1 : 1 - introExitProgress * 0.62
   const traceOpacity = reducedMotion ? 1 : 0.72 + introExitProgress * 0.28
-  const bridgeOpacity = reducedMotion ? 1 : 0.2 + introExitProgress * 0.8
-  const introBridgePath =
-    'M 343 622 C 305 622, 305 666, 344 694 C 383 722, 390 766, 350 800 C 311 833, 316 878, 354 908 C 382 931, 365 972, 343 1000'
+  const bridgeOpacity = reducedMotion ? 1 : 0.12 + introExitProgress * 0.88
+  const heroTracePath =
+    'M 22 252 C 178 252, 205 94, 392 110 S 565 182, 698 118'
+  const heroTravelPath =
+    'M 698 118 C 565 182, 499 94, 392 110 S 178 252, 22 252'
+  const heroContinuationPath =
+    'M 22 252 C -40 252, -54 300, 8 330 C 72 361, 70 405, 17 434 C -29 459, -18 507, 29 536 C 55 553, 39 579, 22 590'
 
   return (
     <>
@@ -126,10 +130,19 @@ export function ScrollStory() {
             >
               <defs>
                 <linearGradient id="qtHeroTrace" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#60a5fa" stopOpacity="0" />
+                  <stop
+                    offset="0%"
+                    stopColor="#60a5fa"
+                    stopOpacity={0.05 + introExitProgress * 0.32}
+                  />
                   <stop offset="28%" stopColor="#60a5fa" stopOpacity="0.28" />
                   <stop offset="68%" stopColor="#22d3ee" stopOpacity="0.74" />
                   <stop offset="100%" stopColor="#67e8f9" stopOpacity="0.08" />
+                </linearGradient>
+                <linearGradient id="qtHeroContinuation" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.42" />
+                  <stop offset="36%" stopColor="#22d3ee" stopOpacity="0.72" />
+                  <stop offset="100%" stopColor="#67e8f9" stopOpacity="0.2" />
                 </linearGradient>
                 <filter id="qtHeroTraceGlow" x="-40%" y="-40%" width="180%" height="180%">
                   <feGaussianBlur stdDeviation="7" />
@@ -138,8 +151,9 @@ export function ScrollStory() {
                   <feGaussianBlur stdDeviation="5" />
                 </filter>
               </defs>
+
               <path
-                d="M 22 252 C 178 252, 205 94, 392 110 S 565 182, 698 118"
+                d={heroTracePath}
                 fill="none"
                 stroke="url(#qtHeroTrace)"
                 strokeWidth="12"
@@ -147,7 +161,7 @@ export function ScrollStory() {
                 filter="url(#qtHeroTraceGlow)"
               />
               <path
-                d="M 22 252 C 178 252, 205 94, 392 110 S 565 182, 698 118"
+                d={heroTracePath}
                 fill="none"
                 stroke="url(#qtHeroTrace)"
                 strokeWidth="1.5"
@@ -164,6 +178,34 @@ export function ScrollStory() {
                 ) : null}
               </path>
 
+              <g opacity={bridgeOpacity}>
+                <path
+                  d={heroContinuationPath}
+                  fill="none"
+                  stroke="url(#qtHeroContinuation)"
+                  strokeWidth="12"
+                  opacity="0.14"
+                  filter="url(#qtHeroTraceGlow)"
+                />
+                <path
+                  d={heroContinuationPath}
+                  fill="none"
+                  stroke="url(#qtHeroContinuation)"
+                  strokeWidth="1.5"
+                  strokeDasharray="8 10"
+                >
+                  {!reducedMotion ? (
+                    <animate
+                      attributeName="stroke-dashoffset"
+                      from="0"
+                      to="180"
+                      dur="7s"
+                      repeatCount="indefinite"
+                    />
+                  ) : null}
+                </path>
+              </g>
+
               {!reducedMotion ? (
                 <>
                   <circle
@@ -175,19 +217,44 @@ export function ScrollStory() {
                     <animateMotion
                       dur="5.2s"
                       repeatCount="indefinite"
-                      path="M 698 118 C 565 182, 499 94, 392 110 S 178 252, 22 252"
+                      path={heroTravelPath}
                     />
                   </circle>
                   <circle r="3.5" fill="#a5f3fc" opacity="0.95">
                     <animateMotion
                       dur="5.2s"
                       repeatCount="indefinite"
-                      path="M 698 118 C 565 182, 499 94, 392 110 S 178 252, 22 252"
+                      path={heroTravelPath}
                     />
                   </circle>
+
+                  {introExitProgress > 0.04 ? (
+                    <>
+                      <circle
+                        r="10"
+                        fill="#67e8f9"
+                        opacity={0.15 * bridgeOpacity}
+                        filter="url(#qtHeroTravelerGlow)"
+                      >
+                        <animateMotion
+                          dur="5.2s"
+                          repeatCount="indefinite"
+                          path={heroContinuationPath}
+                        />
+                      </circle>
+                      <circle r="3.5" fill="#a5f3fc" opacity={0.95 * bridgeOpacity}>
+                        <animateMotion
+                          dur="5.2s"
+                          repeatCount="indefinite"
+                          path={heroContinuationPath}
+                        />
+                      </circle>
+                    </>
+                  ) : null}
                 </>
               ) : null}
 
+              <circle cx="22" cy="252" r="2.8" fill="#67e8f9" opacity={bridgeOpacity} />
               <circle cx="395" cy="110" r="4" fill="#67e8f9" className="animate-pulse" />
               <circle cx="698" cy="118" r="3" fill="#93c5fd" className="animate-pulse" />
             </svg>
@@ -255,85 +322,6 @@ export function ScrollStory() {
             <span className="text-[8px] font-bold uppercase tracking-[0.12em] text-slate-400">
               Operación industrial conectada
             </span>
-          </div>
-
-          <div
-            className="pointer-events-none absolute inset-0 z-[14] hidden lg:block"
-            style={{ opacity: bridgeOpacity }}
-            aria-hidden="true"
-          >
-            <svg
-              viewBox="0 0 1000 1000"
-              className="absolute inset-0 h-full w-full overflow-visible"
-              preserveAspectRatio="none"
-            >
-              <defs>
-                <linearGradient id="qtIntroBridgeTrace" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.12" />
-                  <stop offset="36%" stopColor="#22d3ee" stopOpacity="0.72" />
-                  <stop offset="100%" stopColor="#67e8f9" stopOpacity="0.18" />
-                </linearGradient>
-                <filter id="qtIntroBridgeGlow" x="-100%" y="-40%" width="300%" height="180%">
-                  <feGaussianBlur stdDeviation="6" />
-                </filter>
-                <filter id="qtIntroBridgeTravelerGlow" x="-200%" y="-200%" width="500%" height="500%">
-                  <feGaussianBlur stdDeviation="5" />
-                </filter>
-              </defs>
-
-              <path
-                d={introBridgePath}
-                fill="none"
-                stroke="url(#qtIntroBridgeTrace)"
-                strokeWidth="11"
-                opacity="0.14"
-                filter="url(#qtIntroBridgeGlow)"
-              />
-              <path
-                d={introBridgePath}
-                fill="none"
-                stroke="url(#qtIntroBridgeTrace)"
-                strokeWidth="1.5"
-                strokeDasharray="8 10"
-              >
-                {!reducedMotion ? (
-                  <animate
-                    attributeName="stroke-dashoffset"
-                    from="0"
-                    to="180"
-                    dur="7s"
-                    repeatCount="indefinite"
-                  />
-                ) : null}
-              </path>
-
-              {!reducedMotion ? (
-                <>
-                  <circle
-                    r="10"
-                    fill="#67e8f9"
-                    opacity="0.15"
-                    filter="url(#qtIntroBridgeTravelerGlow)"
-                  >
-                    <animateMotion
-                      dur="5.2s"
-                      repeatCount="indefinite"
-                      path={introBridgePath}
-                    />
-                  </circle>
-                  <circle r="3.5" fill="#a5f3fc" opacity="0.95">
-                    <animateMotion
-                      dur="5.2s"
-                      repeatCount="indefinite"
-                      path={introBridgePath}
-                    />
-                  </circle>
-                </>
-              ) : null}
-
-              <circle cx="343" cy="622" r="3" fill="#67e8f9" opacity="0.92" />
-              <circle cx="343" cy="1000" r="2.5" fill="#67e8f9" opacity="0.72" />
-            </svg>
           </div>
         </div>
       </section>
