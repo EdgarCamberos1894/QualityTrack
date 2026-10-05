@@ -5,6 +5,7 @@ export {
   formatJobCaseDate,
   getJobCaseStatusPresentation,
 } from './model/jobCasePresenter'
+export { JOB_CASE_STATUSES } from './types/jobCase.types'
 export type {
   JobCaseDto,
   JobCaseStatus,
