@@ -48,10 +48,14 @@ export function InternalListingPanel({
   children,
   className,
 }: InternalListingPanelProps) {
+  const hasExplicitTopMargin =
+    className?.split(/\s+/).some((token) => /^!?mt-/.test(token)) ?? false
+
   return (
     <section
       className={cn(
-        'mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]',
+        !hasExplicitTopMargin && 'mt-4',
+        'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]',
         className,
       )}
     >
