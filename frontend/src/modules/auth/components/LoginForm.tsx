@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+import { ApiError } from '@/shared/api/ApiError'
 import { Button } from '@/shared/components/ui/Button'
 import { TextField } from '@/shared/components/ui/TextField'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -10,6 +11,20 @@ import { useLogin } from '../hooks/useLogin'
 
 interface LoginFormProps {
   onAuthenticated: () => void
+}
+
+function getLoginErrorMessage(error: unknown) {
+  if (error instanceof ApiError) {
+    if (error.status === 401) {
+      return 'Correo o contraseña incorrectos.'
+    }
+
+    if (error.status === 403) {
+      return 'Tu cuenta todavía no tiene acceso. Verifica tu correo o contacta al administrador.'
+    }
+  }
+
+  return getErrorMessage(error)
 }
 
 export function LoginForm({ onAuthenticated }: LoginFormProps) {
@@ -108,7 +123,7 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
           role="alert"
           className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700"
         >
-          {getErrorMessage(loginMutation.error)}
+          {getLoginErrorMessage(loginMutation.error)}
         </div>
       ) : null}
 
