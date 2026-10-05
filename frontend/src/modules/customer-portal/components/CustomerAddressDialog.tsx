@@ -119,7 +119,7 @@ export function CustomerAddressDialog({
           <button
             type="button"
             aria-label="Cerrar"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm text-slate-400 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+            className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-md border border-slate-200/80 bg-white/80 text-[12px] font-medium leading-none text-slate-400 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
             onClick={onClose}
             disabled={submitting}
           >
