@@ -3,6 +3,12 @@ import { useSessionStore } from '@/modules/auth'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import {
+  InternalListingBody,
+  InternalListingHeader,
+  InternalListingPanel,
+  InternalListingResultsBar,
+} from '@/shared/components/listing/InternalListing'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Card } from '@/shared/components/ui/Card'
@@ -165,46 +171,27 @@ export function WorkOrdersPage() {
         />
       )}
 
-      <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
-        <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/55 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Órdenes registradas
+      <InternalListingPanel>
+        <InternalListingHeader
+          eyebrow="Órdenes registradas"
+          title="Seguimiento operativo"
+          aside={
+            <p className="text-[8px] font-medium text-slate-400">
+              Ubica la orden y su etapa antes de entrar al detalle operativo.
             </p>
-            <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
-              Seguimiento operativo
-            </h2>
-          </div>
-          <p className="text-[8px] font-medium text-slate-400">
-            Ubica la orden y su etapa antes de entrar al detalle operativo.
-          </p>
-        </div>
+          }
+        />
 
         <WorkOrderFilters value={filters} onChange={setFilters} />
 
-        <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/65 px-4 py-2.5 sm:px-5">
-          <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-            <p className="text-[9px] font-semibold text-slate-700">
-              {filteredWorkOrders.length}{' '}
-              {filteredWorkOrders.length === 1
-                ? 'orden visible'
-                : 'órdenes visibles'}
-            </p>
-          </div>
+        <InternalListingResultsBar
+          count={filteredWorkOrders.length}
+          singular="orden visible"
+          plural="órdenes visibles"
+          onClear={hasFilters ? () => setFilters(initialFilters) : undefined}
+        />
 
-          {hasFilters ? (
-            <button
-              type="button"
-              onClick={() => setFilters(initialFilters)}
-              className="text-[9px] font-semibold text-blue-600 transition hover:text-blue-700"
-            >
-              Limpiar filtros
-            </button>
-          ) : null}
-        </div>
-
-        <div className="bg-slate-50/40 p-3.5 sm:p-4">
+        <InternalListingBody>
           {filteredWorkOrders.length > 0 ? (
             <WorkOrderTable workOrders={filteredWorkOrders} />
           ) : (
@@ -215,8 +202,8 @@ export function WorkOrdersPage() {
               />
             </Card>
           )}
-        </div>
-      </section>
+        </InternalListingBody>
+      </InternalListingPanel>
     </PageContainer>
   )
 }
