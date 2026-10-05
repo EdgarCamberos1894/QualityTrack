@@ -1,6 +1,7 @@
-import { Button } from '@/shared/components/ui/Button'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
+import { Button } from '@/shared/components/ui/Button'
 import { useDocumentVersions } from '../hooks/useDocumentCenter'
 import {
   formatDocumentDateTime,
@@ -80,28 +81,23 @@ export function DocumentHistoryDialog({
                   </div>
 
                   <div className="flex shrink-0 gap-1.5">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="!h-7 !px-2 !text-[8px]"
-                      disabled={busyVersionId === version.id}
+                    <ActionIconButton
+                      icon="view"
+                      label={`Ver versión ${version.version}`}
+                      tone="primary"
+                      disabled={busyVersionId !== null}
                       onClick={() =>
                         onOpenVersion(version.id, version.fileName)
                       }
-                    >
-                      Ver
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="!h-7 !px-2 !text-[8px]"
-                      disabled={busyVersionId === version.id}
+                    />
+                    <ActionIconButton
+                      icon="download"
+                      label={`Descargar versión ${version.version}`}
+                      disabled={busyVersionId !== null}
                       onClick={() =>
                         onDownloadVersion(version.id, version.fileName)
                       }
-                    >
-                      Descargar
-                    </Button>
+                    />
                   </div>
                 </article>
               ))}
