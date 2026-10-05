@@ -31,7 +31,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
       ([entry]) => {
         if (entry?.isIntersecting) setActive(true)
       },
-      { threshold: 0.28 },
+      { threshold: 0.04 },
     )
 
     observer.observe(node)
@@ -47,7 +47,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
   })
 
   const requestTracePath =
-    'M 343 0 C 321 28, 326 65, 358 88 C 390 112, 378 151, 345 176 C 313 200, 272 235, 202 284'
+    'M 343 0 C 326 27, 311 61, 329 96 C 352 137, 365 174, 328 206 C 294 236, 245 253, 202 284'
 
   return (
     <section
@@ -68,7 +68,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
         >
           <defs>
             <linearGradient id="qtRequestTrace" x1="0.343" y1="0" x2="0.2" y2="0.7">
-              <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.16" />
+              <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.22" />
               <stop offset="22%" stopColor="#22d3ee" stopOpacity="0.62" />
               <stop offset="70%" stopColor="#60a5fa" stopOpacity="0.48" />
               <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.05" />
@@ -135,9 +135,9 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
           <circle
             cx="343"
             cy="0"
-            r="3"
+            r="2.8"
             fill="#67e8f9"
-            opacity={active ? 0.92 : 0}
+            opacity={active ? 0.9 : 0}
           />
         </svg>
       </div>
