@@ -39,8 +39,29 @@
   border-bottom: 1px solid;
 }
 
+/*
+ * Solicitud is a scroll-driven chapter. Keep one viewport physically pinned
+ * while the surrounding section consumes the scroll distance required by the
+ * five narrative stages.
+ */
+#solicitud {
+  height: 560svh !important;
+  min-height: 560svh !important;
+}
+
+#solicitud > .sticky {
+  position: sticky !important;
+  top: 0 !important;
+  height: 100svh !important;
+  min-height: 100svh !important;
+  overflow: hidden !important;
+}
+
+/* The beam is positioned from React scroll progress. Never let a timer-based
+ * CSS animation override that transform, otherwise reverse scrolling breaks. */
 .qt-request-scan-beam {
-  animation: qt-request-scan 7.4s cubic-bezier(.45, 0, .55, 1) infinite;
+  animation: none;
+  will-change: transform, opacity;
 }
 
 .qt-request-orbit {
@@ -63,7 +84,7 @@
 }
 
 .qt-request-mobile-scan {
-  animation: qt-request-mobile-scan 6.2s cubic-bezier(.45, 0, .55, 1) infinite;
+  animation: none;
 }
 
 .qt-request-mobile-trace::after {
@@ -88,6 +109,11 @@
 }
 
 @media (min-width: 1024px) {
+  #solicitud {
+    height: 600svh !important;
+    min-height: 600svh !important;
+  }
+
   #inicio > .sticky > div[aria-hidden='true']:last-child {
     top: 62.2% !important;
     right: auto !important;
@@ -104,44 +130,6 @@
   }
   50% {
     translate: 0 -5px;
-  }
-}
-
-@keyframes qt-request-scan {
-  0%,
-  14% {
-    translate: -24% 0;
-    opacity: 0;
-  }
-  24% {
-    opacity: 1;
-  }
-  76% {
-    opacity: 0.75;
-  }
-  88%,
-  100% {
-    translate: 570% 0;
-    opacity: 0;
-  }
-}
-
-@keyframes qt-request-mobile-scan {
-  0%,
-  12% {
-    translate: -120% 0;
-    opacity: 0;
-  }
-  22% {
-    opacity: 1;
-  }
-  76% {
-    opacity: 0.7;
-  }
-  88%,
-  100% {
-    translate: 540% 0;
-    opacity: 0;
   }
 }
 
@@ -204,6 +192,17 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  #solicitud {
+    height: auto !important;
+    min-height: 100svh !important;
+  }
+
+  #solicitud > .sticky {
+    position: relative !important;
+    height: auto !important;
+    min-height: 100svh !important;
+  }
+
   .qt-request-result,
   .qt-request-scan-beam,
   .qt-request-mobile-scan,
