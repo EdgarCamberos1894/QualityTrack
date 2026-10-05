@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import type { LandingStoryStage } from '../model/landingStory'
+import { QuoteReviewBadge } from './QuoteReviewBadge'
 import '../quoteSection.css'
 
 interface QuoteSectionProps {
@@ -230,7 +231,7 @@ export function QuoteSection({ stage, reducedMotion }: QuoteSectionProps) {
 
         <div className="relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-rows-[auto_1fr] gap-3 px-5 pb-4 pt-4 sm:px-8 sm:pt-5 lg:grid-cols-[1.12fr_0.88fr] lg:grid-rows-1 lg:items-center lg:gap-14 lg:px-12 lg:pb-8 lg:pt-8 xl:px-16">
           <div className="order-2 min-h-0 lg:order-1">
-            <div className="relative flex h-full min-h-[390px] items-start justify-center lg:min-h-[610px] lg:items-center">
+            <div className="qt-landing-stage relative flex h-full min-h-[390px] items-start justify-center lg:min-h-[610px] lg:items-center">
               <div className="pointer-events-none absolute left-[3%] top-[12%] h-[66%] w-[74%] rounded-full bg-amber-400/[0.065] blur-[95px]" />
               <div className="pointer-events-none absolute right-[2%] top-[26%] h-[44%] w-[44%] rounded-full bg-blue-500/[0.045] blur-[75px]" />
 
@@ -437,23 +438,11 @@ export function QuoteSection({ stage, reducedMotion }: QuoteSectionProps) {
                 />
               </div>
 
-              <div
-                className="pointer-events-none absolute left-[12%] top-[8%] z-[6] hidden rounded-xl border border-amber-200/[0.1] bg-[#0d1117]/92 px-3 py-2.5 shadow-[0_20px_65px_-36px_rgba(245,158,11,0.65)] backdrop-blur-xl lg:block"
-                style={{
-                  opacity: reviewProgress * (1 - approvalProgress),
-                  transform: `translate3d(${(1 - reviewProgress) * -12}px, ${versionProgress * -7}px, 0)`,
-                }}
-              >
-                <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-300 shadow-[0_0_9px_rgba(252,211,77,0.65)]" />
-                  <span className="text-[6px] font-bold uppercase tracking-[0.12em] text-amber-200/70">Revisión comercial</span>
-                </div>
-                <div className="mt-2 flex items-center gap-2 font-mono text-[8px]">
-                  <span className="text-slate-600 line-through">18 OCT</span>
-                  <span className="text-slate-700">→</span>
-                  <span className="font-semibold text-amber-200">08 OCT</span>
-                </div>
-              </div>
+              <QuoteReviewBadge
+                reviewProgress={reviewProgress}
+                versionProgress={versionProgress}
+                approvalProgress={approvalProgress}
+              />
 
               <div className="pointer-events-none absolute left-1/2 top-0 h-10 w-px -translate-x-1/2 bg-gradient-to-b from-blue-300/45 via-cyan-300/35 to-amber-300/25 lg:hidden" style={{ opacity: entryProgress }} />
               <div className="pointer-events-none absolute bottom-0 left-1/2 h-10 w-px -translate-x-1/2 origin-top bg-gradient-to-b from-amber-300/45 to-violet-300/28 lg:hidden" style={{ opacity: exitProgress, transform: `translateX(-50%) scaleY(${exitProgress})` }} />
