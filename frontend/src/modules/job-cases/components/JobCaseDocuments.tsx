@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { DocumentPreviewDialog } from '@/shared/components/documents/DocumentPreviewDialog'
+import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
-import { Button } from '@/shared/components/ui/Button'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Card } from '@/shared/components/ui/Card'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { useJobCaseDocumentFileActions } from '../hooks/useJobCaseDocumentFileActions'
@@ -117,39 +117,37 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                   </div>
 
                   <div className="flex shrink-0 flex-wrap gap-1.5">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="!h-7 !px-2.5 !text-[8px]"
-                      disabled={files.busy !== null}
+                    <ActionIconButton
+                      icon="view"
+                      label={opening ? 'Abriendo documento…' : `Ver ${document.name}`}
+                      tone="primary"
+                      busy={opening}
+                      disabled={files.busy !== null && !opening}
                       onClick={() =>
                         void files.openVersion(document.id, version)
                       }
-                    >
-                      {opening ? 'Abriendo…' : 'Ver'}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="!h-7 !px-2.5 !text-[8px]"
-                      disabled={files.busy !== null}
+                    />
+                    <ActionIconButton
+                      icon="download"
+                      label={
+                        downloading
+                          ? 'Descargando documento…'
+                          : `Descargar ${document.name}`
+                      }
+                      busy={downloading}
+                      disabled={files.busy !== null && !downloading}
                       onClick={() =>
                         void files.downloadVersion(document.id, version)
                       }
-                    >
-                      {downloading ? 'Descargando…' : 'Descargar'}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="!h-7 !px-2.5 !text-[8px]"
+                    />
+                    <ActionIconButton
+                      icon="history"
+                      label={`Ver historial de ${document.name}`}
                       onClick={() => {
                         files.clearError()
                         setHistoryDocument(document)
                       }}
-                    >
-                      Historial
-                    </Button>
+                    />
                   </div>
                 </div>
               </article>
