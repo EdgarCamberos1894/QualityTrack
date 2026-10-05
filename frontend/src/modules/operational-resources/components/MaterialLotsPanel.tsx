@@ -9,6 +9,11 @@ import {
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import {
+  InternalListingHeader,
+  InternalListingPanel,
+  InternalListingResultsBar,
+} from '@/shared/components/listing/InternalListing'
 import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
@@ -62,12 +67,14 @@ export function MaterialLotsPanel({
 
   if (!material) {
     return (
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
-        <EmptyState
-          title="Selecciona un material"
-          description="Aquí verás sus lotes, proveedor, fecha de recepción, cantidad y certificado."
-        />
-      </section>
+      <InternalListingPanel className="mt-0">
+        <div className="p-4">
+          <EmptyState
+            title="Selecciona un material"
+            description="Aquí verás sus lotes, proveedor, fecha de recepción, cantidad y certificado."
+          />
+        </div>
+      </InternalListingPanel>
     )
   }
 
@@ -133,74 +140,73 @@ export function MaterialLotsPanel({
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
-      <div className="flex flex-col gap-2.5 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
-          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-            {material.code} · {material.unit}
-          </p>
-          <h2 className="mt-0.5 truncate text-[12px] font-semibold text-slate-950">
-            {material.name}
-          </h2>
-          <p className="mt-0.5 line-clamp-2 text-[8px] leading-4 text-slate-400">
-            {material.specification ?? 'Sin especificación adicional'}
-          </p>
-          <div className="mt-2 flex flex-wrap items-center gap-1.5">
-            {material.technicalSheetDocumentVersionId ? (
-              <>
-                <Badge tone="success" className="px-2 py-0.5 text-[7px]">
-                  Ficha técnica
+    <InternalListingPanel className="mt-0">
+      <InternalListingHeader
+        eyebrow={`${material.code} · ${material.unit}`}
+        title={material.name}
+        description={
+          <>
+            <p className="line-clamp-2">
+              {material.specification ?? 'Sin especificación adicional'}
+            </p>
+            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+              {material.technicalSheetDocumentVersionId ? (
+                <>
+                  <Badge tone="success" className="px-2 py-0.5 text-[7px]">
+                    Ficha técnica
+                  </Badge>
+                  {material.technicalSheetDocumentId ? (
+                    <ActionIconButton
+                      icon="view"
+                      label={
+                        certificateFile.busyLotId === material.id
+                          ? 'Abriendo ficha técnica…'
+                          : `Ver ficha técnica de ${material.name}`
+                      }
+                      tone="primary"
+                      busy={certificateFile.busyLotId === material.id}
+                      onClick={() =>
+                        void certificateFile.open(
+                          material.id,
+                          material.technicalSheetDocumentId as number,
+                          material.technicalSheetDocumentVersionId as number,
+                        )
+                      }
+                    />
+                  ) : null}
+                </>
+              ) : (
+                <Badge tone="neutral" className="px-2 py-0.5 text-[7px]">
+                  Sin ficha técnica
                 </Badge>
-                {material.technicalSheetDocumentId ? (
-                  <ActionIconButton
-                    icon="view"
-                    label={
-                      certificateFile.busyLotId === material.id
-                        ? 'Abriendo ficha técnica…'
-                        : `Ver ficha técnica de ${material.name}`
-                    }
-                    tone="primary"
-                    busy={certificateFile.busyLotId === material.id}
-                    onClick={() =>
-                      void certificateFile.open(
-                        material.id,
-                        material.technicalSheetDocumentId as number,
-                        material.technicalSheetDocumentVersionId as number,
-                      )
-                    }
-                  />
-                ) : null}
-              </>
-            ) : (
-              <Badge tone="neutral" className="px-2 py-0.5 text-[7px]">
-                Sin ficha técnica
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        {canManage ? (
-          <Button
-            size="sm"
-            className="!h-7 !px-2.5 !text-[8px]"
-            onClick={() => {
-              mutations.createLot.reset()
-              mutations.uploadCertificate.reset()
-              setCreatedLotIdForRetry(null)
-              setCreateOpen(true)
-            }}
-          >
-            Registrar lote
-          </Button>
-        ) : null}
-      </div>
+              )}
+            </div>
+          </>
+        }
+        aside={
+          canManage ? (
+            <Button
+              size="sm"
+              className="!h-8 !px-3 !text-[9px]"
+              onClick={() => {
+                mutations.createLot.reset()
+                mutations.uploadCertificate.reset()
+                setCreatedLotIdForRetry(null)
+                setCreateOpen(true)
+              }}
+            >
+              Registrar lote
+            </Button>
+          ) : undefined
+        }
+      />
 
       {!lotsQuery.isPending && !lotsQuery.isError ? (
-        <div className="border-b border-slate-100 bg-slate-50/45 px-4 py-2">
-          <p className="text-[7px] font-medium text-slate-400">
-            {lots.length} {lots.length === 1 ? 'lote registrado' : 'lotes registrados'}
-          </p>
-        </div>
+        <InternalListingResultsBar
+          count={lots.length}
+          singular="lote registrado"
+          plural="lotes registrados"
+        />
       ) : null}
 
       {certificateFile.error ? (
@@ -223,14 +229,16 @@ export function MaterialLotsPanel({
           />
         </div>
       ) : lots.length === 0 ? (
-        <div className="p-4">
-          <EmptyState
-            title="Sin lotes registrados"
-            description="Registra una recepción para que el material pueda utilizarse con trazabilidad en producción."
-          />
+        <div className="bg-slate-50/40 p-4">
+          <div className="rounded-xl border border-slate-200 bg-white p-4">
+            <EmptyState
+              title="Sin lotes registrados"
+              description="Registra una recepción para que el material pueda utilizarse con trazabilidad en producción."
+            />
+          </div>
         </div>
       ) : (
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-slate-100 bg-white">
           {lots.map((lot) => {
             const openingCertificate = certificateFile.busyLotId === lot.id
 
@@ -309,7 +317,7 @@ export function MaterialLotsPanel({
                       variant={
                         lot.certificateDocumentVersionId ? 'ghost' : 'secondary'
                       }
-                      className="!h-7 !px-2 !text-[8px]"
+                      className="!h-8 !px-3 !text-[9px]"
                       onClick={() => {
                         mutations.uploadCertificate.reset()
                         setCertificateLot(lot)
@@ -348,6 +356,6 @@ export function MaterialLotsPanel({
         }}
         onSubmit={uploadCertificate}
       />
-    </section>
+    </InternalListingPanel>
   )
 }
