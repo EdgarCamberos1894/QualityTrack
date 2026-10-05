@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Badge } from '@/shared/components/ui/Badge'
-import { Button } from '@/shared/components/ui/Button'
 import {
   formatDocumentDateTime,
   formatDocumentFileSize,
@@ -28,7 +28,7 @@ export function DocumentCenterRow({
       : '/resources?tab=materials'
 
   return (
-    <article className="grid gap-3 border-b border-slate-100 px-4 py-3 transition last:border-b-0 hover:bg-blue-50/25 sm:px-5 lg:grid-cols-[minmax(230px,1.45fr)_150px_minmax(170px,0.9fr)_70px_155px_130px] lg:items-center">
+    <article className="grid gap-3 border-b border-slate-100 px-4 py-3 transition last:border-b-0 hover:bg-blue-50/25 sm:px-5 lg:grid-cols-[minmax(230px,1.45fr)_150px_minmax(170px,0.9fr)_70px_155px_90px] lg:items-center">
       <div className="min-w-0">
         <p className="truncate text-[10px] font-semibold text-slate-950">
           {document.name}
@@ -76,23 +76,19 @@ export function DocumentCenterRow({
       </div>
 
       <div className="flex flex-wrap gap-1.5 lg:justify-end">
-        <Button
-          size="sm"
-          variant="secondary"
-          className="!h-7 !px-2.5 !text-[8px]"
-          disabled={busy}
+        <ActionIconButton
+          icon="view"
+          label={busy ? 'Abriendo documento…' : `Ver ${document.name}`}
+          tone="primary"
+          busy={busy}
           onClick={onOpen}
-        >
-          {busy ? 'Abriendo…' : 'Ver'}
-        </Button>
-        <Button
-          size="sm"
-          variant="ghost"
-          className="!h-7 !px-2 !text-[8px]"
+        />
+        <ActionIconButton
+          icon="history"
+          label={`Ver historial de ${document.name}`}
+          disabled={busy}
           onClick={onHistory}
-        >
-          Historial
-        </Button>
+        />
       </div>
     </article>
   )
