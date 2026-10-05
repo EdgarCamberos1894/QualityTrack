@@ -2,6 +2,7 @@ import { CaseChapter } from '../components/CaseChapter'
 import { LandingHeader } from '../components/LandingHeader'
 import { QuoteChapter } from '../components/QuoteChapter'
 import { ScrollStory } from '../components/ScrollStory'
+import { WorkOrderChapter } from '../components/WorkOrderChapter'
 import '../landing.css'
 
 export function LandingPage() {
@@ -12,6 +13,7 @@ export function LandingPage() {
         <ScrollStory />
         <CaseChapter />
         <QuoteChapter />
+        <WorkOrderChapter />
       </main>
     </div>
   )
