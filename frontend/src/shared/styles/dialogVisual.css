@@ -77,6 +77,34 @@
   color: #64748b !important;
 }
 
+/* Legacy fields inherit the same compact density as the newer portal dialogs. */
+:where([role='dialog'][aria-modal='true'])
+  :where(
+    input[type='text'],
+    input[type='email'],
+    input[type='tel'],
+    input[type='number'],
+    input[type='date'],
+    input[type='password'],
+    select
+  ) {
+  min-height: 2.25rem !important;
+  height: 2.25rem !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.625rem !important;
+}
+
+:where([role='dialog'][aria-modal='true']) textarea {
+  min-height: 4.25rem !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.625rem !important;
+  line-height: 1rem !important;
+}
+
+:where([role='dialog'][aria-modal='true']) label {
+  font-size: 0.625rem;
+}
+
 /* Keep action bars visually anchored instead of floating inside the body. */
 :where([role='dialog'][aria-modal='true']) > footer:last-child,
 :where([role='dialog'][aria-modal='true'])
@@ -126,6 +154,20 @@
     #fff 0%,
     #fff 58%,
     rgb(254 242 242 / 0.82) 100%
+  ) !important;
+}
+
+:where(
+    [role='dialog'][aria-modal='true'][aria-labelledby*='cancel'],
+    [role='dialog'][aria-modal='true'][aria-labelledby*='reject'],
+    [role='dialog'][aria-modal='true'][aria-labelledby*='remove'],
+    [role='dialog'][aria-modal='true'][aria-labelledby*='delete']
+  ):has(> h2:first-child) {
+  background: linear-gradient(
+    135deg,
+    #fff 0%,
+    #fff 76%,
+    rgb(254 242 242 / 0.72) 100%
   ) !important;
 }
 
