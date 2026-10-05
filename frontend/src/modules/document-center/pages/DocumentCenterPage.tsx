@@ -2,6 +2,11 @@ import { useMemo, useState } from 'react'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import {
+  InternalListingHeader,
+  InternalListingPanel,
+  InternalListingResultsBar,
+} from '@/shared/components/listing/InternalListing'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { DocumentPreviewDialog } from '@/shared/components/documents/DocumentPreviewDialog'
@@ -125,20 +130,16 @@ export function DocumentCenterPage() {
         </div>
       </section>
 
-      <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
-        <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Biblioteca transversal
+      <InternalListingPanel>
+        <InternalListingHeader
+          eyebrow="Biblioteca transversal"
+          title="Documentos vigentes"
+          aside={
+            <p className="text-[8px] font-medium text-slate-400">
+              Consulta la versión vigente y conserva acceso al historial.
             </p>
-            <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
-              Documentos vigentes
-            </h2>
-          </div>
-          <p className="text-[8px] text-slate-400">
-            {visibleDocuments.length} de {documents.length} visibles
-          </p>
-        </div>
+          }
+        />
 
         <DocumentCenterFilters
           documents={documents}
@@ -152,18 +153,12 @@ export function DocumentCenterPage() {
           onCustomerChange={setCustomerId}
         />
 
-        {hasFilters ? (
-          <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-2 sm:px-5">
-            <p className="text-[8px] text-slate-400">Filtros aplicados</p>
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="text-[8px] font-semibold text-blue-600 hover:text-blue-700"
-            >
-              Limpiar filtros
-            </button>
-          </div>
-        ) : null}
+        <InternalListingResultsBar
+          count={visibleDocuments.length}
+          singular="documento visible"
+          plural="documentos visibles"
+          onClear={hasFilters ? clearFilters : undefined}
+        />
 
         {fileError ? (
           <p className="mx-4 mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700 sm:mx-5">
@@ -181,35 +176,39 @@ export function DocumentCenterPage() {
         </div>
 
         {visibleDocuments.length === 0 ? (
-          <div className="p-4">
-            <EmptyState
-              title="No hay documentos para mostrar"
-              description="Prueba otra búsqueda o cambia los filtros."
-            />
+          <div className="bg-slate-50/40 p-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <EmptyState
+                title="No hay documentos para mostrar"
+                description="Prueba otra búsqueda o cambia los filtros."
+              />
+            </div>
           </div>
         ) : (
-          visibleDocuments.map((document) => (
-            <DocumentCenterRow
-              key={document.id}
-              document={document}
-              busy={busyVersionId === document.currentVersion.id}
-              onOpen={() =>
-                void openVersion(
-                  document,
-                  document.currentVersion.id,
-                  document.currentVersion.fileName,
-                )
-              }
-              onHistory={() => setHistoryDocument(document)}
-            />
-          ))
+          <div className="bg-white">
+            {visibleDocuments.map((document) => (
+              <DocumentCenterRow
+                key={document.id}
+                document={document}
+                busy={busyVersionId === document.currentVersion.id}
+                onOpen={() =>
+                  void openVersion(
+                    document,
+                    document.currentVersion.id,
+                    document.currentVersion.fileName,
+                  )
+                }
+                onHistory={() => setHistoryDocument(document)}
+              />
+            ))}
+          </div>
         )}
 
         <p className="border-t border-slate-100 bg-slate-50/55 px-4 py-2 text-[7px] leading-3 text-slate-400 sm:px-5">
           Una nueva versión no reemplaza el historial. Las referencias operativas
           conservan la versión exacta que utilizaron.
         </p>
-      </section>
+      </InternalListingPanel>
 
       <DocumentHistoryDialog
         document={historyDocument}
