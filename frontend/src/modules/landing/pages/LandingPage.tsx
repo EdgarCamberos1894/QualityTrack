@@ -1,5 +1,6 @@
 import { CaseChapter } from '../components/CaseChapter'
 import { DeliveryChapter } from '../components/DeliveryChapter'
+import { FinalCta } from '../components/FinalCta'
 import { LandingHeader } from '../components/LandingHeader'
 import { ProductionChapter } from '../components/ProductionChapter'
 import { QualityChapter } from '../components/QualityChapter'
@@ -20,6 +21,7 @@ export function LandingPage() {
         <ProductionChapter />
         <QualityChapter />
         <DeliveryChapter />
+        <FinalCta />
       </main>
     </div>
   )
