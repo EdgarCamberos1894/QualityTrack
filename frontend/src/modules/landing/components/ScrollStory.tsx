@@ -67,6 +67,43 @@ export function ScrollStory() {
     }
   }, [])
 
+  useEffect(() => {
+    if (reducedMotion) return
+
+    const accelerateReverse = (event: WheelEvent) => {
+      if (event.deltaY >= 0 || event.ctrlKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+        return
+      }
+
+      const section = document.getElementById('solicitud')
+      if (!section) return
+
+      const rect = section.getBoundingClientRect()
+      const travel = Math.max(section.offsetHeight - window.innerHeight, 1)
+      const progress = clamp(-rect.top / travel)
+
+      // Keep the entry/exit breathing room native. Only accelerate while the
+      // request story itself is actively being scrubbed in reverse.
+      if (progress <= 0.015 || progress >= 0.995 || rect.top > 0 || rect.bottom <= window.innerHeight) {
+        return
+      }
+
+      event.preventDefault()
+
+      const deltaPixels =
+        event.deltaMode === WheelEvent.DOM_DELTA_LINE
+          ? event.deltaY * 16
+          : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+            ? event.deltaY * window.innerHeight
+            : event.deltaY
+
+      window.scrollBy({ top: deltaPixels * 2, behavior: 'auto' })
+    }
+
+    window.addEventListener('wheel', accelerateReverse, { passive: false })
+    return () => window.removeEventListener('wheel', accelerateReverse)
+  }, [reducedMotion])
+
   if (!intro || !request) return null
 
   const sceneOpacity = reducedMotion ? 1 : 1 - introExitProgress * 0.92
