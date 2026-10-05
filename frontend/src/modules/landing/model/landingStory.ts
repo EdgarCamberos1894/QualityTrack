@@ -53,11 +53,11 @@ export const landingStory: LandingStoryStage[] = [
     id: 'cotizacion',
     step: '03',
     eyebrow: 'Cotización',
-    title: 'La propuesta comercial nace del mismo contexto técnico.',
+    title: 'El contexto técnico se convierte en una decisión comercial.',
     description:
-      'Conceptos, tiempos y ajustes se preparan sin romper la continuidad del caso. El cliente revisa la propuesta y su aprobación habilita el siguiente movimiento.',
+      'Conceptos, cantidades, plazo y condiciones se construyen desde el expediente. La propuesta se revisa y, al aprobarse, libera el siguiente paso de ejecución.',
     signal: 'Cotización aprobada',
-    detail: 'Versiones y ajustes permanecen ligados a la solicitud original.',
+    detail: 'Importe, plazo y aprobación permanecen ligados al caso que los originó.',
     side: 'right',
     accent: 'amber',
   },
@@ -127,7 +127,7 @@ export const operationalCapabilities = [
   {
     title: 'Cotizaciones',
     eyebrow: 'Decisión comercial',
-    description: 'Versiones, conceptos, ajustes y aprobación sin perder el origen.',
+    description: 'Conceptos, condiciones y aprobación sin perder el origen técnico.',
     glyph: '03',
   },
   {
