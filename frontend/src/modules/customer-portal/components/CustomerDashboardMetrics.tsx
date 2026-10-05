@@ -76,39 +76,39 @@ export function CustomerDashboardMetrics({
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {metrics.map((metric) => (
         <Link key={metric.label} to={metric.href} className="group min-w-0">
-          <Card className="relative h-full overflow-hidden px-5 py-4 transition duration-200 group-hover:-translate-y-0.5 group-hover:border-slate-300 group-hover:shadow-lg">
+          <Card className="relative h-full overflow-hidden px-4 py-3.5 transition duration-200 group-hover:-translate-y-0.5 group-hover:border-slate-300 group-hover:shadow-lg">
             <div
-              className={`absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r ${metric.accentClassName}`}
+              className={`absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r ${metric.accentClassName}`}
             />
 
             <div className="flex items-start justify-between gap-4">
               <div
-                className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${metric.iconSurfaceClassName}`}
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ${metric.iconSurfaceClassName}`}
               >
                 <SidebarNavIcon
                   name={metric.icon}
-                  className={`h-[18px] w-[18px] ${metric.iconClassName}`}
+                  className={`h-4 w-4 ${metric.iconClassName}`}
                 />
               </div>
-              <span className="text-lg font-bold leading-none text-slate-950">
+              <span className="text-[16px] font-bold leading-none tabular-nums text-slate-950">
                 {metric.value}
               </span>
             </div>
 
-            <p className="mt-4 text-xs font-semibold text-slate-900">
+            <p className="mt-3 text-[11px] font-semibold text-slate-900">
               {metric.label}
             </p>
-            <p className="mt-1.5 text-[10px] leading-4 text-slate-500">
+            <p className="mt-1 text-[9px] leading-4 text-slate-500">
               {metric.detail}
             </p>
 
-            <div className="mt-3 flex items-center justify-between">
-              <span className="text-[9px] font-semibold uppercase tracking-wide text-slate-400">
+            <div className="mt-2.5 flex items-center justify-between">
+              <span className="text-[8px] font-semibold uppercase tracking-wide text-slate-400">
                 Ver detalle
               </span>
               <span
                 aria-hidden="true"
-                className="text-xs font-semibold text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-blue-600"
+                className="text-[10px] font-semibold text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-blue-600"
               >
                 →
               </span>
