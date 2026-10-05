@@ -10,6 +10,7 @@ import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { CustomerPortalContextProvider } from '../context/CustomerPortalContext'
 import { useCustomerContexts } from '../hooks/useCustomerContexts'
+import '../customerPortal.css'
 import { CustomerPortalSidebar } from './CustomerPortalSidebar'
 import { CustomerPortalTopbar } from './CustomerPortalTopbar'
 
@@ -67,7 +68,7 @@ export function CustomerPortalShell() {
     <CustomerPortalContextProvider
       value={{ customer, contexts: contextsQuery.data }}
     >
-      <div className="min-h-screen bg-[#f6f8fc] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
+      <div className="qt-customer-portal min-h-screen bg-[#f6f8fc] lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
         <CustomerPortalSidebar
           customer={customer}
           hasMultipleCustomers={contextsQuery.data.length > 1}
