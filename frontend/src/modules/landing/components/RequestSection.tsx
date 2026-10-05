@@ -84,10 +84,10 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
   }
 
   const linkProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.025, 0.13)
-  const fieldProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.15, 0.52)
-  const documentProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.52, 0.66)
-  const consolidationProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.68, 0.84)
-  const exitProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.88, 0.98)
+  const fieldProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.15, 0.4)
+  const documentProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.42, 0.58)
+  const consolidationProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.61, 0.78)
+  const exitProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.83, 0.96)
 
   const phase =
     exitProgress > 0
@@ -170,7 +170,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
               ) : null}
             </path>
 
-            {!reducedMotion && linkProgress > 0 && scrollProgress < 0.86 ? (
+            {!reducedMotion && linkProgress > 0 && scrollProgress < 0.81 ? (
               <>
                 <circle
                   r="10"
@@ -339,8 +339,8 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                 >
                   <div className="grid grid-cols-2 gap-2 px-3 py-3 sm:gap-2.5 sm:px-4 lg:gap-x-5 lg:gap-y-3.5 lg:px-6 lg:py-5">
                     {requestFields.map(([label, value], index) => {
-                      const start = 0.16 + index * 0.055
-                      const end = start + 0.06
+                      const start = 0.15 + index * 0.038
+                      const end = start + 0.045
 
                       return (
                         <div
@@ -357,7 +357,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
 
                   <div
                     className="border-t border-white/[0.06] bg-slate-950/20 px-3 py-3 sm:px-4 lg:px-6 lg:py-4"
-                    style={scrollReveal(0.52, 0.61, 10)}
+                    style={scrollReveal(0.42, 0.49, 10)}
                   >
                     <div className="mb-2 flex items-center justify-between gap-3 lg:mb-3">
                       <span className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-500 lg:text-[8px] lg:tracking-[0.13em]">Documentación adjunta</span>
@@ -368,7 +368,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                         <div
                           key={name}
                           className="min-w-0 rounded-xl border border-white/[0.055] bg-slate-950/45 p-2 lg:flex lg:items-center lg:gap-2.5 lg:p-2.5"
-                          style={scrollReveal(0.54 + index * 0.035, 0.61 + index * 0.025, 8)}
+                          style={scrollReveal(0.44 + index * 0.028, 0.5 + index * 0.02, 8)}
                         >
                           <div className="grid h-6 w-6 shrink-0 place-items-center rounded-lg border border-cyan-300/10 bg-cyan-300/[0.06] font-mono text-[6px] font-bold text-cyan-200 lg:h-8 lg:w-8 lg:text-[8px]">PDF</div>
                           <div className="mt-1 min-w-0 lg:mt-0">
