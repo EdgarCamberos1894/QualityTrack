@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Button } from '@/shared/components/ui/Button'
 import { getJobCaseDocumentVersions } from '../api/jobCases.api'
 import {
@@ -93,24 +94,19 @@ export function JobCaseDocumentHistoryDialog({
                   </div>
 
                   <div className="flex shrink-0 gap-1.5">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="!h-7 !px-2 !text-[8px]"
-                      disabled={busyVersionId === version.id}
+                    <ActionIconButton
+                      icon="view"
+                      label={`Ver versión ${version.version}`}
+                      tone="primary"
+                      disabled={busyVersionId !== null}
                       onClick={() => onOpenVersion(document.id, version)}
-                    >
-                      {busyVersionId === version.id ? 'Abriendo…' : 'Ver'}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="!h-7 !px-2 !text-[8px]"
-                      disabled={busyVersionId === version.id}
+                    />
+                    <ActionIconButton
+                      icon="download"
+                      label={`Descargar versión ${version.version}`}
+                      disabled={busyVersionId !== null}
                       onClick={() => onDownloadVersion(document.id, version)}
-                    >
-                      Descargar
-                    </Button>
+                    />
                   </div>
                 </article>
               ))}
