@@ -53,8 +53,10 @@ export function InternalCustomerDetailPage() {
     )
   }
 
-  const { customer, members, jobCases } = query.data
+  const { customer, members } = query.data
   const status = getInternalCustomerStatusPresentation(customer.status)
+  const totalCases =
+    customer.openCases + customer.completedCases + customer.cancelledCases
 
   return (
     <PageContainer className="py-4 lg:py-3">
@@ -187,7 +189,7 @@ export function InternalCustomerDetailPage() {
         <InternalCustomerMembers members={members} />
       </div>
 
-      <InternalCustomerCasesPanel jobCases={jobCases} />
+      <InternalCustomerCasesPanel customerId={customer.id} totalCases={totalCases} />
     </PageContainer>
   )
 }
