@@ -42,11 +42,11 @@
 
 @keyframes qt-delivery-breathe {
   0%, 100% {
-    transform: scale(0.98);
+    transform: translate(-50%, -50%) scale(0.98);
     opacity: 0.72;
   }
   50% {
-    transform: scale(1.02);
+    transform: translate(-50%, -50%) scale(1.02);
     opacity: 1;
   }
 }
