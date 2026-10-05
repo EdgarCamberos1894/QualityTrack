@@ -19,6 +19,8 @@ const requestDocuments = [
   ['Especificacion_material.pdf', '1.4 MB'],
 ] as const
 
+const captureSteps = ['Cliente', 'Plano', 'Contexto', 'Registro'] as const
+
 export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const [active, setActive] = useState(false)
@@ -57,6 +59,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_47%,rgba(8,145,178,0.15),transparent_28%),radial-gradient(circle_at_48%_20%,rgba(37,99,235,0.09),transparent_34%),linear-gradient(180deg,#020617_0%,#041022_48%,#020817_100%)]" />
       <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(148,163,184,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.055)_1px,transparent_1px)] [background-size:68px_68px] [mask-image:radial-gradient(circle_at_30%_48%,black,transparent_68%)]" />
+      <div className="pointer-events-none absolute left-[4%] top-[28%] h-[46%] w-[46%] rounded-full bg-cyan-400/[0.055] blur-[110px]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-20 bg-gradient-to-b from-[#020617] via-[#020617]/58 to-transparent lg:h-24" />
 
       <div className="pointer-events-none absolute inset-0 z-[3] hidden lg:block" aria-hidden="true">
@@ -173,85 +176,105 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
             <div className="pointer-events-none absolute left-[-18%] top-[8%] h-48 w-48 rounded-full bg-cyan-400/[0.08] blur-[70px]" />
             <div className="pointer-events-none absolute right-[-22%] top-[32%] h-52 w-52 rounded-full bg-blue-500/[0.07] blur-[80px]" />
 
-            <div className="qt-request-mobile-card relative overflow-hidden rounded-[24px] border border-cyan-200/[0.12] bg-[#07111f]/94 shadow-[0_28px_80px_-40px_rgba(14,165,233,0.85)] backdrop-blur-xl">
-              <div className="relative border-b border-white/[0.06] px-4 pb-3.5 pt-4">
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/45 to-transparent" />
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.75)]" />
-                      <span className="text-[8px] font-extrabold uppercase tracking-[0.15em] text-cyan-100/85">
-                        Nueva solicitud
-                      </span>
+            <div className="qt-request-mobile-shell relative">
+              <div className="qt-request-mobile-trace pointer-events-none absolute left-5 top-[-26px] h-12 w-px bg-gradient-to-b from-cyan-300/0 via-cyan-300/70 to-cyan-300/15" />
+              <div className="qt-request-mobile-card relative overflow-hidden rounded-[24px] border border-cyan-200/[0.14] bg-[#07111f]/95 shadow-[0_32px_90px_-42px_rgba(14,165,233,0.95)] backdrop-blur-xl">
+                <div className="qt-request-mobile-scan pointer-events-none absolute inset-y-0 left-0 z-[6] w-20 bg-gradient-to-r from-transparent via-cyan-200/[0.045] to-transparent" />
+
+                <div className="relative border-b border-white/[0.06] px-4 pb-3.5 pt-4">
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/55 to-transparent" />
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.75)]" />
+                        <span className="text-[8px] font-extrabold uppercase tracking-[0.15em] text-cyan-100/85">
+                          Nueva solicitud
+                        </span>
+                      </div>
+                      <p className="mt-1.5 text-[16px] font-semibold tracking-[-0.025em] text-white">
+                        Requerimiento de fabricación
+                      </p>
                     </div>
-                    <p className="mt-1.5 text-[16px] font-semibold tracking-[-0.025em] text-white">
-                      Requerimiento de fabricación
-                    </p>
+                    <span className="rounded-lg border border-white/[0.07] bg-white/[0.035] px-2 py-1 font-mono text-[7px] text-slate-500">
+                      BORRADOR
+                    </span>
                   </div>
-                  <span className="rounded-lg border border-white/[0.07] bg-white/[0.035] px-2 py-1 font-mono text-[7px] text-slate-500">
-                    BORRADOR
-                  </span>
-                </div>
 
-                <div className="mt-3 flex items-center gap-3 rounded-xl border border-cyan-300/[0.09] bg-cyan-300/[0.035] p-3">
-                  <div className="relative grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-cyan-300/15 bg-[#061523]">
-                    <span className="h-6 w-6 rounded-full border border-cyan-200/45" />
-                    <span className="absolute h-px w-8 bg-cyan-300/20" />
-                    <span className="absolute h-8 w-px bg-cyan-300/20" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-slate-500">Pieza objetivo</p>
-                      <span className="font-mono text-[7px] text-cyan-300/70">REV C</span>
+                  <div className="mt-3 overflow-hidden rounded-xl border border-cyan-300/[0.11] bg-cyan-300/[0.035]">
+                    <div className="relative flex items-center gap-3 p-3">
+                      <div className="relative grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-cyan-300/15 bg-[#061523] shadow-[inset_0_0_20px_rgba(34,211,238,0.04)]">
+                        <span className="h-6 w-7 rounded-[50%] border border-cyan-200/50" />
+                        <span className="absolute h-px w-9 bg-cyan-300/20" />
+                        <span className="absolute h-9 w-px bg-cyan-300/20" />
+                        <span className="absolute right-1 top-1 h-1 w-1 rounded-full bg-cyan-300/70" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-slate-500">Pieza objetivo</p>
+                          <span className="font-mono text-[7px] text-cyan-300/70">REV C</span>
+                        </div>
+                        <p className="mt-1 text-[11px] font-semibold text-slate-200">SHAFT Ø48 · AISI 4140</p>
+                        <p className="mt-0.5 font-mono text-[7px] text-slate-600">Plano técnico vinculado</p>
+                      </div>
                     </div>
-                    <p className="mt-1 text-[11px] font-semibold text-slate-200">SHAFT Ø48 · AISI 4140</p>
-                    <p className="mt-0.5 font-mono text-[7px] text-slate-600">Plano técnico vinculado</p>
+                    <div className="grid grid-cols-4 border-t border-white/[0.05] bg-slate-950/28 px-2 py-2">
+                      {captureSteps.map((item, index) => (
+                        <div key={item} className="relative text-center">
+                          {index < captureSteps.length - 1 ? (
+                            <span className="absolute left-[58%] top-[5px] h-px w-[84%] bg-gradient-to-r from-cyan-300/35 to-white/[0.04]" />
+                          ) : null}
+                          <span className={`relative mx-auto block h-2.5 w-2.5 rounded-full border ${index === captureSteps.length - 1 ? 'border-emerald-300/35 bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.55)]' : 'border-cyan-300/25 bg-[#071725]'}`} />
+                          <span className="mt-1 block text-[6px] font-bold uppercase tracking-[0.08em] text-slate-600">{item}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="divide-y divide-white/[0.055] px-4">
-                {requestFields.map(([label, value], index) => (
-                  <div
-                    key={label}
-                    className="flex items-center justify-between gap-5 py-3"
-                    style={reveal(320 + index * 90)}
-                  >
-                    <p className="shrink-0 text-[7px] font-bold uppercase tracking-[0.12em] text-slate-600">{label}</p>
-                    <p className="min-w-0 text-right text-[10px] font-semibold leading-4 text-slate-200">{value}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="border-t border-white/[0.06] bg-slate-950/25 px-4 py-3.5" style={reveal(760)}>
-                <div className="mb-2.5 flex items-center justify-between gap-3">
-                  <span className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-500">Documentación</span>
-                  <span className="text-[7px] font-semibold text-cyan-300/75">2 archivos vinculados</span>
-                </div>
-                <div className="space-y-2">
-                  {requestDocuments.map(([name, size]) => (
-                    <div key={name} className="flex items-center gap-2.5 rounded-xl border border-white/[0.055] bg-white/[0.025] px-2.5 py-2">
-                      <div className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-cyan-300/10 bg-cyan-300/[0.06] font-mono text-[7px] font-bold text-cyan-200">PDF</div>
-                      <p className="min-w-0 flex-1 truncate text-[8px] font-semibold text-slate-300">{name}</p>
-                      <span className="font-mono text-[7px] text-slate-600">{size}</span>
+                <div className="divide-y divide-white/[0.055] px-4">
+                  {requestFields.map(([label, value], index) => (
+                    <div
+                      key={label}
+                      className="flex items-center justify-between gap-5 py-3"
+                      style={reveal(320 + index * 90)}
+                    >
+                      <p className="shrink-0 text-[7px] font-bold uppercase tracking-[0.12em] text-slate-600">{label}</p>
+                      <p className="min-w-0 text-right text-[10px] font-semibold leading-4 text-slate-200">{value}</p>
                     </div>
                   ))}
                 </div>
-              </div>
 
-              <div className="border-t border-emerald-300/10 bg-emerald-400/[0.035] px-4 py-3.5" style={reveal(1040)}>
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-2.5">
-                    <span className="grid h-8 w-8 place-items-center rounded-full border border-emerald-300/20 bg-emerald-400/10 text-[12px] font-black text-emerald-300">✓</span>
-                    <div>
-                      <p className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-emerald-300">Solicitud registrada</p>
-                      <p className="mt-0.5 font-mono text-[8px] text-slate-500">SOL-2026-014</p>
-                    </div>
+                <div className="border-t border-white/[0.06] bg-slate-950/25 px-4 py-3.5" style={reveal(760)}>
+                  <div className="mb-2.5 flex items-center justify-between gap-3">
+                    <span className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-500">Documentación</span>
+                    <span className="text-[7px] font-semibold text-cyan-300/75">2 archivos vinculados</span>
                   </div>
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-35" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                  </span>
+                  <div className="space-y-2">
+                    {requestDocuments.map(([name, size]) => (
+                      <div key={name} className="flex items-center gap-2.5 rounded-xl border border-white/[0.055] bg-white/[0.025] px-2.5 py-2">
+                        <div className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-cyan-300/10 bg-cyan-300/[0.06] font-mono text-[7px] font-bold text-cyan-200">PDF</div>
+                        <p className="min-w-0 flex-1 truncate text-[8px] font-semibold text-slate-300">{name}</p>
+                        <span className="font-mono text-[7px] text-slate-600">{size}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="relative border-t border-emerald-300/10 bg-emerald-400/[0.035] px-4 py-3.5" style={reveal(1040)}>
+                  <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-emerald-300/60 to-transparent" />
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-2.5">
+                      <span className="grid h-8 w-8 place-items-center rounded-full border border-emerald-300/20 bg-emerald-400/10 text-[12px] font-black text-emerald-300">✓</span>
+                      <div>
+                        <p className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-emerald-300">Solicitud registrada</p>
+                        <p className="mt-0.5 font-mono text-[8px] text-slate-500">SOL-2026-014</p>
+                      </div>
+                    </div>
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-35" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -263,31 +286,60 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
           </div>
 
           <div className="relative hidden min-h-[610px] lg:block">
+            <div className="qt-request-workbench absolute inset-x-[1%] top-[1%] bottom-[5%] rounded-[34px] border border-white/[0.055] bg-[linear-gradient(145deg,rgba(8,22,38,0.32),rgba(2,8,23,0.05))] shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]" />
             <div className="absolute left-[8%] top-[4%] h-[74%] w-[74%] rounded-full bg-cyan-400/[0.08] blur-[85px]" />
             <div className="absolute left-[20%] top-[14%] h-[58%] w-[58%] rounded-full bg-blue-500/[0.08] blur-[68px]" />
+            <div className="qt-request-scan-beam pointer-events-none absolute left-[4%] top-[4%] z-[6] h-[84%] w-24 bg-gradient-to-r from-transparent via-cyan-200/[0.045] to-transparent" />
+
+            <div className="pointer-events-none absolute left-[4%] top-[3%] z-[5] font-mono text-[7px] tracking-[0.16em] text-slate-700">CAPTURE / QT-014</div>
+            <div className="pointer-events-none absolute right-[4%] top-[3%] z-[5] flex items-center gap-2 font-mono text-[7px] text-slate-700">
+              <span>CONTEXT NODE</span>
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/80 shadow-[0_0_10px_rgba(52,211,153,0.45)]" />
+            </div>
+
+            <div className="qt-request-orbit qt-request-orbit-a pointer-events-none absolute right-[2%] top-[18%] z-[8] rounded-xl border border-cyan-300/10 bg-slate-950/55 px-3 py-2 backdrop-blur-md">
+              <p className="text-[6px] font-bold uppercase tracking-[0.11em] text-slate-600">Material</p>
+              <p className="mt-1 font-mono text-[8px] text-cyan-200/80">AISI 4140</p>
+            </div>
+            <div className="qt-request-orbit qt-request-orbit-b pointer-events-none absolute right-[5%] top-[36%] z-[8] rounded-xl border border-white/[0.07] bg-slate-950/55 px-3 py-2 backdrop-blur-md">
+              <p className="text-[6px] font-bold uppercase tracking-[0.11em] text-slate-600">Cantidad</p>
+              <p className="mt-1 font-mono text-[8px] text-slate-300">120 PCS</p>
+            </div>
+            <div className="qt-request-orbit qt-request-orbit-c pointer-events-none absolute right-[2%] top-[54%] z-[8] rounded-xl border border-blue-300/10 bg-slate-950/55 px-3 py-2 backdrop-blur-md">
+              <p className="text-[6px] font-bold uppercase tracking-[0.11em] text-slate-600">Documentos</p>
+              <p className="mt-1 font-mono text-[8px] text-blue-200/80">02 LINKED</p>
+            </div>
 
             <div
-              className="qt-request-document absolute left-[3%] top-[6%] z-[2] w-[214px] rounded-2xl border border-white/10 bg-slate-950/70 p-3.5 shadow-[0_28px_80px_-38px_rgba(14,165,233,0.85)] backdrop-blur-xl"
+              className="qt-request-document absolute left-[2%] top-[7%] z-[2] w-[226px] rounded-2xl border border-white/10 bg-slate-950/72 p-3.5 shadow-[0_30px_90px_-42px_rgba(14,165,233,0.9)] backdrop-blur-xl"
               style={reveal(260)}
             >
               <div className="flex items-center justify-between">
                 <span className="text-[8px] font-extrabold uppercase tracking-[0.15em] text-slate-400">Documento técnico</span>
                 <span className="rounded-md border border-cyan-300/15 bg-cyan-300/10 px-1.5 py-0.5 font-mono text-[7px] text-cyan-200">REV C</span>
               </div>
-              <div className="relative mt-3 h-28 overflow-hidden rounded-xl border border-white/[0.06] bg-[#07111e]">
-                <div className="absolute inset-0 opacity-45 [background-image:linear-gradient(rgba(56,189,248,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.08)_1px,transparent_1px)] [background-size:14px_14px]" />
-                <div className="absolute left-5 top-7 h-12 w-28 rounded-full border border-cyan-300/50" />
-                <div className="absolute left-8 top-10 h-6 w-22 border-x border-cyan-200/50" />
+              <div className="relative mt-3 h-36 overflow-hidden rounded-xl border border-white/[0.06] bg-[#06111d] shadow-[inset_0_0_26px_rgba(14,165,233,0.04)]">
+                <div className="absolute inset-0 opacity-55 [background-image:linear-gradient(rgba(56,189,248,0.085)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.085)_1px,transparent_1px)] [background-size:14px_14px]" />
+                <div className="absolute left-5 top-11 h-12 w-32 rounded-[50%] border border-cyan-300/55" />
+                <div className="absolute left-8 top-[54px] h-6 w-26 border-x border-cyan-200/45" />
+                <div className="absolute left-[84px] top-6 h-24 w-px bg-cyan-300/15" />
+                <div className="absolute left-4 top-[70px] h-px w-[164px] bg-cyan-300/15" />
+                <div className="absolute left-3 top-3 font-mono text-[6px] tracking-[0.12em] text-cyan-300/45">Ø48.00 ±0.02</div>
+                <div className="absolute right-3 top-3 font-mono text-[6px] text-slate-600">SCALE 1:2</div>
                 <div className="absolute bottom-3 left-4 font-mono text-[7px] tracking-[0.12em] text-cyan-200/70">SHAFT Ø48 · AISI 4140</div>
               </div>
-              <p className="mt-2 font-mono text-[8px] text-slate-500">Plano_eje_REV-C.pdf</p>
+              <div className="mt-2 flex items-center justify-between gap-2">
+                <p className="font-mono text-[8px] text-slate-500">Plano_eje_REV-C.pdf</p>
+                <span className="rounded-full bg-emerald-400/10 px-2 py-0.5 text-[6px] font-bold uppercase tracking-[0.1em] text-emerald-300/80">Vinculado</span>
+              </div>
             </div>
 
             <div
-              className="qt-request-card absolute left-[14%] top-[7%] z-[4] w-[80%] max-w-[570px] overflow-hidden rounded-[28px] border border-cyan-200/[0.13] bg-[#07111f]/90 shadow-[0_38px_110px_-46px_rgba(14,165,233,0.8)] backdrop-blur-2xl"
+              className="qt-request-card absolute left-[14%] top-[8%] z-[4] w-[78%] max-w-[570px] overflow-hidden rounded-[28px] border border-cyan-200/[0.15] bg-[#07111f]/92 shadow-[0_44px_120px_-48px_rgba(14,165,233,0.95)] backdrop-blur-2xl"
               style={reveal(80)}
             >
-              <div className="border-b border-white/[0.06] bg-gradient-to-r from-cyan-300/[0.055] via-transparent to-blue-400/[0.04] px-6 py-4">
+              <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-cyan-300/45 to-transparent" />
+              <div className="border-b border-white/[0.06] bg-gradient-to-r from-cyan-300/[0.065] via-transparent to-blue-400/[0.045] px-6 py-4">
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
@@ -298,13 +350,25 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                   </div>
                   <span className="rounded-lg border border-white/[0.07] bg-white/[0.03] px-2.5 py-1.5 font-mono text-[8px] text-slate-500">BORRADOR</span>
                 </div>
+
+                <div className="mt-4 grid grid-cols-4 gap-1.5 rounded-xl border border-white/[0.05] bg-slate-950/24 p-2.5">
+                  {captureSteps.map((item, index) => (
+                    <div key={item} className="relative text-center">
+                      {index < captureSteps.length - 1 ? (
+                        <span className="absolute left-[61%] top-[5px] h-px w-[78%] bg-gradient-to-r from-cyan-300/35 to-white/[0.04]" />
+                      ) : null}
+                      <span className={`relative mx-auto block h-2.5 w-2.5 rounded-full border ${index === captureSteps.length - 1 ? 'border-emerald-300/35 bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.55)]' : 'border-cyan-300/25 bg-[#071725]'}`} />
+                      <span className="mt-1.5 block text-[6px] font-bold uppercase tracking-[0.08em] text-slate-600">{item}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-x-5 gap-y-3.5 px-6 py-5">
                 {requestFields.map(([label, value], index) => (
                   <div
                     key={label}
-                    className="rounded-xl border border-white/[0.055] bg-white/[0.025] px-3.5 py-3"
+                    className="rounded-xl border border-white/[0.055] bg-white/[0.025] px-3.5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]"
                     style={reveal(420 + index * 130)}
                   >
                     <p className="text-[7px] font-bold uppercase tracking-[0.13em] text-slate-600">{label}</p>
@@ -333,9 +397,10 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
             </div>
 
             <div
-              className="qt-request-result absolute bottom-[8%] left-[8%] z-[7] w-[270px] rounded-2xl border border-emerald-300/15 bg-slate-950/88 p-4 shadow-[0_26px_80px_-36px_rgba(52,211,153,0.7)] backdrop-blur-xl"
+              className="qt-request-result absolute bottom-[7%] left-[8%] z-[7] w-[284px] rounded-2xl border border-emerald-300/15 bg-slate-950/90 p-4 shadow-[0_28px_90px_-38px_rgba(52,211,153,0.72)] backdrop-blur-xl"
               style={reveal(1280)}
             >
+              <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-emerald-300/55 to-transparent" />
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-2.5">
                   <span className="grid h-7 w-7 place-items-center rounded-full border border-emerald-300/20 bg-emerald-400/10 text-[11px] font-black text-emerald-300">✓</span>
