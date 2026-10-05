@@ -9,6 +9,7 @@ import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
+import { CustomerAddressDeleteDialog } from '../components/CustomerAddressDeleteDialog'
 import { CustomerAddressDialog } from '../components/CustomerAddressDialog'
 import { CustomerCompanyFields } from '../components/CustomerCompanyFields'
 import { CustomerCompanyHeader } from '../components/CustomerCompanyHeader'
@@ -36,6 +37,7 @@ export function CustomerCompanyPage() {
   const isAdmin = customer.role === 'ADMIN'
   const [addressDialogOpen, setAddressDialogOpen] = useState(false)
   const [editingAddressId, setEditingAddressId] = useState<number | null>(null)
+  const [deletingAddressId, setDeletingAddressId] = useState<number | null>(null)
 
   const company = query.data
   const {
@@ -85,6 +87,9 @@ export function CustomerCompanyPage() {
   const editingAddress =
     addressesQuery.data?.find((address) => address.id === editingAddressId) ??
     null
+  const deletingAddress =
+    addressesQuery.data?.find((address) => address.id === deletingAddressId) ??
+    null
 
   const saveAddress = async (values: CustomerAddressFormValues) => {
     const payload = {
@@ -126,6 +131,22 @@ export function CustomerCompanyPage() {
     mutations.updateAddress.reset()
     setEditingAddressId(null)
     setAddressDialogOpen(false)
+  }
+
+  const closeDeleteAddressDialog = () => {
+    mutations.deleteAddress.reset()
+    setDeletingAddressId(null)
+  }
+
+  const deleteAddress = async () => {
+    if (deletingAddressId === null) return
+
+    try {
+      await mutations.deleteAddress.mutateAsync(deletingAddressId)
+      setDeletingAddressId(null)
+    } catch {
+      // The mutation error stays visible inside the confirmation dialog.
+    }
   }
 
   const submit = handleSubmit(async (values) => {
@@ -335,17 +356,29 @@ export function CustomerCompanyPage() {
                       </p>
                     </div>
                     {isAdmin ? (
-                      <button
-                        type="button"
-                        className="inline-flex h-5 shrink-0 items-center rounded-md px-1.5 !text-[8px] !leading-none font-medium text-blue-600 transition hover:bg-blue-50 hover:text-blue-700"
-                        onClick={() => {
-                          setEditingAddressId(address.id)
-                          mutations.updateAddress.reset()
-                          setAddressDialogOpen(true)
-                        }}
-                      >
-                        Editar
-                      </button>
+                      <div className="flex shrink-0 items-center gap-0.5">
+                        <button
+                          type="button"
+                          className="inline-flex h-5 items-center rounded-md px-1.5 !text-[8px] !leading-none font-medium text-blue-600 transition hover:bg-blue-50 hover:text-blue-700"
+                          onClick={() => {
+                            setEditingAddressId(address.id)
+                            mutations.updateAddress.reset()
+                            setAddressDialogOpen(true)
+                          }}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          className="inline-flex h-5 items-center rounded-md px-1.5 !text-[8px] !leading-none font-medium text-red-500 transition hover:bg-red-50 hover:text-red-700"
+                          onClick={() => {
+                            mutations.deleteAddress.reset()
+                            setDeletingAddressId(address.id)
+                          }}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
                     ) : null}
                   </div>
                 </div>
@@ -392,6 +425,14 @@ export function CustomerCompanyPage() {
         }
         onClose={closeAddressDialog}
         onSubmit={saveAddress}
+      />
+
+      <CustomerAddressDeleteDialog
+        address={deletingAddress}
+        deleting={mutations.deleteAddress.isPending}
+        error={mutations.deleteAddress.error}
+        onClose={closeDeleteAddressDialog}
+        onConfirm={() => void deleteAddress()}
       />
     </PageContainer>
   )
