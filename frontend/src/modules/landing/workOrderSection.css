@@ -38,7 +38,7 @@
 
 @keyframes qt-work-order-travel {
   0% {
-    transform: translateX(0);
+    left: 8%;
     opacity: 0;
   }
   12% {
@@ -48,7 +48,7 @@
     opacity: 1;
   }
   100% {
-    transform: translateX(438px);
+    left: 91%;
     opacity: 0;
   }
 }
