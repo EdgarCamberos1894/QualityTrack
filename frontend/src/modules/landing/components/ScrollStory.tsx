@@ -85,7 +85,7 @@ export function ScrollStory() {
       <section
         ref={introSectionRef}
         id={intro.id}
-        className="relative h-[116svh] bg-[#020617] sm:h-[118svh]"
+        className="relative h-[108svh] bg-[#020617] sm:h-[110svh]"
       >
         <div className="sticky top-0 isolate min-h-screen overflow-hidden bg-[#020617]">
           <div className="absolute inset-0 qt-story-backdrop" />
