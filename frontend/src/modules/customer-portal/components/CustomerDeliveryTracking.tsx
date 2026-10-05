@@ -1,7 +1,7 @@
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Badge } from '@/shared/components/ui/Badge'
-import { Button } from '@/shared/components/ui/Button'
 import { Card } from '@/shared/components/ui/Card'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import {
@@ -134,23 +134,20 @@ function DeliveryCard({
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                disabled={busy}
+            <div className="flex flex-wrap gap-1.5">
+              <ActionIconButton
+                icon="view"
+                label={busy ? 'Abriendo evidencia…' : 'Ver evidencia de entrega'}
+                tone="primary"
+                busy={busy}
                 onClick={onOpenEvidence}
-              >
-                {busy ? 'Abriendo…' : 'Ver'}
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
+              />
+              <ActionIconButton
+                icon="download"
+                label="Descargar evidencia de entrega"
                 disabled={busy}
                 onClick={onDownloadEvidence}
-              >
-                Descargar
-              </Button>
+              />
             </div>
           </div>
         </div>
