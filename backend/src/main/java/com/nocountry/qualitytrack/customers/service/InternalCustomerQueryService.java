@@ -2,6 +2,7 @@ package com.nocountry.qualitytrack.customers.service;
 
 import com.nocountry.qualitytrack.customers.dto.response.CustomerMemberResponse;
 import com.nocountry.qualitytrack.customers.dto.response.InternalCustomerDetailResponse;
+import com.nocountry.qualitytrack.customers.dto.response.InternalCustomerJobCasePageResponse;
 import com.nocountry.qualitytrack.customers.dto.response.InternalCustomerSummaryResponse;
 import com.nocountry.qualitytrack.customers.entity.Customer;
 import com.nocountry.qualitytrack.customers.enums.CustomerMembershipStatus;
@@ -17,6 +18,8 @@ import com.nocountry.qualitytrack.users.enums.AccountType;
 import com.nocountry.qualitytrack.users.enums.UserStatus;
 import com.nocountry.qualitytrack.users.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,8 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class InternalCustomerQueryService {
+
+    private static final int MAX_CASE_PAGE_SIZE = 50;
 
     private final CustomerRepository customerRepository;
     private final CustomerMembershipRepository membershipRepository;
@@ -58,11 +63,7 @@ public class InternalCustomerQueryService {
     public InternalCustomerDetailResponse get(Long currentUserId, Long customerId) {
         requireInternalReader(currentUserId);
 
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new BusinessException(
-                        ApiErrorCode.RESOURCE_NOT_FOUND,
-                        "No se encontró la empresa."
-                ));
+        Customer customer = requireCustomer(customerId);
 
         List<CustomerMemberResponse> members = membershipRepository
                 .findAllByCustomer_IdAndStatusOrderByCreatedAtAsc(
@@ -73,20 +74,43 @@ public class InternalCustomerQueryService {
                 .map(CustomerMemberResponse::from)
                 .toList();
 
-        List<JobCaseResponse> jobCases = jobCaseRepository
-                .findAllByCustomerRequest_Customer_IdOrderByOpenedAtDesc(customerId)
-                .stream()
-                .map(JobCaseResponse::from)
-                .toList();
-
         EnumMap<JobCaseStatus, Long> counts = new EnumMap<>(JobCaseStatus.class);
-        jobCases.forEach(jobCase -> counts.merge(jobCase.status(), 1L, Long::sum));
+        jobCaseRepository.countByCustomerAndStatus(customerId)
+                .forEach(row -> counts.put(row.getStatus(), row.getTotal()));
 
         return new InternalCustomerDetailResponse(
                 summary(customer, members.size(), counts),
-                members,
-                jobCases
+                members
         );
+    }
+
+    @Transactional(readOnly = true)
+    public InternalCustomerJobCasePageResponse getJobCases(
+            Long currentUserId,
+            Long customerId,
+            int page,
+            int size,
+            String search,
+            JobCaseStatus status,
+            Boolean assigned
+    ) {
+        requireInternalReader(currentUserId);
+        requireCustomer(customerId);
+
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), MAX_CASE_PAGE_SIZE);
+        String pattern = normalizePattern(search);
+
+        Page<JobCaseResponse> result = jobCaseRepository.searchByCustomer(
+                        customerId,
+                        pattern,
+                        status,
+                        assigned,
+                        PageRequest.of(safePage, safeSize)
+                )
+                .map(JobCaseResponse::from);
+
+        return InternalCustomerJobCasePageResponse.from(result);
     }
 
     private InternalCustomerSummaryResponse summary(
@@ -126,6 +150,21 @@ public class InternalCustomerQueryService {
         });
 
         return grouped;
+    }
+
+    private Customer requireCustomer(Long customerId) {
+        return customerRepository.findById(customerId)
+                .orElseThrow(() -> new BusinessException(
+                        ApiErrorCode.RESOURCE_NOT_FOUND,
+                        "No se encontró la empresa."
+                ));
+    }
+
+    private String normalizePattern(String search) {
+        if (search == null || search.isBlank()) {
+            return null;
+        }
+        return "%" + search.trim().toLowerCase() + "%";
     }
 
     private void requireInternalReader(Long currentUserId) {
