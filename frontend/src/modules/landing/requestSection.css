@@ -44,15 +44,7 @@
 }
 
 .qt-request-orbit {
-  animation: qt-request-orbit 5.8s ease-in-out infinite;
-}
-
-.qt-request-orbit-b {
-  animation-delay: -1.9s;
-}
-
-.qt-request-orbit-c {
-  animation-delay: -3.7s;
+  display: none;
 }
 
 .qt-request-mobile-card {
@@ -112,16 +104,6 @@
   }
   50% {
     translate: 0 -5px;
-  }
-}
-
-@keyframes qt-request-orbit {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: 0 -4px;
   }
 }
 
@@ -223,7 +205,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .qt-request-result,
-  .qt-request-orbit,
   .qt-request-scan-beam,
   .qt-request-mobile-scan,
   .qt-request-mobile-trace::after,
