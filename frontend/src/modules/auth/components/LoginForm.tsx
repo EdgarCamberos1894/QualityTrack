@@ -46,59 +46,62 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
         {...register('email')}
       />
 
-      <TextField
-        label="Contraseña"
-        type={showPassword ? 'text' : 'password'}
-        autoComplete="current-password"
-        placeholder="Ingresa tu contraseña"
-        labelClassName="!text-[10px] !font-semibold"
-        labelAction={
+      <div>
+        <TextField
+          label="Contraseña"
+          type={showPassword ? 'text' : 'password'}
+          autoComplete="current-password"
+          placeholder="Ingresa tu contraseña"
+          labelClassName="!text-[10px] !font-semibold"
+          className="!h-9 !rounded-lg !px-3 !pr-10 !text-[10px] !shadow-sm placeholder:!text-[9px]"
+          error={errors.password?.message}
+          endAdornment={
+            <button
+              type="button"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+              onClick={() => setShowPassword((current) => !current)}
+              aria-label={
+                showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+              }
+            >
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                className="h-3.5 w-3.5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {showPassword ? (
+                  <>
+                    <path d="M3 3l18 18" />
+                    <path d="M10.6 10.7a2 2 0 002.7 2.7" />
+                    <path d="M9.9 4.2A10.7 10.7 0 0112 4c5.2 0 8.5 4.4 9.5 6a2 2 0 010 2c-.4.6-1.1 1.5-2 2.4" />
+                    <path d="M6.6 6.6C4.7 7.8 3.4 9.5 2.5 11a2 2 0 000 2C3.5 14.6 6.8 19 12 19c1.4 0 2.7-.3 3.8-.7" />
+                  </>
+                ) : (
+                  <>
+                    <path d="M2.5 11a2 2 0 000 2c1 1.6 4.3 6 9.5 6s8.5-4.4 9.5-6a2 2 0 000-2c-1-1.6-4.3-6-9.5-6S3.5 9.4 2.5 11z" />
+                    <circle cx="12" cy="12" r="2.5" />
+                  </>
+                )}
+              </svg>
+            </button>
+          }
+          {...register('password')}
+        />
+
+        <div className="mt-2 text-right">
           <Link
             to="/forgot-password"
             className="text-[9px] font-medium text-blue-600 transition hover:text-blue-700"
           >
             ¿Olvidaste tu contraseña?
           </Link>
-        }
-        className="!h-9 !rounded-lg !px-3 !pr-10 !text-[10px] !shadow-sm placeholder:!text-[9px]"
-        error={errors.password?.message}
-        endAdornment={
-          <button
-            type="button"
-            className="flex h-7 w-7 items-center justify-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-            onClick={() => setShowPassword((current) => !current)}
-            aria-label={
-              showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-            }
-          >
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              className="h-3.5 w-3.5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.7"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              {showPassword ? (
-                <>
-                  <path d="M3 3l18 18" />
-                  <path d="M10.6 10.7a2 2 0 002.7 2.7" />
-                  <path d="M9.9 4.2A10.7 10.7 0 0112 4c5.2 0 8.5 4.4 9.5 6a2 2 0 010 2c-.4.6-1.1 1.5-2 2.4" />
-                  <path d="M6.6 6.6C4.7 7.8 3.4 9.5 2.5 11a2 2 0 000 2C3.5 14.6 6.8 19 12 19c1.4 0 2.7-.3 3.8-.7" />
-                </>
-              ) : (
-                <>
-                  <path d="M2.5 11a2 2 0 000 2c1 1.6 4.3 6 9.5 6s8.5-4.4 9.5-6a2 2 0 000-2c-1-1.6-4.3-6-9.5-6S3.5 9.4 2.5 11z" />
-                  <circle cx="12" cy="12" r="2.5" />
-                </>
-              )}
-            </svg>
-          </button>
-        }
-        {...register('password')}
-      />
+        </div>
+      </div>
 
       {loginMutation.isError ? (
         <div
