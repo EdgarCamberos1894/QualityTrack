@@ -1,5 +1,6 @@
 import { useFieldArray, useWatch } from 'react-hook-form'
 import type { Control, FieldErrors, UseFormRegister } from 'react-hook-form'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Button } from '@/shared/components/ui/Button'
 import type { QuotationFormValues } from '../schemas/quotation.schema'
 
@@ -150,15 +151,12 @@ export function QuotationItemsEditor({
 
               {editable ? (
                 <div className="flex items-end justify-end">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="!h-7 !px-1 !text-[7px] text-slate-500"
+                  <ActionIconButton
+                    icon="delete"
+                    label={`Eliminar concepto ${index + 1}`}
+                    tone="danger"
                     onClick={() => remove(index)}
-                    aria-label={`Eliminar concepto ${index + 1}`}
-                  >
-                    Quitar
-                  </Button>
+                  />
                 </div>
               ) : null}
             </div>
