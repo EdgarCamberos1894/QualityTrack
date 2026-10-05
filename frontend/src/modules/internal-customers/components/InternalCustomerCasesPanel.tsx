@@ -5,6 +5,12 @@ import {
   type JobCaseFiltersValue,
 } from '@/modules/job-cases'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
+import {
+  InternalListingBody,
+  InternalListingHeader,
+  InternalListingPanel,
+  InternalListingResultsBar,
+} from '@/shared/components/listing/InternalListing'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { useInternalCustomerJobCases } from '../hooks/useInternalCustomers'
 import type { InternalCustomerJobCaseQuery } from '../types/internalCustomer.types'
@@ -84,54 +90,35 @@ export function InternalCustomerCasesPanel({
   }
 
   return (
-    <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
-      <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/55 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-        <div>
-          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-            Flujo comercial
-          </p>
-          <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
-            Expedientes de la empresa
-          </h2>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <p className="text-[8px] font-medium text-slate-400">
-            Consulta solicitudes convertidas en expediente y su etapa actual.
-          </p>
-          <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[8px] font-semibold text-slate-600 shadow-sm">
-            {totalCases} en total
-          </span>
-        </div>
-      </div>
+    <InternalListingPanel>
+      <InternalListingHeader
+        eyebrow="Flujo comercial"
+        title="Expedientes de la empresa"
+        aside={
+          <div className="flex items-center gap-2">
+            <p className="text-[8px] font-medium text-slate-400">
+              Consulta solicitudes convertidas en expediente y su etapa actual.
+            </p>
+            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[8px] font-semibold text-slate-600 shadow-sm">
+              {totalCases} en total
+            </span>
+          </div>
+        }
+      />
 
       {totalCases > 0 ? (
         <>
           <JobCaseFilters value={filters} onChange={changeFilters} />
 
-          <div className="flex items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/65 px-4 py-2.5 sm:px-5">
-            <div className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-              <p className="text-[9px] font-semibold text-slate-700">
-                {totalItems}{' '}
-                {totalItems === 1
-                  ? 'expediente visible'
-                  : 'expedientes visibles'}
-              </p>
-            </div>
-
-            {hasFilters ? (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="text-[9px] font-semibold text-blue-600 transition hover:text-blue-700"
-              >
-                Limpiar filtros
-              </button>
-            ) : null}
-          </div>
+          <InternalListingResultsBar
+            count={totalItems}
+            singular="expediente visible"
+            plural="expedientes visibles"
+            onClear={hasFilters ? clearFilters : undefined}
+          />
 
           {casesQuery.isError ? (
-            <div className="bg-slate-50/40 p-3.5 sm:p-4">
+            <InternalListingBody>
               <div className="flex flex-col gap-2 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-[9px] font-semibold text-red-800">
@@ -149,30 +136,28 @@ export function InternalCustomerCasesPanel({
                   Reintentar
                 </button>
               </div>
-            </div>
+            </InternalListingBody>
           ) : casesQuery.isPending && !result ? (
-            <div className="bg-slate-50/40 px-4 py-7 text-center sm:px-5">
+            <InternalListingBody className="px-4 py-7 text-center sm:px-5">
               <p className="text-[9px] font-medium text-slate-500">
                 Cargando expedientes…
               </p>
-            </div>
+            </InternalListingBody>
           ) : visibleCases.length > 0 ? (
-            <div
-              className={`bg-slate-50/40 p-3.5 transition-opacity sm:p-4 ${
-                casesQuery.isFetching ? 'opacity-60' : 'opacity-100'
-              }`}
+            <InternalListingBody
+              className={casesQuery.isFetching ? 'opacity-60' : 'opacity-100'}
             >
               <JobCaseTable jobCases={visibleCases} />
-            </div>
+            </InternalListingBody>
           ) : (
-            <div className="bg-slate-50/40 p-3.5 sm:p-4">
+            <InternalListingBody>
               <div className="rounded-xl border border-slate-200 bg-white p-4">
                 <EmptyState
                   title="No hay expedientes que coincidan"
                   description="Ajusta la búsqueda o los filtros para consultar otros expedientes de esta empresa."
                 />
               </div>
-            </div>
+            </InternalListingBody>
           )}
 
           {result && totalItems > 0 ? (
@@ -212,13 +197,13 @@ export function InternalCustomerCasesPanel({
           ) : null}
         </>
       ) : (
-        <div className="bg-slate-50/40 p-4">
+        <InternalListingBody>
           <EmptyState
             title="Sin expedientes"
             description="Esta empresa todavía no tiene solicitudes convertidas en expediente."
           />
-        </div>
+        </InternalListingBody>
       )}
-    </section>
+    </InternalListingPanel>
   )
 }
