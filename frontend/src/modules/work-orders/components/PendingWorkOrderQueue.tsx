@@ -1,5 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import {
+  InternalListingHeader,
+  InternalListingPanel,
+  InternalListingResultsBar,
+} from '@/shared/components/listing/InternalListing'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { CreateWorkOrderDialog } from './CreateWorkOrderDialog'
@@ -20,28 +25,20 @@ export function PendingWorkOrderQueue({
   if (pendingWorkOrders.length === 0) return null
 
   return (
-    <section className="mt-4 overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
-      <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/65 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-        <div>
-          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-            Handoff comercial → operación
-          </p>
-          <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
-            Pendientes de crear OT
-          </h2>
-          <p className="mt-0.5 max-w-2xl text-[8px] leading-4 text-slate-500">
-            Cotizaciones aprobadas por el cliente que ya salieron del flujo
-            comercial y esperan convertirse en una orden de trabajo.
-          </p>
-        </div>
+    <InternalListingPanel className="border-blue-200">
+      <InternalListingHeader
+        eyebrow="Handoff comercial → operación"
+        title="Pendientes de crear OT"
+        description="Cotizaciones aprobadas por el cliente que ya salieron del flujo comercial y esperan convertirse en una orden de trabajo."
+      />
 
-        <Badge tone="info" className="w-fit px-2 py-0.5 text-[8px]">
-          {pendingWorkOrders.length} pendiente
-          {pendingWorkOrders.length === 1 ? '' : 's'}
-        </Badge>
-      </div>
+      <InternalListingResultsBar
+        count={pendingWorkOrders.length}
+        singular="pendiente de crear"
+        plural="pendientes de crear"
+      />
 
-      <div className="divide-y divide-slate-100">
+      <div className="divide-y divide-slate-100 bg-white">
         {pendingWorkOrders.map((candidate) => (
           <PendingWorkOrderRow
             key={candidate.caseId}
@@ -50,7 +47,7 @@ export function PendingWorkOrderQueue({
           />
         ))}
       </div>
-    </section>
+    </InternalListingPanel>
   )
 }
 
@@ -132,7 +129,7 @@ function PendingWorkOrderRow({
         <div className="flex justify-start lg:justify-end">
           {canCreate ? (
             <Button
-              className="!h-7 !px-2.5 !text-[8px]"
+              className="!h-8 !px-3 !text-[9px]"
               onClick={() => {
                 mutation.reset()
                 setOpen(true)
