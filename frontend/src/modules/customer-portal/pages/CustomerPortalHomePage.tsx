@@ -17,7 +17,7 @@ export function CustomerPortalHomePage() {
 
   if (requestsQuery.isPending || quotationsQuery.isPending) {
     return (
-      <PageContainer>
+      <PageContainer className="py-3">
         <LoadingState label="Preparando tu panel…" />
       </PageContainer>
     )
@@ -25,7 +25,7 @@ export function CustomerPortalHomePage() {
 
   if (requestsQuery.isError || quotationsQuery.isError) {
     return (
-      <PageContainer>
+      <PageContainer className="py-3">
         <ErrorState
           error={requestsQuery.error ?? quotationsQuery.error}
           title="No pudimos preparar tu panel"
@@ -70,7 +70,7 @@ export function CustomerPortalHomePage() {
   ).length
 
   return (
-    <PageContainer>
+    <PageContainer className="py-3">
       <CustomerDashboardHero
         customer={customer}
         activeRequests={activeRequests}
@@ -78,7 +78,7 @@ export function CustomerPortalHomePage() {
         quotationsToReview={quotationsToReview}
       />
 
-      <div className="mt-5">
+      <div className="mt-4">
         <CustomerDashboardMetrics
           customerId={customer.customerId}
           activeRequests={activeRequests}
@@ -88,7 +88,7 @@ export function CustomerPortalHomePage() {
         />
       </div>
 
-      <div className="mt-5">
+      <div className="mt-4">
         <CustomerDashboardJourney
           customerId={customer.customerId}
           reviewCount={reviewCount}
@@ -98,7 +98,7 @@ export function CustomerPortalHomePage() {
         />
       </div>
 
-      <div className="mt-5 grid gap-5 lg:grid-cols-[0.88fr_1.12fr]">
+      <div className="mt-4 grid gap-4 lg:grid-cols-[0.88fr_1.12fr]">
         <CustomerDashboardNextSteps
           customerId={customer.customerId}
           waitingCustomerInfo={waitingCustomerInfo}
