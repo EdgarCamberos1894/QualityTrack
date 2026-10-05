@@ -1,5 +1,5 @@
 import { lerp, segment, type Vec3 } from './math'
-import { ScenePainter } from './webgl'
+import type { ScenePainter } from './webgl'
 import type { SceneFrameState } from './sceneDocuments'
 
 const navy: [number, number, number] = [0.045, 0.09, 0.16]
