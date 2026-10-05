@@ -6,6 +6,7 @@ interface WorkProgressStepsProps {
   cancelled?: boolean
   deliveryComplete?: boolean
   variant?: 'light' | 'dark'
+  heading?: string
   stepHrefs?: Partial<Record<number, string>>
   stepDetails?: Partial<Record<number, string>>
 }
@@ -24,6 +25,7 @@ export function WorkProgressSteps({
   cancelled = false,
   deliveryComplete = false,
   variant = 'light',
+  heading = 'Progreso del trabajo',
   stepHrefs = {},
   stepDetails = {},
 }: WorkProgressStepsProps) {
@@ -57,7 +59,7 @@ export function WorkProgressSteps({
               dark ? 'text-blue-300' : 'text-blue-600',
             )}
           >
-            Progreso del trabajo
+            {heading}
           </p>
           <p
             className={cn(
