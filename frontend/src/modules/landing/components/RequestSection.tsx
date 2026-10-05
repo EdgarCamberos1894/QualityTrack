@@ -104,9 +104,12 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
 
   const requestTracePath =
     'M 343 0 C 326 27, 311 61, 329 96 C 352 137, 365 174, 328 206 C 294 236, 245 253, 202 284'
+  const requestHandoffPath =
+    'M 286 505 C 281 588, 190 635, 205 720 C 219 800, 278 858, 250 1000'
 
   const formOpacity = 1 - consolidationProgress
   const documentOpacity = documentProgress * (1 - consolidationProgress)
+  const handoffLabelProgress = reducedMotion ? 1 : rangeProgress(exitProgress, 0.34, 0.72)
   const sectionClassName = reducedMotion
     ? 'relative isolate min-h-screen bg-[#020817]'
     : 'relative isolate h-[260svh] bg-[#020817] lg:h-[280svh]'
@@ -186,6 +189,57 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
               </>
             ) : null}
           </svg>
+        </div>
+
+        <div className="pointer-events-none absolute inset-0 z-[7] hidden lg:block" aria-hidden="true">
+          <svg viewBox="0 0 1000 1000" className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="qtRequestHandoff" x1="0.28" y1="0.5" x2="0.25" y2="1">
+                <stop offset="0%" stopColor="#34d399" stopOpacity="0.52" />
+                <stop offset="24%" stopColor="#22d3ee" stopOpacity="0.76" />
+                <stop offset="68%" stopColor="#60a5fa" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.22" />
+              </linearGradient>
+              <filter id="qtRequestHandoffGlow" x="-80%" y="-30%" width="260%" height="180%">
+                <feGaussianBlur stdDeviation="8" />
+              </filter>
+            </defs>
+
+            <path
+              d={requestHandoffPath}
+              fill="none"
+              stroke="url(#qtRequestHandoff)"
+              strokeWidth="13"
+              opacity={exitProgress * 0.11}
+              filter="url(#qtRequestHandoffGlow)"
+            />
+            <path
+              d={requestHandoffPath}
+              fill="none"
+              pathLength="1"
+              stroke="url(#qtRequestHandoff)"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeDasharray={`${Math.max(0.001, exitProgress)} 1`}
+              opacity={0.25 + exitProgress * 0.75}
+            />
+            <circle cx="286" cy="505" r="3.5" fill="#6ee7b7" opacity={exitProgress} />
+            <circle cx="250" cy="1000" r="3.4" fill="#93c5fd" opacity={rangeProgress(exitProgress, 0.72, 1)} />
+          </svg>
+
+          <div
+            className="absolute left-[15.5%] top-[76%] flex items-center gap-2.5"
+            style={{
+              opacity: handoffLabelProgress,
+              transform: `translate3d(0, ${(1 - handoffLabelProgress) * 10}px, 0)`,
+            }}
+          >
+            <span className="h-px w-9 bg-gradient-to-r from-transparent to-cyan-300/50" />
+            <div>
+              <p className="font-mono text-[7px] uppercase tracking-[0.16em] text-slate-600">Siguiente</p>
+              <p className="mt-1 text-[9px] font-semibold tracking-[0.03em] text-blue-200/80">Expediente 360</p>
+            </div>
+          </div>
         </div>
 
         <div className="relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-rows-[auto_1fr] items-start gap-3 px-5 pb-4 pt-4 sm:px-8 sm:pb-6 sm:pt-5 lg:grid-cols-[1.08fr_0.92fr] lg:grid-rows-1 lg:items-center lg:gap-14 lg:px-12 lg:pb-8 lg:pt-8 xl:px-16">
@@ -422,19 +476,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
               </div>
 
               <div
-                className="pointer-events-none absolute bottom-[-2%] left-[25%] hidden h-32 w-px origin-top bg-gradient-to-b from-cyan-300/55 via-blue-400/22 to-transparent lg:block"
-                style={{
-                  opacity: exitProgress,
-                  transform: `scaleY(${exitProgress})`,
-                }}
-              >
-                {!reducedMotion && exitProgress > 0.55 ? (
-                  <span className="qt-request-exit-pulse absolute left-[-2px] top-0 h-1 w-1 rounded-full bg-cyan-200 shadow-[0_0_12px_rgba(103,232,249,0.8)]" />
-                ) : null}
-              </div>
-
-              <div
-                className="pointer-events-none absolute bottom-0 left-1/2 h-14 w-px origin-top bg-gradient-to-b from-cyan-300/50 to-transparent lg:hidden"
+                className="pointer-events-none absolute bottom-0 left-1/2 h-24 w-px origin-top bg-gradient-to-b from-cyan-300/50 via-blue-400/24 to-transparent lg:hidden"
                 style={{
                   opacity: exitProgress,
                   transform: `scaleY(${exitProgress})`,
