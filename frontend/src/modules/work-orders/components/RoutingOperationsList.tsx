@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Button } from '@/shared/components/ui/Button'
 import type { RoutingOperationDto } from '../types/workOrder.types'
 
@@ -69,14 +70,12 @@ export function RoutingOperationsList({
 
               {editable ? (
                 <>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="!h-7 !px-2 !text-[8px]"
+                  <ActionIconButton
+                    icon="edit"
+                    label={`Editar operación ${item.code}`}
+                    tone="primary"
                     onClick={() => onEdit(item)}
-                  >
-                    Editar
-                  </Button>
+                  />
 
                   {deleteCandidateId === item.id ? (
                     <>
@@ -102,14 +101,12 @@ export function RoutingOperationsList({
                       </Button>
                     </>
                   ) : (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="!h-7 !px-2 !text-[8px] text-red-600"
+                    <ActionIconButton
+                      icon="delete"
+                      label={`Eliminar operación ${item.code}`}
+                      tone="danger"
                       onClick={() => setDeleteCandidateId(item.id)}
-                    >
-                      Eliminar
-                    </Button>
+                    />
                   )}
                 </>
               ) : null}
