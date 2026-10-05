@@ -1,5 +1,18 @@
 import { Link } from 'react-router-dom'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
+import {
+  InternalListingBody,
+  InternalListingHeader,
+  InternalListingPanel,
+  InternalListingResultsBar,
+} from '@/shared/components/listing/InternalListing'
+import {
+  InternalListingCard,
+  InternalListingCardFooter,
+  InternalListingCardTop,
+  InternalListingSummaryCell,
+  InternalListingSummaryGrid,
+} from '@/shared/components/listing/InternalListingCard'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Badge } from '@/shared/components/ui/Badge'
 import {
@@ -55,26 +68,20 @@ export function OperationalWorkOrderQueue({
   getActionLabel,
 }: OperationalWorkOrderQueueProps) {
   return (
-    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
-      <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-        <div>
-          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-            Trabajo operativo
-          </p>
-          <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
-            {title}
-          </h2>
-          <p className="mt-0.5 max-w-2xl text-[8px] leading-4 text-slate-400">
-            {description}
-          </p>
-        </div>
-        <span className="text-[8px] font-medium text-slate-400">
-          {workOrders.length}{' '}
-          {workOrders.length === 1 ? 'orden visible' : 'órdenes visibles'}
-        </span>
-      </div>
+    <InternalListingPanel className="mt-0">
+      <InternalListingHeader
+        eyebrow="Trabajo operativo"
+        title={title}
+        description={description}
+      />
 
-      <div className="bg-slate-50/40 p-3.5 sm:p-4">
+      <InternalListingResultsBar
+        count={workOrders.length}
+        singular="orden visible"
+        plural="órdenes visibles"
+      />
+
+      <InternalListingBody>
         {workOrders.length === 0 ? (
           <EmptyState title={emptyTitle} description={emptyDescription} />
         ) : (
@@ -84,54 +91,23 @@ export function OperationalWorkOrderQueue({
               const actionLabel = getActionLabel(workOrder)
 
               return (
-                <article
+                <InternalListingCard
                   key={workOrder.id}
-                  className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_10px_28px_-24px_rgba(15,23,42,0.32)] transition duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                  accentClassName={statusAccent[workOrder.status]}
                 >
-                  <div
-                    className={`absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r ${statusAccent[workOrder.status]}`}
-                  />
-
-                  <div className="p-4">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                      <div className="flex min-w-0 gap-3">
-                        <div
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${statusSurface[workOrder.status]}`}
-                        >
-                          <SidebarNavIcon
-                            name={tab === 'quality' ? 'quality' : 'production'}
-                            className="h-[17px] w-[17px]"
-                          />
-                        </div>
-
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-1.5">
-                            <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-slate-400">
-                              {workOrder.workOrderNumber}
-                            </p>
-                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[8px] font-semibold text-slate-500">
-                              Prioridad{' '}
-                              {getWorkOrderPriorityLabel(
-                                workOrder.priority,
-                              ).toLowerCase()}
-                            </span>
-                          </div>
-
-                          <Link
-                            to={`/work-orders/${workOrder.id}?tab=${tab}`}
-                            className="mt-1.5 block truncate text-sm font-semibold text-slate-950 transition group-hover:text-blue-700"
-                          >
-                            {workOrder.customerName}
-                          </Link>
-
-                          <p className="mt-1 truncate text-[10px] leading-4 text-slate-500">
-                            Expediente {workOrder.caseNumber} · Solicitud{' '}
-                            {workOrder.requestNumber}
-                          </p>
-                        </div>
+                  <InternalListingCardTop
+                    icon={
+                      <div
+                        className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${statusSurface[workOrder.status]}`}
+                      >
+                        <SidebarNavIcon
+                          name={tab === 'quality' ? 'quality' : 'production'}
+                          className="h-[17px] w-[17px]"
+                        />
                       </div>
-
-                      <div className="flex shrink-0 flex-wrap items-center gap-2">
+                    }
+                    actions={
+                      <>
                         <Badge
                           tone={status.tone}
                           className="px-2.5 py-0.5 text-[9px]"
@@ -144,58 +120,65 @@ export function OperationalWorkOrderQueue({
                         >
                           {actionLabel}
                         </Link>
-                      </div>
+                      </>
+                    }
+                  >
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <p className="text-[9px] font-bold uppercase tracking-[0.08em] text-slate-400">
+                        {workOrder.workOrderNumber}
+                      </p>
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[8px] font-semibold text-slate-500">
+                        Prioridad{' '}
+                        {getWorkOrderPriorityLabel(workOrder.priority).toLowerCase()}
+                      </span>
                     </div>
 
-                    <div className="mt-4 grid gap-2 sm:grid-cols-3">
-                      <SummaryCell
-                        label="Cantidad"
-                        value={
-                          workOrder.plannedQuantity
-                            ? `${workOrder.plannedQuantity} pieza${workOrder.plannedQuantity === 1 ? '' : 's'}`
-                            : 'Por definir'
-                        }
-                      />
-                      <SummaryCell
-                        label="Inicio previsto"
-                        value={formatWorkOrderDate(workOrder.plannedStartDate)}
-                      />
-                      <SummaryCell
-                        label="Entrega comprometida"
-                        value={formatWorkOrderDate(
-                          workOrder.agreedDeliveryDate,
-                        )}
-                      />
-                    </div>
+                    <Link
+                      to={`/work-orders/${workOrder.id}?tab=${tab}`}
+                      className="mt-1.5 block truncate text-sm font-semibold text-slate-950 transition group-hover:text-blue-700"
+                    >
+                      {workOrder.customerName}
+                    </Link>
 
-                    <div className="mt-4 flex flex-col gap-1 border-t border-slate-100 pt-3 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="text-[9px] leading-4 text-slate-500">
-                        {status.description}
-                      </p>
-                      <p className="shrink-0 text-[8px] font-semibold text-slate-500">
-                        Etapa · {status.stage}
-                      </p>
-                    </div>
-                  </div>
-                </article>
+                    <p className="mt-1 truncate text-[10px] leading-4 text-slate-500">
+                      Expediente {workOrder.caseNumber} · Solicitud{' '}
+                      {workOrder.requestNumber}
+                    </p>
+                  </InternalListingCardTop>
+
+                  <InternalListingSummaryGrid>
+                    <InternalListingSummaryCell
+                      label="Cantidad"
+                      value={
+                        workOrder.plannedQuantity
+                          ? `${workOrder.plannedQuantity} pieza${workOrder.plannedQuantity === 1 ? '' : 's'}`
+                          : 'Por definir'
+                      }
+                    />
+                    <InternalListingSummaryCell
+                      label="Inicio previsto"
+                      value={formatWorkOrderDate(workOrder.plannedStartDate)}
+                    />
+                    <InternalListingSummaryCell
+                      label="Entrega comprometida"
+                      value={formatWorkOrderDate(workOrder.agreedDeliveryDate)}
+                    />
+                  </InternalListingSummaryGrid>
+
+                  <InternalListingCardFooter>
+                    <p className="text-[9px] leading-4 text-slate-500">
+                      {status.description}
+                    </p>
+                    <p className="shrink-0 text-[8px] font-semibold text-slate-500">
+                      Etapa · {status.stage}
+                    </p>
+                  </InternalListingCardFooter>
+                </InternalListingCard>
               )
             })}
           </div>
         )}
-      </div>
-    </section>
-  )
-}
-
-function SummaryCell({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-slate-100 bg-slate-50/70 px-3 py-2.5">
-      <p className="text-[8px] font-bold uppercase tracking-wide text-slate-400">
-        {label}
-      </p>
-      <p className="mt-1 truncate text-[10px] font-semibold text-slate-900">
-        {value}
-      </p>
-    </div>
+      </InternalListingBody>
+    </InternalListingPanel>
   )
 }
