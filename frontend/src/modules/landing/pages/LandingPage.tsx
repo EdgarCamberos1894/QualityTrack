@@ -8,10 +8,11 @@ import { QuoteChapter } from '../components/QuoteChapter'
 import { ScrollStory } from '../components/ScrollStory'
 import { WorkOrderChapter } from '../components/WorkOrderChapter'
 import '../landing.css'
+import '../landingAudit.css'
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen overflow-x-clip bg-[#020617]">
+    <div className="qt-landing-root min-h-screen overflow-x-clip bg-[#020617]">
       <LandingHeader />
       <main>
         <ScrollStory />
