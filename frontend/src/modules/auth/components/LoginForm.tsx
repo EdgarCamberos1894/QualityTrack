@@ -114,7 +114,7 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
         className="!h-9 w-full !rounded-lg !text-[10px] !font-semibold"
         disabled={loginMutation.isPending}
       >
-        {loginMutation.isPending ? 'Ingresando…' : 'Entrar'}
+        {loginMutation.isPending ? 'Iniciando sesión…' : 'Iniciar sesión'}
       </Button>
     </form>
   )
