@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import type { LandingStoryStage } from '../model/landingStory'
 import '../requestSection.css'
 
@@ -8,22 +9,24 @@ interface RequestSectionProps {
 }
 
 const requestFields = [
-  ['Cliente', 'AeroParts Manufacturing'],
+  ['Cliente / empresa', 'AeroParts Manufacturing'],
   ['Requerimiento', 'Eje mecanizado AISI 4140'],
   ['Cantidad', '120 piezas'],
   ['Fecha requerida', '18 oct 2026'],
+  ['Prioridad', 'Alta'],
+  ['Especificaciones', 'Rectificado Ra 1.6 · ±0.02 mm'],
 ] as const
 
 const requestDocuments = [
   ['Plano_eje_REV-C.pdf', '2.8 MB'],
   ['Especificacion_material.pdf', '1.4 MB'],
+  ['Tolerancias_y_acabados.pdf', '920 KB'],
 ] as const
-
-const captureSteps = ['Cliente', 'Plano', 'Contexto', 'Registro'] as const
 
 export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const [active, setActive] = useState(false)
+  const [phase, setPhase] = useState(0)
 
   useEffect(() => {
     const node = sectionRef.current
@@ -40,7 +43,26 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
     return () => observer.disconnect()
   }, [])
 
-  const reveal = (delay: number) => ({
+  useEffect(() => {
+    if (!active) return
+
+    if (reducedMotion) {
+      setPhase(5)
+      return
+    }
+
+    const timers = [
+      window.setTimeout(() => setPhase(1), 180),
+      window.setTimeout(() => setPhase(2), 820),
+      window.setTimeout(() => setPhase(3), 2750),
+      window.setTimeout(() => setPhase(4), 4200),
+      window.setTimeout(() => setPhase(5), 5350),
+    ]
+
+    return () => timers.forEach((timer) => window.clearTimeout(timer))
+  }, [active, reducedMotion])
+
+  const reveal = (delay: number): CSSProperties => ({
     opacity: active ? 1 : 0,
     transform: active ? 'translate3d(0,0,0)' : 'translate3d(0,18px,0)',
     transition: reducedMotion
@@ -48,8 +70,18 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
       : `opacity 620ms ease ${delay}ms, transform 720ms cubic-bezier(.2,.75,.2,1) ${delay}ms`,
   })
 
+  const phaseStyle = (minimumPhase: number, delay = 0): CSSProperties => ({
+    opacity: phase >= minimumPhase ? 1 : 0,
+    transform: phase >= minimumPhase ? 'translate3d(0,0,0)' : 'translate3d(0,12px,0)',
+    transition: reducedMotion
+      ? 'none'
+      : `opacity 520ms ease ${delay}ms, transform 620ms cubic-bezier(.2,.75,.2,1) ${delay}ms`,
+  })
+
   const requestTracePath =
     'M 343 0 C 326 27, 311 61, 329 96 C 352 137, 365 174, 328 206 C 294 236, 245 253, 202 284'
+  const consolidated = phase >= 4
+  const documentVisible = phase >= 3 && phase < 4
 
   return (
     <section
@@ -88,7 +120,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
             fill="none"
             stroke="url(#qtRequestTrace)"
             strokeWidth="12"
-            opacity={active ? 0.16 : 0}
+            opacity={phase >= 1 ? 0.16 : 0.05}
             filter="url(#qtRequestTraceGlow)"
           />
           <path
@@ -97,7 +129,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
             stroke="url(#qtRequestTrace)"
             strokeWidth="1.5"
             strokeDasharray="8 10"
-            opacity={active ? 0.92 : 0}
+            opacity={phase >= 1 ? 0.92 : 0.25}
           >
             {!reducedMotion && active ? (
               <animate
@@ -125,13 +157,11 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
               </circle>
             </>
           ) : null}
-
-          <circle cx="343" cy="0" r="2.8" fill="#67e8f9" opacity={active ? 0.9 : 0} />
         </svg>
       </div>
 
       <div className="relative z-10 mx-auto grid w-full max-w-[1440px] items-start gap-7 px-5 pb-12 pt-6 sm:px-8 sm:pb-16 sm:pt-8 lg:min-h-screen lg:grid-cols-[1.08fr_0.92fr] lg:gap-14 lg:px-12 lg:pb-14 lg:pt-10 xl:px-16">
-        <div className="order-1 pt-1 lg:order-2 lg:pl-4 lg:pt-5" style={reveal(160)}>
+        <div className="order-1 pt-1 lg:order-2 lg:pl-4 lg:pt-5" style={reveal(120)}>
           <div className="flex items-center gap-2.5">
             <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.13em] text-cyan-300">
               {stage.eyebrow}
@@ -152,7 +182,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
               <span
                 key={item}
                 className="rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.11em] text-slate-400"
-                style={reveal(620 + index * 100)}
+                style={reveal(520 + index * 90)}
               >
                 {item}
               </span>
@@ -161,7 +191,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
 
           <div
             className="mt-5 flex max-w-[500px] items-start gap-3 rounded-2xl border border-cyan-300/10 bg-slate-950/40 p-3.5 backdrop-blur-md lg:mt-7"
-            style={reveal(920)}
+            style={reveal(780)}
           >
             <span className="mt-1 flex h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.7)]" />
             <div>
@@ -172,147 +202,22 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
         </div>
 
         <div className="order-2 lg:order-1">
-          <div className="relative lg:hidden" style={reveal(80)}>
-            <div className="pointer-events-none absolute left-[-18%] top-[8%] h-48 w-48 rounded-full bg-cyan-400/[0.08] blur-[70px]" />
-            <div className="pointer-events-none absolute right-[-22%] top-[32%] h-52 w-52 rounded-full bg-blue-500/[0.07] blur-[80px]" />
-
-            <div className="qt-request-mobile-shell relative">
-              <div className="qt-request-mobile-trace pointer-events-none absolute left-5 top-[-26px] h-12 w-px bg-gradient-to-b from-cyan-300/0 via-cyan-300/70 to-cyan-300/15" />
-              <div className="qt-request-mobile-card relative overflow-hidden rounded-[24px] border border-cyan-200/[0.14] bg-[#07111f]/95 shadow-[0_32px_90px_-42px_rgba(14,165,233,0.95)] backdrop-blur-xl">
-                <div className="qt-request-mobile-scan pointer-events-none absolute inset-y-0 left-0 z-[6] w-20 bg-gradient-to-r from-transparent via-cyan-200/[0.045] to-transparent" />
-
-                <div className="relative border-b border-white/[0.06] px-4 pb-3.5 pt-4">
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/55 to-transparent" />
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.75)]" />
-                        <span className="text-[8px] font-extrabold uppercase tracking-[0.15em] text-cyan-100/85">
-                          Nueva solicitud
-                        </span>
-                      </div>
-                      <p className="mt-1.5 text-[16px] font-semibold tracking-[-0.025em] text-white">
-                        Requerimiento de fabricación
-                      </p>
-                    </div>
-                    <span className="rounded-lg border border-white/[0.07] bg-white/[0.035] px-2 py-1 font-mono text-[7px] text-slate-500">
-                      BORRADOR
-                    </span>
-                  </div>
-
-                  <div className="mt-3 overflow-hidden rounded-xl border border-cyan-300/[0.11] bg-cyan-300/[0.035]">
-                    <div className="relative flex items-center gap-3 p-3">
-                      <div className="relative grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-cyan-300/15 bg-[#061523] shadow-[inset_0_0_20px_rgba(34,211,238,0.04)]">
-                        <span className="h-6 w-7 rounded-[50%] border border-cyan-200/50" />
-                        <span className="absolute h-px w-9 bg-cyan-300/20" />
-                        <span className="absolute h-9 w-px bg-cyan-300/20" />
-                        <span className="absolute right-1 top-1 h-1 w-1 rounded-full bg-cyan-300/70" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-slate-500">Pieza objetivo</p>
-                          <span className="font-mono text-[7px] text-cyan-300/70">REV C</span>
-                        </div>
-                        <p className="mt-1 text-[11px] font-semibold text-slate-200">SHAFT Ø48 · AISI 4140</p>
-                        <p className="mt-0.5 font-mono text-[7px] text-slate-600">Plano técnico vinculado</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-4 border-t border-white/[0.05] bg-slate-950/28 px-2 py-2">
-                      {captureSteps.map((item, index) => (
-                        <div key={item} className="relative text-center">
-                          {index < captureSteps.length - 1 ? (
-                            <span className="absolute left-[58%] top-[5px] h-px w-[84%] bg-gradient-to-r from-cyan-300/35 to-white/[0.04]" />
-                          ) : null}
-                          <span className={`relative mx-auto block h-2.5 w-2.5 rounded-full border ${index === captureSteps.length - 1 ? 'border-emerald-300/35 bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.55)]' : 'border-cyan-300/25 bg-[#071725]'}`} />
-                          <span className="mt-1 block text-[6px] font-bold uppercase tracking-[0.08em] text-slate-600">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="divide-y divide-white/[0.055] px-4">
-                  {requestFields.map(([label, value], index) => (
-                    <div
-                      key={label}
-                      className="flex items-center justify-between gap-5 py-3"
-                      style={reveal(320 + index * 90)}
-                    >
-                      <p className="shrink-0 text-[7px] font-bold uppercase tracking-[0.12em] text-slate-600">{label}</p>
-                      <p className="min-w-0 text-right text-[10px] font-semibold leading-4 text-slate-200">{value}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="border-t border-white/[0.06] bg-slate-950/25 px-4 py-3.5" style={reveal(760)}>
-                  <div className="mb-2.5 flex items-center justify-between gap-3">
-                    <span className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-500">Documentación</span>
-                    <span className="text-[7px] font-semibold text-cyan-300/75">2 archivos vinculados</span>
-                  </div>
-                  <div className="space-y-2">
-                    {requestDocuments.map(([name, size]) => (
-                      <div key={name} className="flex items-center gap-2.5 rounded-xl border border-white/[0.055] bg-white/[0.025] px-2.5 py-2">
-                        <div className="grid h-7 w-7 shrink-0 place-items-center rounded-lg border border-cyan-300/10 bg-cyan-300/[0.06] font-mono text-[7px] font-bold text-cyan-200">PDF</div>
-                        <p className="min-w-0 flex-1 truncate text-[8px] font-semibold text-slate-300">{name}</p>
-                        <span className="font-mono text-[7px] text-slate-600">{size}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="relative border-t border-emerald-300/10 bg-emerald-400/[0.035] px-4 py-3.5" style={reveal(1040)}>
-                  <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-emerald-300/60 to-transparent" />
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-2.5">
-                      <span className="grid h-8 w-8 place-items-center rounded-full border border-emerald-300/20 bg-emerald-400/10 text-[12px] font-black text-emerald-300">✓</span>
-                      <div>
-                        <p className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-emerald-300">Solicitud registrada</p>
-                        <p className="mt-0.5 font-mono text-[8px] text-slate-500">SOL-2026-014</p>
-                      </div>
-                    </div>
-                    <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-35" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="mx-auto mt-4 flex w-fit items-center gap-2 rounded-full border border-white/[0.06] bg-slate-950/35 px-3 py-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.65)]" />
-              <span className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-500">Contexto listo para continuar</span>
-            </div>
-          </div>
-
-          <div className="relative hidden min-h-[610px] lg:block">
-            <div className="qt-request-workbench absolute inset-x-[1%] top-[1%] bottom-[5%] rounded-[34px] border border-white/[0.055] bg-[linear-gradient(145deg,rgba(8,22,38,0.32),rgba(2,8,23,0.05))] shadow-[inset_0_1px_0_rgba(255,255,255,0.025)]" />
-            <div className="absolute left-[8%] top-[4%] h-[74%] w-[74%] rounded-full bg-cyan-400/[0.08] blur-[85px]" />
-            <div className="absolute left-[20%] top-[14%] h-[58%] w-[58%] rounded-full bg-blue-500/[0.08] blur-[68px]" />
-            <div className="qt-request-scan-beam pointer-events-none absolute left-[4%] top-[4%] z-[6] h-[84%] w-24 bg-gradient-to-r from-transparent via-cyan-200/[0.045] to-transparent" />
-
-            <div className="pointer-events-none absolute left-[4%] top-[3%] z-[5] font-mono text-[7px] tracking-[0.16em] text-slate-700">CAPTURE / QT-014</div>
-            <div className="pointer-events-none absolute right-[4%] top-[3%] z-[5] flex items-center gap-2 font-mono text-[7px] text-slate-700">
-              <span>CONTEXT NODE</span>
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400/80 shadow-[0_0_10px_rgba(52,211,153,0.45)]" />
-            </div>
-
-            <div className="qt-request-orbit qt-request-orbit-a pointer-events-none absolute right-[2%] top-[18%] z-[8] rounded-xl border border-cyan-300/10 bg-slate-950/55 px-3 py-2 backdrop-blur-md">
-              <p className="text-[6px] font-bold uppercase tracking-[0.11em] text-slate-600">Material</p>
-              <p className="mt-1 font-mono text-[8px] text-cyan-200/80">AISI 4140</p>
-            </div>
-            <div className="qt-request-orbit qt-request-orbit-b pointer-events-none absolute right-[5%] top-[36%] z-[8] rounded-xl border border-white/[0.07] bg-slate-950/55 px-3 py-2 backdrop-blur-md">
-              <p className="text-[6px] font-bold uppercase tracking-[0.11em] text-slate-600">Cantidad</p>
-              <p className="mt-1 font-mono text-[8px] text-slate-300">120 PCS</p>
-            </div>
-            <div className="qt-request-orbit qt-request-orbit-c pointer-events-none absolute right-[2%] top-[54%] z-[8] rounded-xl border border-blue-300/10 bg-slate-950/55 px-3 py-2 backdrop-blur-md">
-              <p className="text-[6px] font-bold uppercase tracking-[0.11em] text-slate-600">Documentos</p>
-              <p className="mt-1 font-mono text-[8px] text-blue-200/80">02 LINKED</p>
-            </div>
+          <div className="relative min-h-[560px] lg:min-h-[610px]">
+            <div className="pointer-events-none absolute left-[-14%] top-[8%] h-56 w-56 rounded-full bg-cyan-400/[0.08] blur-[80px] lg:left-[8%] lg:top-[4%] lg:h-[74%] lg:w-[74%] lg:blur-[85px]" />
+            <div className="pointer-events-none absolute right-[-20%] top-[30%] h-52 w-52 rounded-full bg-blue-500/[0.07] blur-[80px] lg:left-[20%] lg:right-auto lg:top-[14%] lg:h-[58%] lg:w-[58%] lg:blur-[68px]" />
+            <div className="qt-request-workbench pointer-events-none absolute inset-x-0 top-0 bottom-[5%] hidden rounded-[34px] border border-white/[0.055] bg-[linear-gradient(145deg,rgba(8,22,38,0.32),rgba(2,8,23,0.05))] shadow-[inset_0_1px_0_rgba(255,255,255,0.025)] lg:block" />
 
             <div
-              className="qt-request-document absolute left-[2%] top-[7%] z-[2] w-[226px] rounded-2xl border border-white/10 bg-slate-950/72 p-3.5 shadow-[0_30px_90px_-42px_rgba(14,165,233,0.9)] backdrop-blur-xl"
-              style={reveal(260)}
+              className="qt-request-document pointer-events-none absolute left-[2%] top-[7%] z-[2] hidden w-[226px] rounded-2xl border border-white/10 bg-slate-950/72 p-3.5 shadow-[0_30px_90px_-42px_rgba(14,165,233,0.9)] backdrop-blur-xl lg:block"
+              style={{
+                opacity: documentVisible ? 1 : phase >= 4 ? 0.15 : 0,
+                transform: documentVisible
+                  ? 'perspective(900px) rotateY(7deg) rotateZ(-2.5deg) translate3d(0,0,0)'
+                  : 'perspective(900px) rotateY(7deg) rotateZ(-2.5deg) translate3d(-8px,14px,0) scale(.96)',
+                transition: reducedMotion
+                  ? 'none'
+                  : 'opacity 600ms ease, transform 760ms cubic-bezier(.2,.75,.2,1)',
+              }}
             >
               <div className="flex items-center justify-between">
                 <span className="text-[8px] font-extrabold uppercase tracking-[0.15em] text-slate-400">Documento técnico</span>
@@ -328,99 +233,151 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                 <div className="absolute right-3 top-3 font-mono text-[6px] text-slate-600">SCALE 1:2</div>
                 <div className="absolute bottom-3 left-4 font-mono text-[7px] tracking-[0.12em] text-cyan-200/70">SHAFT Ø48 · AISI 4140</div>
               </div>
-              <div className="mt-2 flex items-center justify-between gap-2">
-                <p className="font-mono text-[8px] text-slate-500">Plano_eje_REV-C.pdf</p>
-                <span className="rounded-full bg-emerald-400/10 px-2 py-0.5 text-[6px] font-bold uppercase tracking-[0.1em] text-emerald-300/80">Vinculado</span>
-              </div>
+              <p className="mt-2 font-mono text-[8px] text-slate-500">Plano_eje_REV-C.pdf</p>
             </div>
 
             <div
-              className="qt-request-card absolute left-[14%] top-[8%] z-[4] w-[78%] max-w-[570px] overflow-hidden rounded-[28px] border border-cyan-200/[0.15] bg-[#07111f]/92 shadow-[0_44px_120px_-48px_rgba(14,165,233,0.95)] backdrop-blur-2xl"
-              style={reveal(80)}
+              className={`qt-request-card relative z-[4] mx-auto mt-2 w-full max-w-[570px] overflow-hidden rounded-[26px] border bg-[#07111f]/94 shadow-[0_40px_110px_-46px_rgba(14,165,233,0.9)] backdrop-blur-2xl transition-[border-color,box-shadow] duration-700 lg:absolute lg:left-[14%] lg:top-[8%] lg:mt-0 lg:w-[78%] ${phase >= 1 ? 'border-cyan-200/[0.18] shadow-[0_44px_120px_-44px_rgba(14,165,233,0.95)]' : 'border-white/[0.07]'}`}
+              style={reveal(40)}
             >
               <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-cyan-300/45 to-transparent" />
-              <div className="border-b border-white/[0.06] bg-gradient-to-r from-cyan-300/[0.065] via-transparent to-blue-400/[0.045] px-6 py-4">
-                <div className="flex items-center justify-between gap-4">
+              {phase >= 1 && phase < 4 ? (
+                <div className="qt-request-scan-beam pointer-events-none absolute inset-y-0 left-0 z-[8] w-24 bg-gradient-to-r from-transparent via-cyan-200/[0.045] to-transparent" />
+              ) : null}
+
+              <div className="relative border-b border-white/[0.06] bg-gradient-to-r from-cyan-300/[0.06] via-transparent to-blue-400/[0.04] px-4 py-4 sm:px-6">
+                <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.75)]" />
-                      <span className="text-[8px] font-extrabold uppercase tracking-[0.16em] text-cyan-100/80">Nueva solicitud</span>
+                      <span className={`h-2 w-2 rounded-full ${consolidated ? 'bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,0.7)]' : phase >= 1 ? 'bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.75)]' : 'bg-slate-700'}`} />
+                      <span className="text-[8px] font-extrabold uppercase tracking-[0.15em] text-cyan-100/85">
+                        {consolidated ? 'Solicitud consolidada' : 'Nueva solicitud'}
+                      </span>
                     </div>
-                    <p className="mt-1.5 text-[15px] font-semibold tracking-[-0.02em] text-white">Requerimiento de fabricación</p>
+                    <p className="mt-1.5 text-[16px] font-semibold tracking-[-0.025em] text-white">
+                      {consolidated ? 'Contexto listo para continuar' : 'Requerimiento de fabricación'}
+                    </p>
                   </div>
-                  <span className="rounded-lg border border-white/[0.07] bg-white/[0.03] px-2.5 py-1.5 font-mono text-[8px] text-slate-500">BORRADOR</span>
+                  <span className={`rounded-lg border px-2.5 py-1.5 font-mono text-[8px] ${consolidated ? 'border-emerald-300/15 bg-emerald-400/[0.06] text-emerald-300' : 'border-white/[0.07] bg-white/[0.03] text-slate-500'}`}>
+                    {consolidated ? 'RECIBIDA' : 'BORRADOR'}
+                  </span>
                 </div>
 
-                <div className="mt-4 grid grid-cols-4 gap-1.5 rounded-xl border border-white/[0.05] bg-slate-950/24 p-2.5">
-                  {captureSteps.map((item, index) => (
-                    <div key={item} className="relative text-center">
-                      {index < captureSteps.length - 1 ? (
-                        <span className="absolute left-[61%] top-[5px] h-px w-[78%] bg-gradient-to-r from-cyan-300/35 to-white/[0.04]" />
-                      ) : null}
-                      <span className={`relative mx-auto block h-2.5 w-2.5 rounded-full border ${index === captureSteps.length - 1 ? 'border-emerald-300/35 bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.55)]' : 'border-cyan-300/25 bg-[#071725]'}`} />
-                      <span className="mt-1.5 block text-[6px] font-bold uppercase tracking-[0.08em] text-slate-600">{item}</span>
+                {phase < 2 ? (
+                  <div className="mt-4 rounded-xl border border-white/[0.05] bg-slate-950/25 px-3 py-3 font-mono text-[8px] text-slate-600" style={phaseStyle(1)}>
+                    Esperando contexto del cliente…
+                  </div>
+                ) : null}
+              </div>
+
+              <div
+                className="overflow-hidden"
+                style={{
+                  maxHeight: consolidated ? 0 : 560,
+                  opacity: consolidated ? 0 : 1,
+                  transform: consolidated ? 'scale(.985) translateY(-8px)' : 'scale(1) translateY(0)',
+                  transition: reducedMotion
+                    ? 'none'
+                    : 'max-height 760ms cubic-bezier(.2,.75,.2,1), opacity 420ms ease, transform 620ms cubic-bezier(.2,.75,.2,1)',
+                }}
+              >
+                <div className="grid gap-2.5 px-4 py-4 sm:grid-cols-2 sm:gap-x-5 sm:gap-y-3.5 sm:px-6 sm:py-5">
+                  {requestFields.map(([label, value], index) => (
+                    <div
+                      key={label}
+                      className="rounded-xl border border-white/[0.055] bg-white/[0.025] px-3.5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]"
+                      style={phaseStyle(2, index * 120)}
+                    >
+                      <p className="text-[7px] font-bold uppercase tracking-[0.13em] text-slate-600">{label}</p>
+                      <p className="mt-1.5 text-[10px] font-semibold leading-4 text-slate-200">{value}</p>
                     </div>
                   ))}
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-x-5 gap-y-3.5 px-6 py-5">
-                {requestFields.map(([label, value], index) => (
-                  <div
-                    key={label}
-                    className="rounded-xl border border-white/[0.055] bg-white/[0.025] px-3.5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)]"
-                    style={reveal(420 + index * 130)}
-                  >
-                    <p className="text-[7px] font-bold uppercase tracking-[0.13em] text-slate-600">{label}</p>
-                    <p className="mt-1.5 text-[10px] font-semibold text-slate-200">{value}</p>
+                <div
+                  className="border-t border-white/[0.06] bg-slate-950/20 px-4 py-4 sm:px-6"
+                  style={phaseStyle(3)}
+                >
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <span className="text-[8px] font-bold uppercase tracking-[0.13em] text-slate-500">Documentación adjunta</span>
+                    <span className="text-[8px] font-semibold text-cyan-300/80">3 archivos</span>
                   </div>
-                ))}
+                  <div className="space-y-2 sm:grid sm:grid-cols-3 sm:gap-2 sm:space-y-0">
+                    {requestDocuments.map(([name, size], index) => (
+                      <div
+                        key={name}
+                        className="flex min-w-0 items-center gap-2.5 rounded-xl border border-white/[0.055] bg-slate-950/45 p-2.5"
+                        style={phaseStyle(3, index * 100)}
+                      >
+                        <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-cyan-300/10 bg-cyan-300/[0.06] font-mono text-[8px] font-bold text-cyan-200">PDF</div>
+                        <div className="min-w-0">
+                          <p className="truncate text-[8px] font-semibold text-slate-300">{name}</p>
+                          <p className="mt-0.5 font-mono text-[7px] text-slate-600">{size}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
 
-              <div className="border-t border-white/[0.06] px-6 py-4" style={reveal(920)}>
-                <div className="flex items-center justify-between">
-                  <span className="text-[8px] font-bold uppercase tracking-[0.13em] text-slate-500">Documentación</span>
-                  <span className="text-[8px] font-semibold text-cyan-300/80">2 archivos vinculados</span>
-                </div>
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  {requestDocuments.map(([name, size]) => (
-                    <div key={name} className="flex items-center gap-2.5 rounded-xl border border-white/[0.055] bg-slate-950/45 p-2.5">
-                      <div className="grid h-8 w-8 shrink-0 place-items-center rounded-lg border border-cyan-300/10 bg-cyan-300/[0.06] font-mono text-[8px] font-bold text-cyan-200">PDF</div>
-                      <div className="min-w-0">
-                        <p className="truncate text-[8px] font-semibold text-slate-300">{name}</p>
-                        <p className="mt-0.5 font-mono text-[7px] text-slate-600">{size}</p>
+              <div
+                className="overflow-hidden"
+                style={{
+                  maxHeight: consolidated ? 220 : 0,
+                  opacity: consolidated ? 1 : 0,
+                  transform: consolidated ? 'translateY(0)' : 'translateY(14px)',
+                  transition: reducedMotion
+                    ? 'none'
+                    : 'max-height 820ms cubic-bezier(.2,.75,.2,1), opacity 620ms ease 180ms, transform 720ms cubic-bezier(.2,.75,.2,1) 120ms',
+                }}
+              >
+                <div className="relative px-4 py-5 sm:px-6">
+                  <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300/45 to-transparent" />
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <span className="grid h-10 w-10 place-items-center rounded-full border border-emerald-300/20 bg-emerald-400/10 text-[15px] font-black text-emerald-300 shadow-[0_0_22px_rgba(52,211,153,0.12)]">✓</span>
+                      <div>
+                        <p className="text-[9px] font-extrabold uppercase tracking-[0.13em] text-emerald-300">Solicitud registrada</p>
+                        <p className="mt-1 font-mono text-[10px] text-white">SOL-2026-014</p>
                       </div>
                     </div>
-                  ))}
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-35" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                    </span>
+                  </div>
+
+                  <div className="mt-5 grid grid-cols-3 gap-2">
+                    {[
+                      ['Documentos', '3'],
+                      ['Estado', 'Recibida'],
+                      ['Seguimiento', 'Activo'],
+                    ].map(([label, value]) => (
+                      <div key={label} className="rounded-xl border border-white/[0.055] bg-white/[0.025] px-3 py-2.5">
+                        <p className="text-[6px] font-bold uppercase tracking-[0.11em] text-slate-600">{label}</p>
+                        <p className="mt-1 text-[9px] font-semibold text-slate-200">{value}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
             <div
-              className="qt-request-result absolute bottom-[7%] left-[8%] z-[7] w-[284px] rounded-2xl border border-emerald-300/15 bg-slate-950/90 p-4 shadow-[0_28px_90px_-38px_rgba(52,211,153,0.72)] backdrop-blur-xl"
-              style={reveal(1280)}
+              className="pointer-events-none absolute bottom-[-5%] left-[25%] hidden h-32 w-px bg-gradient-to-b from-cyan-300/50 via-blue-400/20 to-transparent lg:block"
+              style={{ opacity: phase >= 5 ? 1 : 0, transition: 'opacity 500ms ease' }}
             >
-              <div className="absolute inset-y-0 left-0 w-px bg-gradient-to-b from-transparent via-emerald-300/55 to-transparent" />
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-2.5">
-                  <span className="grid h-7 w-7 place-items-center rounded-full border border-emerald-300/20 bg-emerald-400/10 text-[11px] font-black text-emerald-300">✓</span>
-                  <div>
-                    <p className="text-[8px] font-extrabold uppercase tracking-[0.13em] text-emerald-300">Solicitud registrada</p>
-                    <p className="mt-1 font-mono text-[8px] text-slate-500">SOL-2026-014</p>
-                  </div>
-                </div>
-                <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.7)]" />
-              </div>
-              <div className="mt-3 flex gap-2 text-[7px] font-semibold uppercase tracking-[0.08em] text-slate-500">
-                <span>2 documentos</span>
-                <span>·</span>
-                <span>Seguimiento activo</span>
-              </div>
+              {!reducedMotion && phase >= 5 ? (
+                <span className="qt-request-exit-pulse absolute left-[-2px] top-0 h-1 w-1 rounded-full bg-cyan-200 shadow-[0_0_12px_rgba(103,232,249,0.8)]" />
+              ) : null}
             </div>
 
-            <div className="pointer-events-none absolute bottom-[-4%] left-[25%] h-28 w-px bg-gradient-to-b from-cyan-300/50 via-blue-400/20 to-transparent">
-              {!reducedMotion && active ? (
-                <span className="qt-request-exit-pulse absolute left-[-2px] top-0 h-1 w-1 rounded-full bg-cyan-200 shadow-[0_0_12px_rgba(103,232,249,0.8)]" />
+            <div
+              className="pointer-events-none mx-auto mt-4 flex h-16 w-px bg-gradient-to-b from-cyan-300/45 to-transparent lg:hidden"
+              style={{ opacity: phase >= 5 ? 1 : 0, transition: 'opacity 500ms ease' }}
+            >
+              {!reducedMotion && phase >= 5 ? (
+                <span className="qt-request-exit-pulse relative left-[-2px] top-0 h-1 w-1 rounded-full bg-cyan-200 shadow-[0_0_12px_rgba(103,232,249,0.8)]" />
               ) : null}
             </div>
           </div>
