@@ -1,6 +1,7 @@
-import { Button } from '@/shared/components/ui/Button'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
+import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { useCustomerRequestDocumentVersions } from '../hooks/useCustomerRequests'
 import {
@@ -79,50 +80,58 @@ export function RequestDocumentHistoryDialog({
             />
           ) : (
             <div className="space-y-3">
-              {query.data.map((version) => (
-                <article
-                  key={version.id}
-                  className="flex flex-col gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div>
-                    <p className="text-xs font-semibold text-slate-950">
-                      Versión {version.version} · {version.fileName}
-                    </p>
-                    <p className="mt-1 text-[10px] text-slate-500">
-                      {formatFileSize(version.fileSize)} ·{' '}
-                      {formatCustomerRequestDateTime(version.uploadedAt)}
-                      {version.uploadedByName
-                        ? ` · ${version.uploadedByName}`
-                        : ''}
-                    </p>
-                  </div>
+              {query.data.map((version) => {
+                const opening =
+                  busy?.versionId === version.id && busy.action === 'open'
+                const downloading =
+                  busy?.versionId === version.id && busy.action === 'download'
 
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      disabled={busy !== null}
-                      onClick={() => onOpenVersion(version)}
-                    >
-                      {busy?.versionId === version.id &&
-                      busy.action === 'open'
-                        ? 'Abriendo…'
-                        : 'Ver'}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      disabled={busy !== null}
-                      onClick={() => onDownloadVersion(version)}
-                    >
-                      {busy?.versionId === version.id &&
-                      busy.action === 'download'
-                        ? 'Descargando…'
-                        : 'Descargar'}
-                    </Button>
-                  </div>
-                </article>
-              ))}
+                return (
+                  <article
+                    key={version.id}
+                    className="flex flex-col gap-3 rounded-xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div>
+                      <p className="text-xs font-semibold text-slate-950">
+                        Versión {version.version} · {version.fileName}
+                      </p>
+                      <p className="mt-1 text-[10px] text-slate-500">
+                        {formatFileSize(version.fileSize)} ·{' '}
+                        {formatCustomerRequestDateTime(version.uploadedAt)}
+                        {version.uploadedByName
+                          ? ` · ${version.uploadedByName}`
+                          : ''}
+                      </p>
+                    </div>
+
+                    <div className="flex gap-1.5">
+                      <ActionIconButton
+                        icon="view"
+                        label={
+                          opening
+                            ? 'Abriendo versión…'
+                            : `Ver versión ${version.version}`
+                        }
+                        tone="primary"
+                        busy={opening}
+                        disabled={busy !== null && !opening}
+                        onClick={() => onOpenVersion(version)}
+                      />
+                      <ActionIconButton
+                        icon="download"
+                        label={
+                          downloading
+                            ? 'Descargando versión…'
+                            : `Descargar versión ${version.version}`
+                        }
+                        busy={downloading}
+                        disabled={busy !== null && !downloading}
+                        onClick={() => onDownloadVersion(version)}
+                      />
+                    </div>
+                  </article>
+                )
+              })}
             </div>
           )}
         </div>
