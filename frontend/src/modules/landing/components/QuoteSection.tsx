@@ -30,8 +30,8 @@ export function QuoteSection({ stage, reducedMotion }: QuoteSectionProps) {
 
   useEffect(() => {
     if (reducedMotion) {
-      setScrollProgress(1)
-      return
+      const reducedMotionFrame = window.requestAnimationFrame(() => setScrollProgress(1))
+      return () => window.cancelAnimationFrame(reducedMotionFrame)
     }
 
     let frame = 0
