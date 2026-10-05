@@ -1,7 +1,8 @@
-import type { JobCaseDto } from '@/modules/job-cases'
+import type { JobCaseDto, JobCaseStatus } from '@/modules/job-cases'
 
 export type InternalCustomerStatus = 'ACTIVE' | 'SUSPENDED'
 export type InternalCustomerRole = 'ADMIN' | 'REQUESTER' | 'VIEWER'
+export type InternalCustomerCaseAssignment = 'ALL' | 'ASSIGNED' | 'UNASSIGNED'
 
 export interface InternalCustomerSummaryDto {
   id: number
@@ -35,7 +36,22 @@ export interface InternalCustomerMemberDto {
 export interface InternalCustomerDetailDto {
   customer: InternalCustomerSummaryDto
   members: InternalCustomerMemberDto[]
-  jobCases: JobCaseDto[]
+}
+
+export interface InternalCustomerJobCasePageDto {
+  items: JobCaseDto[]
+  page: number
+  pageSize: number
+  totalItems: number
+  totalPages: number
+}
+
+export interface InternalCustomerJobCaseQuery {
+  page: number
+  size: number
+  search: string
+  status: JobCaseStatus | 'ALL'
+  assignment: InternalCustomerCaseAssignment
 }
 
 export interface InternalCustomerFiltersValue {
