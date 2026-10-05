@@ -1,6 +1,7 @@
 import { CaseChapter } from '../components/CaseChapter'
 import { LandingHeader } from '../components/LandingHeader'
 import { ProductionChapter } from '../components/ProductionChapter'
+import { QualityChapter } from '../components/QualityChapter'
 import { QuoteChapter } from '../components/QuoteChapter'
 import { ScrollStory } from '../components/ScrollStory'
 import { WorkOrderChapter } from '../components/WorkOrderChapter'
@@ -16,6 +17,7 @@ export function LandingPage() {
         <QuoteChapter />
         <WorkOrderChapter />
         <ProductionChapter />
+        <QualityChapter />
       </main>
     </div>
   )
