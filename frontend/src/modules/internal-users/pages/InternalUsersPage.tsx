@@ -3,6 +3,12 @@ import { useSessionStore, type SystemRole } from '@/modules/auth'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import {
+  InternalListingBody,
+  InternalListingHeader,
+  InternalListingPanel,
+  InternalListingResultsBar,
+} from '@/shared/components/listing/InternalListing'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
 import { Button } from '@/shared/components/ui/Button'
@@ -158,7 +164,7 @@ export function InternalUsersPage() {
             </div>
 
             <Button
-              className="!h-7 shrink-0 !px-2.5 !text-[8px]"
+              className="!h-8 shrink-0 !px-3 !text-[9px]"
               onClick={() => {
                 mutations.invite.reset()
                 setInviteOpen(true)
@@ -177,61 +183,51 @@ export function InternalUsersPage() {
         </div>
       </section>
 
-      <section className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
-        <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Control de acceso
+      <InternalListingPanel>
+        <InternalListingHeader
+          eyebrow="Control de acceso"
+          title="Acceso interno"
+          aside={
+            <p className="text-[8px] font-medium text-slate-400">
+              Gestiona roles y disponibilidad sin mezclar accesos de empresas cliente.
             </p>
-            <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
-              Acceso interno
-            </h2>
-          </div>
-          <p className="text-[8px] text-slate-400">
-            {visibleUsers.length} de {users.length} visibles
-          </p>
-        </div>
+          }
+        />
 
         <InternalUserFilters value={filters} onChange={setFilters} />
 
-        {hasFilters ? (
-          <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-2 sm:px-5">
-            <p className="text-[8px] text-slate-400">
-              Filtros aplicados
-            </p>
-            <button
-              type="button"
-              onClick={() => setFilters(initialFilters)}
-              className="text-[8px] font-semibold text-blue-600 hover:text-blue-700"
-            >
-              Limpiar filtros
-            </button>
-          </div>
-        ) : null}
+        <InternalListingResultsBar
+          count={visibleUsers.length}
+          singular="usuario visible"
+          plural="usuarios visibles"
+          onClear={hasFilters ? () => setFilters(initialFilters) : undefined}
+        />
 
-        {visibleUsers.length > 0 ? (
-          <InternalUsersTable
-            users={visibleUsers}
-            currentUserId={session.user.id}
-            onManage={(user) => {
-              mutations.updateRoles.reset()
-              mutations.updateStatus.reset()
-              setSelectedUser(user)
-            }}
-          />
-        ) : (
-          <div className="p-4">
-            <EmptyState
-              title="No hay usuarios que coincidan"
-              description="Ajusta la búsqueda o los filtros para consultar otros accesos internos."
+        <InternalListingBody>
+          {visibleUsers.length > 0 ? (
+            <InternalUsersTable
+              users={visibleUsers}
+              currentUserId={session.user.id}
+              onManage={(user) => {
+                mutations.updateRoles.reset()
+                mutations.updateStatus.reset()
+                setSelectedUser(user)
+              }}
             />
-          </div>
-        )}
+          ) : (
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <EmptyState
+                title="No hay usuarios que coincidan"
+                description="Ajusta la búsqueda o los filtros para consultar otros accesos internos."
+              />
+            </div>
+          )}
+        </InternalListingBody>
 
-        <p className="border-t border-slate-100 bg-slate-50/55 px-4 py-2 text-[7px] leading-3 text-slate-400 sm:px-5">
+        <p className="border-t border-slate-100 bg-white px-4 py-2 text-[7px] leading-3 text-slate-400 sm:px-5">
           Tu propio acceso debe modificarlo otro administrador. Los roles internos no se mezclan con los roles de las empresas cliente.
         </p>
-      </section>
+      </InternalListingPanel>
 
       <InviteInternalUserDialog
         open={inviteOpen}
