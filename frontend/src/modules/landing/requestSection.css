@@ -51,9 +51,9 @@
 
 #solicitud > .sticky {
   position: sticky !important;
-  top: 0 !important;
-  height: 100svh !important;
-  min-height: 100svh !important;
+  top: 64px !important;
+  height: calc(100svh - 64px) !important;
+  min-height: calc(100svh - 64px) !important;
   overflow: hidden !important;
 }
 
@@ -112,6 +112,12 @@
   #solicitud {
     height: 380svh !important;
     min-height: 380svh !important;
+  }
+
+  #solicitud > .sticky {
+    top: 72px !important;
+    height: calc(100svh - 72px) !important;
+    min-height: calc(100svh - 72px) !important;
   }
 
   #inicio > .sticky > div[aria-hidden='true']:last-child {
@@ -199,6 +205,7 @@
 
   #solicitud > .sticky {
     position: relative !important;
+    top: 0 !important;
     height: auto !important;
     min-height: 100svh !important;
   }
