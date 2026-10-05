@@ -337,7 +337,7 @@ export function CustomerCompanyPage() {
                     {isAdmin ? (
                       <button
                         type="button"
-                        className="shrink-0 text-[8px] font-semibold text-blue-600 hover:text-blue-700"
+                        className="inline-flex h-5 shrink-0 items-center rounded-md px-1.5 !text-[8px] !leading-none font-medium text-blue-600 transition hover:bg-blue-50 hover:text-blue-700"
                         onClick={() => {
                           setEditingAddressId(address.id)
                           mutations.updateAddress.reset()
