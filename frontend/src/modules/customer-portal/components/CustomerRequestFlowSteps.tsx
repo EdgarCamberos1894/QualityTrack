@@ -1,12 +1,14 @@
+import { useParams } from 'react-router-dom'
+import { useCustomerQuotations } from '@/modules/quotations'
 import { WorkProgressSteps } from '@/shared/components/workflow/WorkProgressSteps'
+import { useCustomerPortalContext } from '../hooks/useCustomerPortalContext'
+import { useCustomerRequestDetail } from '../hooks/useCustomerRequests'
 import type { CustomerRequestStatus } from '../types/customerRequest.types'
 
 interface CustomerRequestFlowStepsProps {
   status: CustomerRequestStatus
   deliveryProgress?: 'IN_TRANSIT' | 'PARTIAL' | 'DELIVERED'
   variant?: 'light' | 'dark'
-  quotationHref?: string
-  deliveryHref?: string
 }
 
 function activeStep(status: CustomerRequestStatus): number {
@@ -30,29 +32,37 @@ export function CustomerRequestFlowSteps({
   status,
   deliveryProgress,
   variant = 'light',
-  quotationHref,
-  deliveryHref,
 }: CustomerRequestFlowStepsProps) {
+  const { requestId } = useParams()
+  const { customer } = useCustomerPortalContext()
+  const numericRequestId = Number(requestId)
+  const validRequestId =
+    Number.isInteger(numericRequestId) && numericRequestId > 0
+      ? numericRequestId
+      : null
+  const requestQuery = useCustomerRequestDetail(customer.customerId, validRequestId)
+  const quotationsQuery = useCustomerQuotations(
+    customer.customerId,
+    Boolean(requestQuery.data),
+  )
+  const relatedQuotation = quotationsQuery.data?.find(
+    (quotation) => quotation.requestNumber === requestQuery.data?.requestNumber,
+  )
+
   const stepHrefs: Partial<Record<number, string>> = {}
   const stepDetails: Partial<Record<number, string>> = {
     0: 'Origen del trabajo',
     2: 'Preparación interna',
     3: 'Fabricación',
     4: 'Inspección',
+    5: deliveryProgress ? 'Seguimiento visible abajo' : 'Cierre del trabajo',
   }
 
-  if (quotationHref) {
-    stepHrefs[1] = quotationHref
+  if (relatedQuotation) {
+    stepHrefs[1] = `/portal/${customer.customerId}/quotations/${relatedQuotation.id}`
     stepDetails[1] = 'Abrir propuesta'
   } else {
     stepDetails[1] = 'Propuesta comercial'
-  }
-
-  if (deliveryHref && deliveryProgress) {
-    stepHrefs[5] = deliveryHref
-    stepDetails[5] = 'Ver seguimiento'
-  } else {
-    stepDetails[5] = 'Cierre del trabajo'
   }
 
   return (
