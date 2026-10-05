@@ -6,6 +6,7 @@ import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -356,28 +357,26 @@ export function CustomerCompanyPage() {
                       </p>
                     </div>
                     {isAdmin ? (
-                      <div className="flex shrink-0 items-center gap-0.5">
-                        <button
-                          type="button"
-                          className="inline-flex h-5 items-center rounded-md px-1.5 !text-[8px] !leading-none font-medium text-blue-600 transition hover:bg-blue-50 hover:text-blue-700"
+                      <div className="flex shrink-0 items-center gap-1">
+                        <ActionIconButton
+                          icon="edit"
+                          label={`Editar dirección ${address.label}`}
+                          tone="primary"
                           onClick={() => {
                             setEditingAddressId(address.id)
                             mutations.updateAddress.reset()
                             setAddressDialogOpen(true)
                           }}
-                        >
-                          Editar
-                        </button>
-                        <button
-                          type="button"
-                          className="inline-flex h-5 items-center rounded-md px-1.5 !text-[8px] !leading-none font-medium text-red-500 transition hover:bg-red-50 hover:text-red-700"
+                        />
+                        <ActionIconButton
+                          icon="delete"
+                          label={`Eliminar dirección ${address.label}`}
+                          tone="danger"
                           onClick={() => {
                             mutations.deleteAddress.reset()
                             setDeletingAddressId(address.id)
                           }}
-                        >
-                          Eliminar
-                        </button>
+                        />
                       </div>
                     ) : null}
                   </div>
