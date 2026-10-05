@@ -41,12 +41,12 @@
 
 /*
  * Solicitud is a scroll-driven chapter. Keep one viewport physically pinned
- * while the surrounding section consumes the scroll distance required by the
+ * while the surrounding section consumes a compact scroll runway for the
  * five narrative stages.
  */
 #solicitud {
-  height: 560svh !important;
-  min-height: 560svh !important;
+  height: 340svh !important;
+  min-height: 340svh !important;
 }
 
 #solicitud > .sticky {
@@ -110,8 +110,8 @@
 
 @media (min-width: 1024px) {
   #solicitud {
-    height: 600svh !important;
-    min-height: 600svh !important;
+    height: 380svh !important;
+    min-height: 380svh !important;
   }
 
   #inicio > .sticky > div[aria-hidden='true']:last-child {
