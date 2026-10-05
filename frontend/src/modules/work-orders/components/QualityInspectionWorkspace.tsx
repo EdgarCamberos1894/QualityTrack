@@ -1,3 +1,4 @@
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import {
@@ -215,14 +216,14 @@ export function QualityInspectionWorkspace({
                     </td>
                     <td className="px-3 py-2.5 text-right">
                       {inspection.status === 'IN_PROGRESS' && canEdit ? (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="!h-7 !px-2 !text-[8px]"
-                          onClick={() => onEditCheck(qualityCheck)}
-                        >
-                          Editar
-                        </Button>
+                        <span className="inline-flex justify-end">
+                          <ActionIconButton
+                            icon="edit"
+                            label={`Editar control ${qualityCheck.name}`}
+                            tone="primary"
+                            onClick={() => onEditCheck(qualityCheck)}
+                          />
+                        </span>
                       ) : (
                         <span className="text-[7px] text-slate-400">
                           Bloqueado
