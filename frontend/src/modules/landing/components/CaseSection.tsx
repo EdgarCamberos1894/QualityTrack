@@ -182,10 +182,9 @@ export function CaseSection({ stage, reducedMotion }: CaseSectionProps) {
               fill="none"
               stroke="url(#qtCaseEntry)"
               strokeWidth="1.5"
-              strokeDasharray="8 10"
               pathLength="1"
-              strokeDashoffset={1 - entryProgress}
-              strokeDasharray={`${entryProgress} 1`}
+              strokeDasharray={`${entryProgress} ${Math.max(0.001, 1 - entryProgress)}`}
+              opacity={0.2 + entryProgress * 0.78}
             />
             <circle cx="718" cy="208" r={2.5 + entryProgress * 1.5} fill="#67e8f9" opacity={entryProgress} />
           </svg>
@@ -264,8 +263,9 @@ export function CaseSection({ stage, reducedMotion }: CaseSectionProps) {
                       {caseEvents.map((event, index) => {
                         const start = 0.16 + index * 0.052
                         const end = start + 0.055
+                        const nextStart = index < caseEvents.length - 1 ? 0.16 + (index + 1) * 0.052 : 0.48
                         const eventProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, start, end)
-                        const activeEvent = eventProgress > 0.82 && consolidationProgress < 0.5
+                        const activeEvent = eventProgress > 0.82 && scrollProgress < nextStart && consolidationProgress < 0.5
 
                         return (
                           <div
@@ -318,7 +318,7 @@ export function CaseSection({ stage, reducedMotion }: CaseSectionProps) {
                   </div>
 
                   <div
-                    className="pointer-events-none absolute inset-x-4 top-1/2 z-[5] -translate-y-1/2 sm:inset-x-5 lg:inset-x-6"
+                    className="pointer-events-none absolute inset-x-4 top-1/2 z-[5] sm:inset-x-5 lg:inset-x-6"
                     style={{
                       opacity: consolidationProgress,
                       transform: `translateY(calc(-50% + ${(1 - consolidationProgress) * 18}px)) scale(${summaryScale})`,
