@@ -28,7 +28,7 @@ export function PublicAuthLayout({
     <main
       className={`qt-auth-root min-h-screen lg:grid ${
         immersive
-          ? 'lg:grid-cols-[minmax(360px,0.92fr)_minmax(520px,1.08fr)]'
+          ? 'lg:grid-cols-[minmax(340px,0.82fr)_minmax(520px,1.18fr)]'
           : 'lg:grid-cols-[minmax(340px,0.78fr)_minmax(520px,1.22fr)]'
       }`}
     >
@@ -36,30 +36,20 @@ export function PublicAuthLayout({
 
       <section className="qt-auth-form-stage flex min-h-screen items-center justify-center px-5 py-6 sm:px-8 lg:px-12 lg:py-8 xl:px-16">
         <div className={widthClass}>
-          <div className="mb-4 flex items-center justify-between gap-4 lg:mb-5">
-            <Link
-              to="/"
-              className="flex items-center gap-2.5 rounded-xl py-1 lg:hidden"
-              aria-label="Volver a la página principal"
-            >
-              <img
-                src="/brand/qualitytrack-mark-inverse.svg"
-                alt=""
-                className="h-9 w-9"
-              />
-              <span className="text-[15px] font-semibold tracking-[-0.02em] text-white">
-                Quality<span className="text-blue-400">Track</span>
-              </span>
-            </Link>
-
-            <Link
-              to="/"
-              className="qt-auth-back-link ml-auto inline-flex h-8 items-center gap-2 rounded-lg px-3 text-[8px] font-bold uppercase tracking-[0.09em]"
-            >
-              <span aria-hidden="true">←</span>
-              Volver al recorrido
-            </Link>
-          </div>
+          <Link
+            to="/"
+            className="mb-5 flex w-fit items-center gap-2.5 rounded-xl py-1 lg:hidden"
+            aria-label="Volver a la página principal"
+          >
+            <img
+              src="/brand/qualitytrack-mark-inverse.svg"
+              alt=""
+              className="h-9 w-9"
+            />
+            <span className="text-[15px] font-semibold tracking-[-0.02em] text-white">
+              Quality<span className="text-blue-400">Track</span>
+            </span>
+          </Link>
 
           <div className="qt-auth-form-card rounded-[26px] px-5 py-5 sm:px-6 sm:py-6">
             <div className="mb-5">
