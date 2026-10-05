@@ -58,7 +58,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_24%_47%,rgba(8,145,178,0.15),transparent_28%),radial-gradient(circle_at_48%_20%,rgba(37,99,235,0.09),transparent_34%),linear-gradient(180deg,#020617_0%,#041022_48%,#020817_100%)]" />
       <div className="absolute inset-0 opacity-25 [background-image:linear-gradient(rgba(148,163,184,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.055)_1px,transparent_1px)] [background-size:68px_68px] [mask-image:radial-gradient(circle_at_30%_48%,black,transparent_68%)]" />
 
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-36 bg-gradient-to-b from-[#020617] via-[#020617]/70 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-24 bg-gradient-to-b from-[#020617] via-[#020617]/62 to-transparent" />
 
       <div className="pointer-events-none absolute inset-0 z-[3] hidden lg:block" aria-hidden="true">
         <svg
@@ -142,13 +142,13 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
         </svg>
       </div>
 
-      <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1440px] items-center gap-12 px-5 py-24 sm:px-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14 lg:px-12 xl:px-16">
+      <div className="relative z-10 mx-auto grid min-h-screen w-full max-w-[1440px] items-start gap-10 px-5 pb-16 pt-8 sm:px-8 sm:pt-10 lg:grid-cols-[1.08fr_0.92fr] lg:gap-14 lg:px-12 lg:pb-14 lg:pt-10 xl:px-16">
         <div className="relative order-2 min-h-[500px] lg:order-1 lg:min-h-[610px]">
-          <div className="absolute left-[8%] top-[10%] h-[74%] w-[74%] rounded-full bg-cyan-400/[0.08] blur-[85px]" />
-          <div className="absolute left-[20%] top-[22%] h-[58%] w-[58%] rounded-full bg-blue-500/[0.08] blur-[68px]" />
+          <div className="absolute left-[8%] top-[4%] h-[74%] w-[74%] rounded-full bg-cyan-400/[0.08] blur-[85px]" />
+          <div className="absolute left-[20%] top-[14%] h-[58%] w-[58%] rounded-full bg-blue-500/[0.08] blur-[68px]" />
 
           <div
-            className="qt-request-document absolute left-[3%] top-[16%] z-[2] hidden w-[214px] rounded-2xl border border-white/10 bg-slate-950/70 p-3.5 shadow-[0_28px_80px_-38px_rgba(14,165,233,0.85)] backdrop-blur-xl sm:block"
+            className="qt-request-document absolute left-[3%] top-[8%] z-[2] hidden w-[214px] rounded-2xl border border-white/10 bg-slate-950/70 p-3.5 shadow-[0_28px_80px_-38px_rgba(14,165,233,0.85)] backdrop-blur-xl sm:block lg:top-[6%]"
             style={reveal(260)}
           >
             <div className="flex items-center justify-between">
@@ -165,7 +165,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
           </div>
 
           <div
-            className="qt-request-card absolute left-[11%] top-[20%] z-[4] w-[88%] max-w-[570px] overflow-hidden rounded-[28px] border border-cyan-200/[0.13] bg-[#07111f]/90 shadow-[0_38px_110px_-46px_rgba(14,165,233,0.8)] backdrop-blur-2xl sm:left-[16%] sm:w-[80%] lg:left-[14%] lg:top-[18%]"
+            className="qt-request-card absolute left-[11%] top-[10%] z-[4] w-[88%] max-w-[570px] overflow-hidden rounded-[28px] border border-cyan-200/[0.13] bg-[#07111f]/90 shadow-[0_38px_110px_-46px_rgba(14,165,233,0.8)] backdrop-blur-2xl sm:left-[16%] sm:top-[9%] sm:w-[80%] lg:left-[14%] lg:top-[7%]"
             style={reveal(80)}
           >
             <div className="border-b border-white/[0.06] bg-gradient-to-r from-cyan-300/[0.055] via-transparent to-blue-400/[0.04] px-5 py-4 sm:px-6">
@@ -214,7 +214,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
           </div>
 
           <div
-            className="qt-request-result absolute bottom-[7%] left-[5%] z-[7] w-[270px] rounded-2xl border border-emerald-300/15 bg-slate-950/88 p-4 shadow-[0_26px_80px_-36px_rgba(52,211,153,0.7)] backdrop-blur-xl sm:left-[13%] lg:bottom-[4%] lg:left-[8%]"
+            className="qt-request-result absolute bottom-[10%] left-[5%] z-[7] w-[270px] rounded-2xl border border-emerald-300/15 bg-slate-950/88 p-4 shadow-[0_26px_80px_-36px_rgba(52,211,153,0.7)] backdrop-blur-xl sm:left-[13%] lg:bottom-[8%] lg:left-[8%]"
             style={reveal(1280)}
           >
             <div className="flex items-center justify-between gap-4">
@@ -239,7 +239,7 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
           </div>
         </div>
 
-        <div className="order-1 lg:order-2 lg:pl-4" style={reveal(180)}>
+        <div className="order-1 pt-2 lg:order-2 lg:pl-4 lg:pt-5" style={reveal(180)}>
           <div className="flex items-center gap-2.5">
             <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.13em] text-cyan-300">{stage.eyebrow}</span>
             <span className="text-[9px] font-semibold tracking-[0.18em] text-slate-600">{stage.step}</span>
