@@ -1,4 +1,5 @@
 import { CaseChapter } from '../components/CaseChapter'
+import { DeliveryChapter } from '../components/DeliveryChapter'
 import { LandingHeader } from '../components/LandingHeader'
 import { ProductionChapter } from '../components/ProductionChapter'
 import { QualityChapter } from '../components/QualityChapter'
@@ -18,6 +19,7 @@ export function LandingPage() {
         <WorkOrderChapter />
         <ProductionChapter />
         <QualityChapter />
+        <DeliveryChapter />
       </main>
     </div>
   )
