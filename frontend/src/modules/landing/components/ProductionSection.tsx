@@ -279,7 +279,7 @@ export function ProductionSection({ stage, reducedMotion }: ProductionSectionPro
                     const subtitles = ['OP-01', 'OP-02 · CNC-02', 'OP-03', 'SALIDA']
                     const progressValues = [cutProgress, turnProgress, grindProgress, qualityProgress]
                     const completed = [scrollProgress >= 0.28, scrollProgress >= 0.52, scrollProgress >= 0.72, false][index]
-                    const active = progressValues[index] > 0 && !completed
+                    const active = (progressValues[index] ?? 0) > 0 && !completed
 
                     return (
                       <div key={labels[index]} className="absolute top-[51%] z-[8] h-0 w-0" style={{ left: `${left}%` }}>
