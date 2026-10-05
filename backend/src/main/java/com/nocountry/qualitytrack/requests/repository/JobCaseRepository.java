@@ -3,6 +3,7 @@ package com.nocountry.qualitytrack.requests.repository;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
 import com.nocountry.qualitytrack.requests.enums.JobCaseStatus;
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,6 +39,18 @@ public interface JobCaseRepository extends JpaRepository<JobCase, Long> {
             """)
     List<CustomerStatusCount> countByCustomerAndStatus();
 
+    @Query("""
+            select jobCase.customerRequest.customer.id as customerId,
+                   jobCase.status as status,
+                   count(jobCase) as total
+            from JobCase jobCase
+            where jobCase.customerRequest.customer.id = :customerId
+            group by jobCase.customerRequest.customer.id, jobCase.status
+            """)
+    List<CustomerStatusCount> countByCustomerAndStatus(
+            @Param("customerId") Long customerId
+    );
+
     interface CustomerStatusCount {
         Long getCustomerId();
 
@@ -67,6 +80,74 @@ public interface JobCaseRepository extends JpaRepository<JobCase, Long> {
             """)
     List<JobCase> searchInternal(
             @Param("pattern") String pattern,
+            Pageable pageable
+    );
+
+    @EntityGraph(attributePaths = {
+            "customerRequest",
+            "customerRequest.customer",
+            "customerRequest.requestedByUser",
+            "assignedToUser",
+            "cancelledByUser"
+    })
+    @Query(
+            value = """
+                    select jobCase
+                    from JobCase jobCase
+                    join jobCase.customerRequest request
+                    join request.customer customer
+                    join request.requestedByUser requestedBy
+                    left join jobCase.assignedToUser assigned
+                    where customer.id = :customerId
+                      and (:status is null or jobCase.status = :status)
+                      and (
+                          :assigned is null
+                          or (:assigned = true and assigned is not null)
+                          or (:assigned = false and assigned is null)
+                      )
+                      and (
+                          :pattern is null
+                          or lower(jobCase.caseNumber) like :pattern
+                          or lower(request.requestNumber) like :pattern
+                          or lower(request.title) like :pattern
+                          or lower(request.description) like :pattern
+                          or lower(coalesce(request.customerReference, '')) like :pattern
+                          or lower(concat(requestedBy.firstName, ' ', requestedBy.lastName)) like :pattern
+                          or lower(concat(coalesce(assigned.firstName, ''), ' ', coalesce(assigned.lastName, ''))) like :pattern
+                      )
+                    order by jobCase.openedAt desc, jobCase.id desc
+                    """,
+            countQuery = """
+                    select count(jobCase)
+                    from JobCase jobCase
+                    join jobCase.customerRequest request
+                    join request.customer customer
+                    join request.requestedByUser requestedBy
+                    left join jobCase.assignedToUser assigned
+                    where customer.id = :customerId
+                      and (:status is null or jobCase.status = :status)
+                      and (
+                          :assigned is null
+                          or (:assigned = true and assigned is not null)
+                          or (:assigned = false and assigned is null)
+                      )
+                      and (
+                          :pattern is null
+                          or lower(jobCase.caseNumber) like :pattern
+                          or lower(request.requestNumber) like :pattern
+                          or lower(request.title) like :pattern
+                          or lower(request.description) like :pattern
+                          or lower(coalesce(request.customerReference, '')) like :pattern
+                          or lower(concat(requestedBy.firstName, ' ', requestedBy.lastName)) like :pattern
+                          or lower(concat(coalesce(assigned.firstName, ''), ' ', coalesce(assigned.lastName, ''))) like :pattern
+                      )
+                    """
+    )
+    Page<JobCase> searchByCustomer(
+            @Param("customerId") Long customerId,
+            @Param("pattern") String pattern,
+            @Param("status") JobCaseStatus status,
+            @Param("assigned") Boolean assigned,
             Pageable pageable
     );
 
