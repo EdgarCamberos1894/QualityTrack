@@ -9,6 +9,7 @@ import {
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { cn } from '@/shared/lib/cn'
@@ -151,11 +152,15 @@ export function MaterialLotsPanel({
                   Ficha técnica
                 </Badge>
                 {material.technicalSheetDocumentId ? (
-                  <Button
-                    size="sm"
-                    variant="secondary"
-                    className="!h-6 !px-2 !text-[7px]"
-                    disabled={certificateFile.busyLotId === material.id}
+                  <ActionIconButton
+                    icon="view"
+                    label={
+                      certificateFile.busyLotId === material.id
+                        ? 'Abriendo ficha técnica…'
+                        : `Ver ficha técnica de ${material.name}`
+                    }
+                    tone="primary"
+                    busy={certificateFile.busyLotId === material.id}
                     onClick={() =>
                       void certificateFile.open(
                         material.id,
@@ -163,11 +168,7 @@ export function MaterialLotsPanel({
                         material.technicalSheetDocumentVersionId as number,
                       )
                     }
-                  >
-                    {certificateFile.busyLotId === material.id
-                      ? 'Abriendo…'
-                      : 'Ver ficha'}
-                  </Button>
+                  />
                 ) : null}
               </>
             ) : (
@@ -230,95 +231,99 @@ export function MaterialLotsPanel({
         </div>
       ) : (
         <div className="divide-y divide-slate-100">
-          {lots.map((lot) => (
-            <article
-              id={`material-lot-${lot.id}`}
-              key={lot.id}
-              className={cn(
-                'scroll-mt-24 grid gap-3 px-4 py-3 transition md:grid-cols-[minmax(150px,1fr)_minmax(130px,0.8fr)_130px_minmax(190px,auto)] md:items-center',
-                highlightedLotId === lot.id &&
-                  'bg-blue-50/60 ring-2 ring-inset ring-blue-100',
-              )}
-            >
-              <div className="min-w-0">
-                <p className="truncate text-[10px] font-semibold text-slate-950">
-                  {lot.lotNumber}
-                </p>
-                <p className="mt-0.5 truncate text-[8px] text-slate-400">
-                  {lot.supplier ?? 'Proveedor no especificado'}
-                </p>
-              </div>
+          {lots.map((lot) => {
+            const openingCertificate = certificateFile.busyLotId === lot.id
 
-              <div>
-                <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
-                  Recepción
-                </p>
-                <p className="mt-1 text-[9px] text-slate-700">
-                  {formatResourceDate(lot.receivedAt)}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
-                  Cantidad
-                </p>
-                <p className="mt-1 text-[9px] font-semibold text-slate-900">
-                  {lot.quantityReceived} {material.unit}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-1.5 md:justify-end">
-                {lot.certificateDocumentVersionId ? (
-                  <>
-                    <Badge tone="success" className="px-2 py-0.5 text-[7px]">
-                      Certificado
-                    </Badge>
-                    {lot.certificateDocumentId ? (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="!h-7 !px-2 !text-[8px]"
-                        disabled={certificateFile.busyLotId === lot.id}
-                        onClick={() =>
-                          void certificateFile.open(
-                            lot.id,
-                            lot.certificateDocumentId as number,
-                            lot.certificateDocumentVersionId as number,
-                          )
-                        }
-                      >
-                        {certificateFile.busyLotId === lot.id
-                          ? 'Abriendo…'
-                          : 'Ver'}
-                      </Button>
-                    ) : null}
-                  </>
-                ) : (
-                  <Badge tone="neutral" className="px-2 py-0.5 text-[7px]">
-                    Sin certificado
-                  </Badge>
+            return (
+              <article
+                id={`material-lot-${lot.id}`}
+                key={lot.id}
+                className={cn(
+                  'scroll-mt-24 grid gap-3 px-4 py-3 transition md:grid-cols-[minmax(150px,1fr)_minmax(130px,0.8fr)_130px_minmax(190px,auto)] md:items-center',
+                  highlightedLotId === lot.id &&
+                    'bg-blue-50/60 ring-2 ring-inset ring-blue-100',
                 )}
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-[10px] font-semibold text-slate-950">
+                    {lot.lotNumber}
+                  </p>
+                  <p className="mt-0.5 truncate text-[8px] text-slate-400">
+                    {lot.supplier ?? 'Proveedor no especificado'}
+                  </p>
+                </div>
 
-                {canManage ? (
-                  <Button
-                    size="sm"
-                    variant={
-                      lot.certificateDocumentVersionId ? 'ghost' : 'secondary'
-                    }
-                    className="!h-7 !px-2 !text-[8px]"
-                    onClick={() => {
-                      mutations.uploadCertificate.reset()
-                      setCertificateLot(lot)
-                    }}
-                  >
-                    {lot.certificateDocumentVersionId
-                      ? 'Actualizar'
-                      : 'Adjuntar'}
-                  </Button>
-                ) : null}
-              </div>
-            </article>
-          ))}
+                <div>
+                  <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
+                    Recepción
+                  </p>
+                  <p className="mt-1 text-[9px] text-slate-700">
+                    {formatResourceDate(lot.receivedAt)}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[7px] font-bold uppercase tracking-wide text-slate-400">
+                    Cantidad
+                  </p>
+                  <p className="mt-1 text-[9px] font-semibold text-slate-900">
+                    {lot.quantityReceived} {material.unit}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1.5 md:justify-end">
+                  {lot.certificateDocumentVersionId ? (
+                    <>
+                      <Badge tone="success" className="px-2 py-0.5 text-[7px]">
+                        Certificado
+                      </Badge>
+                      {lot.certificateDocumentId ? (
+                        <ActionIconButton
+                          icon="view"
+                          label={
+                            openingCertificate
+                              ? 'Abriendo certificado…'
+                              : `Ver certificado del lote ${lot.lotNumber}`
+                          }
+                          tone="primary"
+                          busy={openingCertificate}
+                          onClick={() =>
+                            void certificateFile.open(
+                              lot.id,
+                              lot.certificateDocumentId as number,
+                              lot.certificateDocumentVersionId as number,
+                            )
+                          }
+                        />
+                      ) : null}
+                    </>
+                  ) : (
+                    <Badge tone="neutral" className="px-2 py-0.5 text-[7px]">
+                      Sin certificado
+                    </Badge>
+                  )}
+
+                  {canManage ? (
+                    <Button
+                      size="sm"
+                      variant={
+                        lot.certificateDocumentVersionId ? 'ghost' : 'secondary'
+                      }
+                      className="!h-7 !px-2 !text-[8px]"
+                      onClick={() => {
+                        mutations.uploadCertificate.reset()
+                        setCertificateLot(lot)
+                      }}
+                    >
+                      {lot.certificateDocumentVersionId
+                        ? 'Actualizar'
+                        : 'Adjuntar'}
+                    </Button>
+                  ) : null}
+                </div>
+              </article>
+            )
+          })}
         </div>
       )}
 
