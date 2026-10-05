@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { DocumentPreviewDialog } from '@/shared/components/documents/DocumentPreviewDialog'
 import { SidebarNavIcon } from '@/shared/components/navigation/SidebarNavIcon'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Button } from '@/shared/components/ui/Button'
 import { Card } from '@/shared/components/ui/Card'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -99,6 +100,12 @@ export function CustomerRequestDocuments({
             {documents.map((documentItem) => {
               const version = documentItem.currentVersion
               const confirmingRemove = removeId === documentItem.id
+              const opening =
+                files.busy?.versionId === version.id &&
+                files.busy.action === 'open'
+              const downloading =
+                files.busy?.versionId === version.id &&
+                files.busy.action === 'download'
 
               return (
                 <article
@@ -120,43 +127,38 @@ export function CustomerRequestDocuments({
                       </p>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5 [&_button]:!h-7 [&_button]:!px-2.5 [&_button]:!text-[9px]">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        disabled={files.busy !== null}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <ActionIconButton
+                        icon="view"
+                        label={opening ? 'Abriendo documento…' : `Ver ${documentItem.name}`}
+                        tone="primary"
+                        busy={opening}
+                        disabled={files.busy !== null && !opening}
                         onClick={() =>
                           void files.openVersion(documentItem.id, version)
                         }
-                      >
-                        {files.busy?.versionId === version.id &&
-                        files.busy.action === 'open'
-                          ? 'Abriendo…'
-                          : 'Ver'}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        disabled={files.busy !== null}
+                      />
+                      <ActionIconButton
+                        icon="download"
+                        label={
+                          downloading
+                            ? 'Descargando documento…'
+                            : `Descargar ${documentItem.name}`
+                        }
+                        busy={downloading}
+                        disabled={files.busy !== null && !downloading}
                         onClick={() =>
                           void files.downloadVersion(documentItem.id, version)
                         }
-                      >
-                        {files.busy?.versionId === version.id &&
-                        files.busy.action === 'download'
-                          ? 'Descargando…'
-                          : 'Descargar'}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
+                      />
+                      <ActionIconButton
+                        icon="history"
+                        label={`Ver historial de ${documentItem.name}`}
                         onClick={() => {
                           files.clearError()
                           setHistory(documentItem)
                         }}
-                      >
-                        Historial
-                      </Button>
+                      />
 
                       {canModify ? (
                         <>
@@ -178,6 +180,7 @@ export function CustomerRequestDocuments({
                           <Button
                             size="sm"
                             variant="ghost"
+                            className="!h-7 !px-2.5 !text-[9px]"
                             disabled={addingVersion}
                             onClick={() =>
                               versionInputRefs.current[documentItem.id]?.click()
@@ -191,6 +194,7 @@ export function CustomerRequestDocuments({
                               <Button
                                 size="sm"
                                 variant="danger"
+                                className="!h-7 !px-2.5 !text-[9px]"
                                 disabled={removing}
                                 onClick={() => {
                                   void onRemove(documentItem.id).then(
@@ -205,19 +209,19 @@ export function CustomerRequestDocuments({
                               <Button
                                 size="sm"
                                 variant="ghost"
+                                className="!h-7 !px-2.5 !text-[9px]"
                                 onClick={() => setRemoveId(null)}
                               >
-                                No quitar
+                                Cancelar
                               </Button>
                             </>
                           ) : (
-                            <Button
-                              size="sm"
-                              variant="ghost"
+                            <ActionIconButton
+                              icon="delete"
+                              label={`Quitar ${documentItem.name}`}
+                              tone="danger"
                               onClick={() => setRemoveId(documentItem.id)}
-                            >
-                              Quitar
-                            </Button>
+                            />
                           )}
                         </>
                       ) : null}
