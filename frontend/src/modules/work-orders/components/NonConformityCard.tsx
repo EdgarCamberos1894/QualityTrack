@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useSessionStore } from '@/modules/auth'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -174,21 +175,34 @@ export function NonConformityCard({
 
           <div className="flex flex-wrap gap-2">
             {open && nonConformity.disposition === null && canEditDetails ? (
-              <Button
-                size="sm"
-                className="!h-7 !px-2.5 !text-[8px]"
-                variant="secondary"
-                onClick={() => setEditOpen(true)}
-              >
-                {detailsComplete ? 'Editar datos' : 'Completar datos'}
-              </Button>
+              detailsComplete ? (
+                <ActionIconButton
+                  icon="edit"
+                  label={`Editar datos de ${nonConformity.number}`}
+                  tone="primary"
+                  onClick={() => setEditOpen(true)}
+                />
+              ) : (
+                <Button
+                  size="sm"
+                  className="!h-7 !px-2.5 !text-[8px]"
+                  variant="secondary"
+                  onClick={() => setEditOpen(true)}
+                >
+                  Completar datos
+                </Button>
+              )
             ) : null}
 
             {open &&
             detailsComplete &&
             nonConformity.disposition === null &&
             canChooseDisposition ? (
-              <Button size="sm" className="!h-7 !px-2.5 !text-[8px]" onClick={() => setDispositionOpen(true)}>
+              <Button
+                size="sm"
+                className="!h-7 !px-2.5 !text-[8px]"
+                onClick={() => setDispositionOpen(true)}
+              >
                 Definir disposición
               </Button>
             ) : null}
