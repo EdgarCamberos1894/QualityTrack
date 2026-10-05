@@ -1,3 +1,4 @@
+import { CaseChapter } from '../components/CaseChapter'
 import { LandingHeader } from '../components/LandingHeader'
 import { ScrollStory } from '../components/ScrollStory'
 import '../landing.css'
@@ -8,6 +9,7 @@ export function LandingPage() {
       <LandingHeader />
       <main>
         <ScrollStory />
+        <CaseChapter />
       </main>
     </div>
   )
