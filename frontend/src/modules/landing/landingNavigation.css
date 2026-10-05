@@ -50,6 +50,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
   transition:
     color 180ms ease,
     background 180ms ease;
@@ -144,6 +145,12 @@
   .qt-landing-header-shell > a:first-child img {
     width: 30px;
     height: 30px;
+  }
+
+  .qt-mobile-nav-action {
+    gap: 5px;
+    font-size: 7px;
+    letter-spacing: 0.045em;
   }
 }
 
