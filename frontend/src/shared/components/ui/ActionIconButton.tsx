@@ -44,7 +44,7 @@ export function ActionIconButton({
       title={label}
       disabled={disabled || busy}
       className={cn(
-        'inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-45',
+        'inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg border transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-45',
         toneClasses[tone],
         className,
       )}
@@ -54,7 +54,7 @@ export function ActionIconButton({
         <svg
           viewBox="0 0 24 24"
           aria-hidden="true"
-          className="h-3.5 w-3.5 animate-spin"
+          className="h-[13px] w-[13px] animate-spin"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.8"
@@ -73,7 +73,7 @@ function ActionIcon({ name }: { name: ActionIconName }) {
   const commonProps = {
     viewBox: '0 0 24 24',
     'aria-hidden': true,
-    className: 'h-3.5 w-3.5',
+    className: 'h-[13px] w-[13px]',
     fill: 'none',
     stroke: 'currentColor',
     strokeWidth: 1.8,
