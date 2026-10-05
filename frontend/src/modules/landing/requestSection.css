@@ -79,8 +79,17 @@
   content: '';
   pointer-events: none;
   background:
-    radial-gradient(circle at 18% 8%, rgba(34, 211, 238, 0.075), transparent 24%),
-    linear-gradient(115deg, transparent 36%, rgba(103, 232, 249, 0.025) 50%, transparent 64%);
+    radial-gradient(
+      circle at 18% 8%,
+      rgba(34, 211, 238, 0.075),
+      transparent 24%
+    ),
+    linear-gradient(
+      115deg,
+      transparent 36%,
+      rgba(103, 232, 249, 0.025) 50%,
+      transparent 64%
+    );
 }
 
 .qt-request-mobile-scan {

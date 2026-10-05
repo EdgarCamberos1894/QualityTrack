@@ -6,11 +6,7 @@ export interface GeometryData {
 type Point3 = [number, number, number]
 type Quad = [Point3, Point3, Point3, Point3]
 
-function pushVertex(
-  target: number[],
-  position: Point3,
-  normal: Point3,
-) {
+function pushVertex(target: number[], position: Point3, normal: Point3) {
   target.push(...position, ...normal)
 }
 
@@ -20,17 +16,67 @@ export function createCubeGeometry(): GeometryData {
     normal: Point3
     corners: Quad
   }> = [
-    { normal: [0, 0, 1], corners: [[-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]] },
-    { normal: [0, 0, -1], corners: [[1, -1, -1], [-1, -1, -1], [-1, 1, -1], [1, 1, -1]] },
-    { normal: [1, 0, 0], corners: [[1, -1, 1], [1, -1, -1], [1, 1, -1], [1, 1, 1]] },
-    { normal: [-1, 0, 0], corners: [[-1, -1, -1], [-1, -1, 1], [-1, 1, 1], [-1, 1, -1]] },
-    { normal: [0, 1, 0], corners: [[-1, 1, 1], [1, 1, 1], [1, 1, -1], [-1, 1, -1]] },
-    { normal: [0, -1, 0], corners: [[-1, -1, -1], [1, -1, -1], [1, -1, 1], [-1, -1, 1]] },
+    {
+      normal: [0, 0, 1],
+      corners: [
+        [-1, -1, 1],
+        [1, -1, 1],
+        [1, 1, 1],
+        [-1, 1, 1],
+      ],
+    },
+    {
+      normal: [0, 0, -1],
+      corners: [
+        [1, -1, -1],
+        [-1, -1, -1],
+        [-1, 1, -1],
+        [1, 1, -1],
+      ],
+    },
+    {
+      normal: [1, 0, 0],
+      corners: [
+        [1, -1, 1],
+        [1, -1, -1],
+        [1, 1, -1],
+        [1, 1, 1],
+      ],
+    },
+    {
+      normal: [-1, 0, 0],
+      corners: [
+        [-1, -1, -1],
+        [-1, -1, 1],
+        [-1, 1, 1],
+        [-1, 1, -1],
+      ],
+    },
+    {
+      normal: [0, 1, 0],
+      corners: [
+        [-1, 1, 1],
+        [1, 1, 1],
+        [1, 1, -1],
+        [-1, 1, -1],
+      ],
+    },
+    {
+      normal: [0, -1, 0],
+      corners: [
+        [-1, -1, -1],
+        [1, -1, -1],
+        [1, -1, 1],
+        [-1, -1, 1],
+      ],
+    },
   ]
 
   for (const face of faces) {
     const [a, b, c, d] = face.corners
-    ;[a, b, c, a, c, d].forEach((corner) => pushVertex(data, corner, face.normal))
+    ;[a, b, c, a, c, d].forEach((corner) =>
+      pushVertex(data, corner, face.normal),
+    )
   }
 
   return { vertices: new Float32Array(data), count: data.length / 6 }

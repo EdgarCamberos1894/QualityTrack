@@ -21,12 +21,16 @@ export function FinalCta() {
         <div className="flex flex-1 items-center justify-center py-16 text-center lg:py-20">
           <div className="w-full max-w-[760px]">
             <div className="qt-final-terminal mx-auto mb-7 grid h-12 w-12 place-items-center rounded-full border border-cyan-200/14 bg-cyan-300/[0.035] shadow-[0_0_45px_rgba(34,211,238,0.08)]">
-              <span className="grid h-6 w-6 place-items-center rounded-full border border-emerald-300/18 bg-emerald-300/[0.06] text-[10px] font-bold text-emerald-300">✓</span>
+              <span className="grid h-6 w-6 place-items-center rounded-full border border-emerald-300/18 bg-emerald-300/[0.06] text-[10px] font-bold text-emerald-300">
+                ✓
+              </span>
             </div>
 
             <div className="flex items-center justify-center gap-2.5">
               <span className="h-px w-7 bg-gradient-to-r from-transparent to-cyan-300/35" />
-              <span className="text-[8px] font-bold uppercase tracking-[0.18em] text-cyan-100/65">El hilo está completo</span>
+              <span className="text-[8px] font-bold uppercase tracking-[0.18em] text-cyan-100/65">
+                El hilo está completo
+              </span>
               <span className="h-px w-7 bg-gradient-to-l from-transparent to-cyan-300/35" />
             </div>
 
@@ -35,7 +39,9 @@ export function FinalCta() {
             </h2>
 
             <p className="mx-auto mt-5 max-w-[620px] text-[12px] leading-6 text-slate-400 sm:text-[13px] lg:text-[14px] lg:leading-7">
-              Una solicitud, una historia operativa y la evidencia necesaria para saber qué pasó, qué sigue y cómo llegó cada pieza hasta su destino.
+              Una solicitud, una historia operativa y la evidencia necesaria
+              para saber qué pasó, qué sigue y cómo llegó cada pieza hasta su
+              destino.
             </p>
 
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -44,7 +50,9 @@ export function FinalCta() {
                 className="qt-final-primary inline-flex h-11 min-w-[178px] items-center justify-center rounded-xl border border-blue-300/20 bg-blue-500 px-5 text-[10px] font-bold text-white shadow-[0_16px_45px_-22px_rgba(59,130,246,0.95)] transition hover:bg-blue-400"
               >
                 Ver plataforma
-                <span className="ml-2 text-[13px]" aria-hidden="true">↗</span>
+                <span className="ml-2 text-[13px]" aria-hidden="true">
+                  ↗
+                </span>
               </Link>
 
               <a
@@ -52,36 +60,63 @@ export function FinalCta() {
                 className="inline-flex h-11 min-w-[178px] items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.025] px-5 text-[10px] font-bold text-slate-300 transition hover:border-white/[0.14] hover:bg-white/[0.045] hover:text-white"
               >
                 Recorrer de nuevo
-                <span className="ml-2 text-[12px] text-slate-500" aria-hidden="true">↑</span>
+                <span
+                  className="ml-2 text-[12px] text-slate-500"
+                  aria-hidden="true"
+                >
+                  ↑
+                </span>
               </a>
             </div>
 
             <div className="mx-auto mt-10 flex max-w-[560px] items-center justify-center gap-2 sm:gap-3">
-              {['Solicitud', 'Producción', 'Calidad', 'Entrega'].map((item, index) => (
-                <div key={item} className="contents">
-                  {index > 0 ? <span className="h-px w-5 bg-white/[0.07] sm:w-8" /> : null}
-                  <span className="whitespace-nowrap font-mono text-[6px] uppercase tracking-[0.11em] text-slate-700 sm:text-[7px]">{item}</span>
-                </div>
-              ))}
+              {['Solicitud', 'Producción', 'Calidad', 'Entrega'].map(
+                (item, index) => (
+                  <div key={item} className="contents">
+                    {index > 0 ? (
+                      <span className="h-px w-5 bg-white/[0.07] sm:w-8" />
+                    ) : null}
+                    <span className="whitespace-nowrap font-mono text-[6px] uppercase tracking-[0.11em] text-slate-700 sm:text-[7px]">
+                      {item}
+                    </span>
+                  </div>
+                ),
+              )}
             </div>
           </div>
         </div>
 
         <footer className="border-t border-white/[0.055] py-7 lg:py-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <a href="#inicio" className="flex w-fit items-center gap-2.5 rounded-xl py-1">
-              <img src="/brand/qualitytrack-mark-inverse.svg" alt="" className="h-8 w-8" />
+            <a
+              href="#inicio"
+              className="flex w-fit items-center gap-2.5 rounded-xl py-1"
+            >
+              <img
+                src="/brand/qualitytrack-mark-inverse.svg"
+                alt=""
+                className="h-8 w-8"
+              />
               <div className="leading-none">
                 <p className="text-[13px] font-semibold tracking-[-0.02em] text-white">
                   Quality<span className="text-blue-400">Track</span>
                 </p>
-                <p className="mt-1 text-[7px] font-medium uppercase tracking-[0.15em] text-slate-600">Industrial workflow</p>
+                <p className="mt-1 text-[7px] font-medium uppercase tracking-[0.15em] text-slate-600">
+                  Industrial workflow
+                </p>
               </div>
             </a>
 
-            <nav aria-label="Flujo QualityTrack" className="flex flex-wrap gap-x-4 gap-y-2 lg:justify-center">
+            <nav
+              aria-label="Flujo QualityTrack"
+              className="flex flex-wrap gap-x-4 gap-y-2 lg:justify-center"
+            >
               {footerLinks.map(([label, href]) => (
-                <a key={href} href={href} className="text-[8px] font-semibold text-slate-600 transition hover:text-slate-300">
+                <a
+                  key={href}
+                  href={href}
+                  className="text-[8px] font-semibold text-slate-600 transition hover:text-slate-300"
+                >
                   {label}
                 </a>
               ))}

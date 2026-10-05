@@ -37,7 +37,11 @@ function drawCard(
     alpha,
   })
   painter.draw({
-    position: [position[0] - width * 0.42, y + height * 0.36, position[2] + 0.04],
+    position: [
+      position[0] - width * 0.42,
+      y + height * 0.36,
+      position[2] + 0.04,
+    ],
     rotation,
     scale: [0.055, height * 0.72, 0.012],
     color: accent,
@@ -48,7 +52,11 @@ function drawCard(
   const lineWidths = [0.36, 0.47, 0.3, 0.41]
   lineWidths.forEach((lineWidth, index) => {
     painter.draw({
-      position: [position[0] + 0.07, y + 0.34 - index * 0.18, position[2] + 0.045],
+      position: [
+        position[0] + 0.07,
+        y + 0.34 - index * 0.18,
+        position[2] + 0.045,
+      ],
       rotation,
       scale: [lineWidth, 0.018, 0.01],
       color: index === 0 ? accent : slate,
@@ -91,12 +99,39 @@ function drawRequest(painter: ScenePainter, state: SceneFrameState) {
   const x = lerp(-3.7, -1.7, enter)
   const z = lerp(0.5, 0.05, enter)
 
-  drawCard(painter, [x, 0.95, z], [0.03, -0.24, -0.04], cyan, alpha, time, 0.72, 0.92)
+  drawCard(
+    painter,
+    [x, 0.95, z],
+    [0.03, -0.24, -0.04],
+    cyan,
+    alpha,
+    time,
+    0.72,
+    0.92,
+  )
   drawConnector(painter, x + 0.75, -0.25, 0.46, alpha, cyan)
 
   const attachmentAlpha = alpha * segment(progress, 0.1, 0.15)
-  drawCard(painter, [x - 0.72, 0.48, -0.42], [-0.03, 0.2, 0.08], blue, attachmentAlpha, time + 0.8, 0.38, 0.5)
-  drawCard(painter, [x + 0.78, 0.32, -0.5], [0.02, -0.2, -0.07], blue, attachmentAlpha, time + 1.5, 0.34, 0.45)
+  drawCard(
+    painter,
+    [x - 0.72, 0.48, -0.42],
+    [-0.03, 0.2, 0.08],
+    blue,
+    attachmentAlpha,
+    time + 0.8,
+    0.38,
+    0.5,
+  )
+  drawCard(
+    painter,
+    [x + 0.78, 0.32, -0.5],
+    [0.02, -0.2, -0.07],
+    blue,
+    attachmentAlpha,
+    time + 1.5,
+    0.34,
+    0.45,
+  )
 }
 
 function drawExpediente(painter: ScenePainter, state: SceneFrameState) {
@@ -107,7 +142,13 @@ function drawExpediente(painter: ScenePainter, state: SceneFrameState) {
   if (alpha <= 0.01) return
 
   const spread = segment(progress, 0.2, 0.3)
-  const pages: Array<{ x: number; y: number; z: number; r: number; accent: [number, number, number] }> = [
+  const pages: Array<{
+    x: number
+    y: number
+    z: number
+    r: number
+    accent: [number, number, number]
+  }> = [
     { x: -1.85, y: 1.15, z: -0.5, r: -0.16, accent: blue },
     { x: -0.9, y: 1.32, z: -0.72, r: 0.12, accent: cyan },
     { x: -1.35, y: 0.45, z: 0.5, r: 0.03, accent: emerald },
@@ -117,7 +158,16 @@ function drawExpediente(painter: ScenePainter, state: SceneFrameState) {
     const x = lerp(-1.25, page.x, spread)
     const y = lerp(0.82, page.y, spread)
     const z = lerp(0.05, page.z, spread)
-    drawCard(painter, [x, y, z], [0, page.r, page.r * 0.3], page.accent, alpha, time + index, 0.5, 0.64)
+    drawCard(
+      painter,
+      [x, y, z],
+      [0, page.r, page.r * 0.3],
+      page.accent,
+      alpha,
+      time + index,
+      0.5,
+      0.64,
+    )
   })
 
   drawConnector(painter, -1.0, -0.2, 0.12, alpha * 0.85, blue)
@@ -181,7 +231,16 @@ function drawWorkOrderCard(painter: ScenePainter, state: SceneFrameState) {
   const alpha = enter * (1 - exit)
   if (alpha <= 0.01) return
 
-  drawCard(painter, [1.4, 1.25, -0.86], [0.02, -0.34, 0.02], [0.52, 0.36, 0.96], alpha, time, 0.58, 0.75)
+  drawCard(
+    painter,
+    [1.4, 1.25, -0.86],
+    [0.02, -0.34, 0.02],
+    [0.52, 0.36, 0.96],
+    alpha,
+    time,
+    0.58,
+    0.75,
+  )
   const route = segment(progress, 0.46, 0.55)
   for (let index = 0; index < 4; index += 1) {
     const active = route * 4 >= index
@@ -218,7 +277,10 @@ function drawAmbientScreen(painter: ScenePainter, state: SceneFrameState) {
   }
 }
 
-export function drawStoryDocuments(painter: ScenePainter, state: SceneFrameState) {
+export function drawStoryDocuments(
+  painter: ScenePainter,
+  state: SceneFrameState,
+) {
   drawAmbientScreen(painter, state)
   drawRequest(painter, state)
   drawExpediente(painter, state)

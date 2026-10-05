@@ -38,7 +38,9 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
 
   useEffect(() => {
     if (reducedMotion) {
-      const reducedMotionFrame = window.requestAnimationFrame(() => setScrollProgress(1))
+      const reducedMotionFrame = window.requestAnimationFrame(() =>
+        setScrollProgress(1),
+      )
       return () => window.cancelAnimationFrame(reducedMotionFrame)
     }
 
@@ -74,7 +76,11 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
     }
   }, [reducedMotion])
 
-  const scrollReveal = (start: number, end: number, distance = 14): CSSProperties => {
+  const scrollReveal = (
+    start: number,
+    end: number,
+    distance = 14,
+  ): CSSProperties => {
     const value = reducedMotion ? 1 : rangeProgress(scrollProgress, start, end)
 
     return {
@@ -83,11 +89,21 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
     }
   }
 
-  const linkProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.025, 0.13)
-  const fieldProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.15, 0.4)
-  const documentProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.42, 0.58)
-  const consolidationProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.61, 0.78)
-  const exitProgress = reducedMotion ? 1 : rangeProgress(scrollProgress, 0.83, 0.96)
+  const linkProgress = reducedMotion
+    ? 1
+    : rangeProgress(scrollProgress, 0.025, 0.13)
+  const fieldProgress = reducedMotion
+    ? 1
+    : rangeProgress(scrollProgress, 0.15, 0.4)
+  const documentProgress = reducedMotion
+    ? 1
+    : rangeProgress(scrollProgress, 0.42, 0.58)
+  const consolidationProgress = reducedMotion
+    ? 1
+    : rangeProgress(scrollProgress, 0.61, 0.78)
+  const exitProgress = reducedMotion
+    ? 1
+    : rangeProgress(scrollProgress, 0.83, 0.96)
 
   const phase =
     exitProgress > 0
@@ -109,7 +125,9 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
 
   const formOpacity = 1 - consolidationProgress
   const documentOpacity = documentProgress * (1 - consolidationProgress)
-  const handoffLabelProgress = reducedMotion ? 1 : rangeProgress(exitProgress, 0.34, 0.72)
+  const handoffLabelProgress = reducedMotion
+    ? 1
+    : rangeProgress(exitProgress, 0.34, 0.72)
   const sectionClassName = reducedMotion
     ? 'relative isolate min-h-screen bg-[#020817]'
     : 'relative isolate h-[260svh] bg-[#020817] lg:h-[280svh]'
@@ -125,23 +143,44 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
         <div className="pointer-events-none absolute left-[4%] top-[28%] h-[46%] w-[46%] rounded-full bg-cyan-400/[0.055] blur-[110px]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-16 bg-gradient-to-b from-[#020617] via-[#020617]/58 to-transparent lg:h-24" />
 
-        <div className="pointer-events-none absolute inset-0 z-[3] hidden lg:block" aria-hidden="true">
+        <div
+          className="pointer-events-none absolute inset-0 z-[3] hidden lg:block"
+          aria-hidden="true"
+        >
           <svg
             viewBox="0 0 1000 430"
             className="absolute left-0 top-0 h-[48%] w-full overflow-visible"
             preserveAspectRatio="none"
           >
             <defs>
-              <linearGradient id="qtRequestTrace" x1="0.343" y1="0" x2="0.2" y2="0.7">
+              <linearGradient
+                id="qtRequestTrace"
+                x1="0.343"
+                y1="0"
+                x2="0.2"
+                y2="0.7"
+              >
                 <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.22" />
                 <stop offset="22%" stopColor="#22d3ee" stopOpacity="0.62" />
                 <stop offset="70%" stopColor="#60a5fa" stopOpacity="0.48" />
                 <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.05" />
               </linearGradient>
-              <filter id="qtRequestTraceGlow" x="-60%" y="-60%" width="220%" height="220%">
+              <filter
+                id="qtRequestTraceGlow"
+                x="-60%"
+                y="-60%"
+                width="220%"
+                height="220%"
+              >
                 <feGaussianBlur stdDeviation="7" />
               </filter>
-              <filter id="qtRequestTravelerGlow" x="-200%" y="-200%" width="500%" height="500%">
+              <filter
+                id="qtRequestTravelerGlow"
+                x="-200%"
+                y="-200%"
+                width="500%"
+                height="500%"
+              >
                 <feGaussianBlur stdDeviation="5" />
               </filter>
             </defs>
@@ -181,26 +220,53 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                   opacity={0.16 * linkProgress}
                   filter="url(#qtRequestTravelerGlow)"
                 >
-                  <animateMotion dur="5.2s" repeatCount="indefinite" path={requestTracePath} />
+                  <animateMotion
+                    dur="5.2s"
+                    repeatCount="indefinite"
+                    path={requestTracePath}
+                  />
                 </circle>
                 <circle r="3.5" fill="#a5f3fc" opacity={0.95 * linkProgress}>
-                  <animateMotion dur="5.2s" repeatCount="indefinite" path={requestTracePath} />
+                  <animateMotion
+                    dur="5.2s"
+                    repeatCount="indefinite"
+                    path={requestTracePath}
+                  />
                 </circle>
               </>
             ) : null}
           </svg>
         </div>
 
-        <div className="pointer-events-none absolute inset-0 z-[7] hidden lg:block" aria-hidden="true">
-          <svg viewBox="0 0 1000 1000" className="absolute inset-0 h-full w-full" preserveAspectRatio="none">
+        <div
+          className="pointer-events-none absolute inset-0 z-[7] hidden lg:block"
+          aria-hidden="true"
+        >
+          <svg
+            viewBox="0 0 1000 1000"
+            className="absolute inset-0 h-full w-full"
+            preserveAspectRatio="none"
+          >
             <defs>
-              <linearGradient id="qtRequestHandoff" x1="0.28" y1="0.5" x2="0.25" y2="1">
+              <linearGradient
+                id="qtRequestHandoff"
+                x1="0.28"
+                y1="0.5"
+                x2="0.25"
+                y2="1"
+              >
                 <stop offset="0%" stopColor="#34d399" stopOpacity="0.52" />
                 <stop offset="24%" stopColor="#22d3ee" stopOpacity="0.76" />
                 <stop offset="68%" stopColor="#60a5fa" stopOpacity="0.5" />
                 <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.22" />
               </linearGradient>
-              <filter id="qtRequestHandoffGlow" x="-80%" y="-30%" width="260%" height="180%">
+              <filter
+                id="qtRequestHandoffGlow"
+                x="-80%"
+                y="-30%"
+                width="260%"
+                height="180%"
+              >
                 <feGaussianBlur stdDeviation="8" />
               </filter>
             </defs>
@@ -223,8 +289,20 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
               strokeDasharray={`${Math.max(0.001, exitProgress)} 1`}
               opacity={0.25 + exitProgress * 0.75}
             />
-            <circle cx="286" cy="505" r="3.5" fill="#6ee7b7" opacity={exitProgress} />
-            <circle cx="250" cy="1000" r="3.4" fill="#93c5fd" opacity={rangeProgress(exitProgress, 0.72, 1)} />
+            <circle
+              cx="286"
+              cy="505"
+              r="3.5"
+              fill="#6ee7b7"
+              opacity={exitProgress}
+            />
+            <circle
+              cx="250"
+              cy="1000"
+              r="3.4"
+              fill="#93c5fd"
+              opacity={rangeProgress(exitProgress, 0.72, 1)}
+            />
           </svg>
 
           <div
@@ -236,8 +314,12 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
           >
             <span className="h-px w-9 bg-gradient-to-r from-transparent to-cyan-300/50" />
             <div>
-              <p className="font-mono text-[7px] uppercase tracking-[0.16em] text-slate-600">Siguiente</p>
-              <p className="mt-1 text-[9px] font-semibold tracking-[0.03em] text-blue-200/80">Expediente 360</p>
+              <p className="font-mono text-[7px] uppercase tracking-[0.16em] text-slate-600">
+                Siguiente
+              </p>
+              <p className="mt-1 text-[9px] font-semibold tracking-[0.03em] text-blue-200/80">
+                Expediente 360
+              </p>
             </div>
           </div>
         </div>
@@ -248,7 +330,9 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
               <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.13em] text-cyan-300">
                 {stage.eyebrow}
               </span>
-              <span className="text-[9px] font-semibold tracking-[0.18em] text-slate-600">{stage.step}</span>
+              <span className="text-[9px] font-semibold tracking-[0.18em] text-slate-600">
+                {stage.step}
+              </span>
             </div>
 
             <h2 className="mt-3 max-w-[620px] text-[clamp(2rem,9vw,3.2rem)] font-semibold leading-[0.95] tracking-[-0.055em] text-white lg:mt-4 lg:text-[clamp(2.15rem,4.4vw,4.2rem)] lg:leading-[0.98]">
@@ -273,8 +357,12 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
             <div className="mt-7 hidden max-w-[500px] items-start gap-3 rounded-2xl border border-cyan-300/10 bg-slate-950/40 p-3.5 backdrop-blur-md lg:flex">
               <span className="mt-1 flex h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.7)]" />
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.11em] text-white">{stage.signal}</p>
-                <p className="mt-1 text-[9px] leading-4 text-slate-400">{stage.detail}</p>
+                <p className="text-[9px] font-bold uppercase tracking-[0.11em] text-white">
+                  {stage.signal}
+                </p>
+                <p className="mt-1 text-[9px] leading-4 text-slate-400">
+                  {stage.detail}
+                </p>
               </div>
             </div>
 
@@ -317,8 +405,12 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-[8px] font-extrabold uppercase tracking-[0.15em] text-slate-400">Documento técnico</span>
-                  <span className="rounded-md border border-cyan-300/15 bg-cyan-300/10 px-1.5 py-0.5 font-mono text-[7px] text-cyan-200">REV C</span>
+                  <span className="text-[8px] font-extrabold uppercase tracking-[0.15em] text-slate-400">
+                    Documento técnico
+                  </span>
+                  <span className="rounded-md border border-cyan-300/15 bg-cyan-300/10 px-1.5 py-0.5 font-mono text-[7px] text-cyan-200">
+                    REV C
+                  </span>
                 </div>
                 <div className="relative mt-3 h-36 overflow-hidden rounded-xl border border-white/[0.06] bg-[#06111d] shadow-[inset_0_0_26px_rgba(14,165,233,0.04)]">
                   <div className="absolute inset-0 opacity-55 [background-image:linear-gradient(rgba(56,189,248,0.085)_1px,transparent_1px),linear-gradient(90deg,rgba(56,189,248,0.085)_1px,transparent_1px)] [background-size:14px_14px]" />
@@ -326,11 +418,19 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                   <div className="absolute left-8 top-[54px] h-6 w-26 border-x border-cyan-200/45" />
                   <div className="absolute left-[84px] top-6 h-24 w-px bg-cyan-300/15" />
                   <div className="absolute left-4 top-[70px] h-px w-[164px] bg-cyan-300/15" />
-                  <div className="absolute left-3 top-3 font-mono text-[6px] tracking-[0.12em] text-cyan-300/45">Ø48.00 ±0.02</div>
-                  <div className="absolute right-3 top-3 font-mono text-[6px] text-slate-600">SCALE 1:2</div>
-                  <div className="absolute bottom-3 left-4 font-mono text-[7px] tracking-[0.12em] text-cyan-200/70">SHAFT Ø48 · AISI 4140</div>
+                  <div className="absolute left-3 top-3 font-mono text-[6px] tracking-[0.12em] text-cyan-300/45">
+                    Ø48.00 ±0.02
+                  </div>
+                  <div className="absolute right-3 top-3 font-mono text-[6px] text-slate-600">
+                    SCALE 1:2
+                  </div>
+                  <div className="absolute bottom-3 left-4 font-mono text-[7px] tracking-[0.12em] text-cyan-200/70">
+                    SHAFT Ø48 · AISI 4140
+                  </div>
                 </div>
-                <p className="mt-2 font-mono text-[8px] text-slate-500">Plano_eje_REV-C.pdf</p>
+                <p className="mt-2 font-mono text-[8px] text-slate-500">
+                  Plano_eje_REV-C.pdf
+                </p>
               </div>
 
               <div
@@ -344,7 +444,9 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                 {phase >= 1 && phase < 4 ? (
                   <div
                     className="pointer-events-none absolute inset-y-0 left-0 z-[8] w-24 bg-gradient-to-r from-transparent via-cyan-200/[0.045] to-transparent"
-                    style={{ transform: `translate3d(${fieldProgress * 520 - 110}%,0,0)` }}
+                    style={{
+                      transform: `translate3d(${fieldProgress * 520 - 110}%,0,0)`,
+                    }}
                   />
                 ) : null}
 
@@ -356,11 +458,15 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                           className={`h-2 w-2 rounded-full ${consolidationProgress > 0.55 ? 'bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,0.7)]' : linkProgress > 0.3 ? 'bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.75)]' : 'bg-slate-700'}`}
                         />
                         <span className="text-[8px] font-extrabold uppercase tracking-[0.15em] text-cyan-100/85">
-                          {consolidationProgress > 0.55 ? 'Solicitud consolidada' : 'Nueva solicitud'}
+                          {consolidationProgress > 0.55
+                            ? 'Solicitud consolidada'
+                            : 'Nueva solicitud'}
                         </span>
                       </div>
                       <p className="mt-1 text-[14px] font-semibold tracking-[-0.025em] text-white lg:mt-1.5 lg:text-[16px]">
-                        {consolidationProgress > 0.55 ? 'Contexto listo para continuar' : 'Requerimiento de fabricación'}
+                        {consolidationProgress > 0.55
+                          ? 'Contexto listo para continuar'
+                          : 'Requerimiento de fabricación'}
                       </p>
                     </div>
                     <span
@@ -402,8 +508,12 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                           className="rounded-xl border border-white/[0.055] bg-white/[0.025] px-2.5 py-2.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.02)] lg:px-3.5 lg:py-3"
                           style={scrollReveal(start, end, 12)}
                         >
-                          <p className="text-[6px] font-bold uppercase tracking-[0.11em] text-slate-600 lg:text-[7px] lg:tracking-[0.13em]">{label}</p>
-                          <p className="mt-1 text-[9px] font-semibold leading-3.5 text-slate-200 lg:mt-1.5 lg:text-[10px] lg:leading-4">{value}</p>
+                          <p className="text-[6px] font-bold uppercase tracking-[0.11em] text-slate-600 lg:text-[7px] lg:tracking-[0.13em]">
+                            {label}
+                          </p>
+                          <p className="mt-1 text-[9px] font-semibold leading-3.5 text-slate-200 lg:mt-1.5 lg:text-[10px] lg:leading-4">
+                            {value}
+                          </p>
                         </div>
                       )
                     })}
@@ -414,20 +524,34 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                     style={scrollReveal(0.42, 0.49, 10)}
                   >
                     <div className="mb-2 flex items-center justify-between gap-3 lg:mb-3">
-                      <span className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-500 lg:text-[8px] lg:tracking-[0.13em]">Documentación adjunta</span>
-                      <span className="text-[7px] font-semibold text-cyan-300/80 lg:text-[8px]">3 archivos</span>
+                      <span className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-500 lg:text-[8px] lg:tracking-[0.13em]">
+                        Documentación adjunta
+                      </span>
+                      <span className="text-[7px] font-semibold text-cyan-300/80 lg:text-[8px]">
+                        3 archivos
+                      </span>
                     </div>
                     <div className="grid grid-cols-3 gap-1.5 lg:gap-2">
                       {requestDocuments.map(([name, size], index) => (
                         <div
                           key={name}
                           className="min-w-0 rounded-xl border border-white/[0.055] bg-slate-950/45 p-2 lg:flex lg:items-center lg:gap-2.5 lg:p-2.5"
-                          style={scrollReveal(0.44 + index * 0.028, 0.5 + index * 0.02, 8)}
+                          style={scrollReveal(
+                            0.44 + index * 0.028,
+                            0.5 + index * 0.02,
+                            8,
+                          )}
                         >
-                          <div className="grid h-6 w-6 shrink-0 place-items-center rounded-lg border border-cyan-300/10 bg-cyan-300/[0.06] font-mono text-[6px] font-bold text-cyan-200 lg:h-8 lg:w-8 lg:text-[8px]">PDF</div>
+                          <div className="grid h-6 w-6 shrink-0 place-items-center rounded-lg border border-cyan-300/10 bg-cyan-300/[0.06] font-mono text-[6px] font-bold text-cyan-200 lg:h-8 lg:w-8 lg:text-[8px]">
+                            PDF
+                          </div>
                           <div className="mt-1 min-w-0 lg:mt-0">
-                            <p className="truncate text-[7px] font-semibold text-slate-300 lg:text-[8px]">{name}</p>
-                            <p className="mt-0.5 font-mono text-[6px] text-slate-600 lg:text-[7px]">{size}</p>
+                            <p className="truncate text-[7px] font-semibold text-slate-300 lg:text-[8px]">
+                              {name}
+                            </p>
+                            <p className="mt-0.5 font-mono text-[6px] text-slate-600 lg:text-[7px]">
+                              {size}
+                            </p>
                           </div>
                         </div>
                       ))}
@@ -447,10 +571,16 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                     <div className="absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-emerald-300/45 to-transparent" />
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
-                        <span className="grid h-9 w-9 place-items-center rounded-full border border-emerald-300/20 bg-emerald-400/10 text-[14px] font-black text-emerald-300 shadow-[0_0_22px_rgba(52,211,153,0.12)] lg:h-10 lg:w-10 lg:text-[15px]">✓</span>
+                        <span className="grid h-9 w-9 place-items-center rounded-full border border-emerald-300/20 bg-emerald-400/10 text-[14px] font-black text-emerald-300 shadow-[0_0_22px_rgba(52,211,153,0.12)] lg:h-10 lg:w-10 lg:text-[15px]">
+                          ✓
+                        </span>
                         <div>
-                          <p className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-emerald-300 lg:text-[9px] lg:tracking-[0.13em]">Solicitud registrada</p>
-                          <p className="mt-1 font-mono text-[9px] text-white lg:text-[10px]">SOL-2026-014</p>
+                          <p className="text-[8px] font-extrabold uppercase tracking-[0.12em] text-emerald-300 lg:text-[9px] lg:tracking-[0.13em]">
+                            Solicitud registrada
+                          </p>
+                          <p className="mt-1 font-mono text-[9px] text-white lg:text-[10px]">
+                            SOL-2026-014
+                          </p>
                         </div>
                       </div>
                       <span className="relative flex h-2 w-2">
@@ -465,9 +595,16 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
                         ['Estado', 'Recibida'],
                         ['Seguimiento', 'Activo'],
                       ].map(([label, value]) => (
-                        <div key={label} className="rounded-xl border border-white/[0.055] bg-white/[0.025] px-2.5 py-2 lg:px-3 lg:py-2.5">
-                          <p className="text-[6px] font-bold uppercase tracking-[0.1em] text-slate-600 lg:tracking-[0.11em]">{label}</p>
-                          <p className="mt-1 text-[8px] font-semibold text-slate-200 lg:text-[9px]">{value}</p>
+                        <div
+                          key={label}
+                          className="rounded-xl border border-white/[0.055] bg-white/[0.025] px-2.5 py-2 lg:px-3 lg:py-2.5"
+                        >
+                          <p className="text-[6px] font-bold uppercase tracking-[0.1em] text-slate-600 lg:tracking-[0.11em]">
+                            {label}
+                          </p>
+                          <p className="mt-1 text-[8px] font-semibold text-slate-200 lg:text-[9px]">
+                            {value}
+                          </p>
                         </div>
                       ))}
                     </div>
