@@ -11,6 +11,7 @@ interface PublicAuthLayoutProps {
   footer?: ReactNode
   wide?: boolean
   immersive?: boolean
+  lockViewport?: boolean
 }
 
 export function PublicAuthLayout({
@@ -21,12 +22,15 @@ export function PublicAuthLayout({
   footer,
   wide = false,
   immersive = false,
+  lockViewport = false,
 }: PublicAuthLayoutProps) {
   const widthClass = wide ? 'w-full max-w-[520px]' : 'w-full max-w-[460px]'
 
   return (
     <main
       className={`qt-auth-root min-h-screen lg:grid ${
+        lockViewport ? 'qt-auth-root--locked' : ''
+      } ${
         immersive
           ? 'lg:grid-cols-[minmax(340px,0.82fr)_minmax(520px,1.18fr)]'
           : 'lg:grid-cols-[minmax(340px,0.78fr)_minmax(520px,1.22fr)]'
