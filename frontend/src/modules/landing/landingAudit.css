@@ -1,4 +1,18 @@
 /* Responsive and motion guardrails shared by the complete landing story. */
+@media (max-width: 1023px) {
+  .qt-landing-root #solicitud > .sticky,
+  .qt-landing-root .qt-case-pinned,
+  .qt-landing-root .qt-quote-pinned,
+  .qt-landing-root .qt-work-order-pinned,
+  .qt-landing-root .qt-production-pinned,
+  .qt-landing-root .qt-quality-pinned,
+  .qt-landing-root .qt-delivery-pinned {
+    top: 72px !important;
+    height: calc(100svh - 72px) !important;
+    min-height: calc(100svh - 72px) !important;
+  }
+}
+
 @media (min-width: 1024px) and (max-height: 820px) {
   .qt-case-pinned > .relative.z-10,
   .qt-quote-pinned > .relative.z-10,
