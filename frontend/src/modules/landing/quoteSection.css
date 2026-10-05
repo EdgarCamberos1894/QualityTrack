@@ -36,10 +36,23 @@
   height: 72px;
   content: '';
   pointer-events: none;
-  border-top: 1px solid rgba(251, 191, 36, 0.12);
-  border-right: 1px solid rgba(251, 191, 36, 0.12);
+  border-top: 1px solid rgba(251, 191, 36, 0.14);
+  border-right: 1px solid rgba(251, 191, 36, 0.14);
   border-top-right-radius: 28px;
-  opacity: 0.8;
+  opacity: 0.9;
+}
+
+.qt-quote-version {
+  transform-origin: 50% 50%;
+}
+
+.qt-quote-version::after {
+  position: absolute;
+  inset: 8px;
+  content: '';
+  pointer-events: none;
+  border: 1px dashed rgba(251, 191, 36, 0.05);
+  border-radius: 20px;
 }
 
 @media (min-width: 1024px) {
