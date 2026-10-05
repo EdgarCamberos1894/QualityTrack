@@ -3,10 +3,13 @@ export interface GeometryData {
   count: number
 }
 
+type Point3 = [number, number, number]
+type Quad = [Point3, Point3, Point3, Point3]
+
 function pushVertex(
   target: number[],
-  position: [number, number, number],
-  normal: [number, number, number],
+  position: Point3,
+  normal: Point3,
 ) {
   target.push(...position, ...normal)
 }
@@ -14,8 +17,8 @@ function pushVertex(
 export function createCubeGeometry(): GeometryData {
   const data: number[] = []
   const faces: Array<{
-    normal: [number, number, number]
-    corners: Array<[number, number, number]>
+    normal: Point3
+    corners: Quad
   }> = [
     { normal: [0, 0, 1], corners: [[-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]] },
     { normal: [0, 0, -1], corners: [[1, -1, -1], [-1, -1, -1], [-1, 1, -1], [1, 1, -1]] },
@@ -26,10 +29,7 @@ export function createCubeGeometry(): GeometryData {
   ]
 
   for (const face of faces) {
-    const a = face.corners[0]!
-    const b = face.corners[1]!
-    const c = face.corners[2]!
-    const d = face.corners[3]!
+    const [a, b, c, d] = face.corners
     ;[a, b, c, a, c, d].forEach((corner) => pushVertex(data, corner, face.normal))
   }
 
@@ -47,10 +47,10 @@ export function createCylinderGeometry(segments = 20): GeometryData {
     const x1 = Math.cos(a1)
     const z1 = Math.sin(a1)
 
-    const bottom0: [number, number, number] = [x0, -1, z0]
-    const top0: [number, number, number] = [x0, 1, z0]
-    const bottom1: [number, number, number] = [x1, -1, z1]
-    const top1: [number, number, number] = [x1, 1, z1]
+    const bottom0: Point3 = [x0, -1, z0]
+    const top0: Point3 = [x0, 1, z0]
+    const bottom1: Point3 = [x1, -1, z1]
+    const top1: Point3 = [x1, 1, z1]
 
     pushVertex(data, bottom0, [x0, 0, z0])
     pushVertex(data, bottom1, [x1, 0, z1])
