@@ -270,6 +270,21 @@
     position: relative;
     z-index: 4;
   }
+
+  .qt-production-pinned
+    [class~='lg:hidden'][class*='h-[370px]']
+    > .absolute.inset-0.grid.place-items-center {
+    z-index: 28;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        circle at 50% 46%,
+        rgba(14, 165, 233, 0.12),
+        transparent 42%
+      ),
+      rgba(2, 8, 23, 0.985);
+    backdrop-filter: blur(10px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
