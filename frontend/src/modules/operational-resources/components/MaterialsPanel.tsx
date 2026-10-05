@@ -3,6 +3,12 @@ import { useMaterialMutations, useMaterials } from '@/modules/materials'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import {
+  InternalListingHeader,
+  InternalListingPanel,
+  InternalListingResultsBar,
+  InternalListingSearchInput,
+} from '@/shared/components/listing/InternalListing'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { cn } from '@/shared/lib/cn'
@@ -109,78 +115,64 @@ export function MaterialsPanel({
   return (
     <>
       <div className="grid gap-3 xl:grid-cols-[360px_minmax(0,1fr)]">
-        <section className="h-fit overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
-          <div className="flex items-center justify-between gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3">
-            <div>
-              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-                Referencias
-              </p>
-              <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
-                Materiales
-              </h2>
-              <p className="mt-0.5 text-[8px] text-slate-400">
-                {materials.length} registrados
-              </p>
-            </div>
+        <InternalListingPanel className="mt-0 h-fit">
+          <InternalListingHeader
+            eyebrow="Referencias"
+            title="Materiales"
+            aside={
+              canManage ? (
+                <Button
+                  size="sm"
+                  className="!h-8 !px-3 !text-[9px]"
+                  onClick={() => {
+                    mutations.create.reset()
+                    mutations.uploadTechnicalSheet.reset()
+                    setCreatedMaterialIdForRetry(null)
+                    setCreateOpen(true)
+                  }}
+                >
+                  Nuevo material
+                </Button>
+              ) : undefined
+            }
+          />
 
-            {canManage ? (
-              <Button
-                size="sm"
-                className="!h-7 !px-2.5 !text-[8px]"
-                onClick={() => {
-                  mutations.create.reset()
-                  mutations.uploadTechnicalSheet.reset()
-                  setCreatedMaterialIdForRetry(null)
-                  setCreateOpen(true)
-                }}
-              >
-                Nuevo material
-              </Button>
-            ) : null}
+          <div className="border-b border-slate-200 bg-slate-50/65 px-3 py-2.5">
+            <InternalListingSearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder="Buscar código, nombre o especificación…"
+              ariaLabel="Buscar material"
+            />
           </div>
 
-          <div className="border-b border-slate-100 bg-slate-50/55 px-3 py-2.5">
-            <label className="relative block">
-              <span className="sr-only">Buscar material</span>
-              <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              >
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-3.5-3.5" />
-              </svg>
-              <input
-                type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Buscar código, nombre o especificación…"
-                className="h-9 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[10px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
-              />
-            </label>
-          </div>
+          <InternalListingResultsBar
+            count={filtered.length}
+            singular="material visible"
+            plural="materiales visibles"
+            onClear={search ? () => setSearch('') : undefined}
+            clearLabel="Limpiar búsqueda"
+          />
 
           {filtered.length === 0 ? (
-            <div className="p-4">
-              <EmptyState
-                title={
-                  materials.length === 0
-                    ? 'Sin materiales registrados'
-                    : 'Sin coincidencias'
-                }
-                description={
-                  materials.length === 0
-                    ? 'Registra una referencia antes de capturar sus lotes.'
-                    : 'Ajusta la búsqueda para encontrar otra referencia.'
-                }
-              />
+            <div className="bg-slate-50/40 p-4">
+              <div className="rounded-xl border border-slate-200 bg-white p-4">
+                <EmptyState
+                  title={
+                    materials.length === 0
+                      ? 'Sin materiales registrados'
+                      : 'Sin coincidencias'
+                  }
+                  description={
+                    materials.length === 0
+                      ? 'Registra una referencia antes de capturar sus lotes.'
+                      : 'Ajusta la búsqueda para encontrar otra referencia.'
+                  }
+                />
+              </div>
             </div>
           ) : (
-            <div className="max-h-[540px] divide-y divide-slate-100 overflow-y-auto">
+            <div className="max-h-[540px] divide-y divide-slate-100 overflow-y-auto bg-white">
               {filtered.map((material) => (
                 <button
                   key={material.id}
@@ -214,7 +206,7 @@ export function MaterialsPanel({
               ))}
             </div>
           )}
-        </section>
+        </InternalListingPanel>
 
         <MaterialLotsPanel
           material={selectedMaterial}
