@@ -74,11 +74,18 @@
 
   .qt-case-pinned [class~='lg:hidden'][class*='h-[360px]'],
   .qt-work-order-pinned [class~='lg:hidden'][class*='h-[390px]'],
-  .qt-production-pinned [class~='lg:hidden'][class*='h-[370px]'],
-  .qt-quality-pinned [class~='lg:hidden'][class*='h-[370px]'],
   .qt-delivery-pinned [class~='lg:hidden'][class*='h-[370px]'] {
     margin-top: 0.2rem !important;
     scale: 0.92;
+    transform-origin: top center;
+  }
+
+  /* Production and quality depend on small moving parts. Keep them at native
+   * mobile scale so the piece, scan beam and inspection states remain legible. */
+  .qt-production-pinned [class~='lg:hidden'][class*='h-[370px]'],
+  .qt-quality-pinned [class~='lg:hidden'][class*='h-[370px]'] {
+    margin-top: 0.2rem !important;
+    scale: 1 !important;
     transform-origin: top center;
   }
 
@@ -113,10 +120,13 @@
   .qt-quote-pinned .qt-quote-sheet,
   .qt-case-pinned [class~='lg:hidden'][class*='h-[360px]'],
   .qt-work-order-pinned [class~='lg:hidden'][class*='h-[390px]'],
-  .qt-production-pinned [class~='lg:hidden'][class*='h-[370px]'],
-  .qt-quality-pinned [class~='lg:hidden'][class*='h-[370px]'],
   .qt-delivery-pinned [class~='lg:hidden'][class*='h-[370px]'] {
     scale: 0.86;
+  }
+
+  .qt-production-pinned [class~='lg:hidden'][class*='h-[370px]'],
+  .qt-quality-pinned [class~='lg:hidden'][class*='h-[370px]'] {
+    scale: 0.96 !important;
   }
 }
 
