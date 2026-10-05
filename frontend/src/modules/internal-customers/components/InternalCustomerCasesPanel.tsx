@@ -1,98 +1,86 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
+  JOB_CASE_STATUSES,
   JobCaseTable,
   getJobCaseStatusPresentation,
-  type JobCaseDto,
   type JobCaseStatus,
 } from '@/modules/job-cases'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
+import { getErrorMessage } from '@/shared/lib/getErrorMessage'
+import { useInternalCustomerJobCases } from '../hooks/useInternalCustomers'
+import type {
+  InternalCustomerCaseAssignment,
+  InternalCustomerJobCaseQuery,
+} from '../types/internalCustomer.types'
 
 interface InternalCustomerCasesPanelProps {
-  jobCases: JobCaseDto[]
+  customerId: number
+  totalCases: number
 }
-
-type AssignmentFilter = 'ALL' | 'ASSIGNED' | 'UNASSIGNED'
 
 const PAGE_SIZE = 5
-
-function normalize(value: string | null | undefined) {
-  return (value ?? '').trim().toLocaleLowerCase('es-MX')
-}
-
-function getCaseTimestamp(jobCase: JobCaseDto) {
-  const value = jobCase.openedAt ?? jobCase.request.submittedAt
-  const timestamp = Date.parse(value)
-  return Number.isNaN(timestamp) ? 0 : timestamp
-}
+const SEARCH_DELAY_MS = 300
 
 export function InternalCustomerCasesPanel({
-  jobCases,
+  customerId,
+  totalCases,
 }: InternalCustomerCasesPanelProps) {
+  const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<JobCaseStatus | 'ALL'>('ALL')
-  const [assignment, setAssignment] = useState<AssignmentFilter>('ALL')
-  const [page, setPage] = useState(1)
+  const [assignment, setAssignment] =
+    useState<InternalCustomerCaseAssignment>('ALL')
+  const [page, setPage] = useState(0)
 
-  const availableStatuses = useMemo(
-    () =>
-      Array.from(new Set(jobCases.map((jobCase) => jobCase.status))).sort((a, b) =>
-        getJobCaseStatusPresentation(a).label.localeCompare(
-          getJobCaseStatusPresentation(b).label,
-          'es-MX',
-        ),
-      ),
-    [jobCases],
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setSearch(searchInput.trim())
+      setPage(0)
+    }, SEARCH_DELAY_MS)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [searchInput])
+
+  const query = useMemo<InternalCustomerJobCaseQuery>(
+    () => ({
+      page,
+      size: PAGE_SIZE,
+      search,
+      status,
+      assignment,
+    }),
+    [assignment, page, search, status],
   )
 
-  const filteredCases = useMemo(() => {
-    const term = normalize(search)
-
-    return [...jobCases]
-      .filter((jobCase) => {
-        if (status !== 'ALL' && jobCase.status !== status) return false
-
-        if (assignment === 'ASSIGNED' && jobCase.assignedToUserId === null) {
-          return false
-        }
-
-        if (assignment === 'UNASSIGNED' && jobCase.assignedToUserId !== null) {
-          return false
-        }
-
-        if (!term) return true
-
-        return [
-          jobCase.caseNumber,
-          jobCase.request.requestNumber,
-          jobCase.request.customerReference,
-          jobCase.request.title,
-          jobCase.request.description,
-          jobCase.assignedToName,
-          jobCase.request.requestedByName,
-        ].some((value) => normalize(value).includes(term))
-      })
-      .sort((a, b) => getCaseTimestamp(b) - getCaseTimestamp(a))
-  }, [assignment, jobCases, search, status])
-
-  const totalPages = Math.max(1, Math.ceil(filteredCases.length / PAGE_SIZE))
-  const safePage = Math.min(page, totalPages)
-  const pageStart = (safePage - 1) * PAGE_SIZE
-  const visibleCases = filteredCases.slice(pageStart, pageStart + PAGE_SIZE)
-  const hasFilters = search.trim() !== '' || status !== 'ALL' || assignment !== 'ALL'
+  const casesQuery = useInternalCustomerJobCases(customerId, query)
+  const result = casesQuery.data
+  const visibleCases = result?.items ?? []
+  const totalItems = result?.totalItems ?? 0
+  const totalPages = result?.totalPages ?? 0
+  const hasFilters = search !== '' || status !== 'ALL' || assignment !== 'ALL'
 
   useEffect(() => {
-    setPage(1)
-  }, [search, status, assignment])
-
-  useEffect(() => {
-    if (page > totalPages) setPage(totalPages)
+    if (totalPages > 0 && page >= totalPages) {
+      setPage(totalPages - 1)
+    }
   }, [page, totalPages])
 
   const clearFilters = () => {
+    setSearchInput('')
     setSearch('')
     setStatus('ALL')
     setAssignment('ALL')
-    setPage(1)
+    setPage(0)
+  }
+
+  const changeStatus = (value: JobCaseStatus | 'ALL') => {
+    setStatus(value)
+    setPage(0)
+  }
+
+  const changeAssignment = (value: InternalCustomerCaseAssignment) => {
+    setAssignment(value)
+    setPage(0)
   }
 
   return (
@@ -111,17 +99,17 @@ export function InternalCustomerCasesPanel({
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[8px] font-semibold text-slate-600 shadow-sm">
-            {jobCases.length} en total
+            {totalCases} en total
           </span>
-          {hasFilters ? (
+          {hasFilters && result ? (
             <span className="rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[8px] font-semibold text-blue-700">
-              {filteredCases.length} visibles
+              {totalItems} coincidencia{totalItems === 1 ? '' : 's'}
             </span>
           ) : null}
         </div>
       </div>
 
-      {jobCases.length > 0 ? (
+      {totalCases > 0 ? (
         <>
           <div className="grid gap-2.5 border-b border-slate-200 bg-slate-50/65 px-4 py-2.5 md:grid-cols-[minmax(280px,1fr)_190px_160px] sm:px-5">
             <label className="relative block">
@@ -140,8 +128,8 @@ export function InternalCustomerCasesPanel({
               </svg>
               <input
                 type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
                 placeholder="Buscar expediente, solicitud, referencia o proyecto…"
                 className="h-9 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[10px] text-slate-900 shadow-[0_1px_2px_rgba(15,23,42,0.04)] outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
               />
@@ -152,12 +140,12 @@ export function InternalCustomerCasesPanel({
               <select
                 value={status}
                 onChange={(event) =>
-                  setStatus(event.target.value as JobCaseStatus | 'ALL')
+                  changeStatus(event.target.value as JobCaseStatus | 'ALL')
                 }
                 className="h-9 w-full rounded-xl border border-slate-300 bg-white px-3 text-[10px] font-medium text-slate-700 shadow-[0_1px_2px_rgba(15,23,42,0.04)] outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
               >
                 <option value="ALL">Todos los estados</option>
-                {availableStatuses.map((caseStatus) => (
+                {JOB_CASE_STATUSES.map((caseStatus) => (
                   <option key={caseStatus} value={caseStatus}>
                     {getJobCaseStatusPresentation(caseStatus).label}
                   </option>
@@ -170,7 +158,9 @@ export function InternalCustomerCasesPanel({
               <select
                 value={assignment}
                 onChange={(event) =>
-                  setAssignment(event.target.value as AssignmentFilter)
+                  changeAssignment(
+                    event.target.value as InternalCustomerCaseAssignment,
+                  )
                 }
                 className="h-9 w-full rounded-xl border border-slate-300 bg-white px-3 text-[10px] font-medium text-slate-700 shadow-[0_1px_2px_rgba(15,23,42,0.04)] outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
               >
@@ -181,8 +171,27 @@ export function InternalCustomerCasesPanel({
             </label>
           </div>
 
-          {visibleCases.length > 0 ? (
-            <div className="bg-slate-50/25 px-4 py-4 sm:px-5">
+          {casesQuery.isError ? (
+            <div className="bg-slate-50/35 px-4 py-5 sm:px-5">
+              <p
+                role="alert"
+                className="rounded-xl border border-red-200 bg-red-50 px-3.5 py-3 text-[9px] leading-4 text-red-700"
+              >
+                {getErrorMessage(casesQuery.error)}
+              </p>
+            </div>
+          ) : casesQuery.isPending && !result ? (
+            <div className="bg-slate-50/35 px-4 py-8 text-center sm:px-5">
+              <p className="text-[9px] font-medium text-slate-500">
+                Cargando expedientes…
+              </p>
+            </div>
+          ) : visibleCases.length > 0 ? (
+            <div
+              className={`bg-slate-50/25 px-4 py-4 transition-opacity sm:px-5 ${
+                casesQuery.isFetching ? 'opacity-60' : 'opacity-100'
+              }`}
+            >
               <JobCaseTable jobCases={visibleCases} />
             </div>
           ) : (
@@ -203,31 +212,34 @@ export function InternalCustomerCasesPanel({
             </div>
           )}
 
-          {filteredCases.length > 0 ? (
+          {result && totalItems > 0 ? (
             <div className="flex flex-col gap-2 border-t border-slate-200 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
               <p className="text-[8px] font-medium text-slate-500">
-                Mostrando {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filteredCases.length)} de{' '}
-                {filteredCases.length} expediente{filteredCases.length === 1 ? '' : 's'}
+                Mostrando {page * PAGE_SIZE + 1}–
+                {Math.min(page * PAGE_SIZE + visibleCases.length, totalItems)} de{' '}
+                {totalItems} expediente{totalItems === 1 ? '' : 's'}
               </p>
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setPage((current) => Math.max(1, current - 1))}
-                  disabled={safePage === 1}
+                  onClick={() => setPage((current) => Math.max(0, current - 1))}
+                  disabled={page === 0 || casesQuery.isFetching}
                   className="inline-flex h-8 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-[8px] font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Anterior
                 </button>
                 <span className="min-w-20 text-center text-[8px] font-semibold text-slate-500">
-                  Página {safePage} de {totalPages}
+                  Página {page + 1} de {Math.max(totalPages, 1)}
                 </span>
                 <button
                   type="button"
                   onClick={() =>
-                    setPage((current) => Math.min(totalPages, current + 1))
+                    setPage((current) => Math.min(totalPages - 1, current + 1))
                   }
-                  disabled={safePage === totalPages}
+                  disabled={
+                    totalPages === 0 || page >= totalPages - 1 || casesQuery.isFetching
+                  }
                   className="inline-flex h-8 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-[8px] font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Siguiente
