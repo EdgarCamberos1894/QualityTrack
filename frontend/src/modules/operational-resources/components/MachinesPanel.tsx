@@ -8,6 +8,12 @@ import {
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
 import { ErrorState } from '@/shared/components/feedback/ErrorState'
 import { LoadingState } from '@/shared/components/feedback/LoadingState'
+import {
+  InternalListingHeader,
+  InternalListingPanel,
+  InternalListingResultsBar,
+  InternalListingSearchInput,
+} from '@/shared/components/listing/InternalListing'
 import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import {
@@ -88,79 +94,68 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
 
   return (
     <>
-      <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_14px_40px_-32px_rgba(15,23,42,0.34)]">
-        <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Parque de máquinas
-            </p>
-            <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
-              Disponibilidad operativa
-            </h2>
-          </div>
+      <InternalListingPanel className="mt-0">
+        <InternalListingHeader
+          eyebrow="Parque de máquinas"
+          title="Disponibilidad operativa"
+          aside={
+            canManage ? (
+              <Button
+                size="sm"
+                className="!h-8 !px-3 !text-[9px]"
+                onClick={() => {
+                  mutations.create.reset()
+                  setCreateOpen(true)
+                }}
+              >
+                Registrar máquina
+              </Button>
+            ) : undefined
+          }
+        />
 
-          {canManage ? (
-            <Button
-              size="sm"
-              className="!h-7 !px-2.5 !text-[8px]"
-              onClick={() => {
-                mutations.create.reset()
-                setCreateOpen(true)
-              }}
-            >
-              Registrar máquina
-            </Button>
-          ) : null}
-        </div>
-
-        <div className="grid border-b border-slate-100 sm:grid-cols-3 sm:divide-x sm:divide-slate-100">
+        <div className="grid border-b border-slate-100 bg-white sm:grid-cols-3 sm:divide-x sm:divide-slate-100">
           <Metric label="Disponibles" value={available} valueClassName="text-emerald-700" />
           <Metric label="En uso" value={inUse} valueClassName="text-blue-700" />
           <Metric label="No disponibles" value={unavailable} valueClassName="text-amber-700" />
         </div>
 
-        <div className="border-b border-slate-100 bg-slate-50/55 px-4 py-2.5 sm:px-5">
-          <label className="relative block">
-            <span className="sr-only">Buscar máquina</span>
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-              className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-            >
-              <circle cx="11" cy="11" r="7" />
-              <path d="m20 20-3.5-3.5" />
-            </svg>
-            <input
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Buscar código, nombre o tipo…"
-              className="h-9 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[10px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
-            />
-          </label>
+        <div className="border-b border-slate-200 bg-slate-50/65 px-4 py-2.5 sm:px-5">
+          <InternalListingSearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Buscar código, nombre o tipo…"
+            ariaLabel="Buscar máquina"
+          />
         </div>
 
+        <InternalListingResultsBar
+          count={filtered.length}
+          singular="máquina visible"
+          plural="máquinas visibles"
+          onClear={search ? () => setSearch('') : undefined}
+          clearLabel="Limpiar búsqueda"
+        />
+
         {filtered.length === 0 ? (
-          <div className="p-4">
-            <EmptyState
-              title={
-                machines.length === 0
-                  ? 'Sin máquinas registradas'
-                  : 'Sin coincidencias'
-              }
-              description={
-                machines.length === 0
-                  ? 'Registra el parque de máquinas para poder asignarlo a las ejecuciones de producción.'
-                  : 'Prueba con otro código, nombre o tipo.'
-              }
-            />
+          <div className="bg-slate-50/40 p-4">
+            <div className="rounded-xl border border-slate-200 bg-white p-4">
+              <EmptyState
+                title={
+                  machines.length === 0
+                    ? 'Sin máquinas registradas'
+                    : 'Sin coincidencias'
+                }
+                description={
+                  machines.length === 0
+                    ? 'Registra el parque de máquinas para poder asignarlo a las ejecuciones de producción.'
+                    : 'Prueba con otro código, nombre o tipo.'
+                }
+              />
+            </div>
           </div>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 bg-white">
             {filtered.map((machine) => {
               const status = getMachineStatusPresentation(machine.status)
 
@@ -200,7 +195,7 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
                       <Button
                         size="sm"
                         variant="secondary"
-                        className="!h-7 !px-2.5 !text-[8px]"
+                        className="!h-8 !px-3 !text-[9px]"
                         disabled={machine.status === 'IN_USE'}
                         title={
                           machine.status === 'IN_USE'
@@ -225,7 +220,7 @@ export function MachinesPanel({ canManage }: MachinesPanelProps) {
             })}
           </div>
         )}
-      </section>
+      </InternalListingPanel>
 
       <CreateMachineDialog
         open={createOpen}
