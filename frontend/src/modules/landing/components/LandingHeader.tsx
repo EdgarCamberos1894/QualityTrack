@@ -131,7 +131,7 @@ export function LandingHeader() {
             to="/login"
             className="qt-landing-login ml-auto hidden h-8 shrink-0 items-center justify-center gap-2 rounded-lg border border-cyan-200/15 bg-white/[0.025] px-3 text-[8px] font-bold uppercase tracking-[0.09em] text-slate-200 shadow-[0_8px_28px_-18px_rgba(34,211,238,0.4)] transition hover:border-cyan-200/30 hover:bg-cyan-300/[0.06] hover:text-white sm:inline-flex"
           >
-            Entrar
+            Iniciar sesión
             <span className="text-cyan-300/65" aria-hidden="true">
               →
             </span>
@@ -253,7 +253,7 @@ export function LandingHeader() {
             <span className="text-[13px] text-cyan-300" aria-hidden="true">
               →
             </span>
-            <span>Entrar</span>
+            <span>Iniciar sesión</span>
           </Link>
         </div>
       </div>
