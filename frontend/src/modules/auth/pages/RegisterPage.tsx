@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
+import { ApiError } from '@/shared/api/ApiError'
 import { Button } from '@/shared/components/ui/Button'
 import { TextField } from '@/shared/components/ui/TextField'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
@@ -13,6 +14,14 @@ import {
   registerSchema,
   type RegisterFormValues,
 } from '../schemas/publicAuth.schemas'
+
+function getRegisterErrorMessage(error: unknown) {
+  if (error instanceof ApiError && error.status === 409) {
+    return 'Ya existe una cuenta con este correo. Inicia sesión o recupera tu contraseña.'
+  }
+
+  return getErrorMessage(error)
+}
 
 export function RegisterPage() {
   const registerMutation = useRegisterCustomer()
@@ -154,7 +163,7 @@ export function RegisterPage() {
 
         {registerMutation.error ? (
           <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700">
-            {getErrorMessage(registerMutation.error)}
+            {getRegisterErrorMessage(registerMutation.error)}
           </p>
         ) : null}
 
