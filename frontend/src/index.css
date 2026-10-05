@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './shared/styles/dialogVisual.css';
 
 :root {
   font-family:
