@@ -235,8 +235,8 @@ export function CustomerCompanyPage() {
           </div>
         </section>
 
-        <aside className="overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-3.5 shadow-[0_12px_35px_-28px_rgba(15,23,42,0.24)] lg:flex lg:h-full lg:min-h-0 lg:flex-col">
-          <div className="flex shrink-0 items-start gap-3">
+        <aside className="overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-3.5 shadow-[0_12px_35px_-28px_rgba(15,23,42,0.24)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain">
+          <div className="flex items-start gap-3">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
               <SidebarNavIcon name="members" className="h-[17px] w-[17px]" />
             </div>
@@ -258,7 +258,7 @@ export function CustomerCompanyPage() {
             </div>
           </div>
 
-          <div className="mt-3 shrink-0 rounded-xl border border-slate-200 bg-white/80 px-3 py-3">
+          <div className="mt-3 rounded-xl border border-slate-200 bg-white/80 px-3 py-3">
             <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-slate-400">
               Permisos sobre la empresa
             </p>
@@ -271,7 +271,7 @@ export function CustomerCompanyPage() {
             </p>
           </div>
 
-          <dl className="mt-2.5 shrink-0 divide-y divide-slate-100 border-y border-slate-100">
+          <dl className="mt-2.5 divide-y divide-slate-100 border-y border-slate-100">
             <div className="flex items-center justify-between gap-4 py-2">
               <dt className="text-[8px] text-slate-500">Estado</dt>
               <dd className="text-[9px] font-semibold text-emerald-700">
@@ -286,8 +286,8 @@ export function CustomerCompanyPage() {
             </div>
           </dl>
 
-          <div className="mt-3 border-t border-slate-100 pt-3 lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
-            <div className="flex shrink-0 items-start justify-between gap-3">
+          <div className="mt-3 border-t border-slate-100 pt-3">
+            <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
                   Direcciones de entrega
@@ -313,7 +313,7 @@ export function CustomerCompanyPage() {
               ) : null}
             </div>
 
-            <div className="mt-2 space-y-2 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pr-1">
+            <div className="mt-2 space-y-2 lg:max-h-[184px] lg:overflow-y-auto lg:overscroll-contain lg:pr-1">
               {(addressesQuery.data ?? []).map((address) => (
                 <div
                   key={address.id}
@@ -360,7 +360,7 @@ export function CustomerCompanyPage() {
             </div>
           </div>
 
-          <div className="mt-3 shrink-0 border-t border-slate-100 pt-3">
+          <div className="mt-3 border-t border-slate-100 pt-3">
             <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
               Accesos de la empresa
             </p>
