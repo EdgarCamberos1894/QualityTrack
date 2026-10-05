@@ -1,5 +1,5 @@
 import { lerp, segment, type Vec3 } from './math'
-import { ScenePainter } from './webgl'
+import type { ScenePainter } from './webgl'
 
 export interface SceneFrameState {
   progress: number
