@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDocumentFileActions } from '@/modules/document-center'
 import { DocumentPreviewDialog } from '@/shared/components/documents/DocumentPreviewDialog'
 import { EmptyState } from '@/shared/components/feedback/EmptyState'
+import { ActionIconButton } from '@/shared/components/ui/ActionIconButton'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import type { WorkOrderDocumentDto } from '../types/workOrder.types'
@@ -130,10 +131,15 @@ export function WorkOrderPinnedDocuments({
                           </svg>
                         </div>
 
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          className="!h-7 !px-2.5 !text-[8px]"
+                        <ActionIconButton
+                          icon="view"
+                          label={
+                            openingSelected
+                              ? 'Abriendo versión…'
+                              : `Ver ${document.name}, versión ${selectedVersion.version}`
+                          }
+                          tone="primary"
+                          busy={openingSelected}
                           disabled={openingSelected}
                           onClick={() =>
                             void fileActions.openVersion(
@@ -142,9 +148,7 @@ export function WorkOrderPinnedDocuments({
                               selectedVersion.fileName,
                             )
                           }
-                        >
-                          {openingSelected ? 'Abriendo…' : 'Abrir'}
-                        </Button>
+                        />
 
                         {canEdit ? (
                           <Button
