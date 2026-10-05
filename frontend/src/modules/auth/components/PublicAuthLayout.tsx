@@ -36,20 +36,31 @@ export function PublicAuthLayout({
 
       <section className="qt-auth-form-stage flex min-h-screen items-center justify-center px-5 py-6 sm:px-8 lg:px-12 lg:py-8 xl:px-16">
         <div className={widthClass}>
-          <Link
-            to="/"
-            className="mb-5 flex w-fit items-center gap-2.5 rounded-xl py-1 lg:hidden"
-            aria-label="Volver a la página principal"
-          >
-            <img
-              src="/brand/qualitytrack-mark-inverse.svg"
-              alt=""
-              className="h-9 w-9"
-            />
-            <span className="text-[15px] font-semibold tracking-[-0.02em] text-white">
-              Quality<span className="text-blue-400">Track</span>
-            </span>
-          </Link>
+          <div className="mb-4 flex items-center justify-between gap-3 lg:mb-5">
+            <Link
+              to="/"
+              className="flex w-fit items-center gap-2.5 rounded-xl py-1 lg:hidden"
+              aria-label="Volver a la página principal"
+            >
+              <img
+                src="/brand/qualitytrack-mark-inverse.svg"
+                alt=""
+                className="h-9 w-9"
+              />
+              <span className="text-[15px] font-semibold tracking-[-0.02em] text-white">
+                Quality<span className="text-blue-400">Track</span>
+              </span>
+            </Link>
+
+            <Link
+              to="/"
+              className="qt-auth-back-link inline-flex h-8 shrink-0 items-center gap-2 rounded-lg px-3 text-[8px] font-bold uppercase tracking-[0.09em]"
+            >
+              <span aria-hidden="true">←</span>
+              <span className="sm:hidden">Volver</span>
+              <span className="hidden sm:inline">Volver a la página principal</span>
+            </Link>
+          </div>
 
           <div className="qt-auth-form-card rounded-[26px] px-5 py-5 sm:px-6 sm:py-6">
             <div className="mb-5">
