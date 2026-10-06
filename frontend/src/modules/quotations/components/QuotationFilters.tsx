@@ -40,8 +40,11 @@ export function QuotationFilters({ value, onChange }: QuotationFiltersProps) {
         ariaLabel="Filtrar por estado"
       >
         <option value="ACTIVE">Trabajo comercial activo</option>
+        <option value="ADJUSTMENT_REQUESTED">Pendientes de respuesta</option>
         <option value="ALL">Todos los estados / historial</option>
-        {QUOTATION_STATUSES.map((status) => (
+        {QUOTATION_STATUSES.filter(
+          (status) => status !== 'ADJUSTMENT_REQUESTED',
+        ).map((status) => (
           <option key={status} value={status}>
             {getQuotationStatusPresentation(status).label}
           </option>
