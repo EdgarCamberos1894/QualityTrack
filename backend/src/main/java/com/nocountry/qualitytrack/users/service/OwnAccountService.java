@@ -22,6 +22,7 @@ public class OwnAccountService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TokenCleanupService tokenCleanupService;
+    private final DemoAccountPolicy demoAccountPolicy;
 
     @Transactional(readOnly = true)
     public User getActiveUser(Long currentUserId, AccountType accountType) {
@@ -40,6 +41,7 @@ public class OwnAccountService {
             AccountType accountType,
             UpdateOwnProfileRequest request
     ) {
+        demoAccountPolicy.requireIdentityMutationAllowed(currentUserId);
         User user = requireUserForUpdate(currentUserId, accountType);
         requireActive(user);
 
@@ -60,6 +62,7 @@ public class OwnAccountService {
             AccountType accountType,
             ChangeOwnPasswordRequest request
     ) {
+        demoAccountPolicy.requireIdentityMutationAllowed(currentUserId);
         User user = requireUserForUpdate(currentUserId, accountType);
         requireActive(user);
 
