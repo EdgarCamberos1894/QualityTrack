@@ -7,7 +7,6 @@ import { LoadingState } from '@/shared/components/feedback/LoadingState'
 import { PageContainer } from '@/shared/components/layout/PageContainer'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { CancelQuotationDialog } from '../components/CancelQuotationDialog'
-import { QuotationAdjustmentCard } from '../components/QuotationAdjustmentCard'
 import { QuotationDetailHeader } from '../components/QuotationDetailHeader'
 import { QuotationEditorForm } from '../components/QuotationEditorForm'
 import { QuotationFlowSteps } from '../components/QuotationFlowSteps'
@@ -170,19 +169,6 @@ export function QuotationDetailPage() {
   const revisions =
     revisionsQuery.data ?? (revisionsQuery.isPending ? [] : [quotation])
 
-  const focusAdjustmentResponse = () => {
-    const responseField = document.getElementById(
-      'quotation-adjustment-response',
-    )
-
-    if (!(responseField instanceof HTMLTextAreaElement)) return
-
-    responseField.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    window.requestAnimationFrame(() => {
-      responseField.focus({ preventScroll: true })
-    })
-  }
-
   return (
     <PageContainer className="py-4 lg:py-3">
       <QuotationDetailHeader
@@ -200,11 +186,6 @@ export function QuotationDetailPage() {
       <div className="space-y-3">
         <QuotationFlowSteps />
         <QuotationSourceCard source={quotation.source} />
-        <QuotationAdjustmentCard
-          quotation={quotation}
-          canRespond={editable && !quotation.adjustmentResponse}
-          onRespond={focusAdjustmentResponse}
-        />
 
         {quotation.status === 'CANCELLED' ? (
           <section className="rounded-xl border border-red-200 bg-red-50/45 px-3.5 py-2.5">
