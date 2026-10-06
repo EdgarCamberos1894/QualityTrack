@@ -53,7 +53,7 @@ export function StoryStage({ stage, active }: StoryStageProps) {
         <div className="mt-7 flex flex-wrap items-center gap-2.5">
           <Link
             to="/login"
-            className="inline-flex h-10 items-center justify-center rounded-xl bg-blue-500 px-4 text-[10px] font-bold text-white shadow-[0_18px_50px_-18px_rgba(59,130,246,0.9)] transition hover:bg-blue-400"
+            className="inline-flex h-11 items-center justify-center rounded-xl bg-blue-500 px-4 text-[10px] font-bold text-white shadow-[0_18px_50px_-18px_rgba(59,130,246,0.9)] transition hover:bg-blue-400"
           >
             Entrar a QualityTrack
           </Link>
