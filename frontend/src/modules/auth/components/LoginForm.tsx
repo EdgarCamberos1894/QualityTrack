@@ -7,7 +7,9 @@ import { Button } from '@/shared/components/ui/Button'
 import { TextField } from '@/shared/components/ui/TextField'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { loginSchema, type LoginFormValues } from '../schemas/login.schema'
+import { useDemoLogin } from '../hooks/useDemoLogin'
 import { useLogin } from '../hooks/useLogin'
+import type { AccountType } from '../types/auth.types'
 
 interface LoginFormProps {
   onAuthenticated: () => void
@@ -22,6 +24,10 @@ function getLoginErrorMessage(error: unknown) {
     if (error.status === 403) {
       return 'Tu cuenta todavía no tiene acceso. Verifica tu correo o contacta al administrador.'
     }
+
+    if (error.status === 404) {
+      return 'La demostración todavía no está habilitada en este entorno.'
+    }
   }
 
   return getErrorMessage(error)
@@ -30,6 +36,7 @@ function getLoginErrorMessage(error: unknown) {
 export function LoginForm({ onAuthenticated }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const loginMutation = useLogin()
+  const demoMutation = useDemoLogin()
   const {
     register,
     handleSubmit,
@@ -43,9 +50,19 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
   })
 
   const onSubmit = async (values: LoginFormValues) => {
+    demoMutation.reset()
     await loginMutation.mutateAsync(values)
     onAuthenticated()
   }
+
+  const enterDemo = async (accountType: AccountType) => {
+    loginMutation.reset()
+    await demoMutation.mutateAsync(accountType)
+    onAuthenticated()
+  }
+
+  const pending = loginMutation.isPending || demoMutation.isPending
+  const activeError = loginMutation.error ?? demoMutation.error
 
   return (
     <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -118,22 +135,73 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
         </div>
       </div>
 
-      {loginMutation.isError ? (
+      {activeError ? (
         <div
           role="alert"
           className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700"
         >
-          {getLoginErrorMessage(loginMutation.error)}
+          {getLoginErrorMessage(activeError)}
         </div>
       ) : null}
 
       <Button
         type="submit"
         className="!h-9 w-full !rounded-lg !text-[10px] !font-semibold"
-        disabled={loginMutation.isPending}
+        disabled={pending}
       >
         {loginMutation.isPending ? 'Iniciando sesión…' : 'Iniciar sesión'}
       </Button>
+
+      <div className="relative py-0.5">
+        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+          <div className="w-full border-t border-slate-200" />
+        </div>
+        <div className="relative flex justify-center">
+          <span className="bg-white px-2 text-[8px] font-semibold uppercase tracking-[0.1em] text-slate-400">
+            Explorar demo
+          </span>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-blue-100 bg-blue-50/40 p-2.5">
+        <p className="text-[8px] leading-3.5 text-slate-500">
+          Entra con datos preparados y recorre QualityTrack desde cualquiera de
+          los dos lados del proceso.
+        </p>
+        <div className="mt-2 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => void enterDemo('CUSTOMER')}
+            className="flex min-h-12 flex-col items-start justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-left transition hover:border-blue-200 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <span className="text-[9px] font-semibold text-slate-900">
+              Demo cliente
+            </span>
+            <span className="mt-0.5 text-[7px] leading-3 text-slate-400">
+              Industrias Nova
+            </span>
+          </button>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => void enterDemo('INTERNAL')}
+            className="flex min-h-12 flex-col items-start justify-center rounded-lg border border-slate-200 bg-white px-3 py-2 text-left transition hover:border-blue-200 hover:bg-blue-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <span className="text-[9px] font-semibold text-slate-900">
+              Demo equipo interno
+            </span>
+            <span className="mt-0.5 text-[7px] leading-3 text-slate-400">
+              Operación completa
+            </span>
+          </button>
+        </div>
+        {demoMutation.isPending ? (
+          <p className="mt-2 text-center text-[8px] font-medium text-blue-600">
+            Preparando acceso de demostración…
+          </p>
+        ) : null}
+      </div>
     </form>
   )
 }
