@@ -1,5 +1,8 @@
 import { useLocation } from 'react-router-dom'
-import type { AuthenticatedUser } from '@/modules/auth'
+import {
+  isPublicDemoAccount,
+  type AuthenticatedUser,
+} from '@/modules/auth'
 import { TopbarActionIcon } from '@/shared/components/navigation/TopbarActionIcon'
 import { TopbarBreadcrumb } from '@/shared/components/navigation/TopbarBreadcrumb'
 import { TopbarUserMenu } from '@/shared/components/navigation/TopbarUserMenu'
@@ -63,6 +66,7 @@ export function CustomerPortalTopbar({
   onLogout,
 }: CustomerPortalTopbarProps) {
   const location = useLocation()
+  const demoAccount = isPublicDemoAccount(user)
 
   return (
     <header className="sticky top-0 z-30 flex h-[72px] items-center border-b border-slate-200/90 bg-white/95 px-5 shadow-[0_1px_0_rgba(15,23,42,0.02)] backdrop-blur sm:px-7">
@@ -79,12 +83,18 @@ export function CustomerPortalTopbar({
         <TopbarBreadcrumb value={breadcrumb(location.pathname)} />
       </div>
 
-      <div className="ml-auto flex shrink-0 items-center">
+      <div className="ml-auto flex shrink-0 items-center gap-3">
+        {demoAccount ? (
+          <span className="hidden rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.08em] text-blue-700 sm:inline-flex">
+            Modo demo
+          </span>
+        ) : null}
+
         <TopbarUserMenu
           email={user.email}
           roleLabel={roleLabels[customer.role]}
-          accountLabel="Portal de cliente"
-          detailLabel={customer.customerName}
+          accountLabel={demoAccount ? 'Portal de cliente · Demo' : 'Portal de cliente'}
+          detailLabel={demoAccount ? 'Industrias Nova · Datos demo' : customer.customerName}
           onProfile={onProfile}
           onLogout={onLogout}
         />
