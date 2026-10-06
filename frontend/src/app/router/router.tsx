@@ -17,9 +17,7 @@ import {
   VerifyEmailPage,
 } from '@/modules/auth'
 
-type LazyModule = object
-
-function lazyComponent<TModule extends LazyModule>(
+function lazyComponent<TModule extends object>(
   loader: () => Promise<TModule>,
   exportName: keyof TModule,
 ) {
@@ -27,76 +25,6 @@ function lazyComponent<TModule extends LazyModule>(
     const module = await loader()
     return { Component: module[exportName] as ComponentType }
   }
-}
-
-const lazyCustomerPortal = (exportName: string) =>
-  lazyComponent(
-    () => import('@/modules/customer-portal'),
-    exportName as keyof Awaited<ReturnType<typeof importCustomerPortal>>,
-  )
-
-function importCustomerPortal() {
-  return import('@/modules/customer-portal')
-}
-
-const lazyJobCases = (exportName: string) =>
-  lazyComponent(
-    () => import('@/modules/job-cases'),
-    exportName as keyof Awaited<ReturnType<typeof importJobCases>>,
-  )
-
-function importJobCases() {
-  return import('@/modules/job-cases')
-}
-
-const lazyQuotations = (exportName: string) =>
-  lazyComponent(
-    () => import('@/modules/quotations'),
-    exportName as keyof Awaited<ReturnType<typeof importQuotations>>,
-  )
-
-function importQuotations() {
-  return import('@/modules/quotations')
-}
-
-const lazyWorkOrders = (exportName: string) =>
-  lazyComponent(
-    () => import('@/modules/work-orders'),
-    exportName as keyof Awaited<ReturnType<typeof importWorkOrders>>,
-  )
-
-function importWorkOrders() {
-  return import('@/modules/work-orders')
-}
-
-const lazyResources = (exportName: string) =>
-  lazyComponent(
-    () => import('@/modules/operational-resources'),
-    exportName as keyof Awaited<ReturnType<typeof importResources>>,
-  )
-
-function importResources() {
-  return import('@/modules/operational-resources')
-}
-
-const lazyInternalCustomers = (exportName: string) =>
-  lazyComponent(
-    () => import('@/modules/internal-customers'),
-    exportName as keyof Awaited<ReturnType<typeof importInternalCustomers>>,
-  )
-
-function importInternalCustomers() {
-  return import('@/modules/internal-customers')
-}
-
-const lazyProfiles = (exportName: string) =>
-  lazyComponent(
-    () => import('@/modules/user-profile'),
-    exportName as keyof Awaited<ReturnType<typeof importProfiles>>,
-  )
-
-function importProfiles() {
-  return import('@/modules/user-profile')
 }
 
 export const router = createBrowserRouter([
@@ -139,32 +67,95 @@ export const router = createBrowserRouter([
               },
               {
                 path: '/profile',
-                lazy: lazyProfiles('InternalProfilePage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/user-profile'),
+                  'InternalProfilePage',
+                ),
               },
-              { path: '/job-cases', lazy: lazyJobCases('JobCasesPage') },
+              {
+                path: '/job-cases',
+                lazy: lazyComponent(
+                  () => import('@/modules/job-cases'),
+                  'JobCasesPage',
+                ),
+              },
               {
                 path: '/job-cases/:caseId',
-                lazy: lazyJobCases('JobCaseDetailPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/job-cases'),
+                  'JobCaseDetailPage',
+                ),
               },
-              { path: '/quotations', lazy: lazyQuotations('QuotationsPage') },
+              {
+                path: '/quotations',
+                lazy: lazyComponent(
+                  () => import('@/modules/quotations'),
+                  'QuotationsPage',
+                ),
+              },
               {
                 path: '/quotations/:quotationId',
-                lazy: lazyQuotations('QuotationDetailPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/quotations'),
+                  'QuotationDetailPage',
+                ),
               },
-              { path: '/work-orders', lazy: lazyWorkOrders('WorkOrdersPage') },
+              {
+                path: '/work-orders',
+                lazy: lazyComponent(
+                  () => import('@/modules/work-orders'),
+                  'WorkOrdersPage',
+                ),
+              },
               {
                 path: '/work-orders/:workOrderId',
-                lazy: lazyWorkOrders('WorkOrderDetailPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/work-orders'),
+                  'WorkOrderDetailPage',
+                ),
               },
-              { path: '/production', lazy: lazyWorkOrders('ProductionPage') },
-              { path: '/machines', lazy: lazyResources('MachinesPage') },
-              { path: '/materials', lazy: lazyResources('MaterialsPage') },
+              {
+                path: '/production',
+                lazy: lazyComponent(
+                  () => import('@/modules/work-orders'),
+                  'ProductionPage',
+                ),
+              },
+              {
+                path: '/machines',
+                lazy: lazyComponent(
+                  () => import('@/modules/operational-resources'),
+                  'MachinesPage',
+                ),
+              },
+              {
+                path: '/materials',
+                lazy: lazyComponent(
+                  () => import('@/modules/operational-resources'),
+                  'MaterialsPage',
+                ),
+              },
               {
                 path: '/resources',
-                lazy: lazyResources('OperationalResourcesPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/operational-resources'),
+                  'OperationalResourcesPage',
+                ),
               },
-              { path: '/quality', lazy: lazyWorkOrders('QualityPage') },
-              { path: '/deliveries', lazy: lazyWorkOrders('DeliveriesPage') },
+              {
+                path: '/quality',
+                lazy: lazyComponent(
+                  () => import('@/modules/work-orders'),
+                  'QualityPage',
+                ),
+              },
+              {
+                path: '/deliveries',
+                lazy: lazyComponent(
+                  () => import('@/modules/work-orders'),
+                  'DeliveriesPage',
+                ),
+              },
               {
                 path: '/documents',
                 lazy: lazyComponent(
@@ -174,11 +165,17 @@ export const router = createBrowserRouter([
               },
               {
                 path: '/customers',
-                lazy: lazyInternalCustomers('InternalCustomersPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/internal-customers'),
+                  'InternalCustomersPage',
+                ),
               },
               {
                 path: '/customers/:customerId',
-                lazy: lazyInternalCustomers('InternalCustomerDetailPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/internal-customers'),
+                  'InternalCustomerDetailPage',
+                ),
               },
               {
                 path: '/internal-users',
@@ -196,46 +193,79 @@ export const router = createBrowserRouter([
         children: [
           {
             path: '/portal',
-            lazy: lazyCustomerPortal('CustomerPortalLandingPage'),
+            lazy: lazyComponent(
+              () => import('@/modules/customer-portal'),
+              'CustomerPortalLandingPage',
+            ),
           },
           {
-            lazy: lazyCustomerPortal('CustomerPortalShell'),
+            lazy: lazyComponent(
+              () => import('@/modules/customer-portal'),
+              'CustomerPortalShell',
+            ),
             children: [
               {
                 path: '/portal/:customerId',
-                lazy: lazyCustomerPortal('CustomerPortalHomePage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/customer-portal'),
+                  'CustomerPortalHomePage',
+                ),
               },
               {
                 path: '/portal/:customerId/profile',
-                lazy: lazyProfiles('CustomerProfilePage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/user-profile'),
+                  'CustomerProfilePage',
+                ),
               },
               {
                 path: '/portal/:customerId/requests',
-                lazy: lazyCustomerPortal('CustomerRequestsPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/customer-portal'),
+                  'CustomerRequestsPage',
+                ),
               },
               {
                 path: '/portal/:customerId/requests/new',
-                lazy: lazyCustomerPortal('CustomerRequestCreatePage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/customer-portal'),
+                  'CustomerRequestCreatePage',
+                ),
               },
               {
                 path: '/portal/:customerId/requests/:requestId',
-                lazy: lazyCustomerPortal('CustomerRequestDetailPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/customer-portal'),
+                  'CustomerRequestDetailPage',
+                ),
               },
               {
                 path: '/portal/:customerId/members',
-                lazy: lazyCustomerPortal('CustomerMembersPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/customer-portal'),
+                  'CustomerMembersPage',
+                ),
               },
               {
                 path: '/portal/:customerId/company',
-                lazy: lazyCustomerPortal('CustomerCompanyPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/customer-portal'),
+                  'CustomerCompanyPage',
+                ),
               },
               {
                 path: '/portal/:customerId/quotations',
-                lazy: lazyQuotations('CustomerQuotationsPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/quotations'),
+                  'CustomerQuotationsPage',
+                ),
               },
               {
                 path: '/portal/:customerId/quotations/:quotationId',
-                lazy: lazyQuotations('CustomerQuotationDetailPage'),
+                lazy: lazyComponent(
+                  () => import('@/modules/quotations'),
+                  'CustomerQuotationDetailPage',
+                ),
               },
             ],
           },
