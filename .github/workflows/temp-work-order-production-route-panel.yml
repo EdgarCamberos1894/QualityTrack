@@ -37,7 +37,7 @@ jobs:
 
       - name: Format refactor
         working-directory: frontend
-        run: npx prettier --write scripts/architecture-baseline.json src/modules/work-orders/components/WorkOrderProduction.tsx src/modules/work-orders/components/ProductionRoutePanel.tsx src/modules/work-orders/model/productionPresenter.ts
+        run: npx prettier --write scripts/architecture-baseline.json src/modules/work-orders/components/WorkOrderProduction.tsx src/modules/work-orders/components/ProductionRoutePanel.tsx src/modules/work-orders/hooks/useProductionHashSelection.ts src/modules/work-orders/model/productionPresenter.ts
 
       - name: Audit dependencies
         working-directory: frontend
@@ -49,7 +49,7 @@ jobs:
 
       - name: Lint refactor
         working-directory: frontend
-        run: npx eslint src/modules/work-orders/components/WorkOrderProduction.tsx src/modules/work-orders/components/ProductionRoutePanel.tsx src/modules/work-orders/model/productionPresenter.ts
+        run: npx eslint src/modules/work-orders/components/WorkOrderProduction.tsx src/modules/work-orders/components/ProductionRoutePanel.tsx src/modules/work-orders/hooks/useProductionHashSelection.ts src/modules/work-orders/model/productionPresenter.ts
 
       - name: Typecheck
         working-directory: frontend
@@ -69,6 +69,7 @@ jobs:
           git add frontend/scripts/architecture-baseline.json \
             frontend/src/modules/work-orders/components/WorkOrderProduction.tsx \
             frontend/src/modules/work-orders/components/ProductionRoutePanel.tsx \
+            frontend/src/modules/work-orders/hooks/useProductionHashSelection.ts \
             frontend/src/modules/work-orders/model/productionPresenter.ts
           if git diff --cached --quiet; then
             echo "No product changes to commit"
