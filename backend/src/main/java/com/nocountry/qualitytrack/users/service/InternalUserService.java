@@ -35,6 +35,7 @@ public class InternalUserService {
     private final UserRepository userRepository;
     private final UserSystemRoleRepository roleRepository;
     private final OwnAccountService ownAccountService;
+    private final DemoAccountPolicy demoAccountPolicy;
 
     @Transactional(readOnly = true)
     public InternalUserResponse getOwnProfile(Long currentUserId) {
@@ -180,6 +181,8 @@ public class InternalUserService {
     }
 
     private User requireInternalAdmin(Long currentUserId) {
+        demoAccountPolicy.requireIdentityMutationAllowed(currentUserId);
+
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.ACCESS_DENIED,
