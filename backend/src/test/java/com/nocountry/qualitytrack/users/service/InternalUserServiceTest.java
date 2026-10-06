@@ -40,6 +40,7 @@ class InternalUserServiceTest {
     @Mock private UserSystemRoleRepository roleRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private TokenCleanupService tokenCleanupService;
+    @Mock private DemoAccountPolicy demoAccountPolicy;
 
     private InternalUserService service;
 
@@ -48,12 +49,14 @@ class InternalUserServiceTest {
         OwnAccountService ownAccountService = new OwnAccountService(
                 userRepository,
                 passwordEncoder,
-                tokenCleanupService
+                tokenCleanupService,
+                demoAccountPolicy
         );
         service = new InternalUserService(
                 userRepository,
                 roleRepository,
-                ownAccountService
+                ownAccountService,
+                demoAccountPolicy
         );
     }
 
