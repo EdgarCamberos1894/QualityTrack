@@ -1,19 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useReducedMotionPreference } from '../hooks/useReducedMotionPreference'
 import { landingStory } from '../model/landingStory'
 import { CaseSection } from './CaseSection'
 
 export function CaseChapter() {
-  const [reducedMotion, setReducedMotion] = useState(false)
+  const reducedMotion = useReducedMotionPreference()
   const stage = landingStory[2]
-
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const sync = () => setReducedMotion(media.matches)
-
-    sync()
-    media.addEventListener('change', sync)
-    return () => media.removeEventListener('change', sync)
-  }, [])
 
   if (!stage) return null
 
