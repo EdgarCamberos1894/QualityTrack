@@ -155,4 +155,11 @@
   .qt-landing-root {
     scroll-behavior: auto;
   }
+
+  .qt-landing-root .animate-pulse,
+  .qt-landing-root .animate-ping,
+  .qt-landing-root .qt-landing-progress > span {
+    animation: none !important;
+    transition: none !important;
+  }
 }
