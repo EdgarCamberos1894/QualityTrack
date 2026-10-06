@@ -1,8 +1,10 @@
 import type { InputHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/shared/lib/cn'
 
-interface PortalSearchFieldProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
+interface PortalSearchFieldProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'type'
+> {
   label: string
 }
 
