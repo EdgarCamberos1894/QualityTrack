@@ -3,6 +3,8 @@ import {
   usePinnedSectionProgress,
 } from '../hooks/usePinnedSectionProgress'
 import type { LandingStoryStage } from '../model/landingStory'
+import { DeliveryIntro } from './DeliveryIntro'
+import { DeliveryTrace } from './DeliveryTrace'
 import '../deliverySection.css'
 
 interface DeliverySectionProps {
@@ -66,9 +68,6 @@ export function DeliverySection({
               ? 'Despachando'
               : 'Recibiendo liberación'
 
-  const entryPath =
-    'M 760 0 C 760 72, 727 98, 713 144 C 698 194, 718 219, 716 252'
-
   return (
     <section
       ref={sectionRef}
@@ -79,135 +78,16 @@ export function DeliverySection({
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_47%,rgba(34,211,238,0.11),transparent_28%),radial-gradient(circle_at_48%_58%,rgba(59,130,246,0.055),transparent_31%),linear-gradient(180deg,#020b0b_0%,#03111a_48%,#020617_100%)]" />
         <div className="absolute inset-0 opacity-[0.15] [background-image:linear-gradient(rgba(103,232,249,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(103,232,249,0.04)_1px,transparent_1px)] [background-size:76px_76px] [mask-image:radial-gradient(circle_at_68%_53%,black,transparent_70%)]" />
 
-        <div
-          className="pointer-events-none absolute inset-0 z-[3] hidden lg:block"
-          aria-hidden="true"
-        >
-          <svg
-            viewBox="0 0 1000 1000"
-            className="absolute inset-0 h-full w-full"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <linearGradient
-                id="qtDeliveryEntry"
-                x1="0.76"
-                y1="0"
-                x2="0.716"
-                y2="0.25"
-              >
-                <stop offset="0%" stopColor="#34d399" stopOpacity="0.38" />
-                <stop offset="48%" stopColor="#22d3ee" stopOpacity="0.66" />
-                <stop offset="100%" stopColor="#67e8f9" stopOpacity="0.7" />
-              </linearGradient>
-              <filter
-                id="qtDeliveryGlow"
-                x="-80%"
-                y="-50%"
-                width="260%"
-                height="200%"
-              >
-                <feGaussianBlur stdDeviation="8" />
-              </filter>
-            </defs>
-
-            <path
-              d={entryPath}
-              fill="none"
-              stroke="url(#qtDeliveryEntry)"
-              strokeWidth="14"
-              opacity={entryProgress * 0.11}
-              filter="url(#qtDeliveryGlow)"
-            />
-            <path
-              d={entryPath}
-              fill="none"
-              pathLength="1"
-              stroke="url(#qtDeliveryEntry)"
-              strokeWidth="1.9"
-              strokeLinecap="round"
-              strokeDasharray="1"
-              strokeDashoffset={1 - entryProgress}
-            />
-            <circle
-              cx="760"
-              cy="0"
-              r="3.4"
-              fill="#67e8f9"
-              opacity={entryProgress}
-            />
-            <circle
-              cx="716"
-              cy="252"
-              r="3.6"
-              fill="#a5f3fc"
-              opacity={rangeProgress(entryProgress, 0.68, 1)}
-            />
-          </svg>
-        </div>
+        <DeliveryTrace entryProgress={entryProgress} />
 
         <div className="relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-rows-[auto_1fr] gap-3 px-5 pb-4 pt-4 sm:px-8 sm:pt-5 lg:grid-cols-[0.72fr_1.28fr] lg:grid-rows-1 lg:items-center lg:gap-10 lg:px-12 lg:pb-8 lg:pt-8 xl:px-16">
-          <div className="order-1 lg:pr-4">
-            <div className="flex items-center gap-2.5">
-              <span className="rounded-full border border-cyan-400/20 bg-cyan-400/[0.08] px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.13em] text-cyan-100">
-                {stage.eyebrow}
-              </span>
-              <span className="text-[9px] font-semibold tracking-[0.18em] text-slate-600">
-                {stage.step}
-              </span>
-            </div>
-
-            <h2 className="mt-3 max-w-[590px] text-[clamp(2rem,8.7vw,3.15rem)] font-semibold leading-[0.96] tracking-[-0.052em] text-white lg:mt-4 lg:text-[clamp(2.15rem,3.9vw,3.9rem)]">
-              {stage.title}
-            </h2>
-
-            <p className="mt-3 max-w-lg text-[11px] leading-5 text-slate-300/90 sm:text-[12px] lg:mt-5 lg:text-[13px] lg:leading-6">
-              {stage.description}
-            </p>
-
-            <div className="mt-6 hidden flex-wrap gap-2 lg:flex">
-              {['Destino', 'Evidencia', 'Cierre'].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.11em] text-slate-400"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-
-            <div
-              className="mt-7 hidden max-w-[470px] items-center gap-3 lg:flex"
-              style={reveal(0.08, 0.18, 8)}
-            >
-              <span className="relative flex h-2.5 w-2.5 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-300 opacity-20" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-cyan-300" />
-              </span>
-              <div>
-                <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-cyan-100/80">
-                  ENT-2026-014 · OT-2026-014
-                </p>
-                <p className="mt-1 text-[8px] text-slate-500">
-                  La pieza liberada cambia de contexto, no de identidad.
-                </p>
-              </div>
-            </div>
-
-            {!reducedMotion ? (
-              <div className="mt-3 flex items-center gap-2 lg:mt-7">
-                <div className="h-px flex-1 overflow-hidden bg-white/[0.055]">
-                  <div
-                    className="h-full bg-gradient-to-r from-emerald-300/20 via-cyan-300/78 to-blue-300/28 shadow-[0_0_12px_rgba(34,211,238,0.38)]"
-                    style={{ width: `${Math.max(3, scrollProgress * 100)}%` }}
-                  />
-                </div>
-                <span className="font-mono text-[7px] text-slate-600">
-                  {phase}
-                </span>
-              </div>
-            ) : null}
-          </div>
+          <DeliveryIntro
+            stage={stage}
+            reducedMotion={reducedMotion}
+            scrollProgress={scrollProgress}
+            phase={phase}
+            reveal={reveal}
+          />
 
           <div className="order-2 min-h-0">
             <div className="relative h-full min-h-[410px] lg:min-h-[620px]">
