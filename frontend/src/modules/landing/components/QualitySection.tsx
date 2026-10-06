@@ -4,6 +4,8 @@ import {
 } from '../hooks/usePinnedSectionProgress'
 import type { LandingStoryStage } from '../model/landingStory'
 import '../qualitySection.css'
+import { QualityIntro } from './QualityIntro'
+import { QualityTrace } from './QualityTrace'
 
 interface QualitySectionProps {
   stage: LandingStoryStage
@@ -53,11 +55,6 @@ export function QualitySection({ stage, reducedMotion }: QualitySectionProps) {
                 ? 'Escaneando pieza'
                 : 'Recibiendo producción'
 
-  const entryPath =
-    'M 666 0 C 666 74, 690 105, 686 154 C 682 205, 648 225, 650 262'
-  const exitPath =
-    'M 688 735 C 730 786, 760 826, 748 880 C 738 925, 756 964, 760 1000'
-
   const inspectionOpacity = 1 - conformProgress * 0.62
   const inspectionScale = 1 - conformProgress * 0.035
   const scanX = 13 + scanProgress * 74
@@ -73,187 +70,19 @@ export function QualitySection({ stage, reducedMotion }: QualitySectionProps) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_69%_48%,rgba(16,185,129,0.12),transparent_27%),radial-gradient(circle_at_62%_54%,rgba(34,211,238,0.06),transparent_30%),linear-gradient(180deg,#020817_0%,#03130f_50%,#020b0b_100%)]" />
         <div className="absolute inset-0 opacity-[0.17] [background-image:linear-gradient(rgba(110,231,183,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(110,231,183,0.04)_1px,transparent_1px)] [background-size:68px_68px] [mask-image:radial-gradient(circle_at_67%_52%,black,transparent_68%)]" />
 
-        <div
-          className="pointer-events-none absolute inset-0 z-[3] hidden lg:block"
-          aria-hidden="true"
-        >
-          <svg
-            viewBox="0 0 1000 1000"
-            className="absolute inset-0 h-full w-full"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <linearGradient
-                id="qtQualityEntry"
-                x1="0.666"
-                y1="0"
-                x2="0.65"
-                y2="0.27"
-              >
-                <stop offset="0%" stopColor="#34d399" stopOpacity="0.38" />
-                <stop offset="48%" stopColor="#22d3ee" stopOpacity="0.62" />
-                <stop offset="100%" stopColor="#6ee7b7" stopOpacity="0.7" />
-              </linearGradient>
-              <linearGradient
-                id="qtQualityExit"
-                x1="0.688"
-                y1="0.73"
-                x2="0.76"
-                y2="1"
-              >
-                <stop offset="0%" stopColor="#34d399" stopOpacity="0.75" />
-                <stop offset="58%" stopColor="#22d3ee" stopOpacity="0.58" />
-                <stop offset="100%" stopColor="#67e8f9" stopOpacity="0.34" />
-              </linearGradient>
-              <filter
-                id="qtQualityGlow"
-                x="-80%"
-                y="-50%"
-                width="260%"
-                height="200%"
-              >
-                <feGaussianBlur stdDeviation="8" />
-              </filter>
-            </defs>
-
-            <path
-              d={entryPath}
-              fill="none"
-              stroke="url(#qtQualityEntry)"
-              strokeWidth="14"
-              opacity={entryProgress * 0.11}
-              filter="url(#qtQualityGlow)"
-            />
-            <path
-              d={entryPath}
-              fill="none"
-              pathLength="1"
-              stroke="url(#qtQualityEntry)"
-              strokeWidth="1.85"
-              strokeLinecap="round"
-              strokeDasharray="1"
-              strokeDashoffset={1 - entryProgress}
-            />
-            <circle
-              cx="666"
-              cy="0"
-              r="3.4"
-              fill="#6ee7b7"
-              opacity={entryProgress}
-            />
-            <circle
-              cx="650"
-              cy="262"
-              r="3.6"
-              fill="#a7f3d0"
-              opacity={rangeProgress(entryProgress, 0.68, 1)}
-            />
-
-            <path
-              d={exitPath}
-              fill="none"
-              stroke="url(#qtQualityExit)"
-              strokeWidth="14"
-              opacity={exitProgress * 0.11}
-              filter="url(#qtQualityGlow)"
-            />
-            <path
-              d={exitPath}
-              fill="none"
-              pathLength="1"
-              stroke="url(#qtQualityExit)"
-              strokeWidth="1.9"
-              strokeLinecap="round"
-              strokeDasharray="1"
-              strokeDashoffset={1 - exitProgress}
-            />
-            <circle
-              cx="760"
-              cy="1000"
-              r="3.4"
-              fill="#67e8f9"
-              opacity={rangeProgress(exitProgress, 0.72, 1)}
-            />
-          </svg>
-
-          <div
-            className="absolute left-[75.8%] top-[84%] flex items-center gap-2.5"
-            style={{ opacity: rangeProgress(exitProgress, 0.24, 0.72) }}
-          >
-            <span className="h-px w-9 bg-gradient-to-r from-emerald-300/60 via-cyan-300/48 to-cyan-200/28" />
-            <div>
-              <p className="font-mono text-[7px] uppercase tracking-[0.15em] text-slate-600">
-                Siguiente
-              </p>
-              <p className="mt-1 text-[9px] font-semibold text-cyan-100/85">
-                Entrega
-              </p>
-            </div>
-          </div>
-        </div>
+        <QualityTrace
+          entryProgress={entryProgress}
+          exitProgress={exitProgress}
+        />
 
         <div className="relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-rows-[auto_1fr] gap-3 px-5 pb-4 pt-4 sm:px-8 sm:pt-5 lg:grid-cols-[0.72fr_1.28fr] lg:grid-rows-1 lg:items-center lg:gap-10 lg:px-12 lg:pb-8 lg:pt-8 xl:px-16">
-          <div className="order-1 lg:pr-4">
-            <div className="flex items-center gap-2.5">
-              <span className="rounded-full border border-emerald-400/20 bg-emerald-400/[0.08] px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.13em] text-emerald-200">
-                {stage.eyebrow}
-              </span>
-              <span className="text-[9px] font-semibold tracking-[0.18em] text-slate-600">
-                {stage.step}
-              </span>
-            </div>
-
-            <h2 className="mt-3 max-w-[590px] text-[clamp(2rem,8.7vw,3.15rem)] font-semibold leading-[0.96] tracking-[-0.052em] text-white lg:mt-4 lg:text-[clamp(2.15rem,3.9vw,3.9rem)]">
-              {stage.title}
-            </h2>
-
-            <p className="mt-3 max-w-lg text-[11px] leading-5 text-slate-300/90 sm:text-[12px] lg:mt-5 lg:text-[13px] lg:leading-6">
-              {stage.description}
-            </p>
-
-            <div className="mt-6 hidden flex-wrap gap-2 lg:flex">
-              {['Dimensional', 'Acabado', 'Evidencia'].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.11em] text-slate-400"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-
-            <div
-              className="mt-7 hidden max-w-[470px] items-center gap-3 lg:flex"
-              style={reveal(0.08, 0.18, 8)}
-            >
-              <span className="relative flex h-2.5 w-2.5 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-20" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-300" />
-              </span>
-              <div>
-                <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-emerald-200/80">
-                  OT-2026-014 · LOT-4140-202
-                </p>
-                <p className="mt-1 text-[8px] text-slate-500">
-                  La pieza fabricada entra a inspección sin perder su historia.
-                </p>
-              </div>
-            </div>
-
-            {!reducedMotion ? (
-              <div className="mt-3 flex items-center gap-2 lg:mt-7">
-                <div className="h-px flex-1 overflow-hidden bg-white/[0.055]">
-                  <div
-                    className="h-full bg-gradient-to-r from-sky-300/20 via-emerald-300/80 to-cyan-200/28 shadow-[0_0_12px_rgba(52,211,153,0.4)]"
-                    style={{ width: `${Math.max(3, scrollProgress * 100)}%` }}
-                  />
-                </div>
-                <span className="font-mono text-[7px] text-slate-600">
-                  {phase}
-                </span>
-              </div>
-            ) : null}
-          </div>
+          <QualityIntro
+            stage={stage}
+            reducedMotion={reducedMotion}
+            scrollProgress={scrollProgress}
+            phase={phase}
+            reveal={reveal}
+          />
 
           <div className="order-2 min-h-0">
             <div className="relative h-full min-h-[410px] lg:min-h-[620px]">
