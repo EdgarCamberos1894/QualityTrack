@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Locale;
 
 @Component
@@ -41,6 +42,15 @@ import java.util.Locale;
 public class PublicDemoSeeder {
 
     private static final String DATASET_MARKER_REFERENCE = "MP-2026-001";
+    private static final List<SystemRole> PUBLIC_DEMO_ROLES = List.of(
+            SystemRole.ADMIN,
+            SystemRole.COMMERCIAL,
+            SystemRole.ENGINEERING,
+            SystemRole.PRODUCTION,
+            SystemRole.QUALITY,
+            SystemRole.LOGISTICS,
+            SystemRole.AUDITOR
+    );
 
     private final UserRepository userRepository;
     private final UserSystemRoleRepository userSystemRoleRepository;
@@ -112,8 +122,10 @@ public class PublicDemoSeeder {
                         )
                 ));
 
-        if (!userSystemRoleRepository.existsByIdUserIdAndIdRole(user.getId(), SystemRole.ADMIN)) {
-            userSystemRoleRepository.saveAndFlush(new UserSystemRole(user, SystemRole.ADMIN));
+        for (SystemRole role : PUBLIC_DEMO_ROLES) {
+            if (!userSystemRoleRepository.existsByIdUserIdAndIdRole(user.getId(), role)) {
+                userSystemRoleRepository.saveAndFlush(new UserSystemRole(user, role));
+            }
         }
 
         return user;
