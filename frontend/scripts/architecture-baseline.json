@@ -5,7 +5,6 @@
   "modules/landing/components/DeliverySection.tsx": 595,
   "modules/landing/components/QuoteSection.tsx": 600,
   "modules/landing/components/RequestSection.tsx": 579,
-  "modules/landing/components/WorkOrderSection.tsx": 613,
   "modules/work-orders/components/RoutingOperationDialog.tsx": 505,
   "modules/work-orders/components/WorkOrderPreparation.tsx": 525,
   "modules/work-orders/components/WorkOrderProduction.tsx": 592,
