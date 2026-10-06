@@ -9,6 +9,12 @@ import {
   routingOperationSchema,
   type RoutingOperationFormValues,
 } from '../schemas/workOrderPreparation.schemas'
+import {
+  defaultPrerequisites,
+  impactedByResequence,
+  previousOperations,
+  suggestOperationCode,
+} from '../model/routingOperationPresenter'
 import type { RoutingOperationDto } from '../types/workOrder.types'
 
 interface RoutingOperationDialogProps {
@@ -20,72 +26,6 @@ interface RoutingOperationDialogProps {
   error: unknown
   onClose: () => void
   onSubmit: (values: RoutingOperationFormValues) => Promise<boolean>
-}
-
-function suggestOperationCode(sequenceNumber: number) {
-  if (!Number.isInteger(sequenceNumber) || sequenceNumber <= 0) return ''
-  return `OP-${sequenceNumber * 10}`
-}
-
-function previousOperations(
-  operations: RoutingOperationDto[],
-  sequenceNumber: number,
-  operationId?: number,
-) {
-  return operations
-    .filter((item) => item.id !== operationId)
-    .filter((item) => item.sequenceNumber < sequenceNumber)
-    .sort((left, right) => left.sequenceNumber - right.sequenceNumber)
-}
-
-function defaultPrerequisites(
-  operations: RoutingOperationDto[],
-  sequenceNumber: number,
-  operationId?: number,
-) {
-  const previous = previousOperations(operations, sequenceNumber, operationId)
-  const immediate = previous.at(-1)
-  return immediate ? [immediate.id] : []
-}
-
-function impactedByResequence(
-  operations: RoutingOperationDto[],
-  targetSequence: number,
-  current?: RoutingOperationDto,
-) {
-  if (!Number.isInteger(targetSequence) || targetSequence <= 0) return []
-
-  if (!current) {
-    return operations
-      .filter((item) => item.sequenceNumber >= targetSequence)
-      .sort((left, right) => left.sequenceNumber - right.sequenceNumber)
-      .map((item) => ({
-        operation: item,
-        nextSequence: item.sequenceNumber + 1,
-      }))
-  }
-
-  if (targetSequence < current.sequenceNumber) {
-    return operations
-      .filter((item) => item.id !== current.id)
-      .filter((item) => item.sequenceNumber >= targetSequence)
-      .filter((item) => item.sequenceNumber < current.sequenceNumber)
-      .sort((left, right) => left.sequenceNumber - right.sequenceNumber)
-      .map((item) => ({
-        operation: item,
-        nextSequence: item.sequenceNumber + 1,
-      }))
-  }
-
-  return operations
-    .filter((item) => item.id !== current.id)
-    .filter((item) => item.sequenceNumber > current.sequenceNumber)
-    .filter((item) => item.sequenceNumber <= targetSequence)
-    .sort((left, right) => left.sequenceNumber - right.sequenceNumber)
-    .map((item) => ({
-      operation: item,
-      nextSequence: item.sequenceNumber - 1,
-    }))
 }
 
 export function RoutingOperationDialog({
@@ -209,7 +149,9 @@ export function RoutingOperationDialog({
     }
 
     const availableIds = new Set(
-      previousOperations(operations, value, operation?.id).map((item) => item.id),
+      previousOperations(operations, value, operation?.id).map(
+        (item) => item.id,
+      ),
     )
 
     if (!dependenciesManuallyEditedRef.current) {
@@ -259,7 +201,8 @@ export function RoutingOperationDialog({
             {operation ? 'Editar operación' : 'Agregar operación'}
           </h2>
           <p className="mt-1 text-[9px] leading-4 text-slate-500">
-            Define la operación, su posición y qué pasos deben terminar antes de que pueda iniciar.
+            Define la operación, su posición y qué pasos deben terminar antes de
+            que pueda iniciar.
           </p>
         </div>
 
@@ -304,7 +247,8 @@ export function RoutingOperationDialog({
               <p className="mt-1 text-[8px] leading-4 text-red-700">
                 {blockingDependents.map((item) => item.code).join(', ')}{' '}
                 {blockingDependents.length === 1 ? 'depende' : 'dependen'} de{' '}
-                {operation?.code}. Ajusta primero esas dependencias para no invertir el flujo de fabricación.
+                {operation?.code}. Ajusta primero esas dependencias para no
+                invertir el flujo de fabricación.
               </p>
             </div>
           ) : sequenceConflict && conflictingOperation ? (
@@ -312,7 +256,8 @@ export function RoutingOperationDialog({
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-[9px] font-semibold text-amber-900">
-                    La secuencia {sequenceNumber} ya está ocupada por {conflictingOperation.code}
+                    La secuencia {sequenceNumber} ya está ocupada por{' '}
+                    {conflictingOperation.code}
                   </p>
                   <p className="mt-1 text-[8px] leading-4 text-amber-800">
                     {operation
@@ -334,24 +279,29 @@ export function RoutingOperationDialog({
                     })
                   }
                 >
-                  {resequenceOperations ? '✓ Recorrer secuencias' : 'Confirmar recorrido'}
+                  {resequenceOperations
+                    ? '✓ Recorrer secuencias'
+                    : 'Confirmar recorrido'}
                 </button>
               </div>
 
               {impactedOperations.length > 0 ? (
                 <div className="mt-2.5 flex flex-wrap gap-1.5">
-                  {impactedOperations.map(({ operation: item, nextSequence }) => (
-                    <span
-                      key={item.id}
-                      className="rounded-full border border-amber-200 bg-white px-2 py-1 text-[7px] font-medium text-amber-800"
-                    >
-                      {item.code} · {item.sequenceNumber} → {nextSequence}
-                    </span>
-                  ))}
+                  {impactedOperations.map(
+                    ({ operation: item, nextSequence }) => (
+                      <span
+                        key={item.id}
+                        className="rounded-full border border-amber-200 bg-white px-2 py-1 text-[7px] font-medium text-amber-800"
+                      >
+                        {item.code} · {item.sequenceNumber} → {nextSequence}
+                      </span>
+                    ),
+                  )}
                 </div>
               ) : null}
               <p className="mt-2 text-[7px] leading-3.5 text-amber-700">
-                Los códigos OP generados automáticamente se ajustarán a su nueva secuencia; los códigos personalizados se conservarán.
+                Los códigos OP generados automáticamente se ajustarán a su nueva
+                secuencia; los códigos personalizados se conservarán.
               </p>
             </div>
           ) : null}
@@ -384,7 +334,8 @@ export function RoutingOperationDialog({
                   Debe esperar a
                 </p>
                 <p className="mt-0.5 text-[7px] leading-3.5 text-slate-500">
-                  Solo aparecen secuencias anteriores. Puedes elegir varias para unir ramas del proceso.
+                  Solo aparecen secuencias anteriores. Puedes elegir varias para
+                  unir ramas del proceso.
                 </p>
               </div>
               <button
@@ -409,7 +360,9 @@ export function RoutingOperationDialog({
             ) : (
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {availablePrerequisites.map((candidate) => {
-                  const selected = selectedPrerequisiteIds.includes(candidate.id)
+                  const selected = selectedPrerequisiteIds.includes(
+                    candidate.id,
+                  )
                   return (
                     <button
                       key={candidate.id}
