@@ -1,3 +1,4 @@
+// quality-refactor-validation
 import { Badge } from '@/shared/components/ui/Badge'
 import {
   countQualityCheckResults,
