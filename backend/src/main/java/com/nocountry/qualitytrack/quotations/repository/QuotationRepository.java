@@ -115,7 +115,6 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
             @Param("customerId") Long customerId
     );
 
-
     @EntityGraph(attributePaths = {
             "jobCase",
             "jobCase.customerRequest",
@@ -172,16 +171,7 @@ public interface QuotationRepository extends JpaRepository<Quotation, Long> {
     Optional<Quotation> findDetailById(@Param("quotationId") Long quotationId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("""
-            select quotation
-            from Quotation quotation
-            join fetch quotation.jobCase jobCase
-            join fetch jobCase.customerRequest request
-            join fetch request.customer customer
-            join fetch quotation.createdByUser
-            left join fetch quotation.cancelledByUser
-            where quotation.id = :quotationId
-            """)
+    @Query("select quotation from Quotation quotation where quotation.id = :quotationId")
     Optional<Quotation> findByIdForUpdate(@Param("quotationId") Long quotationId);
 
     @Query("""
