@@ -3,6 +3,8 @@ import {
   usePinnedSectionProgress,
 } from '../hooks/usePinnedSectionProgress'
 import type { LandingStoryStage } from '../model/landingStory'
+import { CaseIntro } from './CaseIntro'
+import { CaseTrace } from './CaseTrace'
 import '../caseSection.css'
 
 interface CaseSectionProps {
@@ -90,8 +92,6 @@ export function CaseSection({ stage, reducedMotion }: CaseSectionProps) {
   const mapScale = 1 - overviewProgress * 0.055
   const tracePath =
     'M 250 0 C 250 54, 382 48, 500 86 C 575 111, 520 150, 420 165 C 280 188, 250 250, 330 285 C 455 326, 720 250, 755 365 C 785 455, 565 470, 505 500 C 420 545, 660 575, 790 625'
-  const quoteHandoffPath = 'M 950 900 C 956 940, 924 970, 900 1000'
-
   return (
     <section
       ref={sectionRef}
@@ -102,109 +102,15 @@ export function CaseSection({ stage, reducedMotion }: CaseSectionProps) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_72%_45%,rgba(37,99,235,0.12),transparent_29%),radial-gradient(circle_at_58%_65%,rgba(34,211,238,0.065),transparent_25%),linear-gradient(180deg,#020817_0%,#050f1d_48%,#020817_100%)]" />
         <div className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(rgba(148,163,184,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.05)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(circle_at_67%_52%,black,transparent_67%)]" />
 
-        <div
-          className="pointer-events-none absolute inset-0 z-[4] hidden lg:block"
-          aria-hidden="true"
-        >
-          <svg
-            viewBox="0 0 1000 1000"
-            className="absolute inset-0 h-full w-full"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <linearGradient
-                id="qtCaseQuoteHandoff"
-                x1="0.95"
-                y1="0.9"
-                x2="0.9"
-                y2="1"
-              >
-                <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.68" />
-                <stop offset="52%" stopColor="#22d3ee" stopOpacity="0.5" />
-                <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.34" />
-              </linearGradient>
-              <filter
-                id="qtCaseQuoteGlow"
-                x="-120%"
-                y="-80%"
-                width="340%"
-                height="260%"
-              >
-                <feGaussianBlur stdDeviation="7" />
-              </filter>
-            </defs>
-            <path
-              d={quoteHandoffPath}
-              fill="none"
-              stroke="url(#qtCaseQuoteHandoff)"
-              strokeWidth="12"
-              opacity={exitProgress * 0.09}
-              filter="url(#qtCaseQuoteGlow)"
-            />
-            <path
-              d={quoteHandoffPath}
-              fill="none"
-              pathLength="1"
-              stroke="url(#qtCaseQuoteHandoff)"
-              strokeWidth="1.7"
-              strokeLinecap="round"
-              strokeDasharray="1"
-              strokeDashoffset={1 - exitProgress}
-            />
-            <circle
-              cx="900"
-              cy="1000"
-              r="3.2"
-              fill="#93c5fd"
-              opacity={rangeProgress(exitProgress, 0.72, 1)}
-            />
-          </svg>
-        </div>
+        <CaseTrace exitProgress={exitProgress} />
 
         <div className="relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-rows-[auto_1fr] gap-3 px-5 pb-4 pt-4 sm:px-8 sm:pt-5 lg:grid-cols-[0.78fr_1.22fr] lg:grid-rows-1 lg:items-center lg:gap-12 lg:px-12 lg:pb-8 lg:pt-8 xl:px-16">
-          <div className="order-1 lg:pr-4">
-            <div className="flex items-center gap-2.5">
-              <span className="rounded-full border border-blue-400/20 bg-blue-400/10 px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.13em] text-blue-200">
-                {stage.eyebrow}
-              </span>
-              <span className="text-[9px] font-semibold tracking-[0.18em] text-slate-600">
-                {stage.step}
-              </span>
-            </div>
-
-            <h2 className="mt-3 max-w-[590px] text-[clamp(2rem,8.7vw,3.1rem)] font-semibold leading-[0.96] tracking-[-0.05em] text-white lg:mt-4 lg:text-[clamp(2.15rem,4vw,3.9rem)]">
-              {stage.title}
-            </h2>
-
-            <p className="mt-3 max-w-lg text-[11px] leading-5 text-slate-300/90 sm:text-[12px] lg:mt-5 lg:text-[13px] lg:leading-6">
-              {stage.description}
-            </p>
-
-            <div className="mt-6 hidden flex-wrap gap-2 lg:flex">
-              {['Historial', 'Evidencia', 'Decisiones'].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.11em] text-slate-400"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-
-            {!reducedMotion ? (
-              <div className="mt-3 flex items-center gap-2 lg:mt-7">
-                <div className="h-px flex-1 overflow-hidden bg-white/[0.055]">
-                  <div
-                    className="h-full bg-gradient-to-r from-blue-500/30 via-cyan-300/75 to-blue-200/20 shadow-[0_0_12px_rgba(59,130,246,0.4)]"
-                    style={{ width: `${Math.max(3, scrollProgress * 100)}%` }}
-                  />
-                </div>
-                <span className="font-mono text-[7px] text-slate-600">
-                  {phase}
-                </span>
-              </div>
-            ) : null}
-          </div>
+          <CaseIntro
+            stage={stage}
+            reducedMotion={reducedMotion}
+            scrollProgress={scrollProgress}
+            phase={phase}
+          />
 
           <div className="order-2 min-h-0 lg:order-2">
             <div className="relative h-full min-h-[390px] lg:min-h-[620px]">
