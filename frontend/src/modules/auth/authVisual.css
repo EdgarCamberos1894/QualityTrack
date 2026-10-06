@@ -203,6 +203,20 @@ body:has(.qt-auth-root) {
   }
 }
 
+@media (max-width: 767px), (pointer: coarse) {
+  .qt-auth-form-card form input,
+  .qt-auth-form-card form button,
+  .qt-auth-form-card form a,
+  .qt-auth-back-link {
+    min-height: 44px !important;
+  }
+
+  .qt-auth-form-card form a {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
 @media (max-width: 639px) {
   .qt-auth-form-card {
     border-radius: 18px;
