@@ -11,18 +11,25 @@ source = source.replace(
 source = source.replace("import { ProductionRouteList } from './ProductionRouteList'\n", '')
 source = source.replace("import { RoutingFlowView } from './RoutingFlowView'\n", '')
 source = source.replace(
-    "import { formatProductionDateTime } from '../model/productionPresenter'\n",
-    '',
+    "import { useProductionMutations } from '../hooks/useProductionMutations'\n",
+    "import { useProductionHashSelection } from '../hooks/useProductionHashSelection'\nimport { useProductionMutations } from '../hooks/useProductionMutations'\n",
 )
 source = source.replace(
-    "import { useProductionMutations } from '../hooks/useProductionMutations'\n",
-    "import { useProductionMutations } from '../hooks/useProductionMutations'\nimport { getProductionDependencyIds } from '../model/productionPresenter'\n",
+    "import { formatProductionDateTime } from '../model/productionPresenter'\n",
+    "import { getProductionDependencyIds } from '../model/productionPresenter'\n",
 )
 source = source.replace(
     '''function dependencyIds(operation: RoutingOperationDto) {\n  return operation.prerequisiteOperationIds ?? []\n}\n\n''',
     '',
 )
 source = source.replace('dependencyIds(', 'getProductionDependencyIds(')
+
+hash_effect = '''  useEffect(() => {\n    const executionMatch = location.hash.match(/^#operation-execution-(\\d+)$/)\n\n    if (executionMatch) {\n      const executionId = Number(executionMatch[1])\n      const execution = productionExecutions.find(\n        (item) => item.id === executionId,\n      )\n\n      if (execution) {\n        setSelectedOperationId(execution.routingOperationId)\n        setExpandedOperationId(execution.routingOperationId)\n      }\n      return\n    }\n\n    const operationMatch = location.hash.match(/^#routing-operation-(\\d+)$/)\n\n    if (operationMatch) {\n      setSelectedOperationId(Number(operationMatch[1]))\n      return\n    }\n\n    if (location.hash.startsWith('#material-lot-')) {\n      setMaterialsOpen(true)\n    }\n  }, [location.hash, productionExecutions])\n\n'''
+source = source.replace(hash_effect, '')
+source = source.replace(
+    "  const latestConsumption = data.materials.at(-1)\n\n",
+    '''  const latestConsumption = data.materials.at(-1)\n\n  useProductionHashSelection({\n    hash: location.hash,\n    executions: productionExecutions,\n    setSelectedOperationId,\n    setExpandedOperationId,\n    setMaterialsOpen,\n  })\n\n''',
+)
 
 route_start_marker = '''        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">'''
 aside_marker = '''        <aside className="flex h-full flex-col rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">'''
@@ -212,9 +219,65 @@ export function ProductionRoutePanel({
   )
 }
 '''
+Path('frontend/src/modules/work-orders/components/ProductionRoutePanel.tsx').write_text(panel_content, encoding='utf-8')
 
-Path('frontend/src/modules/work-orders/components/ProductionRoutePanel.tsx').write_text(
-    panel_content,
+hash_hook_content = '''import { useEffect } from 'react'
+import type { OperationExecutionDto } from '../types/workOrder.types'
+
+interface ProductionHashSelectionParams {
+  hash: string
+  executions: OperationExecutionDto[]
+  setSelectedOperationId: (operationId: number) => void
+  setExpandedOperationId: (operationId: number) => void
+  setMaterialsOpen: (open: boolean) => void
+}
+
+export function useProductionHashSelection({
+  hash,
+  executions,
+  setSelectedOperationId,
+  setExpandedOperationId,
+  setMaterialsOpen,
+}: ProductionHashSelectionParams) {
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const executionMatch = hash.match(/^#operation-execution-(\\d+)$/)
+
+      if (executionMatch) {
+        const executionId = Number(executionMatch[1])
+        const execution = executions.find((item) => item.id === executionId)
+
+        if (execution) {
+          setSelectedOperationId(execution.routingOperationId)
+          setExpandedOperationId(execution.routingOperationId)
+        }
+        return
+      }
+
+      const operationMatch = hash.match(/^#routing-operation-(\\d+)$/)
+
+      if (operationMatch) {
+        setSelectedOperationId(Number(operationMatch[1]))
+        return
+      }
+
+      if (hash.startsWith('#material-lot-')) {
+        setMaterialsOpen(true)
+      }
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [
+    executions,
+    hash,
+    setExpandedOperationId,
+    setMaterialsOpen,
+    setSelectedOperationId,
+  ])
+}
+'''
+Path('frontend/src/modules/work-orders/hooks/useProductionHashSelection.ts').write_text(
+    hash_hook_content,
     encoding='utf-8',
 )
 
@@ -231,7 +294,4 @@ presenter_path.write_text(presenter, encoding='utf-8')
 baseline_path = Path('frontend/scripts/architecture-baseline.json')
 baseline = json.loads(baseline_path.read_text(encoding='utf-8'))
 baseline.pop('modules/work-orders/components/WorkOrderProduction.tsx', None)
-baseline_path.write_text(
-    json.dumps(baseline, ensure_ascii=False, indent=2) + '\n',
-    encoding='utf-8',
-)
+baseline_path.write_text(json.dumps(baseline, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
