@@ -21,6 +21,7 @@ interface QuotationTableProps {
 
 const statusAccent: Record<QuotationStatus, string> = {
   DRAFT: 'from-slate-400 to-slate-300',
+  ADJUSTMENT_REQUESTED: 'from-amber-500 to-orange-400',
   SENT: 'from-blue-500 to-cyan-400',
   APPROVED: 'from-emerald-500 to-teal-400',
   REJECTED: 'from-red-500 to-rose-400',
@@ -31,6 +32,7 @@ const statusAccent: Record<QuotationStatus, string> = {
 
 const statusSurface: Record<QuotationStatus, string> = {
   DRAFT: 'bg-slate-100 text-slate-600',
+  ADJUSTMENT_REQUESTED: 'bg-amber-50 text-amber-700',
   SENT: 'bg-blue-50 text-blue-600',
   APPROVED: 'bg-emerald-50 text-emerald-600',
   REJECTED: 'bg-red-50 text-red-600',
@@ -44,8 +46,15 @@ export function QuotationTable({ quotations }: QuotationTableProps) {
     <div className="space-y-3">
       {quotations.map((quotation) => {
         const status = getQuotationStatusPresentation(quotation.status)
+        const requiresAction =
+          quotation.status === 'DRAFT' ||
+          quotation.status === 'ADJUSTMENT_REQUESTED'
         const actionLabel =
-          quotation.status === 'DRAFT' ? 'Continuar' : 'Abrir cotización'
+          quotation.status === 'ADJUSTMENT_REQUESTED'
+            ? 'Revisar ajuste'
+            : quotation.status === 'DRAFT'
+              ? 'Continuar'
+              : 'Abrir cotización'
 
         return (
           <InternalListingCard
@@ -68,7 +77,7 @@ export function QuotationTable({ quotations }: QuotationTableProps) {
                   <Link
                     to={`/quotations/${quotation.id}`}
                     className={
-                      quotation.status === 'DRAFT'
+                      requiresAction
                         ? 'inline-flex h-9 min-w-28 items-center justify-center rounded-lg bg-blue-600 px-3.5 text-[10px] font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700'
                         : 'inline-flex h-9 min-w-28 items-center justify-center rounded-lg border border-slate-200 bg-white px-3.5 text-[10px] font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700'
                     }
