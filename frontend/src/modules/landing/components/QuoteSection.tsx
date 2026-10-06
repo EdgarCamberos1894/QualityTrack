@@ -3,7 +3,9 @@ import {
   usePinnedSectionProgress,
 } from '../hooks/usePinnedSectionProgress'
 import type { LandingStoryStage } from '../model/landingStory'
+import { QuoteIntro } from './QuoteIntro'
 import { QuoteReviewBadge } from './QuoteReviewBadge'
+import { QuoteTrace } from './QuoteTrace'
 import '../quoteSection.css'
 
 interface QuoteSectionProps {
@@ -63,11 +65,6 @@ export function QuoteSection({ stage, reducedMotion }: QuoteSectionProps) {
                 ? 'Trazando cotización'
                 : 'Conectando expediente'
 
-  const quoteEntryPath =
-    'M 900 0 C 895 72, 808 86, 728 126 C 640 169, 575 205, 458 232'
-  const quoteExitPath =
-    'M 360 715 C 360 794, 315 842, 337 890 C 354 928, 337 963, 340 1000'
-
   const approved = approvalProgress > 0.55
   const showV2 = versionProgress > 0.44 || approvalProgress > 0
   const sheetOpacity = outlineProgress * (1 - versionProgress * 0.02)
@@ -87,127 +84,7 @@ export function QuoteSection({ stage, reducedMotion }: QuoteSectionProps) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_46%,rgba(245,158,11,0.105),transparent_28%),radial-gradient(circle_at_42%_58%,rgba(59,130,246,0.055),transparent_30%),linear-gradient(180deg,#020817_0%,#080d17_48%,#030712_100%)]" />
         <div className="absolute inset-0 opacity-[0.15] [background-image:linear-gradient(rgba(148,163,184,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.04)_1px,transparent_1px)] [background-size:76px_76px] [mask-image:radial-gradient(circle_at_31%_50%,black,transparent_66%)]" />
 
-        <div
-          className="pointer-events-none absolute inset-0 z-[3] hidden lg:block"
-          aria-hidden="true"
-        >
-          <svg
-            viewBox="0 0 1000 1000"
-            className="absolute inset-0 h-full w-full"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <linearGradient
-                id="qtQuoteEntry"
-                x1="0.9"
-                y1="0"
-                x2="0.46"
-                y2="0.24"
-              >
-                <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.42" />
-                <stop offset="42%" stopColor="#22d3ee" stopOpacity="0.66" />
-                <stop offset="100%" stopColor="#fbbf24" stopOpacity="0.72" />
-              </linearGradient>
-              <linearGradient
-                id="qtQuoteExit"
-                x1="0.36"
-                y1="0.71"
-                x2="0.34"
-                y2="1"
-              >
-                <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.82" />
-                <stop offset="48%" stopColor="#c4b5fd" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#8b5cf6" stopOpacity="0.34" />
-              </linearGradient>
-              <filter
-                id="qtQuoteTraceGlow"
-                x="-80%"
-                y="-50%"
-                width="260%"
-                height="200%"
-              >
-                <feGaussianBlur stdDeviation="8" />
-              </filter>
-            </defs>
-
-            <path
-              d={quoteEntryPath}
-              fill="none"
-              stroke="url(#qtQuoteEntry)"
-              strokeWidth="13"
-              opacity={entryProgress * 0.1}
-              filter="url(#qtQuoteTraceGlow)"
-            />
-            <path
-              d={quoteEntryPath}
-              fill="none"
-              pathLength="1"
-              stroke="url(#qtQuoteEntry)"
-              strokeWidth="1.7"
-              strokeLinecap="round"
-              strokeDasharray="1"
-              strokeDashoffset={1 - entryProgress}
-            />
-            <circle
-              cx="900"
-              cy="0"
-              r="3.1"
-              fill="#93c5fd"
-              opacity={entryProgress}
-            />
-            <circle
-              cx="458"
-              cy="232"
-              r="3.6"
-              fill="#fcd34d"
-              opacity={rangeProgress(entryProgress, 0.7, 1)}
-            />
-
-            <path
-              d={quoteExitPath}
-              fill="none"
-              stroke="url(#qtQuoteExit)"
-              strokeWidth="13"
-              opacity={exitProgress * 0.11}
-              filter="url(#qtQuoteTraceGlow)"
-            />
-            <path
-              d={quoteExitPath}
-              fill="none"
-              pathLength="1"
-              stroke="url(#qtQuoteExit)"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeDasharray="1"
-              strokeDashoffset={1 - exitProgress}
-            />
-            <circle
-              cx="340"
-              cy="1000"
-              r="3.3"
-              fill="#a78bfa"
-              opacity={rangeProgress(exitProgress, 0.74, 1)}
-            />
-          </svg>
-
-          <div
-            className="absolute left-[36%] top-[82%] flex items-center gap-2.5"
-            style={{
-              opacity: rangeProgress(exitProgress, 0.28, 0.74),
-              transform: `translate3d(0, ${(1 - exitProgress) * 9}px, 0)`,
-            }}
-          >
-            <span className="h-px w-8 bg-gradient-to-r from-amber-300/55 to-violet-300/35" />
-            <div>
-              <p className="font-mono text-[7px] uppercase tracking-[0.15em] text-slate-600">
-                Siguiente
-              </p>
-              <p className="mt-1 text-[9px] font-semibold text-violet-200/85">
-                Orden de trabajo
-              </p>
-            </div>
-          </div>
-        </div>
+        <QuoteTrace entryProgress={entryProgress} exitProgress={exitProgress} />
 
         <div className="relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-rows-[auto_1fr] gap-3 px-5 pb-4 pt-4 sm:px-8 sm:pt-5 lg:grid-cols-[1.12fr_0.88fr] lg:grid-rows-1 lg:items-center lg:gap-14 lg:px-12 lg:pb-8 lg:pt-8 xl:px-16">
           <div className="order-2 min-h-0 lg:order-1">
@@ -549,49 +426,12 @@ export function QuoteSection({ stage, reducedMotion }: QuoteSectionProps) {
             </div>
           </div>
 
-          <div className="order-1 lg:order-2 lg:pl-2">
-            <div className="flex items-center gap-2.5">
-              <span className="rounded-full border border-amber-400/20 bg-amber-400/[0.08] px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.13em] text-amber-200">
-                {stage.eyebrow}
-              </span>
-              <span className="text-[9px] font-semibold tracking-[0.18em] text-slate-600">
-                {stage.step}
-              </span>
-            </div>
-
-            <h2 className="mt-3 max-w-[600px] text-[clamp(2rem,8.7vw,3.15rem)] font-semibold leading-[0.96] tracking-[-0.052em] text-white lg:mt-4 lg:text-[clamp(2.15rem,4vw,3.95rem)]">
-              {stage.title}
-            </h2>
-
-            <p className="mt-3 max-w-lg text-[11px] leading-5 text-slate-300/90 sm:text-[12px] lg:mt-5 lg:text-[13px] lg:leading-6">
-              {stage.description}
-            </p>
-
-            <div className="mt-6 hidden flex-wrap gap-2 lg:flex">
-              {['V1', 'Revisión breve', 'V2 aprobada'].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.11em] text-slate-400"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-
-            {!reducedMotion ? (
-              <div className="mt-3 flex items-center gap-2 lg:mt-7">
-                <div className="h-px flex-1 overflow-hidden bg-white/[0.055]">
-                  <div
-                    className="h-full bg-gradient-to-r from-cyan-400/20 via-amber-300/78 to-violet-300/24 shadow-[0_0_12px_rgba(251,191,36,0.34)]"
-                    style={{ width: `${Math.max(3, scrollProgress * 100)}%` }}
-                  />
-                </div>
-                <span className="font-mono text-[7px] text-slate-600">
-                  {phase}
-                </span>
-              </div>
-            ) : null}
-          </div>
+          <QuoteIntro
+            stage={stage}
+            reducedMotion={reducedMotion}
+            scrollProgress={scrollProgress}
+            phase={phase}
+          />
         </div>
       </div>
     </section>
