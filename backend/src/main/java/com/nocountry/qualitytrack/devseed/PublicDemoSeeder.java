@@ -40,8 +40,6 @@ import java.util.Locale;
 @Slf4j
 public class PublicDemoSeeder {
 
-    static final String INTERNAL_EMAIL = "admin.demo@qualitytrack.com";
-    static final String CUSTOMER_EMAIL = "cliente.demo@qualitytrack.com";
     private static final String DATASET_MARKER_REFERENCE = "MP-2026-001";
 
     private final UserRepository userRepository;
@@ -56,6 +54,12 @@ public class PublicDemoSeeder {
 
     @Value("${app.demo.password:}")
     private String demoPassword;
+
+    @Value("${app.demo.internal-email:admin.demo@qualitytrack.com}")
+    private String internalEmail;
+
+    @Value("${app.demo.customer-email:cliente.demo@qualitytrack.com}")
+    private String customerEmail;
 
     @EventListener(ApplicationReadyEvent.class)
     @Order(Ordered.LOWEST_PRECEDENCE)
@@ -94,7 +98,7 @@ public class PublicDemoSeeder {
     }
 
     private User ensureInternalAdmin() {
-        String email = normalizeEmail(INTERNAL_EMAIL);
+        String email = normalizeEmail(internalEmail);
         String passwordHash = passwordEncoder.encode(demoPassword);
 
         User user = userRepository.findByEmailIgnoreCase(email)
@@ -136,7 +140,7 @@ public class PublicDemoSeeder {
     }
 
     private DemoCustomer ensureDemoCustomer() {
-        String email = normalizeEmail(CUSTOMER_EMAIL);
+        String email = normalizeEmail(customerEmail);
         String passwordHash = passwordEncoder.encode(demoPassword);
 
         User owner = userRepository.findByEmailIgnoreCase(email)
@@ -224,6 +228,9 @@ public class PublicDemoSeeder {
     }
 
     private String normalizeEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalStateException("Los correos de demo deben estar configurados.");
+        }
         return email.trim().toLowerCase(Locale.ROOT);
     }
 }
