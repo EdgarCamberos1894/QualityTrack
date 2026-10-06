@@ -340,7 +340,7 @@ export function RoutingOperationDialog({
               </div>
               <button
                 type="button"
-                className="shrink-0 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[7.5px] font-semibold text-slate-600 transition hover:border-blue-200 hover:text-blue-700"
+                className="!h-7 shrink-0 rounded-md border border-slate-200 bg-white !px-2.5 !py-0 !text-[8px] font-semibold !leading-none text-slate-600 transition hover:border-blue-200 hover:text-blue-700"
                 onClick={() => {
                   dependenciesManuallyEditedRef.current = true
                   setValue('prerequisiteOperationIds', [], {
