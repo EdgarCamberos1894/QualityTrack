@@ -1,22 +1,21 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
-import { Badge } from '@/shared/components/ui/Badge'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { CompleteQualityInspectionDialog } from './CompleteQualityInspectionDialog'
 import { NonConformitySection } from './NonConformitySection'
 import { ProductionMaterialsCard } from './ProductionMaterialsCard'
+import { QualityInspectionHistory } from './QualityInspectionHistory'
 import { QualityInspectionWorkspace } from './QualityInspectionWorkspace'
 import { QualityCheckDialog } from './QualityCheckDialog'
 import { QualityPendingWorkspace } from './QualityPendingWorkspace'
 import { QualityStagePanel } from './QualityStagePanel'
-import { useQualityMutations } from '../hooks/useQualityMutations'
 import {
-  countQualityCheckResults,
-  formatQualityDateTime,
-  getQualityInspectionStatusPresentation,
-} from '../model/qualityPresenter'
+  type QualityDetail,
+  useQualityHashNavigation,
+} from '../hooks/useQualityHashNavigation'
+import { useQualityMutations } from '../hooks/useQualityMutations'
 import type { QualityCheckFormValues } from '../schemas/quality.schemas'
 import type {
   QualityCheckDto,
@@ -33,8 +32,6 @@ interface CheckTarget {
   inspectionId: number
   qualityCheck: QualityCheckDto | null
 }
-
-type QualityDetail = 'nonConformity' | 'materials' | 'history' | null
 
 export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
   const session = useSessionStore((state) => state.session)
@@ -66,6 +63,15 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
       ),
     [data.qualityInspections],
   )
+
+  useQualityHashNavigation({
+    hash: location.hash,
+    inspections,
+    detail,
+    selectedInspectionId,
+    setDetail,
+    setSelectedInspectionId,
+  })
 
   const activeInspection =
     inspections.find((inspection) => inspection.status === 'IN_PROGRESS') ??
@@ -114,51 +120,6 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
     selectedInspection !== null &&
     !viewingHistoricalInspection &&
     canModifyInspection(selectedInspection)
-
-  useEffect(() => {
-    const inspectionMatch = location.hash.match(/^#quality-inspection-(\d+)$/)
-
-    if (inspectionMatch) {
-      setSelectedInspectionId(Number(inspectionMatch[1]))
-      return
-    }
-
-    const checkMatch = location.hash.match(
-      /^#quality-(?:check|measurement)-(\d+)$/,
-    )
-
-    if (checkMatch) {
-      const checkId = Number(checkMatch[1])
-      const owner = inspections.find((inspection) =>
-        inspection.checks.some((qualityCheck) => qualityCheck.id === checkId),
-      )
-
-      if (owner) setSelectedInspectionId(owner.id)
-      return
-    }
-
-    if (location.hash.startsWith('#non-conformity-')) {
-      setDetail('nonConformity')
-      return
-    }
-
-    if (location.hash.startsWith('#material-lot-')) {
-      setDetail('materials')
-    }
-  }, [inspections, location.hash])
-
-  useEffect(() => {
-    if (!location.hash) return
-
-    const frame = window.requestAnimationFrame(() => {
-      const target = document.getElementById(
-        decodeURIComponent(location.hash.slice(1)),
-      )
-      target?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    })
-
-    return () => window.cancelAnimationFrame(frame)
-  }, [detail, location.hash, selectedInspectionId])
 
   const startInspection = async (inspectionId: number) => {
     mutations.startInspection.reset()
@@ -402,70 +363,15 @@ export function WorkOrderQuality({ data }: WorkOrderQualityProps) {
         <ProductionMaterialsCard consumptions={data.materials} />
       ) : null}
 
-      {detail === 'history' && inspections.length > 1 ? (
-        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
-          <div className="flex items-center justify-between gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
-            <div>
-              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-                Historial de calidad
-              </p>
-              <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
-                Inspecciones anteriores
-              </h2>
-            </div>
-            <span className="text-[8px] text-slate-400">
-              {inspections.length} registros
-            </span>
-          </div>
-
-          <div className="divide-y divide-slate-100">
-            {inspections.map((inspection) => {
-              const status = getQualityInspectionStatusPresentation(
-                inspection.status,
-              )
-              const totals = countQualityCheckResults(inspection.checks)
-              const current = inspection.id === activeInspection?.id
-
-              return (
-                <button
-                  key={inspection.id}
-                  type="button"
-                  className="grid w-full gap-2 px-4 py-3 text-left transition hover:bg-slate-50 sm:grid-cols-[minmax(0,1fr)_120px_100px_auto] sm:items-center"
-                  onClick={() => {
-                    setSelectedInspectionId(inspection.id)
-                    setDetail(null)
-                  }}
-                >
-                  <div>
-                    <p className="text-[9px] font-semibold text-slate-900">
-                      {inspection.reworkNonConformityId
-                        ? 'Reinspección'
-                        : 'Inspección'}{' '}
-                      #{inspection.id}
-                      {current ? ' · Actual' : ''}
-                    </p>
-                    <p className="mt-0.5 text-[7px] text-slate-400">
-                      {inspection.inspectorName ?? 'Inspector por asignar'} ·{' '}
-                      {formatQualityDateTime(inspection.createdAt)}
-                    </p>
-                  </div>
-                  <Badge
-                    tone={status.tone}
-                    className="w-fit px-2 py-0.5 text-[7px]"
-                  >
-                    {status.label}
-                  </Badge>
-                  <span className="text-[8px] text-slate-500">
-                    {totals.pass} PASS · {totals.fail} FAIL
-                  </span>
-                  <span className="text-[8px] font-semibold text-blue-600">
-                    Ver detalle
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        </section>
+      {detail === 'history' ? (
+        <QualityInspectionHistory
+          inspections={inspections}
+          activeInspectionId={activeInspection?.id ?? null}
+          onSelect={(inspectionId) => {
+            setSelectedInspectionId(inspectionId)
+            setDetail(null)
+          }}
+        />
       ) : null}
 
       <QualityCheckDialog
