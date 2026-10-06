@@ -16,7 +16,7 @@ export function CustomerRequestWorkDetails({
       ? 'Recolección en planta'
       : destination.mode === 'DEFINE_LATER'
         ? 'Destino por definir'
-        : destination.label ?? 'Destino acordado'
+        : (destination.label ?? 'Destino acordado')
   const destinationDetail =
     destination.mode === 'CUSTOMER_PICKUP'
       ? 'La empresa recogerá el pedido cuando esté listo.'
@@ -96,9 +96,7 @@ export function CustomerRequestWorkDetails({
           {destination.contactName ? (
             <p className="mt-1 text-[8px] text-slate-500">
               Contacto: {destination.contactName}
-              {destination.contactPhone
-                ? ' · ' + destination.contactPhone
-                : ''}
+              {destination.contactPhone ? ' · ' + destination.contactPhone : ''}
             </p>
           ) : null}
         </div>
