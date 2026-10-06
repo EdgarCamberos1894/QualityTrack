@@ -1,0 +1,96 @@
+name: Temp landing scene split
+
+on:
+  push:
+    branches:
+      - feature/tmp-landing-scene-split
+    paths:
+      - '.github/scripts/apply-landing-scene-split.py'
+      - '.github/workflows/temp-landing-scene-split.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Pin npm
+        run: npm install --global npm@10.9.0
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci --include=optional --legacy-peer-deps
+
+      - name: Apply scene split
+        run: python .github/scripts/apply-landing-scene-split.py
+
+      - name: Format refactor
+        working-directory: frontend
+        run: |
+          npx prettier --write \
+            scripts/architecture-baseline.json \
+            src/modules/landing/components/ProductionSection.tsx \
+            src/modules/landing/components/ProductionIntro.tsx \
+            src/modules/landing/components/ProductionTrace.tsx \
+            src/modules/landing/components/QualitySection.tsx \
+            src/modules/landing/components/QualityIntro.tsx \
+            src/modules/landing/components/QualityTrace.tsx
+
+      - name: Audit dependencies
+        working-directory: frontend
+        run: npm audit --audit-level=high
+
+      - name: Check architecture
+        working-directory: frontend
+        run: npm run architecture:check
+
+      - name: Lint refactor
+        working-directory: frontend
+        run: |
+          npx eslint \
+            src/modules/landing/components/ProductionSection.tsx \
+            src/modules/landing/components/ProductionIntro.tsx \
+            src/modules/landing/components/ProductionTrace.tsx \
+            src/modules/landing/components/QualitySection.tsx \
+            src/modules/landing/components/QualityIntro.tsx \
+            src/modules/landing/components/QualityTrace.tsx
+
+      - name: Typecheck
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Check diff hygiene
+        run: git diff --check
+
+      - name: Commit validated refactor
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            frontend/scripts/architecture-baseline.json \
+            frontend/src/modules/landing/components/ProductionSection.tsx \
+            frontend/src/modules/landing/components/ProductionIntro.tsx \
+            frontend/src/modules/landing/components/ProductionTrace.tsx \
+            frontend/src/modules/landing/components/QualitySection.tsx \
+            frontend/src/modules/landing/components/QualityIntro.tsx \
+            frontend/src/modules/landing/components/QualityTrace.tsx
+          git commit -m "refactor(landing): split production and quality scenes"
+          git push origin HEAD:${{ github.ref_name }}
