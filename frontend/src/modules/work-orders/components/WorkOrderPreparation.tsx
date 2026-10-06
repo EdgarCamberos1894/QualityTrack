@@ -4,6 +4,7 @@ import { useSessionStore } from '@/modules/auth'
 import { Button } from '@/shared/components/ui/Button'
 import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { useWorkOrderPreparationMutations } from '../hooks/useWorkOrderPreparationMutations'
+import { getWorkOrderPreparationPresentation } from '../model/workOrderPreparationPresenter'
 import type {
   ReopenRoutingFormValues,
   RoutingOperationFormValues,
@@ -12,6 +13,7 @@ import type {
 import type { WorkOrder360Dto } from '../types/workOrder360.types'
 import { WorkOrderPinnedDocuments } from './WorkOrderPinnedDocuments'
 import { WorkOrderPlanningCard } from './WorkOrderPlanningCard'
+import { WorkOrderPreparationChecklist } from './WorkOrderPreparationChecklist'
 import { WorkOrderRoutingCard } from './WorkOrderRoutingCard'
 
 interface WorkOrderPreparationProps {
@@ -19,54 +21,6 @@ interface WorkOrderPreparationProps {
 }
 
 type DetailPanel = 'documents' | 'routing' | null
-
-function getMaterialLabel(data: WorkOrder360Dto): string {
-  const specification = data.workOrder.source.materialSpecification
-
-  if (specification && typeof specification === 'object') {
-    const value = specification as Record<string, unknown>
-    const materialName =
-      typeof value.materialName === 'string' ? value.materialName : null
-    const standardOrGrade =
-      typeof value.standardOrGrade === 'string' ? value.standardOrGrade : null
-    const parts = [materialName, standardOrGrade].filter(Boolean)
-
-    if (parts.length > 0) return parts.join(' / ')
-  }
-
-  return (
-    data.workOrder.source.materialRequirement?.trim() ||
-    'Material pendiente de especificación'
-  )
-}
-
-function Requirement({
-  complete,
-  label,
-  detail,
-}: {
-  complete: boolean
-  label: string
-  detail: string
-}) {
-  return (
-    <div className="flex gap-3">
-      <span
-        className={
-          complete
-            ? 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-[9px] font-bold text-emerald-700'
-            : 'flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-[9px] font-bold text-slate-400'
-        }
-      >
-        {complete ? '✓' : '○'}
-      </span>
-      <div>
-        <p className="text-[9px] font-semibold text-slate-900">{label}</p>
-        <p className="mt-0.5 text-[7px] leading-3.5 text-slate-400">{detail}</p>
-      </div>
-    </div>
-  )
-}
 
 export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
   const session = useSessionStore((state) => state.session)
@@ -81,11 +35,19 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
   })
 
   useEffect(() => {
-    if (location.hash.startsWith('#routing-')) {
-      setDetailPanel('routing')
-    } else if (location.hash.startsWith('#document-')) {
-      setDetailPanel('documents')
-    }
+    const panel = location.hash.startsWith('#routing-')
+      ? 'routing'
+      : location.hash.startsWith('#document-')
+        ? 'documents'
+        : null
+
+    if (!panel) return
+
+    const frame = window.requestAnimationFrame(() => {
+      setDetailPanel(panel)
+    })
+
+    return () => window.cancelAnimationFrame(frame)
   }, [location.hash])
 
   useEffect(() => {
@@ -113,15 +75,24 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
 
     return () => window.cancelAnimationFrame(frame)
   }, [detailPanel])
+
   const roles = session?.user.roles ?? []
   const canPlan =
     roles.includes('ADMIN') ||
     roles.includes('COMMERCIAL') ||
     roles.includes('ENGINEERING')
   const canDesign = roles.includes('ADMIN') || roles.includes('ENGINEERING')
-  const productionRouting = data.routingSheets.find(
-    (routing) => routing.purpose === 'PRODUCTION',
-  )
+  const {
+    productionRouting,
+    planningReady,
+    documentsReady,
+    routingReady,
+    readyForProduction,
+    caseDocuments,
+    materialLabel,
+    documentSummary,
+    routingSummary,
+  } = getWorkOrderPreparationPresentation(data)
   const documentsEditable =
     canPlan &&
     data.workOrder.status === 'CREATED' &&
@@ -251,37 +222,6 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
     }
   }
 
-  const planningReady =
-    Boolean(data.workOrder.plannedQuantity) &&
-    Boolean(data.workOrder.plannedStartDate) &&
-    Boolean(data.workOrder.plannedEndDate)
-  const documentsReady = data.workOrder.pinnedDocuments.length > 0
-  const routingReady = productionRouting?.status === 'RELEASED'
-  const readyForProduction = planningReady && documentsReady && routingReady
-
-  const caseDocuments = data.documents.filter(
-    ({ document }) => document.caseId !== null,
-  )
-  const pinnedDocument =
-    data.workOrder.pinnedDocuments.find((document) =>
-      /PLAN|DRAW|TECH/i.test(document.documentType),
-    ) ?? data.workOrder.pinnedDocuments.at(0)
-  const availableDocument = caseDocuments.at(0)?.document
-
-  const documentSummary = pinnedDocument
-    ? `${pinnedDocument.documentName} · v${pinnedDocument.version} fijada`
-    : availableDocument
-      ? `${availableDocument.name} · v${availableDocument.currentVersion.version} disponible`
-      : 'Sin documento disponible'
-
-  const routingSummary = !productionRouting
-    ? 'Pendiente'
-    : productionRouting.status === 'DRAFT'
-      ? `Borrador · ${productionRouting.operations.length} operaciones`
-      : productionRouting.status === 'APPROVED'
-        ? 'Aprobada · pendiente liberar'
-        : `Liberada · ${productionRouting.operations.length} operaciones`
-
   return (
     <div className="space-y-3">
       {!session ? (
@@ -300,7 +240,8 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
               Preparar la orden para producción
             </h2>
             <p className="mt-1 text-[8px] leading-4 text-slate-500">
-              La fabricación debe quedar cerrada antes de la entrega comprometida.
+              La fabricación debe quedar cerrada antes de la entrega
+              comprometida.
             </p>
           </div>
 
@@ -317,12 +258,13 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
               Material definido en expediente
             </p>
             <p className="mt-1 text-[10px] font-semibold text-slate-900">
-              {getMaterialLabel(data)} ·{' '}
+              {materialLabel} ·{' '}
               {data.workOrder.plannedQuantity ?? data.workOrder.source.quantity}{' '}
               piezas
             </p>
             <p className="mt-1 text-[7px] leading-3.5 text-slate-500">
-              Los lotes y consumos se registrarán durante la ejecución de producción.
+              Los lotes y consumos se registrarán durante la ejecución de
+              producción.
             </p>
           </div>
 
@@ -415,108 +357,42 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
           </div>
         </section>
 
-        <aside className="flex h-full flex-col rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              Preparación para producción
-            </p>
-            <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
-              Requisitos para liberar la OT
-            </h2>
-          </div>
-
-          <div className="mt-5 space-y-5">
-            <Requirement
-              complete={planningReady}
-              label="Fechas planeadas"
-              detail={
-                planningReady
-                  ? 'Planificación operativa completa'
-                  : 'Define inicio y fin planeados'
-              }
-            />
-            <Requirement
-              complete={documentsReady}
-              label="Documento de fabricación"
-              detail={
-                documentsReady
-                  ? 'Versión concreta fijada para la OT'
-                  : 'Falta fijar una versión documental'
-              }
-            />
-            <Requirement
-              complete={routingReady}
-              label="Hoja de ruta liberada"
-              detail={
-                routingReady
-                  ? 'Aprobada y liberada a Producción'
-                  : productionRouting?.status === 'APPROVED'
-                    ? 'Aprobada, pendiente de liberar'
-                    : 'La ruta aún no está cerrada'
-              }
-            />
-          </div>
-
-          <div
-            className={
-              readyForProduction
-                ? 'mt-auto rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-3'
-                : 'mt-auto rounded-xl border border-blue-100 bg-blue-50/55 px-3 py-3'
-            }
-          >
-            <p
-              className={
-                readyForProduction
-                  ? 'text-[8px] font-semibold text-emerald-900'
-                  : 'text-[8px] font-semibold text-blue-900'
-              }
-            >
-              {readyForProduction
-                ? 'Paquete operativo completo'
-                : 'Todavía hay requisitos pendientes'}
-            </p>
-            <p
-              className={
-                readyForProduction
-                  ? 'mt-1 text-[7px] leading-3.5 text-emerald-800'
-                  : 'mt-1 text-[7px] leading-3.5 text-blue-800'
-              }
-            >
-              {readyForProduction
-                ? 'La orden puede avanzar a producción conforme a las reglas del backend.'
-                : 'READY_FOR_PRODUCTION aparece cuando planificación, documentos y routing están cerrados.'}
-            </p>
-          </div>
-        </aside>
+        <WorkOrderPreparationChecklist
+          planningReady={planningReady}
+          documentsReady={documentsReady}
+          routingReady={routingReady}
+          routingApproved={productionRouting?.status === 'APPROVED'}
+          readyForProduction={readyForProduction}
+        />
       </div>
 
       {detailPanel === 'routing' ? (
         <div ref={routingPanelRef} className="scroll-mt-20">
           <WorkOrderRoutingCard
-          routing={productionRouting}
-          workOrderStatus={data.workOrder.status}
-          pinnedDocumentCount={data.workOrder.pinnedDocuments.length}
-          planningReady={planningReady}
-          canDesign={canDesign}
-          pending={{
-            create: mutations.createRouting.isPending,
-            operation:
-              mutations.addOperation.isPending ||
-              mutations.updateOperation.isPending ||
-              mutations.removeOperation.isPending,
-            approve: mutations.approveRouting.isPending,
-            reopen: mutations.reopenRouting.isPending,
-            release: mutations.releaseRouting.isPending,
-          }}
-          error={routingError}
-          onCreate={createRouting}
-          onAdd={addOperation}
-          onUpdate={updateOperation}
-          onRemove={removeOperation}
-          onApprove={approveRouting}
-          onReopen={reopenRouting}
-          onRelease={releaseRouting}
-        />
+            routing={productionRouting}
+            workOrderStatus={data.workOrder.status}
+            pinnedDocumentCount={data.workOrder.pinnedDocuments.length}
+            planningReady={planningReady}
+            canDesign={canDesign}
+            pending={{
+              create: mutations.createRouting.isPending,
+              operation:
+                mutations.addOperation.isPending ||
+                mutations.updateOperation.isPending ||
+                mutations.removeOperation.isPending,
+              approve: mutations.approveRouting.isPending,
+              reopen: mutations.reopenRouting.isPending,
+              release: mutations.releaseRouting.isPending,
+            }}
+            error={routingError}
+            onCreate={createRouting}
+            onAdd={addOperation}
+            onUpdate={updateOperation}
+            onRemove={removeOperation}
+            onApprove={approveRouting}
+            onReopen={reopenRouting}
+            onRelease={releaseRouting}
+          />
         </div>
       ) : null}
     </div>
