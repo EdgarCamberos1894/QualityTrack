@@ -1,0 +1,87 @@
+name: Temporary landing scroll refactor
+
+on:
+  push:
+    branches:
+      - tmp/landing-scroll-refactor
+    paths:
+      - .github/workflows/temp-landing-scroll-refactor.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply-refactor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: tmp/landing-scroll-refactor
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Apply refactor
+        run: python frontend/scripts/apply-landing-scroll-refactor.py
+
+      - name: Format touched files
+        working-directory: frontend
+        run: >-
+          npx prettier --write
+          src/modules/landing/components/RequestSection.tsx
+          src/modules/landing/components/CaseSection.tsx
+          src/modules/landing/components/QuoteSection.tsx
+          src/modules/landing/components/WorkOrderSection.tsx
+          src/modules/landing/components/ProductionSection.tsx
+          src/modules/landing/components/QualitySection.tsx
+          src/modules/landing/components/DeliverySection.tsx
+
+      - name: Lint touched files
+        working-directory: frontend
+        run: >-
+          npx eslint
+          src/modules/landing/components/RequestSection.tsx
+          src/modules/landing/components/CaseSection.tsx
+          src/modules/landing/components/QuoteSection.tsx
+          src/modules/landing/components/WorkOrderSection.tsx
+          src/modules/landing/components/ProductionSection.tsx
+          src/modules/landing/components/QualitySection.tsx
+          src/modules/landing/components/DeliverySection.tsx
+          src/modules/landing/hooks/usePinnedSectionProgress.ts
+
+      - name: Typecheck
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Check architecture
+        working-directory: frontend
+        run: npm run architecture:check
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Commit generated refactor
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            frontend/src/modules/landing/components/RequestSection.tsx \
+            frontend/src/modules/landing/components/CaseSection.tsx \
+            frontend/src/modules/landing/components/QuoteSection.tsx \
+            frontend/src/modules/landing/components/WorkOrderSection.tsx \
+            frontend/src/modules/landing/components/ProductionSection.tsx \
+            frontend/src/modules/landing/components/QualitySection.tsx \
+            frontend/src/modules/landing/components/DeliverySection.tsx
+          git diff --cached --check
+          git commit -m "refactor(landing): generate pinned section scroll migration"
+          git push origin HEAD:tmp/landing-scroll-refactor
