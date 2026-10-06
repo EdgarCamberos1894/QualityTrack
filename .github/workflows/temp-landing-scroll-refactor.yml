@@ -1,5 +1,6 @@
 name: Temporary landing scroll refactor
 
+# retry: architecture baseline aligned to CI line counting
 on:
   push:
     branches:
