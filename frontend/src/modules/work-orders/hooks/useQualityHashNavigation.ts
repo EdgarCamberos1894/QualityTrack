@@ -1,4 +1,3 @@
-// quality-refactor-validation
 import { useEffect } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import type { QualityInspectionDto } from '../types/quality.types'
