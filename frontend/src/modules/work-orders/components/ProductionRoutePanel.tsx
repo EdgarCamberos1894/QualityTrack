@@ -99,28 +99,28 @@ export function ProductionRoutePanel({
             <p className="text-[7px] text-slate-400">
               Selecciona una operación para ver sus acciones y estado.
             </p>
-            <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+            <div className="inline-flex w-fit rounded-md border border-slate-200 bg-slate-50 p-0.5">
               <button
                 type="button"
                 onClick={() => onRouteViewChange('flow')}
                 className={
                   routeView === 'flow'
-                    ? 'rounded-md bg-white px-2.5 py-1.5 text-[7.5px] font-semibold text-blue-700 shadow-sm'
-                    : 'rounded-md px-2.5 py-1.5 text-[7.5px] font-semibold text-slate-500'
+                    ? '!h-7 rounded-md bg-white !px-2.5 !py-0 !text-[8px] font-semibold !leading-none text-blue-700 shadow-sm'
+                    : '!h-7 rounded-md !px-2.5 !py-0 !text-[8px] font-semibold !leading-none text-slate-500 hover:text-slate-800'
                 }
               >
-                Flujo
+                Proceso
               </button>
               <button
                 type="button"
                 onClick={() => onRouteViewChange('list')}
                 className={
                   routeView === 'list'
-                    ? 'rounded-md bg-white px-2.5 py-1.5 text-[7.5px] font-semibold text-blue-700 shadow-sm'
-                    : 'rounded-md px-2.5 py-1.5 text-[7.5px] font-semibold text-slate-500'
+                    ? '!h-7 rounded-md bg-white !px-2.5 !py-0 !text-[8px] font-semibold !leading-none text-blue-700 shadow-sm'
+                    : '!h-7 rounded-md !px-2.5 !py-0 !text-[8px] font-semibold !leading-none text-slate-500 hover:text-slate-800'
                 }
               >
-                Lista
+                Operaciones
               </button>
             </div>
           </div>
