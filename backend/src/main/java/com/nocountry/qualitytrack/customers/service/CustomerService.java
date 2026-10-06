@@ -17,6 +17,7 @@ import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.users.enums.AccountType;
 import com.nocountry.qualitytrack.users.repository.UserRepository;
+import com.nocountry.qualitytrack.users.service.DemoAccountPolicy;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMembershipRepository membershipRepository;
     private final UserRepository userRepository;
+    private final DemoAccountPolicy demoAccountPolicy;
 
     @Transactional
     public CustomerResponse createCustomer(Long currentUserId, CreateCustomerRequest request) {
@@ -93,6 +95,7 @@ public class CustomerService {
             Long customerId,
             UpdateCustomerRequest request
     ) {
+        demoAccountPolicy.requireIdentityMutationAllowed(currentUserId);
         requireActiveAdmin(currentUserId, customerId);
         validateUpdateHasChanges(request);
 
@@ -130,6 +133,7 @@ public class CustomerService {
             Long userId,
             UpdateCustomerMemberRoleRequest request
     ) {
+        demoAccountPolicy.requireIdentityMutationAllowed(currentUserId);
         customerRepository.findByIdForUpdate(customerId)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.RESOURCE_NOT_FOUND,
@@ -175,6 +179,7 @@ public class CustomerService {
 
     @Transactional
     public void removeMember(Long currentUserId, Long customerId, Long userId) {
+        demoAccountPolicy.requireIdentityMutationAllowed(currentUserId);
         customerRepository.findByIdForUpdate(customerId)
                 .orElseThrow(() -> new BusinessException(
                         ApiErrorCode.RESOURCE_NOT_FOUND,
