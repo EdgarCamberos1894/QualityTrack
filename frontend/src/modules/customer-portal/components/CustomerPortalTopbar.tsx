@@ -1,8 +1,5 @@
 import { useLocation } from 'react-router-dom'
-import {
-  isPublicDemoAccount,
-  type AuthenticatedUser,
-} from '@/modules/auth'
+import { isPublicDemoAccount, type AuthenticatedUser } from '@/modules/auth'
 import { TopbarActionIcon } from '@/shared/components/navigation/TopbarActionIcon'
 import { TopbarBreadcrumb } from '@/shared/components/navigation/TopbarBreadcrumb'
 import { TopbarUserMenu } from '@/shared/components/navigation/TopbarUserMenu'
@@ -93,8 +90,14 @@ export function CustomerPortalTopbar({
         <TopbarUserMenu
           email={user.email}
           roleLabel={roleLabels[customer.role]}
-          accountLabel={demoAccount ? 'Portal de cliente · Demo' : 'Portal de cliente'}
-          detailLabel={demoAccount ? 'Industrias Nova · Datos demo' : customer.customerName}
+          accountLabel={
+            demoAccount ? 'Portal de cliente · Demo' : 'Portal de cliente'
+          }
+          detailLabel={
+            demoAccount
+              ? 'Industrias Nova · Datos demo'
+              : customer.customerName
+          }
           onProfile={onProfile}
           onLogout={onLogout}
         />
