@@ -2,11 +2,7 @@ import { useEffect } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import type { QualityInspectionDto } from '../types/quality.types'
 
-export type QualityDetail =
-  | 'nonConformity'
-  | 'materials'
-  | 'history'
-  | null
+export type QualityDetail = 'nonConformity' | 'materials' | 'history' | null
 
 interface UseQualityHashNavigationArgs {
   hash: string
