@@ -4,15 +4,16 @@ import com.nocountry.qualitytrack.customers.entity.Customer;
 import com.nocountry.qualitytrack.quotations.entity.Quotation;
 import com.nocountry.qualitytrack.quotations.enums.CustomerQuotationStatus;
 import com.nocountry.qualitytrack.quotations.enums.QuotationStatus;
+import com.nocountry.qualitytrack.quotations.repository.QuotationAdjustmentRequestRepository;
+import com.nocountry.qualitytrack.quotations.repository.QuotationRepository;
 import com.nocountry.qualitytrack.requests.entity.CustomerRequest;
 import com.nocountry.qualitytrack.requests.entity.JobCase;
-import com.nocountry.qualitytrack.quotations.repository.QuotationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
 import java.util.List;
@@ -32,6 +33,9 @@ class QuotationServiceTest {
     private QuotationRepository quotationRepository;
 
     @Mock
+    private QuotationAdjustmentRequestRepository adjustmentRequestRepository;
+
+    @Mock
     private QuotationAccessPolicy accessPolicy;
 
     @Mock
@@ -43,6 +47,7 @@ class QuotationServiceTest {
     void setUp() {
         service = new QuotationService(
                 quotationRepository,
+                adjustmentRequestRepository,
                 accessPolicy,
                 quotationSourceService
         );
