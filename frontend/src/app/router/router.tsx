@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { AppShell } from '@/app/layout/AppShell'
 import { AccountHomeRedirect } from '@/app/router/AccountHomeRedirect'
@@ -15,47 +16,94 @@ import {
   ResetPasswordPage,
   VerifyEmailPage,
 } from '@/modules/auth'
-import {
-  CustomerCompanyPage,
-  CustomerMembersPage,
-  CustomerPortalHomePage,
-  CustomerPortalLandingPage,
-  CustomerPortalShell,
-  CustomerRequestCreatePage,
-  CustomerRequestDetailPage,
-  CustomerRequestsPage,
-} from '@/modules/customer-portal'
-import { DocumentCenterPage } from '@/modules/document-center'
-import { HomePage } from '@/modules/home'
-import { JobCaseDetailPage, JobCasesPage } from '@/modules/job-cases'
-import {
-  InternalCustomerDetailPage,
-  InternalCustomersPage,
-} from '@/modules/internal-customers'
-import { InternalUsersPage } from '@/modules/internal-users'
-import { LandingPage } from '@/modules/landing'
-import {
-  MachinesPage,
-  MaterialsPage,
-  OperationalResourcesPage,
-} from '@/modules/operational-resources'
-import {
-  CustomerQuotationDetailPage,
-  CustomerQuotationsPage,
-  QuotationDetailPage,
-  QuotationsPage,
-} from '@/modules/quotations'
-import { CustomerProfilePage, InternalProfilePage } from '@/modules/user-profile'
-import {
-  DeliveriesPage,
-  ProductionPage,
-  QualityPage,
-  WorkOrderDetailPage,
-  WorkOrdersPage,
-} from '@/modules/work-orders'
+
+type LazyModule = object
+
+function lazyComponent<TModule extends LazyModule>(
+  loader: () => Promise<TModule>,
+  exportName: keyof TModule,
+) {
+  return async () => {
+    const module = await loader()
+    return { Component: module[exportName] as ComponentType }
+  }
+}
+
+const lazyCustomerPortal = (exportName: string) =>
+  lazyComponent(
+    () => import('@/modules/customer-portal'),
+    exportName as keyof Awaited<ReturnType<typeof importCustomerPortal>>,
+  )
+
+function importCustomerPortal() {
+  return import('@/modules/customer-portal')
+}
+
+const lazyJobCases = (exportName: string) =>
+  lazyComponent(
+    () => import('@/modules/job-cases'),
+    exportName as keyof Awaited<ReturnType<typeof importJobCases>>,
+  )
+
+function importJobCases() {
+  return import('@/modules/job-cases')
+}
+
+const lazyQuotations = (exportName: string) =>
+  lazyComponent(
+    () => import('@/modules/quotations'),
+    exportName as keyof Awaited<ReturnType<typeof importQuotations>>,
+  )
+
+function importQuotations() {
+  return import('@/modules/quotations')
+}
+
+const lazyWorkOrders = (exportName: string) =>
+  lazyComponent(
+    () => import('@/modules/work-orders'),
+    exportName as keyof Awaited<ReturnType<typeof importWorkOrders>>,
+  )
+
+function importWorkOrders() {
+  return import('@/modules/work-orders')
+}
+
+const lazyResources = (exportName: string) =>
+  lazyComponent(
+    () => import('@/modules/operational-resources'),
+    exportName as keyof Awaited<ReturnType<typeof importResources>>,
+  )
+
+function importResources() {
+  return import('@/modules/operational-resources')
+}
+
+const lazyInternalCustomers = (exportName: string) =>
+  lazyComponent(
+    () => import('@/modules/internal-customers'),
+    exportName as keyof Awaited<ReturnType<typeof importInternalCustomers>>,
+  )
+
+function importInternalCustomers() {
+  return import('@/modules/internal-customers')
+}
+
+const lazyProfiles = (exportName: string) =>
+  lazyComponent(
+    () => import('@/modules/user-profile'),
+    exportName as keyof Awaited<ReturnType<typeof importProfiles>>,
+  )
+
+function importProfiles() {
+  return import('@/modules/user-profile')
+}
 
 export const router = createBrowserRouter([
-  { path: '/', element: <LandingPage /> },
+  {
+    path: '/',
+    lazy: lazyComponent(() => import('@/modules/landing'), 'LandingPage'),
+  },
   { path: '/verify-email', element: <VerifyEmailPage /> },
   { path: '/reset-password', element: <ResetPasswordPage /> },
   {
@@ -85,36 +133,60 @@ export const router = createBrowserRouter([
           {
             element: <AppShell />,
             children: [
-              { path: '/dashboard', element: <HomePage /> },
-              { path: '/profile', element: <InternalProfilePage /> },
-              { path: '/job-cases', element: <JobCasesPage /> },
+              {
+                path: '/dashboard',
+                lazy: lazyComponent(() => import('@/modules/home'), 'HomePage'),
+              },
+              {
+                path: '/profile',
+                lazy: lazyProfiles('InternalProfilePage'),
+              },
+              { path: '/job-cases', lazy: lazyJobCases('JobCasesPage') },
               {
                 path: '/job-cases/:caseId',
-                element: <JobCaseDetailPage />,
+                lazy: lazyJobCases('JobCaseDetailPage'),
               },
-              { path: '/quotations', element: <QuotationsPage /> },
+              { path: '/quotations', lazy: lazyQuotations('QuotationsPage') },
               {
                 path: '/quotations/:quotationId',
-                element: <QuotationDetailPage />,
+                lazy: lazyQuotations('QuotationDetailPage'),
               },
-              { path: '/work-orders', element: <WorkOrdersPage /> },
+              { path: '/work-orders', lazy: lazyWorkOrders('WorkOrdersPage') },
               {
                 path: '/work-orders/:workOrderId',
-                element: <WorkOrderDetailPage />,
+                lazy: lazyWorkOrders('WorkOrderDetailPage'),
               },
-              { path: '/production', element: <ProductionPage /> },
-              { path: '/machines', element: <MachinesPage /> },
-              { path: '/materials', element: <MaterialsPage /> },
-              { path: '/resources', element: <OperationalResourcesPage /> },
-              { path: '/quality', element: <QualityPage /> },
-              { path: '/deliveries', element: <DeliveriesPage /> },
-              { path: '/documents', element: <DocumentCenterPage /> },
-              { path: '/customers', element: <InternalCustomersPage /> },
+              { path: '/production', lazy: lazyWorkOrders('ProductionPage') },
+              { path: '/machines', lazy: lazyResources('MachinesPage') },
+              { path: '/materials', lazy: lazyResources('MaterialsPage') },
+              {
+                path: '/resources',
+                lazy: lazyResources('OperationalResourcesPage'),
+              },
+              { path: '/quality', lazy: lazyWorkOrders('QualityPage') },
+              { path: '/deliveries', lazy: lazyWorkOrders('DeliveriesPage') },
+              {
+                path: '/documents',
+                lazy: lazyComponent(
+                  () => import('@/modules/document-center'),
+                  'DocumentCenterPage',
+                ),
+              },
+              {
+                path: '/customers',
+                lazy: lazyInternalCustomers('InternalCustomersPage'),
+              },
               {
                 path: '/customers/:customerId',
-                element: <InternalCustomerDetailPage />,
+                lazy: lazyInternalCustomers('InternalCustomerDetailPage'),
               },
-              { path: '/internal-users', element: <InternalUsersPage /> },
+              {
+                path: '/internal-users',
+                lazy: lazyComponent(
+                  () => import('@/modules/internal-users'),
+                  'InternalUsersPage',
+                ),
+              },
             ],
           },
         ],
@@ -122,45 +194,48 @@ export const router = createBrowserRouter([
       {
         element: <CustomerOnlyRoute />,
         children: [
-          { path: '/portal', element: <CustomerPortalLandingPage /> },
           {
-            element: <CustomerPortalShell />,
+            path: '/portal',
+            lazy: lazyCustomerPortal('CustomerPortalLandingPage'),
+          },
+          {
+            lazy: lazyCustomerPortal('CustomerPortalShell'),
             children: [
               {
                 path: '/portal/:customerId',
-                element: <CustomerPortalHomePage />,
+                lazy: lazyCustomerPortal('CustomerPortalHomePage'),
               },
               {
                 path: '/portal/:customerId/profile',
-                element: <CustomerProfilePage />,
+                lazy: lazyProfiles('CustomerProfilePage'),
               },
               {
                 path: '/portal/:customerId/requests',
-                element: <CustomerRequestsPage />,
+                lazy: lazyCustomerPortal('CustomerRequestsPage'),
               },
               {
                 path: '/portal/:customerId/requests/new',
-                element: <CustomerRequestCreatePage />,
+                lazy: lazyCustomerPortal('CustomerRequestCreatePage'),
               },
               {
                 path: '/portal/:customerId/requests/:requestId',
-                element: <CustomerRequestDetailPage />,
+                lazy: lazyCustomerPortal('CustomerRequestDetailPage'),
               },
               {
                 path: '/portal/:customerId/members',
-                element: <CustomerMembersPage />,
+                lazy: lazyCustomerPortal('CustomerMembersPage'),
               },
               {
                 path: '/portal/:customerId/company',
-                element: <CustomerCompanyPage />,
+                lazy: lazyCustomerPortal('CustomerCompanyPage'),
               },
               {
                 path: '/portal/:customerId/quotations',
-                element: <CustomerQuotationsPage />,
+                lazy: lazyQuotations('CustomerQuotationsPage'),
               },
               {
                 path: '/portal/:customerId/quotations/:quotationId',
-                element: <CustomerQuotationDetailPage />,
+                lazy: lazyQuotations('CustomerQuotationDetailPage'),
               },
             ],
           },

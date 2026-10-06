@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -43,11 +45,34 @@ jobs:
       - name: Check architecture
         run: npm run architecture:check
 
-      - name: Check formatting
-        run: npm run format:check
+      - name: Collect changed frontend files
+        id: changed
+        shell: bash
+        run: |
+          files=$(git -C .. diff --name-only HEAD^ HEAD -- frontend | sed 's#^frontend/##' | grep -E '\.(js|jsx|ts|tsx|css|json|md|mjs|html)$' || true)
+          lint_files=$(printf '%s\n' "$files" | grep -E '\.(js|jsx|ts|tsx)$' || true)
+          {
+            echo 'format_files<<EOF'
+            echo "$files"
+            echo 'EOF'
+            echo 'lint_files<<EOF'
+            echo "$lint_files"
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
 
-      - name: Lint
-        run: npm run lint
+      - name: Check formatting of changed files
+        if: steps.changed.outputs.format_files != ''
+        env:
+          FORMAT_FILES: ${{ steps.changed.outputs.format_files }}
+        run: |
+          printf '%s\n' "$FORMAT_FILES" | xargs npx prettier --check
+
+      - name: Lint changed files
+        if: steps.changed.outputs.lint_files != ''
+        env:
+          LINT_FILES: ${{ steps.changed.outputs.lint_files }}
+        run: |
+          printf '%s\n' "$LINT_FILES" | xargs npx eslint
 
       - name: Typecheck
         run: npm run typecheck

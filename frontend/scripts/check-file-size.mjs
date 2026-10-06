@@ -39,7 +39,7 @@ const violations = []
 for (const file of files) {
   const content = await readFile(file, 'utf8')
   const lineCount = content.split(/\r?\n/).length
-  const relativePath = path.relative(sourceRoot, file)
+  const relativePath = path.relative(sourceRoot, file).split(path.sep).join('/')
 
   if (lineCount > errorLimit) {
     const baselineLimit = baseline[relativePath]
