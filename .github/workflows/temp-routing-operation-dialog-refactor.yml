@@ -1,0 +1,74 @@
+name: Temp Routing Operation Dialog Refactor
+
+on:
+  push:
+    branches:
+      - feature/tmp-routing-operation-dialog-refactor
+
+permissions:
+  contents: write
+
+jobs:
+  refactor-and-validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Pin npm
+        run: npm install --global npm@10.9.0
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci --include=optional --legacy-peer-deps
+
+      - name: Apply refactor
+        run: python .github/scripts/apply-routing-operation-dialog-refactor.py
+
+      - name: Format product files
+        working-directory: frontend
+        run: npx prettier --write scripts/architecture-baseline.json src/modules/work-orders/components/RoutingOperationDialog.tsx src/modules/work-orders/model/routingOperationPresenter.ts
+
+      - name: Audit dependencies
+        working-directory: frontend
+        run: npm audit --audit-level=high
+
+      - name: Check architecture
+        working-directory: frontend
+        run: npm run architecture:check
+
+      - name: Lint product files
+        working-directory: frontend
+        run: npx eslint src/modules/work-orders/components/RoutingOperationDialog.tsx src/modules/work-orders/model/routingOperationPresenter.ts
+
+      - name: Typecheck
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Diff hygiene
+        run: git diff --check
+
+      - name: Commit validated product files
+        run: |
+          if git diff --quiet -- frontend/scripts/architecture-baseline.json frontend/src/modules/work-orders/components/RoutingOperationDialog.tsx frontend/src/modules/work-orders/model/routingOperationPresenter.ts; then
+            echo "No product changes to commit"
+            exit 0
+          fi
+          git config user.name "Edgar Camberos"
+          git config user.email "157107597+EdgarCamberos1894@users.noreply.github.com"
+          git add frontend/scripts/architecture-baseline.json frontend/src/modules/work-orders/components/RoutingOperationDialog.tsx frontend/src/modules/work-orders/model/routingOperationPresenter.ts
+          git commit -m "refactor(work-orders): extract routing operation sequencing"
+          git push origin HEAD:feature/tmp-routing-operation-dialog-refactor
