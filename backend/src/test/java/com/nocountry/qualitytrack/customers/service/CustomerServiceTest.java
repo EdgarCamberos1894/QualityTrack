@@ -15,6 +15,7 @@ import com.nocountry.qualitytrack.shared.exception.BusinessException;
 import com.nocountry.qualitytrack.users.entity.User;
 import com.nocountry.qualitytrack.users.enums.AccountType;
 import com.nocountry.qualitytrack.users.repository.UserRepository;
+import com.nocountry.qualitytrack.users.service.DemoAccountPolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,32 +40,25 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CustomerServiceTest {
 
-    @Mock
-    private CustomerRepository customerRepository;
-
-    @Mock
-    private CustomerMembershipRepository membershipRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private User user;
-
-    @Mock
-    private Customer customer;
-
-    @Mock
-    private CustomerMembership actorMembership;
-
-    @Mock
-    private CustomerMembership targetMembership;
+    @Mock private CustomerRepository customerRepository;
+    @Mock private CustomerMembershipRepository membershipRepository;
+    @Mock private UserRepository userRepository;
+    @Mock private DemoAccountPolicy demoAccountPolicy;
+    @Mock private User user;
+    @Mock private Customer customer;
+    @Mock private CustomerMembership actorMembership;
+    @Mock private CustomerMembership targetMembership;
 
     private CustomerService service;
 
     @BeforeEach
     void setUp() {
-        service = new CustomerService(customerRepository, membershipRepository, userRepository);
+        service = new CustomerService(
+                customerRepository,
+                membershipRepository,
+                userRepository,
+                demoAccountPolicy
+        );
     }
 
     @Test
