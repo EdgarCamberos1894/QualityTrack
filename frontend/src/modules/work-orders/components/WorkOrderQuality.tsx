@@ -1,3 +1,4 @@
+// quality-refactor-validation
 import { useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { useSessionStore } from '@/modules/auth'
