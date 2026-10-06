@@ -1,0 +1,15 @@
+{
+  "modules/customer-portal/components/CustomerRequestOverview.tsx": 551,
+  "modules/customer-portal/pages/CustomerMembersPage.tsx": 558,
+  "modules/landing/components/CaseSection.tsx": 676,
+  "modules/landing/components/DeliverySection.tsx": 693,
+  "modules/landing/components/ProductionSection.tsx": 759,
+  "modules/landing/components/QualitySection.tsx": 725,
+  "modules/landing/components/QuoteSection.tsx": 698,
+  "modules/landing/components/RequestSection.tsx": 633,
+  "modules/landing/components/WorkOrderSection.tsx": 711,
+  "modules/work-orders/components/RoutingOperationDialog.tsx": 505,
+  "modules/work-orders/components/WorkOrderPreparation.tsx": 525,
+  "modules/work-orders/components/WorkOrderProduction.tsx": 592,
+  "modules/work-orders/components/WorkOrderQuality.tsx": 503
+}

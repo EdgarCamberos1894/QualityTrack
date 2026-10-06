@@ -20,7 +20,6 @@
   overscroll-behavior: contain;
 }
 
-/* Dialogs that already separate their heading into a first block. */
 :where([role='dialog'][aria-modal='true'])
   > :where(header, div):first-child:has(h2) {
   border-bottom-color: rgb(219 234 254 / 0.9) !important;
@@ -45,12 +44,11 @@
 :where([role='dialog'][aria-modal='true'])
   > :where(header, div):first-child:has(h2)
   p:not(:first-child) {
-  font-size: 0.5625rem !important;
+  font-size: 0.625rem !important;
   line-height: 1rem !important;
-  color: #64748b !important;
+  color: #475569 !important;
 }
 
-/* Older compact confirmations render h2/p directly in the dialog. */
 :where([role='dialog'][aria-modal='true']):has(> h2:first-child) {
   padding: 1rem 1.25rem 0 !important;
   background: linear-gradient(
@@ -72,12 +70,11 @@
 
 :where([role='dialog'][aria-modal='true']) > h2:first-child + p {
   margin-top: 0.25rem !important;
-  font-size: 0.5625rem !important;
+  font-size: 0.625rem !important;
   line-height: 1rem !important;
-  color: #64748b !important;
+  color: #475569 !important;
 }
 
-/* Legacy fields inherit the same compact density as the newer portal dialogs. */
 :where([role='dialog'][aria-modal='true'])
   :where(
     input[type='text'],
@@ -91,21 +88,20 @@
   min-height: 2.25rem !important;
   height: 2.25rem !important;
   border-radius: 0.5rem !important;
-  font-size: 0.625rem !important;
+  font-size: 0.6875rem !important;
 }
 
 :where([role='dialog'][aria-modal='true']) textarea {
   min-height: 4.25rem !important;
   border-radius: 0.5rem !important;
-  font-size: 0.625rem !important;
+  font-size: 0.6875rem !important;
   line-height: 1rem !important;
 }
 
 :where([role='dialog'][aria-modal='true']) label {
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
 }
 
-/* Keep action bars visually anchored instead of floating inside the body. */
 :where([role='dialog'][aria-modal='true']) > footer:last-child,
 :where([role='dialog'][aria-modal='true'])
   > div:last-child:has(> button) {
@@ -127,11 +123,10 @@
   min-height: 2rem !important;
   height: 2rem !important;
   padding-inline: 0.75rem !important;
-  font-size: 0.5625rem !important;
+  font-size: 0.625rem !important;
   line-height: 1 !important;
 }
 
-/* Destructive dialogs keep the same geometry with a restrained red cue. */
 :where(
     [role='dialog'][aria-modal='true'][aria-labelledby*='cancel'],
     [role='dialog'][aria-modal='true'][aria-labelledby*='reject'],
@@ -180,5 +175,29 @@
   :where([role='dialog'][aria-modal='true']) {
     max-height: calc(100dvh - 1.5rem);
     border-radius: 0.875rem !important;
+  }
+
+  :where([role='dialog'][aria-modal='true'])
+    :where(
+      input[type='text'],
+      input[type='email'],
+      input[type='tel'],
+      input[type='number'],
+      input[type='date'],
+      input[type='password'],
+      select
+    ) {
+    min-height: 2.75rem !important;
+    height: 2.75rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  :where([role='dialog'][aria-modal='true']) > footer:last-child button,
+  :where([role='dialog'][aria-modal='true'])
+    > div:last-child:has(> button)
+    > button {
+    min-height: 2.75rem !important;
+    height: 2.75rem !important;
+    font-size: 0.6875rem !important;
   }
 }

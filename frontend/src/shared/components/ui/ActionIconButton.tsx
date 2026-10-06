@@ -24,7 +24,7 @@ const toneClasses: Record<ActionIconTone, string> = {
   primary:
     'border-blue-100 bg-blue-50/70 text-blue-600 hover:border-blue-200 hover:bg-blue-100/70 hover:text-blue-700',
   danger:
-    'border-red-100 bg-red-50/70 text-red-500 hover:border-red-200 hover:bg-red-100/70 hover:text-red-700',
+    'border-red-100 bg-red-50/70 text-red-600 hover:border-red-200 hover:bg-red-100/70 hover:text-red-700',
 }
 
 export function ActionIconButton({
@@ -44,7 +44,7 @@ export function ActionIconButton({
       title={label}
       disabled={disabled || busy}
       className={cn(
-        'inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-lg border transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-45',
+        'inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-45 sm:h-8 sm:w-8',
         toneClasses[tone],
         className,
       )}
@@ -54,7 +54,7 @@ export function ActionIconButton({
         <svg
           viewBox="0 0 24 24"
           aria-hidden="true"
-          className="h-[13px] w-[13px] animate-spin"
+          className="h-3.5 w-3.5 animate-spin"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.8"
@@ -73,7 +73,7 @@ function ActionIcon({ name }: { name: ActionIconName }) {
   const commonProps = {
     viewBox: '0 0 24 24',
     'aria-hidden': true,
-    className: 'h-[13px] w-[13px]',
+    className: 'h-3.5 w-3.5',
     fill: 'none',
     stroke: 'currentColor',
     strokeWidth: 1.8,

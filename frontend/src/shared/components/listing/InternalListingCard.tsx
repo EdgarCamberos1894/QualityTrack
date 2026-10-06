@@ -110,10 +110,10 @@ export function InternalListingSummaryCell({
         className,
       )}
     >
-      <p className="text-[8px] font-bold uppercase tracking-wide text-slate-400">
+      <p className="text-[9px] font-bold uppercase tracking-wide text-slate-500 sm:text-[8px]">
         {label}
       </p>
-      <div className="mt-1 truncate text-[10px] font-semibold text-slate-900">
+      <div className="mt-1 truncate text-[11px] font-semibold text-slate-900 sm:text-[10px]">
         {value}
       </div>
     </div>

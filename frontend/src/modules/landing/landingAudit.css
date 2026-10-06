@@ -13,8 +13,6 @@
   }
 }
 
-/* Phones need a dedicated composition: keep the narrative pinned, but give the
- * visual stage most of the usable viewport so no chapter is clipped. */
 @media (max-width: 767px) {
   .qt-landing-root #solicitud {
     height: 235svh !important;
@@ -80,8 +78,6 @@
     transform-origin: top center;
   }
 
-  /* Production and quality depend on small moving parts. Keep them at native
-   * mobile scale so the piece, scan beam and inspection states remain legible. */
   .qt-production-pinned [class~='lg:hidden'][class*='h-[370px]'],
   .qt-quality-pinned [class~='lg:hidden'][class*='h-[370px]'] {
     margin-top: 0.2rem !important;
@@ -89,8 +85,6 @@
     transform-origin: top center;
   }
 
-  /* The 360 summary should replace the mobile history instead of sitting on
-   * top of it. Its existing scroll opacity now doubles as a clean crossfade. */
   .qt-case-pinned
     [class~='lg:hidden'][class*='h-[360px]']
     > .absolute.inset-0.grid.place-items-center {
@@ -158,13 +152,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .qt-landing-root *,
-  .qt-landing-root *::before,
-  .qt-landing-root *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    transition-delay: 0ms !important;
+  .qt-landing-root {
+    scroll-behavior: auto;
   }
 }

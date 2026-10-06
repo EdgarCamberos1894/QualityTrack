@@ -1,9 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TopbarActionIcon } from '@/shared/components/navigation/TopbarActionIcon'
 import { useGlobalSearch } from '../hooks/useGlobalSearch'
 import type { GlobalSearchResultDto } from '../types/globalSearch.types'
 import { GlobalSearchResults } from './GlobalSearchResults'
+
+const desktopListboxId = 'global-search-desktop-results'
+const mobileListboxId = 'global-search-mobile-results'
 
 export function GlobalSearch() {
   const navigate = useNavigate()
@@ -13,6 +16,7 @@ export function GlobalSearch() {
   const [query, setQuery] = useState('')
   const [desktopOpen, setDesktopOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(-1)
   const search = useGlobalSearch(query)
 
   const results = search.data?.results ?? []
@@ -64,12 +68,77 @@ export function GlobalSearch() {
     }
   }, [mobileOpen])
 
+  useEffect(() => {
+    if (results.length === 0) {
+      setActiveIndex(-1)
+      return
+    }
+
+    setActiveIndex((current) =>
+      current < 0 || current >= results.length ? 0 : current,
+    )
+  }, [results.length, query])
+
   const select = (result: GlobalSearchResultDto) => {
     setQuery('')
+    setActiveIndex(-1)
     setDesktopOpen(false)
     setMobileOpen(false)
     navigate(result.href)
   }
+
+  const handleSearchKeyDown = (
+    event: ReactKeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (results.length === 0) return
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      setActiveIndex((current) => (current + 1 + results.length) % results.length)
+      return
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      setActiveIndex((current) =>
+        (current - 1 + results.length) % results.length,
+      )
+      return
+    }
+
+    if (event.key === 'Home') {
+      event.preventDefault()
+      setActiveIndex(0)
+      return
+    }
+
+    if (event.key === 'End') {
+      event.preventDefault()
+      setActiveIndex(results.length - 1)
+      return
+    }
+
+    if (
+      event.key === 'Enter' &&
+      !search.isDebouncing &&
+      !search.isFetching
+    ) {
+      const selectedResult = results[activeIndex] ?? results[0]
+      if (selectedResult) {
+        event.preventDefault()
+        select(selectedResult)
+      }
+    }
+  }
+
+  const desktopActiveDescendant =
+    desktopOpen && activeIndex >= 0
+      ? `global-search-desktop-option-${activeIndex}`
+      : undefined
+  const mobileActiveDescendant =
+    mobileOpen && activeIndex >= 0
+      ? `global-search-mobile-option-${activeIndex}`
+      : undefined
 
   return (
     <>
@@ -80,33 +149,29 @@ export function GlobalSearch() {
         <div className="relative">
           <TopbarActionIcon
             name="search"
-            className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
+            className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500"
           />
           <input
             ref={desktopInputRef}
             type="search"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded={desktopOpen}
+            aria-controls={desktopListboxId}
+            aria-activedescendant={desktopActiveDescendant}
+            autoComplete="off"
             value={query}
             onFocus={() => setDesktopOpen(true)}
             onChange={(event) => {
               setQuery(event.target.value)
               setDesktopOpen(true)
             }}
-            onKeyDown={(event) => {
-              if (
-                event.key === 'Enter' &&
-                !search.isDebouncing &&
-                !search.isFetching &&
-                results[0]
-              ) {
-                event.preventDefault()
-                select(results[0])
-              }
-            }}
+            onKeyDown={handleSearchKeyDown}
             placeholder="Buscar folio, cliente, material…"
             aria-label="Búsqueda global"
-            className="h-9 w-full rounded-xl border border-slate-200 bg-slate-50/80 pl-9 pr-14 text-[10px] font-medium text-slate-900 outline-none transition placeholder:font-normal placeholder:text-slate-400 hover:border-slate-300 hover:bg-slate-50 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50"
+            className="h-9 w-full rounded-xl border border-slate-200 bg-slate-50/80 pl-9 pr-14 text-[10px] font-medium text-slate-900 outline-none transition placeholder:font-normal placeholder:text-slate-500 hover:border-slate-300 hover:bg-slate-50 focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-50"
           />
-          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[7px] font-semibold tracking-wide text-slate-400">
+          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[8px] font-semibold tracking-wide text-slate-500">
             Ctrl K
           </span>
         </div>
@@ -118,6 +183,10 @@ export function GlobalSearch() {
               results={results}
               pending={search.isFetching || search.isDebouncing}
               error={search.error}
+              activeIndex={activeIndex}
+              listboxId={desktopListboxId}
+              optionIdPrefix="global-search-desktop-option"
+              onActiveIndexChange={setActiveIndex}
               onSelect={select}
             />
           </div>
@@ -126,7 +195,7 @@ export function GlobalSearch() {
 
       <button
         type="button"
-        className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 md:hidden"
+        className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 md:hidden"
         onClick={() => setMobileOpen(true)}
         aria-label="Abrir búsqueda global"
       >
@@ -135,38 +204,39 @@ export function GlobalSearch() {
 
       {mobileOpen ? (
         <div className="fixed inset-0 z-[70] bg-slate-950/55 p-4 md:hidden">
-          <div className="mx-auto mt-12 w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Búsqueda global"
+            className="mx-auto mt-12 w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+          >
             <div className="flex items-center gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/60 p-3">
               <div className="relative min-w-0 flex-1">
                 <TopbarActionIcon
                   name="search"
-                  className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400"
+                  className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-500"
                 />
                 <input
                   ref={mobileInputRef}
                   type="search"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-expanded={mobileOpen}
+                  aria-controls={mobileListboxId}
+                  aria-activedescendant={mobileActiveDescendant}
+                  autoComplete="off"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (
-                      event.key === 'Enter' &&
-                      !search.isDebouncing &&
-                      !search.isFetching &&
-                      results[0]
-                    ) {
-                      event.preventDefault()
-                      select(results[0])
-                    }
-                  }}
+                  onKeyDown={handleSearchKeyDown}
                   placeholder="Buscar en QualityTrack…"
                   aria-label="Búsqueda global"
-                  className="h-9 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[10px] text-slate-950 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
+                  className="h-11 w-full rounded-xl border border-slate-300 bg-white pl-9 pr-3 text-[11px] text-slate-950 outline-none placeholder:text-slate-500 focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
                 />
               </div>
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
-                className="h-7 rounded-lg px-2.5 text-[8px] font-semibold text-slate-500 hover:bg-slate-100"
+                className="h-11 rounded-lg px-3 text-[10px] font-semibold text-slate-600 hover:bg-slate-100"
               >
                 Cerrar
               </button>
@@ -177,6 +247,10 @@ export function GlobalSearch() {
               results={results}
               pending={search.isFetching || search.isDebouncing}
               error={search.error}
+              activeIndex={activeIndex}
+              listboxId={mobileListboxId}
+              optionIdPrefix="global-search-mobile-option"
+              onActiveIndexChange={setActiveIndex}
               onSelect={select}
             />
           </div>

@@ -42,11 +42,21 @@ body {
   min-height: 100vh;
 }
 
+::selection {
+  background: #bfdbfe;
+  color: #0f172a;
+}
+
 button,
 input,
 select,
 textarea {
   font: inherit;
+}
+
+input,
+textarea {
+  caret-color: var(--qt-blue);
 }
 
 button,
