@@ -2,6 +2,7 @@ import type { BadgeProps } from '@/shared/components/ui/Badge'
 import type {
   OperationExecutionDto,
   OperationExecutionStatus,
+  RoutingOperationDto,
 } from '../types/workOrder.types'
 
 const executionPresentation: Record<
@@ -37,4 +38,10 @@ export function executionDurationMinutes(
   if (!Number.isFinite(started) || !Number.isFinite(finished)) return null
 
   return Math.max(0, Math.round((finished - started) / 60_000))
+}
+
+export function getProductionDependencyIds(
+  operation: RoutingOperationDto,
+): number[] {
+  return operation.prerequisiteOperationIds ?? []
 }

@@ -7,15 +7,15 @@ import { Button } from '@/shared/components/ui/Button'
 import { CancelExecutionDialog } from './CancelExecutionDialog'
 import { CompleteExecutionDialog } from './CompleteExecutionDialog'
 import { ProductionBlocker } from './ProductionBlocker'
+import { ProductionRoutePanel } from './ProductionRoutePanel'
 import { ProductionCurrentOperationPanel } from './ProductionCurrentOperationPanel'
 import { ProductionMaterialsCard } from './ProductionMaterialsCard'
 import { RecordMaterialConsumptionDialog } from './RecordMaterialConsumptionDialog'
-import { ProductionRouteList } from './ProductionRouteList'
 import { QualityHandoffPanel } from './QualityHandoffPanel'
-import { RoutingFlowView } from './RoutingFlowView'
 import { StartOperationDialog } from './StartOperationDialog'
+import { useProductionHashSelection } from '../hooks/useProductionHashSelection'
 import { useProductionMutations } from '../hooks/useProductionMutations'
-import { formatProductionDateTime } from '../model/productionPresenter'
+import { getProductionDependencyIds } from '../model/productionPresenter'
 import type {
   CancelOperationExecutionFormValues,
   CompleteOperationExecutionFormValues,
@@ -29,10 +29,6 @@ import type { WorkOrder360Dto } from '../types/workOrder360.types'
 
 interface WorkOrderProductionProps {
   data: WorkOrder360Dto
-}
-
-function dependencyIds(operation: RoutingOperationDto) {
-  return operation.prerequisiteOperationIds ?? []
 }
 
 export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
@@ -112,7 +108,9 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
     (operation) =>
       !completedOperationIds.has(operation.id) &&
       !inProgressOperationIds.has(operation.id) &&
-      dependencyIds(operation).every((id) => completedOperationIds.has(id)),
+      getProductionDependencyIds(operation).every((id) =>
+        completedOperationIds.has(id),
+      ),
   )
   const firstPendingOperation = operations.find(
     (operation) => !completedOperationIds.has(operation.id),
@@ -128,13 +126,12 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
 
   const selectedExecutions = selectedOperation
     ? productionExecutions.filter(
-        (execution) =>
-          execution.routingOperationId === selectedOperation.id,
+        (execution) => execution.routingOperationId === selectedOperation.id,
       )
     : []
 
   const selectedPendingPrerequisites = selectedOperation
-    ? dependencyIds(selectedOperation)
+    ? getProductionDependencyIds(selectedOperation)
         .filter((id) => !completedOperationIds.has(id))
         .map((id) => operations.find((operation) => operation.id === id)?.code)
         .filter((code): code is string => Boolean(code))
@@ -153,33 +150,13 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
   const materialRecordingOpen = data.workOrder.status === 'IN_PRODUCTION'
   const latestConsumption = data.materials.at(-1)
 
-  useEffect(() => {
-    const executionMatch = location.hash.match(/^#operation-execution-(\d+)$/)
-
-    if (executionMatch) {
-      const executionId = Number(executionMatch[1])
-      const execution = productionExecutions.find(
-        (item) => item.id === executionId,
-      )
-
-      if (execution) {
-        setSelectedOperationId(execution.routingOperationId)
-        setExpandedOperationId(execution.routingOperationId)
-      }
-      return
-    }
-
-    const operationMatch = location.hash.match(/^#routing-operation-(\d+)$/)
-
-    if (operationMatch) {
-      setSelectedOperationId(Number(operationMatch[1]))
-      return
-    }
-
-    if (location.hash.startsWith('#material-lot-')) {
-      setMaterialsOpen(true)
-    }
-  }, [location.hash, productionExecutions])
+  useProductionHashSelection({
+    hash: location.hash,
+    executions: productionExecutions,
+    setSelectedOperationId,
+    setExpandedOperationId,
+    setMaterialsOpen,
+  })
 
   useEffect(() => {
     if (!location.hash) return
@@ -321,117 +298,27 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
       ) : null}
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(300px,0.7fr)] lg:items-stretch">
-        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
-          <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/55 px-4 py-3">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-                  Ejecución de producción
-                </p>
-                <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
-                  Ruta activa de fabricación
-                </h2>
-                <p className="mt-1 text-[8px] leading-4 text-slate-500">
-                  Las ramas pueden avanzar en paralelo cuando sus dependencias estén completas.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-x-5 gap-y-1 text-right">
-                <div>
-                  <p className="text-[7px] text-slate-400">Inicio real</p>
-                  <p className="mt-0.5 text-[8px] font-semibold text-slate-800">
-                    {formatProductionDateTime(data.production.actualStartAt)}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[7px] text-slate-400">Fin real</p>
-                  <p className="mt-0.5 text-[8px] font-semibold text-slate-800">
-                    {formatProductionDateTime(data.production.actualEndAt)}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-3">
-              <div className="flex items-center justify-between gap-3 text-[8px] text-slate-500">
-                <span>Progreso de operaciones</span>
-                <span className="font-semibold text-slate-800">
-                  {completedOperations}/{totalOperations} · {progress}%
-                </span>
-              </div>
-              <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
-                <div
-                  className="h-full rounded-full bg-blue-600 transition-all"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {operations.length > 0 ? (
-            <div>
-              <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-3 py-2">
-                <p className="text-[7px] text-slate-400">
-                  Selecciona una operación para ver sus acciones y estado.
-                </p>
-                <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
-                  <button
-                    type="button"
-                    onClick={() => setRouteView('flow')}
-                    className={
-                      routeView === 'flow'
-                        ? 'rounded-md bg-white px-2.5 py-1.5 text-[7.5px] font-semibold text-blue-700 shadow-sm'
-                        : 'rounded-md px-2.5 py-1.5 text-[7.5px] font-semibold text-slate-500'
-                    }
-                  >
-                    Flujo
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRouteView('list')}
-                    className={
-                      routeView === 'list'
-                        ? 'rounded-md bg-white px-2.5 py-1.5 text-[7.5px] font-semibold text-blue-700 shadow-sm'
-                        : 'rounded-md px-2.5 py-1.5 text-[7.5px] font-semibold text-slate-500'
-                    }
-                  >
-                    Lista
-                  </button>
-                </div>
-              </div>
-
-              {routeView === 'flow' ? (
-                <div className="p-3">
-                  <RoutingFlowView
-                    operations={operations}
-                    executions={productionExecutions}
-                    routingReleased={routingReleased === true}
-                    selectedOperationId={selectedOperation?.id ?? null}
-                    onSelect={setSelectedOperationId}
-                  />
-                </div>
-              ) : (
-                <ProductionRouteList
-                  operations={operations}
-                  executions={productionExecutions}
-                  routingReleased={routingReleased === true}
-                  selectedOperationId={selectedOperation?.id ?? null}
-                  expandedOperationId={expandedOperationId}
-                  onSelect={setSelectedOperationId}
-                  onToggleAttempts={(operationId) =>
-                    setExpandedOperationId((current) =>
-                      current === operationId ? null : operationId,
-                    )
-                  }
-                />
-              )}
-            </div>
-          ) : productionRouting ? (
-            <div className="p-4">
-              <ProductionBlocker text="La hoja de ruta no contiene operaciones ejecutables." />
-            </div>
-          ) : null}
-        </section>
+        <ProductionRoutePanel
+          actualStartAt={data.production.actualStartAt}
+          actualEndAt={data.production.actualEndAt}
+          operations={operations}
+          executions={productionExecutions}
+          routingReleased={routingReleased === true}
+          selectedOperationId={selectedOperation?.id ?? null}
+          expandedOperationId={expandedOperationId}
+          completedOperations={completedOperations}
+          totalOperations={totalOperations}
+          progress={progress}
+          routeView={routeView}
+          hasProductionRouting={Boolean(productionRouting)}
+          onRouteViewChange={setRouteView}
+          onSelect={setSelectedOperationId}
+          onToggleAttempts={(operationId) =>
+            setExpandedOperationId((current) =>
+              current === operationId ? null : operationId,
+            )
+          }
+        />
 
         <aside className="flex h-full flex-col rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
           {data.production.productionCompleted ? (
@@ -440,10 +327,12 @@ export function WorkOrderProduction({ data }: WorkOrderProductionProps) {
                 Producción completada
               </p>
               <h2 className="mt-0.5 text-[13px] font-semibold text-slate-950">
-                {completedOperations} de {totalOperations} operaciones terminadas
+                {completedOperations} de {totalOperations} operaciones
+                terminadas
               </h2>
               <p className="mt-1 text-[8px] leading-4 text-slate-500">
-                La ejecución de fabricación quedó cerrada. El siguiente paso formal es Calidad.
+                La ejecución de fabricación quedó cerrada. El siguiente paso
+                formal es Calidad.
               </p>
 
               <div className="mt-4">
