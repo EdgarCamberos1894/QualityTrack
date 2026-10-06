@@ -1,0 +1,125 @@
+name: Temporary QualityTrack UX Polish
+
+on:
+  push:
+    branches:
+      - tmp/qualitytrack-ux-polish
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout staging branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Pin target branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED="dc364d0efcedec9f3a222362e10465ad5ea09957"
+          git fetch origin feature/quality-flexible-inspection-checks
+          ACTUAL="$(git rev-parse origin/feature/quality-flexible-inspection-checks)"
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "Target branch moved: expected $EXPECTED, found $ACTUAL"
+            exit 1
+          fi
+          git checkout -B qualitytrack-ux-polish-target "$ACTUAL"
+
+      - name: Apply validated patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          PATCH_URL="https://sb-5q3olfymr67s.vercel.run/qualitytrack-ux-polish.patch"
+          EXPECTED_SHA256="2ed851cf615f0b373782ded0cbfb4ca19e58edd790410f66d3885ce3c67d7b87"
+          curl --fail --silent --show-error --location "$PATCH_URL" --output /tmp/qualitytrack-ux-polish.patch
+          echo "$EXPECTED_SHA256  /tmp/qualitytrack-ux-polish.patch" | sha256sum --check -
+          git apply --check /tmp/qualitytrack-ux-polish.patch
+          git apply /tmp/qualitytrack-ux-polish.patch
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Check formatting
+        working-directory: frontend
+        run: >-
+          npx prettier --check
+          src/modules/customer-portal/components/CustomerRequestDocuments.tsx
+          src/modules/customer-portal/components/CustomerRequestFollowUp.tsx
+          src/modules/customer-portal/model/customerRequestOverviewPresenter.ts
+          src/modules/job-cases/components/InformationRequestForm.tsx
+          src/modules/quotations/components/CustomerQuotationHeader.tsx
+          src/modules/quotations/components/QuotationEditorForm.tsx
+          src/modules/quotations/pages/CustomerQuotationDetailPage.tsx
+          src/modules/work-orders/components/RoutingOperationDialog.tsx
+          src/modules/work-orders/components/WorkOrderPreparation.tsx
+          src/modules/work-orders/components/WorkOrderRoutingCard.tsx
+          src/shared/components/navigation/CompactBackButton.tsx
+          src/shared/components/ui/ActionIconButton.tsx
+
+      - name: Lint changed files
+        working-directory: frontend
+        run: >-
+          npx eslint
+          src/modules/customer-portal/components/CustomerRequestDocuments.tsx
+          src/modules/customer-portal/components/CustomerRequestFollowUp.tsx
+          src/modules/customer-portal/model/customerRequestOverviewPresenter.ts
+          src/modules/job-cases/components/InformationRequestForm.tsx
+          src/modules/quotations/components/CustomerQuotationHeader.tsx
+          src/modules/quotations/components/QuotationEditorForm.tsx
+          src/modules/quotations/pages/CustomerQuotationDetailPage.tsx
+          src/modules/work-orders/components/RoutingOperationDialog.tsx
+          src/modules/work-orders/components/WorkOrderPreparation.tsx
+          src/modules/work-orders/components/WorkOrderRoutingCard.tsx
+          src/shared/components/navigation/CompactBackButton.tsx
+          src/shared/components/ui/ActionIconButton.tsx
+
+      - name: Typecheck
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Check architecture
+        working-directory: frontend
+        run: npm run architecture:check
+
+      - name: Check patch whitespace
+        run: git diff --check
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Commit and publish target branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED="dc364d0efcedec9f3a222362e10465ad5ea09957"
+          git config user.name "Edgar Camberos"
+          git config user.email "157107597+EdgarCamberos1894@users.noreply.github.com"
+          git add \
+            frontend/src/modules/customer-portal/components/CustomerRequestDocuments.tsx \
+            frontend/src/modules/customer-portal/components/CustomerRequestFollowUp.tsx \
+            frontend/src/modules/customer-portal/model/customerRequestOverviewPresenter.ts \
+            frontend/src/modules/job-cases/components/InformationRequestForm.tsx \
+            frontend/src/modules/quotations/components/CustomerQuotationHeader.tsx \
+            frontend/src/modules/quotations/components/QuotationEditorForm.tsx \
+            frontend/src/modules/quotations/pages/CustomerQuotationDetailPage.tsx \
+            frontend/src/modules/work-orders/components/RoutingOperationDialog.tsx \
+            frontend/src/modules/work-orders/components/WorkOrderPreparation.tsx \
+            frontend/src/modules/work-orders/components/WorkOrderRoutingCard.tsx \
+            frontend/src/shared/components/navigation/CompactBackButton.tsx \
+            frontend/src/shared/components/ui/ActionIconButton.tsx
+          git diff --cached --quiet && { echo "No source changes were staged"; exit 1; }
+          git commit -m "fix(ux): polish customer and routing workflows"
+          git fetch origin feature/quality-flexible-inspection-checks
+          ACTUAL="$(git rev-parse origin/feature/quality-flexible-inspection-checks)"
+          if [ "$ACTUAL" != "$EXPECTED" ]; then
+            echo "Target branch moved during validation: expected $EXPECTED, found $ACTUAL"
+            exit 1
+          fi
+          git push origin HEAD:feature/quality-flexible-inspection-checks
