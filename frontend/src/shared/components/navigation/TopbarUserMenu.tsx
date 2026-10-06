@@ -57,7 +57,6 @@ export function TopbarUserMenu({
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        aria-haspopup="true"
         aria-expanded={open}
         aria-controls="topbar-account-popover"
         className="group flex h-11 items-center gap-2.5 rounded-xl px-1.5 pr-2 text-left transition hover:bg-slate-50 focus:outline-none focus-visible:ring-4 focus-visible:ring-blue-100"
@@ -109,7 +108,10 @@ export function TopbarUserMenu({
                 }}
                 className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-semibold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:bg-blue-50 focus-visible:text-blue-700"
               >
-                <TopbarActionIcon name="user" className="h-[18px] w-[18px]" />
+                <TopbarActionIcon
+                  name="user"
+                  className="h-[18px] w-[18px]"
+                />
                 Mi perfil
               </button>
             ) : null}
@@ -122,7 +124,10 @@ export function TopbarUserMenu({
               }}
               className="mt-1 flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-xs font-semibold text-slate-700 transition hover:bg-red-50 hover:text-red-700 focus:outline-none focus-visible:bg-red-50 focus-visible:text-red-700"
             >
-              <TopbarActionIcon name="logout" className="h-[18px] w-[18px]" />
+              <TopbarActionIcon
+                name="logout"
+                className="h-[18px] w-[18px]"
+              />
               Cerrar sesión
             </button>
           </div>
