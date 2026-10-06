@@ -1,5 +1,9 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { getSystemRoleLabel, type AuthenticatedUser } from '@/modules/auth'
+import {
+  getSystemRoleLabel,
+  isPublicDemoAccount,
+  type AuthenticatedUser,
+} from '@/modules/auth'
 import { GlobalSearch } from '@/modules/global-search'
 import { TopbarActionIcon } from '@/shared/components/navigation/TopbarActionIcon'
 import { TopbarBreadcrumb } from '@/shared/components/navigation/TopbarBreadcrumb'
@@ -103,6 +107,7 @@ function getBreadcrumb(pathname: string, search: string): string {
 export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
   const location = useLocation()
   const navigate = useNavigate()
+  const demoAccount = isPublicDemoAccount(user)
   const roleLabel =
     user.roles.length > 0
       ? user.roles.map(getSystemRoleLabel).join(' · ')
@@ -129,16 +134,22 @@ export function Topbar({ user, onOpenMenu, onLogout }: TopbarProps) {
       </div>
 
       <div className="ml-4 flex shrink-0 items-center gap-3">
-        <span className="hidden items-center gap-2 text-[10px] font-semibold text-slate-500 xl:inline-flex">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          {getShiftLabel()}
-        </span>
+        {demoAccount ? (
+          <span className="hidden rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.08em] text-blue-700 sm:inline-flex">
+            Modo demo
+          </span>
+        ) : (
+          <span className="hidden items-center gap-2 text-[10px] font-semibold text-slate-500 xl:inline-flex">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            {getShiftLabel()}
+          </span>
+        )}
 
         <TopbarUserMenu
           email={user.email}
           roleLabel={roleLabel}
-          accountLabel="Cuenta interna"
-          detailLabel={getShiftLabel()}
+          accountLabel={demoAccount ? 'Cuenta interna · Demo' : 'Cuenta interna'}
+          detailLabel={demoAccount ? 'Datos de demostración' : getShiftLabel()}
           onProfile={() => navigate('/profile')}
           onLogout={onLogout}
         />
