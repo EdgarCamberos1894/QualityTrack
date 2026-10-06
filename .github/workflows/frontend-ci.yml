@@ -46,6 +46,12 @@ jobs:
         continue-on-error: true
         run: npm audit --audit-level=high
 
+      - name: Preview dependency audit fix
+        continue-on-error: true
+        run: |
+          npm audit fix --package-lock-only
+          git diff -- package-lock.json
+
       - name: Check architecture
         run: npm run architecture:check
 
