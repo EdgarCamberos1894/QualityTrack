@@ -94,9 +94,7 @@ export function CustomerPortalTopbar({
             demoAccount ? 'Portal de cliente · Demo' : 'Portal de cliente'
           }
           detailLabel={
-            demoAccount
-              ? 'Industrias Nova · Datos demo'
-              : customer.customerName
+            demoAccount ? 'Industrias Nova · Datos demo' : customer.customerName
           }
           onProfile={onProfile}
           onLogout={onLogout}
