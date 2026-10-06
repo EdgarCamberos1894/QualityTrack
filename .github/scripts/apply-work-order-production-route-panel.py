@@ -14,6 +14,15 @@ source = source.replace(
     "import { formatProductionDateTime } from '../model/productionPresenter'\n",
     '',
 )
+source = source.replace(
+    "import { useProductionMutations } from '../hooks/useProductionMutations'\n",
+    "import { useProductionMutations } from '../hooks/useProductionMutations'\nimport { getProductionDependencyIds } from '../model/productionPresenter'\n",
+)
+source = source.replace(
+    '''function dependencyIds(operation: RoutingOperationDto) {\n  return operation.prerequisiteOperationIds ?? []\n}\n\n''',
+    '',
+)
+source = source.replace('dependencyIds(', 'getProductionDependencyIds(')
 
 route_start_marker = '''        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">'''
 aside_marker = '''        <aside className="flex h-full flex-col rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">'''
@@ -208,6 +217,16 @@ Path('frontend/src/modules/work-orders/components/ProductionRoutePanel.tsx').wri
     panel_content,
     encoding='utf-8',
 )
+
+presenter_path = Path('frontend/src/modules/work-orders/model/productionPresenter.ts')
+presenter = presenter_path.read_text(encoding='utf-8')
+presenter = presenter.replace(
+    '''import type {\n  OperationExecutionDto,\n  OperationExecutionStatus,\n} from '../types/workOrder.types'\n''',
+    '''import type {\n  OperationExecutionDto,\n  OperationExecutionStatus,\n  RoutingOperationDto,\n} from '../types/workOrder.types'\n''',
+)
+if 'export function getProductionDependencyIds' not in presenter:
+    presenter = presenter.rstrip() + '''\n\nexport function getProductionDependencyIds(\n  operation: RoutingOperationDto,\n): number[] {\n  return operation.prerequisiteOperationIds ?? []\n}\n'''
+presenter_path.write_text(presenter, encoding='utf-8')
 
 baseline_path = Path('frontend/scripts/architecture-baseline.json')
 baseline = json.loads(baseline_path.read_text(encoding='utf-8'))
