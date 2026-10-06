@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import re
 import textwrap
 
 page_path = Path('frontend/src/modules/customer-portal/pages/CustomerMembersPage.tsx')
@@ -38,23 +39,26 @@ directory_markup = directory_markup.replace(
 )
 directory_markup = directory_markup.replace(
     'invitationsQuery.isError',
-    'Boolean(invitationsError)',
+    'invitationsError',
 )
 directory_markup = directory_markup.replace(
     'invitationsQuery.error',
     'invitationsError',
 )
-directory_markup = directory_markup.replace(
-    "mutations.updateMemberRole.reset()\n                                  setRoleTarget(member)",
+directory_markup = re.sub(
+    r'mutations\.updateMemberRole\.reset\(\)\s+setRoleTarget\(member\)',
     'onChangeRole(member)',
+    directory_markup,
 )
-directory_markup = directory_markup.replace(
-    "mutations.removeMember.reset()\n                                  setRemoveTarget(member)",
+directory_markup = re.sub(
+    r'mutations\.removeMember\.reset\(\)\s+setRemoveTarget\(member\)',
     'onRemove(member)',
+    directory_markup,
 )
-directory_markup = directory_markup.replace(
-    "mutations.cancelInvitation.reset()\n                        setCancelInvitationTarget(invitation)",
+directory_markup = re.sub(
+    r'mutations\.cancelInvitation\.reset\(\)\s+setCancelInvitationTarget\(invitation\)',
     'onCancelInvitation(invitation)',
+    directory_markup,
 )
 
 usage = '''        <CustomerMembersDirectory
