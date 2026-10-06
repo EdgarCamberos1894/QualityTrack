@@ -94,7 +94,7 @@ export function RegisterPage() {
                 : 'Reenviar verificación'}
           </Button>
           {resendMutation.error ? (
-            <p className="mt-2.5 text-[9px] text-red-700">
+            <p role="alert" className="mt-2.5 text-[9px] text-red-700">
               {getErrorMessage(resendMutation.error)}
             </p>
           ) : null}
@@ -162,7 +162,10 @@ export function RegisterPage() {
         />
 
         {registerMutation.error ? (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700">
+          <p
+            role="alert"
+            className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700"
+          >
             {getRegisterErrorMessage(registerMutation.error)}
           </p>
         ) : null}
