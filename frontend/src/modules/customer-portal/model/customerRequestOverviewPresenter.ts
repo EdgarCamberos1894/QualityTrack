@@ -190,6 +190,14 @@ export function getCustomerRequestNextStep(
             tone: 'neutral',
             action: 'quotation',
           }
+        default:
+          return {
+            eyebrow: 'Siguiente etapa',
+            title: 'La propuesta comercial está en preparación',
+            description:
+              'El equipo está preparando la cotización para que puedas revisarla cuando esté disponible.',
+            tone: 'info',
+          }
       }
     case 'IN_PRODUCTION':
       return {
