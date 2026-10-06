@@ -51,13 +51,25 @@
     line-height: 0.98 !important;
   }
 
+  /*
+   * Mobile keeps enough narrative context to explain each operational stage
+   * without allowing the copy to compete with the interactive scene below.
+   */
   .qt-case-pinned > .relative.z-10 > .order-1 > p,
   .qt-quote-pinned > .relative.z-10 > .order-1 > p,
   .qt-work-order-pinned > .relative.z-10 > .order-1 > p,
   .qt-production-pinned > .relative.z-10 > .order-1 > p,
   .qt-quality-pinned > .relative.z-10 > .order-1 > p,
   .qt-delivery-pinned > .relative.z-10 > .order-1 > p {
-    display: none !important;
+    display: -webkit-box !important;
+    max-width: 36rem;
+    margin-top: 0.45rem !important;
+    overflow: hidden;
+    color: #94a3b8 !important;
+    font-size: 0.68rem !important;
+    line-height: 1rem !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   .qt-case-pinned > .relative.z-10 > .order-1 > :last-child,
@@ -119,6 +131,18 @@
   .qt-quality-pinned > .relative.z-10 > .order-1 > h2,
   .qt-delivery-pinned > .relative.z-10 > .order-1 > h2 {
     font-size: clamp(1.48rem, 6.9vw, 1.82rem) !important;
+  }
+
+  .qt-case-pinned > .relative.z-10 > .order-1 > p,
+  .qt-quote-pinned > .relative.z-10 > .order-1 > p,
+  .qt-work-order-pinned > .relative.z-10 > .order-1 > p,
+  .qt-production-pinned > .relative.z-10 > .order-1 > p,
+  .qt-quality-pinned > .relative.z-10 > .order-1 > p,
+  .qt-delivery-pinned > .relative.z-10 > .order-1 > p {
+    margin-top: 0.35rem !important;
+    font-size: 0.64rem !important;
+    line-height: 0.9rem !important;
+    -webkit-line-clamp: 1;
   }
 
   .qt-quote-pinned .qt-quote-sheet,
