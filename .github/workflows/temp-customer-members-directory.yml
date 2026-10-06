@@ -1,0 +1,77 @@
+name: Temp customer members directory
+
+on:
+  push:
+    branches:
+      - feature/tmp-customer-members-directory
+
+permissions:
+  contents: write
+
+jobs:
+  refactor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Pin npm
+        run: npm install --global npm@10.9.0
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci --include=optional --legacy-peer-deps
+
+      - name: Apply members directory split
+        run: python .github/scripts/apply-customer-members-directory.py
+
+      - name: Format refactor
+        working-directory: frontend
+        run: npx prettier --write scripts/architecture-baseline.json src/modules/customer-portal/pages/CustomerMembersPage.tsx src/modules/customer-portal/components/CustomerMembersDirectory.tsx
+
+      - name: Audit dependencies
+        working-directory: frontend
+        run: npm audit --audit-level=high
+
+      - name: Check architecture
+        working-directory: frontend
+        run: npm run architecture:check
+
+      - name: Lint refactor
+        working-directory: frontend
+        run: npx eslint src/modules/customer-portal/pages/CustomerMembersPage.tsx src/modules/customer-portal/components/CustomerMembersDirectory.tsx
+
+      - name: Typecheck
+        working-directory: frontend
+        run: npm run typecheck
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      - name: Check diff hygiene
+        run: git diff --check
+
+      - name: Commit validated refactor
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/scripts/architecture-baseline.json \
+            frontend/src/modules/customer-portal/pages/CustomerMembersPage.tsx \
+            frontend/src/modules/customer-portal/components/CustomerMembersDirectory.tsx
+          if git diff --cached --quiet; then
+            echo "No product changes to commit"
+            exit 1
+          fi
+          git commit -m "refactor(customer-portal): extract members directory [skip ci]"
+          git push
