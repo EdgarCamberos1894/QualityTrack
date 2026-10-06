@@ -36,6 +36,7 @@ export function QuotationsPage() {
           (filters.status === 'ACTIVE'
             ? [
                 'DRAFT',
+                'ADJUSTMENT_REQUESTED',
                 'SENT',
                 'REJECTED',
                 'EXPIRED',
@@ -66,12 +67,14 @@ export function QuotationsPage() {
 
   const quotations = query.data
   const drafts = quotations.filter((quotation) => quotation.status === 'DRAFT').length
+  const adjustments = quotations.filter(
+    (quotation) => quotation.status === 'ADJUSTMENT_REQUESTED',
+  ).length
   const sent = quotations.filter((quotation) => quotation.status === 'SENT').length
   const approved = quotations.filter(
     (quotation) => quotation.status === 'APPROVED',
   ).length
-  const hasFilters =
-    filters.search.length > 0 || filters.status !== 'ACTIVE'
+  const hasFilters = filters.search.length > 0 || filters.status !== 'ACTIVE'
 
   return (
     <PageContainer className="py-4 lg:py-3">
@@ -89,13 +92,13 @@ export function QuotationsPage() {
                 Cotizaciones
               </h1>
               <p className="mt-1 max-w-2xl text-[10px] leading-4 text-slate-500">
-                Controla borradores, revisiones enviadas y decisiones del cliente
+                Controla borradores, ajustes solicitados, revisiones enviadas y decisiones del cliente
                 sin perder el vínculo con su expediente de origen.
               </p>
             </div>
           </div>
 
-          <div className="mt-4 grid border-t border-slate-200/80 pt-3 sm:grid-cols-4">
+          <div className="mt-4 grid border-t border-slate-200/80 pt-3 sm:grid-cols-5">
             <div className="py-1 sm:pr-4">
               <p className="text-[8px] font-medium text-slate-400">Flujos</p>
               <p className="mt-0.5 text-[16px] font-bold text-slate-950">
@@ -106,6 +109,12 @@ export function QuotationsPage() {
               <p className="text-[8px] font-medium text-slate-400">Borradores</p>
               <p className="mt-0.5 text-[16px] font-bold text-slate-950">
                 {drafts}
+              </p>
+            </div>
+            <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1">
+              <p className="text-[8px] font-medium text-slate-400">Ajustes por responder</p>
+              <p className="mt-0.5 text-[16px] font-bold text-amber-700">
+                {adjustments}
               </p>
             </div>
             <div className="border-t border-slate-100 py-2 sm:border-l sm:border-t-0 sm:px-4 sm:py-1">
