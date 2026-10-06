@@ -97,7 +97,7 @@ export function PortalVisibleCountBar({
     <div className="flex min-h-10 items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/55 px-4 py-2 sm:min-h-9 sm:px-5">
       <div className="flex items-center gap-2">
         <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-        <p className="text-[10px] font-semibold text-slate-700 sm:text-[8px] sm:text-slate-600">
+        <p className="text-[10px] font-semibold text-slate-600 sm:text-[8px]">
           {count} {count === 1 ? singular : plural}
         </p>
       </div>

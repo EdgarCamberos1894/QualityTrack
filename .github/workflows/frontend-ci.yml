@@ -65,7 +65,11 @@ jobs:
         env:
           FORMAT_FILES: ${{ steps.changed.outputs.format_files }}
         run: |
-          printf '%s\n' "$FORMAT_FILES" | xargs npx prettier --check
+          if ! printf '%s\n' "$FORMAT_FILES" | xargs npx prettier --check; then
+            printf '%s\n' "$FORMAT_FILES" | xargs npx prettier --write
+            git diff -- $FORMAT_FILES
+            exit 1
+          fi
 
       - name: Lint changed files
         if: steps.changed.outputs.lint_files != ''
