@@ -9,14 +9,12 @@ interface CustomerQuotationHeaderProps {
   customerId: number
   quotation: CustomerQuotationDetailDto
   customerName: string
-  requestHref?: string
 }
 
 export function CustomerQuotationHeader({
   customerId,
   quotation,
   customerName,
-  requestHref,
 }: CustomerQuotationHeaderProps) {
   const navigate = useNavigate()
   const status = getCustomerQuotationStatusPresentation(
@@ -51,16 +49,15 @@ export function CustomerQuotationHeader({
           </div>
 
           <p className="mt-0.5 truncate text-[10px] text-slate-500">
-            {quotation.requestNumber} · Revisión {quotation.revision} · {customerName}
+            {quotation.requestNumber} · Revisión {quotation.revision} ·{' '}
+            {customerName}
           </p>
         </div>
       </div>
 
       <CompactBackButton
-        label={requestHref ? 'Volver a la solicitud' : 'Volver a cotizaciones'}
-        onClick={() =>
-          navigate(requestHref ?? `/portal/${customerId}/quotations`)
-        }
+        label="Volver a cotizaciones"
+        onClick={() => navigate(`/portal/${customerId}/quotations`)}
       />
     </header>
   )

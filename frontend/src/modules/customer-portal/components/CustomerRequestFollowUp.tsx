@@ -192,8 +192,19 @@ export function CustomerRequestFollowUp({
         <button
           type="button"
           onClick={onCancel}
-          className="mt-3 inline-flex h-6 items-center rounded-md border border-red-200/80 bg-white/70 px-2 text-[7px] font-medium text-red-500 transition hover:border-red-300 hover:bg-red-50 hover:text-red-600"
+          className="mt-2 inline-flex h-11 items-center gap-1.5 rounded-md px-1.5 text-[9px] font-medium text-red-500 transition hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-100 sm:h-7 sm:text-[8px]"
         >
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            className="h-3.5 w-3.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          >
+            <path d="M7 7l10 10M17 7 7 17" />
+          </svg>
           Cancelar solicitud
         </button>
       ) : null}

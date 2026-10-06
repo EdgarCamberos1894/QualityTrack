@@ -2,16 +2,14 @@ import type { ButtonHTMLAttributes } from 'react'
 import { cn } from '@/shared/lib/cn'
 
 export type ActionIconName =
-  | 'edit'
-  | 'delete'
-  | 'view'
-  | 'download'
-  | 'history'
+  'edit' | 'delete' | 'view' | 'download' | 'history' | 'upload'
 
 export type ActionIconTone = 'neutral' | 'primary' | 'danger'
 
-export interface ActionIconButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
+export interface ActionIconButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'children'
+> {
   icon: ActionIconName
   label: string
   tone?: ActionIconTone
@@ -115,6 +113,16 @@ function ActionIcon({ name }: { name: ActionIconName }) {
       <svg {...commonProps}>
         <path d="M12 3v11" />
         <path d="m8 10 4 4 4-4" />
+        <path d="M5 20h14" />
+      </svg>
+    )
+  }
+
+  if (name === 'upload') {
+    return (
+      <svg {...commonProps}>
+        <path d="M12 16V5" />
+        <path d="m8 9 4-4 4 4" />
         <path d="M5 20h14" />
       </svg>
     )

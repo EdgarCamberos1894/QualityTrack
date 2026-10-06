@@ -47,6 +47,7 @@ export function QuotationEditorForm({
   sidebarContent,
 }: QuotationEditorFormProps) {
   const [actionError, setActionError] = useState<string | null>(null)
+  const [adjustmentDialogOpen, setAdjustmentDialogOpen] = useState(false)
   const {
     control,
     register,
@@ -69,6 +70,10 @@ export function QuotationEditorForm({
   const estimatedDeliveryDate = useWatch({
     control,
     name: 'estimatedDeliveryDate',
+  })
+  const adjustmentResponse = useWatch({
+    control,
+    name: 'adjustmentResponse',
   })
   const totals = calculateQuotationTotals({ items, taxRate })
   const requiresAdjustmentResponse = Boolean(quotation.adjustmentNotes)
@@ -175,22 +180,40 @@ export function QuotationEditorForm({
           </p>
 
           {quotation.adjustmentNotes ? (
-            <div className="mt-4">
-              <TextareaField
-                id="quotation-adjustment-response"
-                label="Respuesta al ajuste"
-                placeholder="Explica qué condiciones pueden ajustarse y cuál es la nueva propuesta."
-                disabled={!editable}
-                labelClassName="!mb-1.5 !text-[10px]"
-                className="!min-h-20 !rounded-lg !px-3 !py-2 !text-[10px] !shadow-none placeholder:!text-[9px]"
-                hint={
-                  editable
-                    ? 'Obligatoria para enviar esta nueva revisión.'
-                    : undefined
-                }
-                error={errors.adjustmentResponse?.message}
-                {...register('adjustmentResponse')}
-              />
+            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/65 p-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-amber-700">
+                    Ajuste solicitado por el cliente
+                  </p>
+                  <p className="mt-1 text-[9px] leading-4 text-slate-700">
+                    {quotation.adjustmentNotes}
+                  </p>
+                  {adjustmentResponse?.trim() ? (
+                    <p className="mt-2 line-clamp-2 text-[8px] leading-4 text-emerald-700">
+                      Respuesta preparada: {adjustmentResponse.trim()}
+                    </p>
+                  ) : (
+                    <p className="mt-2 text-[8px] text-amber-700">
+                      Falta registrar la respuesta antes de enviar la nueva
+                      revisión.
+                    </p>
+                  )}
+                </div>
+
+                {editable ? (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="!h-7 shrink-0 !px-2.5 !text-[8px]"
+                    onClick={() => setAdjustmentDialogOpen(true)}
+                  >
+                    {adjustmentResponse?.trim()
+                      ? 'Editar respuesta'
+                      : 'Responder ajuste'}
+                  </Button>
+                ) : null}
+              </div>
             </div>
           ) : null}
 
@@ -242,6 +265,65 @@ export function QuotationEditorForm({
 
         {sidebarContent}
       </div>
+
+      {adjustmentDialogOpen ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 p-4">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="quotation-adjustment-response-title"
+            className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+          >
+            <div className="border-b border-amber-100 bg-gradient-to-r from-white via-white to-amber-50/70 px-5 py-4">
+              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-amber-700">
+                Solicitud del cliente
+              </p>
+              <h2
+                id="quotation-adjustment-response-title"
+                className="mt-1 text-base font-semibold text-slate-950"
+              >
+                Responder al ajuste
+              </h2>
+              <p className="mt-1.5 text-[10px] leading-5 text-slate-600">
+                {quotation.adjustmentNotes}
+              </p>
+            </div>
+
+            <div className="px-5 py-4">
+              <TextareaField
+                id="quotation-adjustment-response"
+                label="Respuesta comercial"
+                placeholder="Explica qué puede ajustarse y cuál será la nueva propuesta."
+                labelClassName="!mb-1.5 !text-[10px]"
+                className="!min-h-28 !rounded-lg !px-3 !py-2.5 !text-[10px] !shadow-none placeholder:!text-[9px]"
+                hint="Esta respuesta acompañará la nueva revisión de la cotización."
+                error={errors.adjustmentResponse?.message}
+                autoFocus
+                {...register('adjustmentResponse')}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 border-t border-slate-100 bg-slate-50/70 px-5 py-3.5">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="!h-8 !px-3 !text-[9px]"
+                onClick={() => setAdjustmentDialogOpen(false)}
+              >
+                Cerrar
+              </Button>
+              <Button
+                size="sm"
+                className="!h-8 !px-3 !text-[9px]"
+                onClick={() => setAdjustmentDialogOpen(false)}
+                disabled={!adjustmentResponse?.trim()}
+              >
+                Guardar respuesta
+              </Button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </form>
   )
 }

@@ -32,7 +32,6 @@ interface WorkOrderRoutingCardProps {
   canDesign: boolean
   pending: PendingState
   error: unknown
-  onCreate: () => Promise<void>
   onAdd: (values: RoutingOperationFormValues) => Promise<boolean>
   onUpdate: (
     operationId: number,
@@ -56,6 +55,15 @@ const statusLabel = {
   RELEASED: 'Liberada',
 } as const
 
+function formatEstimatedHours(minutes: number) {
+  const hours = minutes / 60
+  const formatted = new Intl.NumberFormat('es-MX', {
+    maximumFractionDigits: 1,
+  }).format(hours)
+
+  return `${formatted} h estimadas`
+}
+
 export function WorkOrderRoutingCard({
   routing,
   workOrderStatus,
@@ -64,7 +72,6 @@ export function WorkOrderRoutingCard({
   canDesign,
   pending,
   error,
-  onCreate,
   onAdd,
   onUpdate,
   onRemove,
@@ -79,7 +86,9 @@ export function WorkOrderRoutingCard({
 
   const nextSequence = useMemo(() => {
     if (!routing || routing.operations.length === 0) return 1
-    return Math.max(...routing.operations.map((item) => item.sequenceNumber)) + 1
+    return (
+      Math.max(...routing.operations.map((item) => item.sequenceNumber)) + 1
+    )
   }, [routing])
 
   const openCreateOperation = () => {
@@ -93,55 +102,75 @@ export function WorkOrderRoutingCard({
   }
 
   if (!routing) {
-    const canCreate =
+    const canAddFirstOperation =
       canDesign && workOrderStatus === 'CREATED' && pinnedDocumentCount > 0
 
     return (
-      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
-        <div className="flex flex-col gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-              03 · Hoja de ruta
-            </p>
-            <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
-              Ruta de producción
-            </h2>
+      <>
+        <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+          <div className="flex flex-col gap-3 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+                03 · Hoja de ruta
+              </p>
+              <h2 className="mt-0.5 text-[11px] font-semibold text-slate-950">
+                Ruta de producción
+              </h2>
+            </div>
+
+            {canAddFirstOperation ? (
+              <Button
+                className="!h-7 !px-2.5 !text-[8px]"
+                onClick={openCreateOperation}
+                disabled={pending.create || pending.operation}
+              >
+                {pending.create || pending.operation
+                  ? 'Guardando…'
+                  : 'Agregar primera operación'}
+              </Button>
+            ) : null}
           </div>
 
-          {canCreate ? (
-            <Button
-              className="!h-7 !px-2.5 !text-[8px]"
-              onClick={() => void onCreate()}
-              disabled={pending.create}
-            >
-              {pending.create ? 'Creando ruta…' : 'Crear hoja de ruta'}
-            </Button>
-          ) : null}
-        </div>
-
-        <div className="px-4 py-3">
-          <p className="text-[8px] leading-4 text-slate-500">
-            Define las operaciones técnicas que deberán ejecutarse. Máquina,
-            operador y tiempos reales se registran durante Producción.
-          </p>
-
-          <div className="mt-3 rounded-lg border border-dashed border-slate-300 bg-slate-50/70 px-3 py-2.5 text-[8px] leading-4 text-slate-500">
-            {pinnedDocumentCount === 0
-              ? 'Fija al menos una versión documental para habilitar la hoja de ruta.'
-              : !canDesign
-                ? 'Solo ENGINEERING o ADMIN pueden diseñar la hoja de ruta.'
-                : workOrderStatus !== 'CREATED'
-                  ? 'La ruta de producción solo puede crearse mientras la OT está En preparación.'
-                  : 'La orden ya está lista para crear su ruta de producción.'}
-          </div>
-
-          {error ? (
-            <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700">
-              {getErrorMessage(error)}
+          <div className="px-4 py-3">
+            <p className="text-[8px] leading-4 text-slate-500">
+              Registra la primera operación y QualityTrack creará la hoja de
+              ruta automáticamente. Después podrás continuar agregando las
+              siguientes etapas del proceso.
             </p>
-          ) : null}
-        </div>
-      </section>
+
+            <div className="mt-3 rounded-lg border border-dashed border-slate-300 bg-slate-50/70 px-3 py-2.5 text-[8px] leading-4 text-slate-500">
+              {pinnedDocumentCount === 0
+                ? 'Fija al menos una versión documental para comenzar la ruta de producción.'
+                : canDesign
+                  ? 'La primera operación abrirá la ruta. Máquina, operador y tiempos reales se registran durante Producción.'
+                  : 'Ingeniería o Administración deben definir las operaciones antes de liberar la orden.'}
+            </div>
+
+            {error ? (
+              <p
+                role="alert"
+                className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[8px] leading-4 text-red-700"
+              >
+                {getErrorMessage(error)}
+              </p>
+            ) : null}
+          </div>
+        </section>
+
+        <RoutingOperationDialog
+          open={operationDialogOpen}
+          operations={[]}
+          nextSequence={1}
+          submitting={pending.create || pending.operation}
+          error={error}
+          onClose={() => setOperationDialogOpen(false)}
+          onSubmit={async (values) => {
+            const created = await onAdd(values)
+            if (created) setOperationDialogOpen(false)
+            return created
+          }}
+        />
+      </>
     )
   }
 
@@ -168,12 +197,16 @@ export function WorkOrderRoutingCard({
             <h2 className="text-[11px] font-semibold text-slate-950">
               Ruta de producción · Rev {routing.revision}
             </h2>
-            <Badge tone={statusTone[routing.status]} className="px-2 py-0.5 text-[8px]">
+            <Badge
+              tone={statusTone[routing.status]}
+              className="px-2 py-0.5 text-[8px]"
+            >
               {statusLabel[routing.status]}
             </Badge>
           </div>
           <p className="mt-0.5 text-[8px] text-slate-400">
-            {routing.operations.length} operaciones · {routing.totalEstimatedMinutes} min estimados
+            {routing.operations.length} operaciones ·{' '}
+            {formatEstimatedHours(routing.totalEstimatedMinutes)}
           </p>
         </div>
 
@@ -202,7 +235,8 @@ export function WorkOrderRoutingCard({
                 Flujo de fabricación
               </p>
               <p className="mt-0.5 text-[7px] text-slate-400">
-                Las conexiones muestran qué operaciones deben terminar antes de habilitar la siguiente.
+                Las conexiones muestran qué operaciones deben terminar antes de
+                habilitar la siguiente.
               </p>
             </div>
             <div className="inline-flex w-fit rounded-lg border border-slate-200 bg-slate-50 p-0.5">
@@ -215,7 +249,7 @@ export function WorkOrderRoutingCard({
                     : 'rounded-md px-2.5 py-1.5 text-[7.5px] font-semibold text-slate-500 hover:text-slate-800'
                 }
               >
-                Flujo
+                Proceso
               </button>
               <button
                 type="button"
@@ -226,7 +260,7 @@ export function WorkOrderRoutingCard({
                     : 'rounded-md px-2.5 py-1.5 text-[7.5px] font-semibold text-slate-500 hover:text-slate-800'
                 }
               >
-                Lista
+                Operaciones
               </button>
             </div>
           </div>
@@ -251,7 +285,8 @@ export function WorkOrderRoutingCard({
                 Revisión en preparación
               </p>
               <p className="mt-0.5 text-[8px] leading-4 text-amber-700">
-                Aprobar congela operaciones, dependencias y versiones documentales fijadas.
+                Aprobar congela operaciones, dependencias y versiones
+                documentales fijadas.
               </p>
             </div>
             {canDesign ? (
@@ -270,7 +305,9 @@ export function WorkOrderRoutingCard({
         {routing.status === 'APPROVED' ? (
           <div className="mt-3 flex flex-col gap-2.5 rounded-lg border border-blue-200 bg-blue-50/60 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-[9px] font-semibold text-blue-900">Ruta aprobada</p>
+              <p className="text-[9px] font-semibold text-blue-900">
+                Ruta aprobada
+              </p>
               <p className="mt-0.5 text-[8px] leading-4 text-blue-700">
                 {planningReady
                   ? 'Libérala para iniciar Producción o reábrela si requiere corrección.'

@@ -175,7 +175,6 @@ export function CustomerQuotationDetailPage() {
         customerId={customer.customerId}
         quotation={quotation}
         customerName={customer.customerName}
-        requestHref={requestHref}
       />
 
       <div className="space-y-4">

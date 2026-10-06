@@ -331,11 +331,11 @@ export function RoutingOperationDialog({
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-[9px] font-semibold text-slate-900">
-                  Debe esperar a
+                  Operaciones previas
                 </p>
                 <p className="mt-0.5 text-[7px] leading-3.5 text-slate-500">
-                  Solo aparecen secuencias anteriores. Puedes elegir varias para
-                  unir ramas del proceso.
+                  Selecciona qué operaciones deben terminar antes de iniciar
+                  esta etapa. Puedes elegir varias si el proceso converge aquí.
                 </p>
               </div>
               <button
@@ -349,13 +349,14 @@ export function RoutingOperationDialog({
                   })
                 }}
               >
-                Puede iniciar libre
+                Iniciar sin dependencia
               </button>
             </div>
 
             {availablePrerequisites.length === 0 ? (
               <div className="mt-3 rounded-lg border border-dashed border-blue-200 bg-white/70 px-3 py-2 text-[8px] text-slate-500">
-                Esta es una operación raíz: podrá iniciar al liberar Producción.
+                Esta será la primera operación y podrá iniciar cuando se libere
+                Producción.
               </div>
             ) : (
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -412,7 +413,7 @@ export function RoutingOperationDialog({
 
           <div className="sm:col-span-2">
             <TextareaField
-              label="Instrucciones"
+              label="Instrucciones para producción"
               placeholder="Indicaciones técnicas para ejecutar la operación…"
               labelClassName="!mb-1.5 !text-[10px]"
               className="!min-h-20 !rounded-lg !px-3 !py-2 !text-[10px] !shadow-none placeholder:!text-[9px]"

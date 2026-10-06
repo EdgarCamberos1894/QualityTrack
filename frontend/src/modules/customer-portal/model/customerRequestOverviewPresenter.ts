@@ -90,7 +90,7 @@ export function getCustomerRequestNextStep(
   if (openInformationRequest) {
     return {
       eyebrow: 'Acción requerida',
-      title: 'Necesitamos información de tu empresa',
+      title: 'Necesitamos información adicional sobre tu solicitud',
       description: openInformationRequest.question,
       tone: 'warning',
       action: 'respond',
@@ -110,7 +110,7 @@ export function getCustomerRequestNextStep(
     case 'WAITING_CUSTOMER_INFO':
       return {
         eyebrow: 'Pendiente de información',
-        title: 'La revisión está esperando datos de tu empresa',
+        title: 'La revisión está esperando información adicional',
         description:
           'Revisa la actividad de la solicitud para identificar la información pendiente.',
         tone: 'warning',

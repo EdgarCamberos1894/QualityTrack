@@ -14,7 +14,7 @@ export function CompactBackButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="inline-flex h-6 shrink-0 items-center gap-1 rounded-md border border-slate-300 bg-white/85 px-2 text-[7px] font-medium leading-none text-slate-500 transition hover:border-slate-400 hover:bg-white hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-50"
+      className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-md bg-transparent px-1.5 text-[9px] font-medium leading-none text-slate-500 transition hover:bg-slate-100/70 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-50 sm:h-7 sm:text-[8px]"
     >
       <svg
         viewBox="0 0 24 24"

@@ -65,7 +65,8 @@ export function CustomerRequestDocuments({
                 Documentos
               </h2>
               <p className="mt-0.5 text-[9px] leading-4 text-slate-500">
-                Consulta la versión vigente, descarga archivos y revisa su historial.
+                Consulta la versión vigente, descarga archivos y revisa su
+                historial.
               </p>
             </div>
           </div>
@@ -130,7 +131,11 @@ export function CustomerRequestDocuments({
                     <div className="flex flex-wrap items-center gap-1.5">
                       <ActionIconButton
                         icon="view"
-                        label={opening ? 'Abriendo documento…' : `Ver ${documentItem.name}`}
+                        label={
+                          opening
+                            ? 'Abriendo documento…'
+                            : `Ver ${documentItem.name}`
+                        }
                         tone="primary"
                         busy={opening}
                         disabled={files.busy !== null && !opening}
@@ -177,17 +182,15 @@ export function CustomerRequestDocuments({
                               event.target.value = ''
                             }}
                           />
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            className="!h-7 !px-2.5 !text-[9px]"
+                          <ActionIconButton
+                            icon="upload"
+                            label={`Subir nueva versión de ${documentItem.name}`}
+                            tone="primary"
                             disabled={addingVersion}
                             onClick={() =>
                               versionInputRefs.current[documentItem.id]?.click()
                             }
-                          >
-                            Nueva versión
-                          </Button>
+                          />
 
                           {confirmingRemove ? (
                             <>

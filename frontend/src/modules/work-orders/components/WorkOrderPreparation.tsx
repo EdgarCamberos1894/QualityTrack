@@ -134,21 +134,14 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
     }
   }
 
-  const createRouting = async () => {
-    clearRoutingErrors()
-    try {
-      await mutations.createRouting.mutateAsync()
-    } catch {
-      // The normalized API error is rendered by the routing card.
-    }
-  }
-
   const addOperation = async (values: RoutingOperationFormValues) => {
-    if (!productionRouting) return false
     clearRoutingErrors()
     try {
+      const routingSheet =
+        productionRouting ?? (await mutations.createRouting.mutateAsync())
+
       await mutations.addOperation.mutateAsync({
-        routingSheetId: productionRouting.id,
+        routingSheetId: routingSheet.id,
         payload: values,
       })
       return true
@@ -385,7 +378,6 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
               release: mutations.releaseRouting.isPending,
             }}
             error={routingError}
-            onCreate={createRouting}
             onAdd={addOperation}
             onUpdate={updateOperation}
             onRemove={removeOperation}
