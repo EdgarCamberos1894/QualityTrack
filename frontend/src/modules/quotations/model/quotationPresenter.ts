@@ -15,6 +15,12 @@ const statusPresentation: Record<QuotationStatus, StatusPresentation> = {
     description: 'Aún no se ha enviado al cliente.',
     tone: 'neutral',
   },
+  ADJUSTMENT_REQUESTED: {
+    label: 'Ajuste solicitado',
+    stage: 'Revisión comercial',
+    description: 'El cliente pidió cambios y esta revisión requiere respuesta.',
+    tone: 'warning',
+  },
   SENT: {
     label: 'Esperando respuesta',
     stage: 'Cliente',
