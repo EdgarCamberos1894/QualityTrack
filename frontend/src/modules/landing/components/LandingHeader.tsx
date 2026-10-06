@@ -73,7 +73,9 @@ export function LandingHeader() {
     setSectionsOpen(false)
     window.requestAnimationFrame(() => {
       document.getElementById(id)?.scrollIntoView({
-        behavior: 'smooth',
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'auto'
+          : 'smooth',
         block: 'start',
       })
     })
@@ -129,7 +131,7 @@ export function LandingHeader() {
 
           <Link
             to="/login"
-            className="qt-landing-login ml-auto hidden h-8 shrink-0 items-center justify-center gap-2 rounded-lg border border-cyan-200/15 bg-white/[0.025] px-3 text-[8px] font-bold uppercase tracking-[0.09em] text-slate-200 shadow-[0_8px_28px_-18px_rgba(34,211,238,0.4)] transition hover:border-cyan-200/30 hover:bg-cyan-300/[0.06] hover:text-white sm:inline-flex"
+            className="qt-landing-login ml-auto hidden h-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-cyan-200/15 bg-white/[0.025] px-3 text-[8px] font-bold uppercase tracking-[0.09em] text-slate-200 shadow-[0_8px_28px_-18px_rgba(34,211,238,0.4)] transition hover:border-cyan-200/30 hover:bg-cyan-300/[0.06] hover:text-white sm:inline-flex"
           >
             Iniciar sesión
             <span className="text-cyan-300/65" aria-hidden="true">
@@ -163,6 +165,7 @@ export function LandingHeader() {
               onClick={() => setSectionsOpen(false)}
             />
             <div
+              id="landing-section-dialog"
               className="qt-mobile-nav-sheet"
               role="dialog"
               aria-modal="true"
@@ -180,7 +183,7 @@ export function LandingHeader() {
                 <button
                   type="button"
                   onClick={() => setSectionsOpen(false)}
-                  className="grid h-8 w-8 place-items-center rounded-full border border-white/[0.08] bg-white/[0.025] text-sm text-slate-400"
+                  className="grid h-11 w-11 place-items-center rounded-full border border-white/[0.08] bg-white/[0.025] text-sm text-slate-400"
                   aria-label="Cerrar"
                 >
                   ×
@@ -196,7 +199,7 @@ export function LandingHeader() {
                       key={id}
                       type="button"
                       onClick={() => jumpTo(id)}
-                      className={`flex items-center justify-between rounded-xl border px-3 py-3 text-left transition ${active ? 'border-cyan-300/25 bg-cyan-300/[0.07]' : 'border-white/[0.06] bg-white/[0.02]'}`}
+                      className={`flex min-h-11 items-center justify-between rounded-xl border px-3 py-3 text-left transition ${active ? 'border-cyan-300/25 bg-cyan-300/[0.07]' : 'border-white/[0.06] bg-white/[0.02]'}`}
                     >
                       <span>
                         <span className="font-mono text-[6px] text-slate-600">
@@ -239,6 +242,7 @@ export function LandingHeader() {
             onClick={() => setSectionsOpen(true)}
             className={`qt-mobile-nav-action ${activeSection !== 'inicio' ? 'is-active' : ''}`}
             aria-expanded={sectionsOpen}
+            aria-controls="landing-section-dialog"
           >
             <span className="qt-mobile-nav-grid" aria-hidden="true">
               <i />
