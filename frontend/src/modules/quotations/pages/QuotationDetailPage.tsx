@@ -92,7 +92,10 @@ export function QuotationDetailPage() {
     quotation.source.assignedToUserId !== null &&
     String(quotation.source.assignedToUserId) === session.user.id
   const canManage = isAdmin || isAssignedCommercial
-  const editable = quotation.status === 'DRAFT' && canManage
+  const editable =
+    (quotation.status === 'DRAFT' ||
+      quotation.status === 'ADJUSTMENT_REQUESTED') &&
+    canManage
   const canCreateRevision =
     canManage && revisionEligibleStatuses.has(quotation.status)
   const canCancel =
