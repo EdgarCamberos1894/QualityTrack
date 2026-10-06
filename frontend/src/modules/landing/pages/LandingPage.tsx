@@ -13,8 +13,14 @@ import '../landingAudit.css'
 export function LandingPage() {
   return (
     <div className="qt-landing-root min-h-screen overflow-x-clip bg-[#020617]">
+      <a
+        href="#qt-main-content"
+        className="sr-only fixed left-4 top-4 z-[100] rounded-lg bg-white px-4 py-3 text-sm font-semibold text-slate-950 shadow-xl focus:not-sr-only"
+      >
+        Saltar al contenido
+      </a>
       <LandingHeader />
-      <main>
+      <main id="qt-main-content">
         <ScrollStory />
         <CaseChapter />
         <QuoteChapter />
