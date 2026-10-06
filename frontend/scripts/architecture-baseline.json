@@ -1,7 +1,6 @@
 {
   "modules/customer-portal/components/CustomerRequestOverview.tsx": 551,
   "modules/customer-portal/pages/CustomerMembersPage.tsx": 558,
-  "modules/landing/components/RequestSection.tsx": 579,
   "modules/work-orders/components/RoutingOperationDialog.tsx": 505,
   "modules/work-orders/components/WorkOrderPreparation.tsx": 525,
   "modules/work-orders/components/WorkOrderProduction.tsx": 592,

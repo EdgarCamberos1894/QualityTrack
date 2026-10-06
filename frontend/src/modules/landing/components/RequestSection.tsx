@@ -3,6 +3,8 @@ import {
   usePinnedSectionProgress,
 } from '../hooks/usePinnedSectionProgress'
 import type { LandingStoryStage } from '../model/landingStory'
+import { RequestIntro } from './RequestIntro'
+import { RequestTrace } from './RequestTrace'
 import '../requestSection.css'
 
 interface RequestSectionProps {
@@ -64,16 +66,8 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
               ? 1
               : 0
 
-  const requestTracePath =
-    'M 343 0 C 326 27, 311 61, 329 96 C 352 137, 365 174, 328 206 C 294 236, 245 253, 202 284'
-  const requestHandoffPath =
-    'M 286 505 C 281 588, 190 635, 205 720 C 219 800, 278 858, 250 1000'
-
   const formOpacity = 1 - consolidationProgress
   const documentOpacity = documentProgress * (1 - consolidationProgress)
-  const handoffLabelProgress = reducedMotion
-    ? 1
-    : rangeProgress(exitProgress, 0.34, 0.72)
   const sectionClassName = reducedMotion
     ? 'relative isolate min-h-screen bg-[#020817]'
     : 'relative isolate h-[260svh] bg-[#020817] lg:h-[280svh]'
@@ -89,253 +83,20 @@ export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
         <div className="pointer-events-none absolute left-[4%] top-[28%] h-[46%] w-[46%] rounded-full bg-cyan-400/[0.055] blur-[110px]" />
         <div className="pointer-events-none absolute inset-x-0 top-0 z-[2] h-16 bg-gradient-to-b from-[#020617] via-[#020617]/58 to-transparent lg:h-24" />
 
-        <div
-          className="pointer-events-none absolute inset-0 z-[3] hidden lg:block"
-          aria-hidden="true"
-        >
-          <svg
-            viewBox="0 0 1000 430"
-            className="absolute left-0 top-0 h-[48%] w-full overflow-visible"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <linearGradient
-                id="qtRequestTrace"
-                x1="0.343"
-                y1="0"
-                x2="0.2"
-                y2="0.7"
-              >
-                <stop offset="0%" stopColor="#67e8f9" stopOpacity="0.22" />
-                <stop offset="22%" stopColor="#22d3ee" stopOpacity="0.62" />
-                <stop offset="70%" stopColor="#60a5fa" stopOpacity="0.48" />
-                <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.05" />
-              </linearGradient>
-              <filter
-                id="qtRequestTraceGlow"
-                x="-60%"
-                y="-60%"
-                width="220%"
-                height="220%"
-              >
-                <feGaussianBlur stdDeviation="7" />
-              </filter>
-              <filter
-                id="qtRequestTravelerGlow"
-                x="-200%"
-                y="-200%"
-                width="500%"
-                height="500%"
-              >
-                <feGaussianBlur stdDeviation="5" />
-              </filter>
-            </defs>
-
-            <path
-              d={requestTracePath}
-              fill="none"
-              stroke="url(#qtRequestTrace)"
-              strokeWidth="12"
-              opacity={0.04 + linkProgress * 0.13}
-              filter="url(#qtRequestTraceGlow)"
-            />
-            <path
-              d={requestTracePath}
-              fill="none"
-              stroke="url(#qtRequestTrace)"
-              strokeWidth="1.5"
-              strokeDasharray="8 10"
-              opacity={0.15 + linkProgress * 0.8}
-            >
-              {!reducedMotion && scrollProgress < 0.99 ? (
-                <animate
-                  attributeName="stroke-dashoffset"
-                  from="0"
-                  to="180"
-                  dur="7s"
-                  repeatCount="indefinite"
-                />
-              ) : null}
-            </path>
-
-            {!reducedMotion && linkProgress > 0 && scrollProgress < 0.81 ? (
-              <>
-                <circle
-                  r="10"
-                  fill="#67e8f9"
-                  opacity={0.16 * linkProgress}
-                  filter="url(#qtRequestTravelerGlow)"
-                >
-                  <animateMotion
-                    dur="5.2s"
-                    repeatCount="indefinite"
-                    path={requestTracePath}
-                  />
-                </circle>
-                <circle r="3.5" fill="#a5f3fc" opacity={0.95 * linkProgress}>
-                  <animateMotion
-                    dur="5.2s"
-                    repeatCount="indefinite"
-                    path={requestTracePath}
-                  />
-                </circle>
-              </>
-            ) : null}
-          </svg>
-        </div>
-
-        <div
-          className="pointer-events-none absolute inset-0 z-[7] hidden lg:block"
-          aria-hidden="true"
-        >
-          <svg
-            viewBox="0 0 1000 1000"
-            className="absolute inset-0 h-full w-full"
-            preserveAspectRatio="none"
-          >
-            <defs>
-              <linearGradient
-                id="qtRequestHandoff"
-                x1="0.28"
-                y1="0.5"
-                x2="0.25"
-                y2="1"
-              >
-                <stop offset="0%" stopColor="#34d399" stopOpacity="0.52" />
-                <stop offset="24%" stopColor="#22d3ee" stopOpacity="0.76" />
-                <stop offset="68%" stopColor="#60a5fa" stopOpacity="0.5" />
-                <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.22" />
-              </linearGradient>
-              <filter
-                id="qtRequestHandoffGlow"
-                x="-80%"
-                y="-30%"
-                width="260%"
-                height="180%"
-              >
-                <feGaussianBlur stdDeviation="8" />
-              </filter>
-            </defs>
-
-            <path
-              d={requestHandoffPath}
-              fill="none"
-              stroke="url(#qtRequestHandoff)"
-              strokeWidth="13"
-              opacity={exitProgress * 0.11}
-              filter="url(#qtRequestHandoffGlow)"
-            />
-            <path
-              d={requestHandoffPath}
-              fill="none"
-              pathLength="1"
-              stroke="url(#qtRequestHandoff)"
-              strokeWidth="1.7"
-              strokeLinecap="round"
-              strokeDasharray={`${Math.max(0.001, exitProgress)} 1`}
-              opacity={0.25 + exitProgress * 0.75}
-            />
-            <circle
-              cx="286"
-              cy="505"
-              r="3.5"
-              fill="#6ee7b7"
-              opacity={exitProgress}
-            />
-            <circle
-              cx="250"
-              cy="1000"
-              r="3.4"
-              fill="#93c5fd"
-              opacity={rangeProgress(exitProgress, 0.72, 1)}
-            />
-          </svg>
-
-          <div
-            className="absolute left-[15.5%] top-[76%] flex items-center gap-2.5"
-            style={{
-              opacity: handoffLabelProgress,
-              transform: `translate3d(0, ${(1 - handoffLabelProgress) * 10}px, 0)`,
-            }}
-          >
-            <span className="h-px w-9 bg-gradient-to-r from-transparent to-cyan-300/50" />
-            <div>
-              <p className="font-mono text-[7px] uppercase tracking-[0.16em] text-slate-600">
-                Siguiente
-              </p>
-              <p className="mt-1 text-[9px] font-semibold tracking-[0.03em] text-blue-200/80">
-                Expediente 360
-              </p>
-            </div>
-          </div>
-        </div>
+        <RequestTrace
+          reducedMotion={reducedMotion}
+          scrollProgress={scrollProgress}
+          linkProgress={linkProgress}
+          exitProgress={exitProgress}
+        />
 
         <div className="relative z-10 mx-auto grid h-full w-full max-w-[1440px] grid-rows-[auto_1fr] items-start gap-3 px-5 pb-4 pt-4 sm:px-8 sm:pb-6 sm:pt-5 lg:grid-cols-[1.08fr_0.92fr] lg:grid-rows-1 lg:items-center lg:gap-14 lg:px-12 lg:pb-8 lg:pt-8 xl:px-16">
-          <div className="order-1 lg:order-2 lg:pl-4">
-            <div className="flex items-center gap-2.5">
-              <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-1 text-[8px] font-bold uppercase tracking-[0.13em] text-cyan-300">
-                {stage.eyebrow}
-              </span>
-              <span className="text-[9px] font-semibold tracking-[0.18em] text-slate-600">
-                {stage.step}
-              </span>
-            </div>
-
-            <h2 className="mt-3 max-w-[620px] text-[clamp(2rem,9vw,3.2rem)] font-semibold leading-[0.95] tracking-[-0.055em] text-white lg:mt-4 lg:text-[clamp(2.15rem,4.4vw,4.2rem)] lg:leading-[0.98]">
-              {stage.title}
-            </h2>
-
-            <p className="mt-3 max-w-lg text-[11px] leading-5 text-slate-300/90 sm:text-[12px] lg:mt-5 lg:text-[13px] lg:leading-6">
-              {stage.description}
-            </p>
-
-            <div className="mt-6 hidden flex-wrap gap-2 lg:flex">
-              {['Requerimientos', 'Documentos', 'Seguimiento'].map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full border border-white/[0.07] bg-white/[0.025] px-3 py-1.5 text-[8px] font-bold uppercase tracking-[0.11em] text-slate-400"
-                >
-                  {item}
-                </span>
-              ))}
-            </div>
-
-            <div className="mt-7 hidden max-w-[500px] items-start gap-3 rounded-2xl border border-cyan-300/10 bg-slate-950/40 p-3.5 backdrop-blur-md lg:flex">
-              <span className="mt-1 flex h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(52,211,153,0.7)]" />
-              <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.11em] text-white">
-                  {stage.signal}
-                </p>
-                <p className="mt-1 text-[9px] leading-4 text-slate-400">
-                  {stage.detail}
-                </p>
-              </div>
-            </div>
-
-            {!reducedMotion ? (
-              <div className="mt-3 flex items-center gap-2 lg:mt-7">
-                <div className="h-px flex-1 overflow-hidden bg-white/[0.055]">
-                  <div
-                    className="h-full bg-gradient-to-r from-blue-500/25 via-cyan-300/80 to-cyan-100/20 shadow-[0_0_12px_rgba(34,211,238,0.45)]"
-                    style={{ width: `${Math.max(3, scrollProgress * 100)}%` }}
-                  />
-                </div>
-                <span className="font-mono text-[7px] text-slate-600">
-                  {phase === 0
-                    ? 'Conectando'
-                    : phase === 1
-                      ? 'Contexto'
-                      : phase === 2
-                        ? 'Estructurando'
-                        : phase === 3
-                          ? 'Documentando'
-                          : phase === 4
-                            ? 'Consolidando'
-                            : 'Continuando'}
-                </span>
-              </div>
-            ) : null}
-          </div>
+          <RequestIntro
+            stage={stage}
+            reducedMotion={reducedMotion}
+            scrollProgress={scrollProgress}
+            phase={phase}
+          />
 
           <div className="order-2 min-h-0 lg:order-1">
             <div className="relative flex h-full min-h-0 items-start justify-center lg:min-h-[610px] lg:items-center">
