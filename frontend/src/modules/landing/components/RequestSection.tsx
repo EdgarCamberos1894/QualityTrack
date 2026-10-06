@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
-import type { CSSProperties } from 'react'
+import {
+  rangeProgress,
+  usePinnedSectionProgress,
+} from '../hooks/usePinnedSectionProgress'
 import type { LandingStoryStage } from '../model/landingStory'
 import '../requestSection.css'
 
@@ -23,71 +25,15 @@ const requestDocuments = [
   ['Tolerancias_y_acabados.pdf', '920 KB'],
 ] as const
 
-function clamp(value: number) {
-  return Math.min(1, Math.max(0, value))
-}
-
-function rangeProgress(progress: number, start: number, end: number) {
-  if (end <= start) return progress >= end ? 1 : 0
-  return clamp((progress - start) / (end - start))
-}
-
 export function RequestSection({ stage, reducedMotion }: RequestSectionProps) {
-  const sectionRef = useRef<HTMLElement | null>(null)
-  const [scrollProgress, setScrollProgress] = useState(reducedMotion ? 1 : 0)
-
-  useEffect(() => {
-    if (reducedMotion) {
-      const reducedMotionFrame = window.requestAnimationFrame(() =>
-        setScrollProgress(1),
-      )
-      return () => window.cancelAnimationFrame(reducedMotionFrame)
-    }
-
-    let frame = 0
-
-    const sync = () => {
-      frame = 0
-      const section = sectionRef.current
-      if (!section) return
-
-      const rect = section.getBoundingClientRect()
-      const travel = Math.max(section.offsetHeight - window.innerHeight, 1)
-      const next = clamp(-rect.top / travel)
-
-      setScrollProgress((previous) =>
-        Math.abs(previous - next) > 0.002 ? next : previous,
-      )
-    }
-
-    const requestSync = () => {
-      if (frame) return
-      frame = window.requestAnimationFrame(sync)
-    }
-
-    sync()
-    window.addEventListener('scroll', requestSync, { passive: true })
-    window.addEventListener('resize', requestSync)
-
-    return () => {
-      window.removeEventListener('scroll', requestSync)
-      window.removeEventListener('resize', requestSync)
-      if (frame) window.cancelAnimationFrame(frame)
-    }
-  }, [reducedMotion])
-
-  const scrollReveal = (
-    start: number,
-    end: number,
-    distance = 14,
-  ): CSSProperties => {
-    const value = reducedMotion ? 1 : rangeProgress(scrollProgress, start, end)
-
-    return {
-      opacity: value,
-      transform: `translate3d(0, ${(1 - value) * distance}px, 0)`,
-    }
-  }
+  const {
+    sectionRef,
+    scrollProgress,
+    reveal: scrollReveal,
+  } = usePinnedSectionProgress({
+    reducedMotion,
+    revealDistance: 14,
+  })
 
   const linkProgress = reducedMotion
     ? 1
