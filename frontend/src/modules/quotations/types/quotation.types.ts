@@ -1,5 +1,6 @@
 export const QUOTATION_STATUSES = [
   'DRAFT',
+  'ADJUSTMENT_REQUESTED',
   'SENT',
   'APPROVED',
   'REJECTED',
