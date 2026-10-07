@@ -154,10 +154,10 @@ export function JobCaseDetailPage() {
   }
 
   return (
-    <PageContainer className="py-4 lg:py-3">
+    <PageContainer className="min-w-0 overflow-x-hidden py-4 lg:py-3">
       <JobCaseDetailHeader jobCase={jobCase} />
 
-      <div className="space-y-4">
+      <div className="min-w-0 max-w-full space-y-4">
         <JobCaseFlowSteps
           status={jobCase.status}
           quotationId={currentQuotation?.id ?? null}
@@ -189,9 +189,9 @@ export function JobCaseDetailPage() {
           </div>
         ) : null}
 
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-start">
-          <div className="contents lg:col-start-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-4">
-            <div className="order-1 lg:order-none">
+        <div className="grid w-full min-w-0 max-w-full grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-start">
+          <div className="contents lg:col-start-2 lg:row-start-1 lg:flex lg:min-w-0 lg:flex-col lg:gap-4">
+            <div className="order-1 min-w-0 max-w-full lg:order-none">
               <JobCaseAssignmentCard
                 jobCase={jobCase}
                 user={session.user}
@@ -201,7 +201,7 @@ export function JobCaseDetailPage() {
             </div>
 
             {jobCase.status !== 'SUBMITTED' ? (
-              <div className="order-5 lg:order-none">
+              <div className="order-5 min-w-0 max-w-full lg:order-none">
                 <JobCaseActionBar
                   jobCase={jobCase}
                   user={session.user}
@@ -223,16 +223,16 @@ export function JobCaseDetailPage() {
             ) : null}
           </div>
 
-          <div className="order-2 lg:col-start-1 lg:row-start-1 lg:order-none">
+          <div className="order-2 min-w-0 max-w-full lg:col-start-1 lg:row-start-1 lg:order-none">
             <JobCaseSummary jobCase={jobCase} />
           </div>
 
-          <div className="order-3 lg:col-span-2 lg:row-start-2 lg:order-none">
+          <div className="order-3 min-w-0 max-w-full lg:col-span-2 lg:row-start-2 lg:order-none">
             <JobCaseDocuments documents={jobCase.documents} />
           </div>
 
-          <div className="order-4 lg:col-span-2 lg:row-start-3 lg:order-none">
-            <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
+          <div className="order-4 min-w-0 max-w-full lg:col-span-2 lg:row-start-3 lg:order-none">
+            <div className="grid min-w-0 max-w-full gap-4 lg:grid-cols-2 lg:items-stretch">
               <JobCaseMaterial
                 specification={jobCase.materialSpecification}
                 request={jobCase.request}
@@ -243,7 +243,7 @@ export function JobCaseDetailPage() {
           </div>
 
           {actionPanel === 'information' ? (
-            <div className="order-6 lg:col-span-2 lg:order-none">
+            <div className="order-6 min-w-0 max-w-full lg:col-span-2 lg:order-none">
               <InformationRequestForm
                 isSubmitting={infoMutation.isPending}
                 onCancel={() => setActionPanel(null)}
@@ -253,7 +253,7 @@ export function JobCaseDetailPage() {
           ) : null}
 
           {actionPanel === 'material' ? (
-            <div className="order-6 lg:col-span-2 lg:order-none">
+            <div className="order-6 min-w-0 max-w-full lg:col-span-2 lg:order-none">
               <MaterialSpecificationForm
                 current={jobCase.materialSpecification}
                 isSubmitting={materialMutation.isPending}
