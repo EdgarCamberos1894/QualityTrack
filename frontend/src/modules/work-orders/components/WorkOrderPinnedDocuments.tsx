@@ -33,16 +33,16 @@ export function WorkOrderPinnedDocuments({
 
   return (
     <>
-      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
-        <div className="border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
+      <section className="w-full min-w-0 max-w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+        <div className="min-w-0 max-w-full border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/50 px-4 py-2.5">
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
             02 · Documentos
           </p>
-          <div className="mt-0.5 flex items-center justify-between gap-3">
-            <h2 className="text-[11px] font-semibold text-slate-950">
+          <div className="mt-0.5 flex min-w-0 items-center justify-between gap-3">
+            <h2 className="min-w-0 text-[11px] font-semibold text-slate-950">
               Versiones fijadas para fabricación
             </h2>
-            <span className="text-[8px] text-slate-400">
+            <span className="shrink-0 text-[8px] text-slate-400">
               {pinnedDocuments.length} fijados
             </span>
           </div>
@@ -63,7 +63,7 @@ export function WorkOrderPinnedDocuments({
               </p>
             ) : null}
 
-            <div className="divide-y divide-slate-100">
+            <div className="w-full min-w-0 max-w-full divide-y divide-slate-100 overflow-hidden">
               {documents.map(({ document, versions }) => {
                 const pinned = pinnedFor(document.id)
                 const availableVersions =
@@ -80,13 +80,16 @@ export function WorkOrderPinnedDocuments({
                   fileActions.busyVersionId === selectedVersion.id
 
                 return (
-                  <article key={document.id} className="px-4 py-3">
-                    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                      <div className="min-w-0">
+                  <article
+                    key={document.id}
+                    className="w-full min-w-0 max-w-full overflow-hidden px-4 py-3"
+                  >
+                    <div className="flex w-full min-w-0 max-w-full flex-col gap-3 overflow-hidden lg:flex-row lg:items-center lg:justify-between">
+                      <div className="w-full min-w-0 max-w-full lg:flex-1">
                         <p className="text-[8px] font-bold uppercase tracking-wide text-blue-600">
                           {document.documentType}
                         </p>
-                        <p className="mt-0.5 truncate text-[10px] font-semibold text-slate-950">
+                        <p className="mt-0.5 block w-full min-w-0 max-w-full whitespace-normal break-all [overflow-wrap:anywhere] text-[10px] font-semibold leading-4 text-slate-950 sm:truncate sm:break-normal">
                           {document.name}
                         </p>
                         <p className="mt-0.5 text-[8px] text-slate-400">
@@ -97,8 +100,8 @@ export function WorkOrderPinnedDocuments({
                         </p>
                       </div>
 
-                      <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center">
-                        <div className="relative min-w-[170px]">
+                      <div className="flex w-full min-w-0 max-w-full flex-col gap-1.5 sm:w-auto sm:flex-row sm:items-center">
+                        <div className="relative w-full min-w-0 max-w-full sm:w-auto sm:min-w-[170px]">
                           <select
                             aria-label={`Versión de ${document.name}`}
                             value={selectedVersionId}
@@ -109,7 +112,7 @@ export function WorkOrderPinnedDocuments({
                                 [document.id]: Number(event.target.value),
                               }))
                             }
-                            className="h-7 w-full appearance-none rounded-lg border border-slate-300 bg-white px-2 pr-7 !text-[8px] !font-normal !leading-none text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 disabled:text-slate-500"
+                            className="h-7 w-full min-w-0 max-w-full truncate appearance-none rounded-lg border border-slate-300 bg-white px-2 pr-7 !text-[8px] !font-normal !leading-none text-slate-700 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100 disabled:bg-slate-100 disabled:text-slate-500"
                           >
                             {availableVersions.map((version) => (
                               <option
@@ -154,7 +157,7 @@ export function WorkOrderPinnedDocuments({
                           <Button
                             size="sm"
                             variant={pinned ? 'secondary' : 'primary'}
-                            className="!h-7 !px-2.5 !text-[8px]"
+                            className="!h-7 !w-full !min-w-0 !max-w-full !px-2.5 !text-[8px] sm:!w-auto"
                             disabled={
                               saving ||
                               openingSelected ||
