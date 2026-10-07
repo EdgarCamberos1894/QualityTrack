@@ -12,7 +12,7 @@ import { useLogin } from '../hooks/useLogin'
 import type { AccountType } from '../types/auth.types'
 
 interface LoginFormProps {
-  onAuthenticated: () => void
+  onAuthenticated: (accountType: AccountType) => void
 }
 
 function getLoginErrorMessage(error: unknown) {
@@ -51,14 +51,14 @@ export function LoginForm({ onAuthenticated }: LoginFormProps) {
 
   const onSubmit = async (values: LoginFormValues) => {
     demoMutation.reset()
-    await loginMutation.mutateAsync(values)
-    onAuthenticated()
+    const session = await loginMutation.mutateAsync(values)
+    onAuthenticated(session.user.accountType)
   }
 
   const enterDemo = async (accountType: AccountType) => {
     loginMutation.reset()
-    await demoMutation.mutateAsync(accountType)
-    onAuthenticated()
+    const session = await demoMutation.mutateAsync(accountType)
+    onAuthenticated(session.user.accountType)
   }
 
   const pending = loginMutation.isPending || demoMutation.isPending
