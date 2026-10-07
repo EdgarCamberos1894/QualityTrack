@@ -77,6 +77,104 @@ button:disabled {
   outline-offset: 2px;
 }
 
+@media (max-width: 639px) {
+  .job-case-detail-header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .job-case-detail-header > :first-child {
+    width: 100%;
+  }
+
+  .job-case-detail-header > button {
+    align-self: flex-start;
+    height: 2rem;
+  }
+
+  #case-overview,
+  .job-case-action-bar,
+  .job-case-documents,
+  .job-case-material,
+  .job-case-clarifications,
+  .job-case-activity {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  #case-overview {
+    overflow: hidden;
+    padding: 0.875rem;
+  }
+
+  #case-overview .job-case-print-hidden {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  #case-overview .job-case-print-hidden > div {
+    min-width: 0;
+  }
+
+  #case-overview .job-case-print-hidden button {
+    align-self: flex-start;
+    max-width: 100%;
+  }
+
+  #case-overview .job-case-print-area {
+    min-width: 0;
+    overflow: hidden;
+    padding: 0.875rem;
+  }
+
+  #case-overview .job-case-sheet-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  #case-overview .job-case-sheet-header > :last-child {
+    max-width: 100%;
+    text-align: left;
+    width: 100%;
+  }
+
+  #case-overview .job-case-sheet-header p,
+  #case-overview .job-case-sheet-meta p,
+  #case-overview .job-case-sheet-requirement p,
+  #case-overview .job-case-sheet-review p,
+  #case-overview .job-case-screen-only p,
+  #case-overview .job-case-sheet-note p {
+    overflow-wrap: anywhere;
+  }
+
+  #case-overview .job-case-sheet-meta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #case-overview .job-case-sheet-requirement > div:first-child,
+  #case-overview .job-case-sheet-review > div:first-child {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  #case-overview .job-case-screen-only {
+    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 1rem;
+  }
+
+  #case-overview .job-case-sheet-note > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
 @media print {
   @page {
     size: A4 portrait;
