@@ -81,7 +81,7 @@ export function JobCaseActivityList({
         return (
           <article
             key={event.id}
-            className="relative min-w-0 overflow-hidden rounded-lg border border-slate-200 bg-white px-3 py-2.5 transition hover:border-slate-300"
+            className="relative min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2.5 transition hover:border-slate-300"
           >
             <span className="absolute -left-[19px] top-3.5 h-2.5 w-2.5 rounded-full bg-blue-500 ring-4 ring-white" />
 
