@@ -14,12 +14,10 @@ import type { JobCaseDetailDto } from '../types/jobCase.types'
 interface JobCaseActionBarProps {
   jobCase: JobCaseDetailDto
   user: AuthenticatedUser
-  taking: boolean
   completing: boolean
   creatingQuotation: boolean
   quotationId: number | null
   quotationLookupReady: boolean
-  onTake: () => void
   onRequestInformation: () => void
   onDefineMaterial: () => void
   onComplete: () => void
@@ -59,10 +57,10 @@ function getReviewContext(
   switch (jobCase.status) {
     case 'SUBMITTED':
       return {
-        eyebrow: 'Asignación pendiente',
-        title: 'El expediente necesita un responsable',
+        eyebrow: 'Revisión no iniciada',
+        title: 'El expediente todavía no está en revisión',
         description:
-          'Comercial debe tomar el expediente antes de iniciar la revisión interna.',
+          'La asignación se gestiona antes de comenzar las acciones internas.',
         tone: 'neutral',
       }
     case 'WAITING_CUSTOMER_INFO':
@@ -171,12 +169,10 @@ function Checkpoint({
 export function JobCaseActionBar({
   jobCase,
   user,
-  taking,
   completing,
   creatingQuotation,
   quotationId,
   quotationLookupReady,
-  onTake,
   onRequestInformation,
   onDefineMaterial,
   onComplete,
@@ -210,14 +206,14 @@ export function JobCaseActionBar({
     jobCase.status === 'COMPLETED'
 
   return (
-    <aside className="flex h-full flex-col rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+    <aside className="rounded-xl border border-slate-200 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
       <div className="flex items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100">
           <SidebarNavIcon name="quality" className="h-[17px] w-[17px]" />
         </div>
         <div className="min-w-0">
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
-            {isOperationalHandoff ? 'Expediente' : 'Revisión'}
+            {isOperationalHandoff ? 'Expediente' : 'Acciones de revisión'}
           </p>
           <div className="mt-0.5 flex flex-wrap items-center gap-2">
             <h2 className="text-sm font-semibold text-slate-950">
@@ -234,7 +230,7 @@ export function JobCaseActionBar({
                 ? 'La ejecución continúa desde la orden de trabajo vinculada.'
                 : jobCase.status === 'COMPLETED'
                   ? 'Consulta aquí el cierre y la trazabilidad del expediente.'
-                  : 'Valida que exista información suficiente antes de iniciar la cotización.'}
+                  : 'Actúa sobre el expediente después de revisar su información, documentos y pendientes.'}
           </p>
         </div>
       </div>
@@ -287,22 +283,10 @@ export function JobCaseActionBar({
             </div>
           ) : null}
 
-          {capabilities.canTake ||
-          capabilities.canAttemptComplete ||
+          {capabilities.canAttemptComplete ||
           canOpenQuotation ||
           canCreateQuotation ? (
             <div className="border-t border-current/10 pt-2.5">
-              {capabilities.canTake ? (
-                <Button
-                  size="sm"
-                  className="!h-8 !w-full !justify-center !px-3 !text-[8px]"
-                  onClick={onTake}
-                  disabled={taking}
-                >
-                  {taking ? 'Tomando…' : 'Tomar expediente'}
-                </Button>
-              ) : null}
-
               {capabilities.canAttemptComplete ? (
                 <Button
                   size="sm"
@@ -337,75 +321,77 @@ export function JobCaseActionBar({
         </div>
       </div>
 
-      <div className="mt-5">
-        <p className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-400">
-          Estado de la revisión
-        </p>
+      <div className="mt-5 grid gap-4 md:grid-cols-2">
+        <div>
+          <p className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-400">
+            Estado de la revisión
+          </p>
 
-        <div className="mt-3">
-          <Checkpoint
-            label="Solicitud"
-            value="Información base recibida"
-            tone="success"
-          />
-          <Checkpoint
-            label="Documentación"
-            value={
-              jobCase.documents.length > 0
-                ? `${jobCase.documents.length} archivo${
-                    jobCase.documents.length === 1 ? '' : 's'
-                  } disponible${
-                    jobCase.documents.length === 1 ? '' : 's'
-                  }`
-                : 'Sin archivos adjuntos'
-            }
-            tone={jobCase.documents.length > 0 ? 'success' : 'neutral'}
-          />
-          <Checkpoint
-            label="Aclaraciones"
-            value={clarificationSummary}
-            tone={openClarifications > 0 ? 'warning' : 'success'}
-          />
-          <Checkpoint
-            label="Material"
-            value={materialSummary}
-            tone={materialPending ? 'warning' : 'success'}
-          />
+          <div className="mt-3">
+            <Checkpoint
+              label="Solicitud"
+              value="Información base recibida"
+              tone="success"
+            />
+            <Checkpoint
+              label="Documentación"
+              value={
+                jobCase.documents.length > 0
+                  ? `${jobCase.documents.length} archivo${
+                      jobCase.documents.length === 1 ? '' : 's'
+                    } disponible${
+                      jobCase.documents.length === 1 ? '' : 's'
+                    }`
+                  : 'Sin archivos adjuntos'
+              }
+              tone={jobCase.documents.length > 0 ? 'success' : 'neutral'}
+            />
+            <Checkpoint
+              label="Aclaraciones"
+              value={clarificationSummary}
+              tone={openClarifications > 0 ? 'warning' : 'success'}
+            />
+            <Checkpoint
+              label="Material"
+              value={materialSummary}
+              tone={materialPending ? 'warning' : 'success'}
+            />
+          </div>
         </div>
-      </div>
 
-      <div className="mt-auto border-t border-slate-100 pt-4">
-        <p className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-400">
-          Gestión interna
-        </p>
-        <dl className="mt-2 divide-y divide-slate-100">
-          <div className="flex items-center justify-between gap-4 py-2.5">
-            <dt className="text-[8px] text-slate-500">Responsable</dt>
-            <dd className="truncate text-[9px] font-semibold text-slate-900">
-              {jobCase.assignedToName ?? 'Sin asignar'}
-            </dd>
-          </div>
-          <div className="flex items-center justify-between gap-4 py-2.5">
-            <dt className="text-[8px] text-slate-500">
-              Tomado para revisión
-            </dt>
-            <dd className="text-right text-[8px] font-medium text-slate-700">
-              {formatJobCaseDate(jobCase.assignedAt)}
-            </dd>
-          </div>
-          <div className="flex items-center justify-between gap-4 py-2.5">
-            <dt className="text-[8px] text-slate-500">Documentos</dt>
-            <dd className="text-[9px] font-semibold text-slate-900">
-              {jobCase.documents.length}
-            </dd>
-          </div>
-          <div className="flex items-center justify-between gap-4 py-2.5">
-            <dt className="text-[8px] text-slate-500">Aclaraciones</dt>
-            <dd className="text-right text-[9px] font-semibold text-slate-900">
-              {clarificationSummary}
-            </dd>
-          </div>
-        </dl>
+        <div className="border-t border-slate-100 pt-4 md:border-l md:border-t-0 md:pl-4 md:pt-0">
+          <p className="text-[7px] font-bold uppercase tracking-[0.12em] text-slate-400">
+            Gestión interna
+          </p>
+          <dl className="mt-2 divide-y divide-slate-100">
+            <div className="flex items-center justify-between gap-4 py-2.5">
+              <dt className="text-[8px] text-slate-500">Responsable</dt>
+              <dd className="truncate text-[9px] font-semibold text-slate-900">
+                {jobCase.assignedToName ?? 'Sin asignar'}
+              </dd>
+            </div>
+            <div className="flex items-center justify-between gap-4 py-2.5">
+              <dt className="text-[8px] text-slate-500">
+                Tomado para revisión
+              </dt>
+              <dd className="text-right text-[8px] font-medium text-slate-700">
+                {formatJobCaseDate(jobCase.assignedAt)}
+              </dd>
+            </div>
+            <div className="flex items-center justify-between gap-4 py-2.5">
+              <dt className="text-[8px] text-slate-500">Documentos</dt>
+              <dd className="text-[9px] font-semibold text-slate-900">
+                {jobCase.documents.length}
+              </dd>
+            </div>
+            <div className="flex items-center justify-between gap-4 py-2.5">
+              <dt className="text-[8px] text-slate-500">Aclaraciones</dt>
+              <dd className="text-right text-[9px] font-semibold text-slate-900">
+                {clarificationSummary}
+              </dd>
+            </div>
+          </dl>
+        </div>
       </div>
     </aside>
   )

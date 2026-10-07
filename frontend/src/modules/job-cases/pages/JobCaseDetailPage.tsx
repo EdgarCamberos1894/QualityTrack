@@ -15,6 +15,7 @@ import { getErrorMessage } from '@/shared/lib/getErrorMessage'
 import { CompleteJobCaseReviewDialog } from '../components/CompleteJobCaseReviewDialog'
 import { InformationRequestForm } from '../components/InformationRequestForm'
 import { JobCaseActionBar } from '../components/JobCaseActionBar'
+import { JobCaseAssignmentCard } from '../components/JobCaseAssignmentCard'
 import { JobCaseClarifications } from '../components/JobCaseClarifications'
 import { JobCaseDetailHeader } from '../components/JobCaseDetailHeader'
 import { JobCaseDocuments } from '../components/JobCaseDocuments'
@@ -169,6 +170,13 @@ export function JobCaseDetailPage() {
 
         <JobCaseSourceCard jobCase={jobCase} />
 
+        <JobCaseAssignmentCard
+          jobCase={jobCase}
+          user={session.user}
+          taking={takeMutation.isPending}
+          onTake={() => takeMutation.mutate()}
+        />
+
         {mutationError ? (
           <div
             role="alert"
@@ -188,6 +196,19 @@ export function JobCaseDetailPage() {
           </div>
         ) : null}
 
+        <JobCaseSummary jobCase={jobCase} />
+
+        <JobCaseDocuments documents={jobCase.documents} />
+
+        <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
+          <JobCaseMaterial
+            specification={jobCase.materialSpecification}
+            request={jobCase.request}
+          />
+
+          <JobCaseClarifications requests={jobCase.informationRequests} />
+        </div>
+
         {actionPanel === 'information' ? (
           <InformationRequestForm
             isSubmitting={infoMutation.isPending}
@@ -205,18 +226,14 @@ export function JobCaseDetailPage() {
           />
         ) : null}
 
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-stretch">
-          <JobCaseSummary jobCase={jobCase} />
-
+        {jobCase.status !== 'SUBMITTED' ? (
           <JobCaseActionBar
             jobCase={jobCase}
             user={session.user}
-            taking={takeMutation.isPending}
             completing={completeMutation.isPending}
             creatingQuotation={createQuotationMutation.isPending}
             quotationId={currentQuotation?.id ?? null}
             quotationLookupReady={quotationLookupReady}
-            onTake={() => takeMutation.mutate()}
             onRequestInformation={() => setActionPanel('information')}
             onDefineMaterial={() => setActionPanel('material')}
             onComplete={() => setCompleteDialogOpen(true)}
@@ -227,18 +244,7 @@ export function JobCaseDetailPage() {
               }
             }}
           />
-        </div>
-
-        <JobCaseDocuments documents={jobCase.documents} />
-
-        <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
-          <JobCaseMaterial
-            specification={jobCase.materialSpecification}
-            request={jobCase.request}
-          />
-
-          <JobCaseClarifications requests={jobCase.informationRequests} />
-        </div>
+        ) : null}
 
         {recentActivityQuery.isPending ? (
           <LoadingState label="Cargando actividad reciente…" />
