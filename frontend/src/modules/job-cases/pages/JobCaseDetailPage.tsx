@@ -170,13 +170,6 @@ export function JobCaseDetailPage() {
 
         <JobCaseSourceCard jobCase={jobCase} />
 
-        <JobCaseAssignmentCard
-          jobCase={jobCase}
-          user={session.user}
-          taking={takeMutation.isPending}
-          onTake={() => takeMutation.mutate()}
-        />
-
         {mutationError ? (
           <div
             role="alert"
@@ -196,55 +189,70 @@ export function JobCaseDetailPage() {
           </div>
         ) : null}
 
-        <JobCaseSummary jobCase={jobCase} />
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-start">
+          <div className="lg:col-start-2 lg:row-start-1">
+            <JobCaseAssignmentCard
+              jobCase={jobCase}
+              user={session.user}
+              taking={takeMutation.isPending}
+              onTake={() => takeMutation.mutate()}
+            />
+          </div>
 
-        <JobCaseDocuments documents={jobCase.documents} />
+          <div className="space-y-4 lg:col-start-1 lg:row-span-2 lg:row-start-1">
+            <JobCaseSummary jobCase={jobCase} />
 
-        <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
-          <JobCaseMaterial
-            specification={jobCase.materialSpecification}
-            request={jobCase.request}
-          />
+            <JobCaseDocuments documents={jobCase.documents} />
 
-          <JobCaseClarifications requests={jobCase.informationRequests} />
+            <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
+              <JobCaseMaterial
+                specification={jobCase.materialSpecification}
+                request={jobCase.request}
+              />
+
+              <JobCaseClarifications requests={jobCase.informationRequests} />
+            </div>
+
+            {actionPanel === 'information' ? (
+              <InformationRequestForm
+                isSubmitting={infoMutation.isPending}
+                onCancel={() => setActionPanel(null)}
+                onSubmit={submitInformation}
+              />
+            ) : null}
+
+            {actionPanel === 'material' ? (
+              <MaterialSpecificationForm
+                current={jobCase.materialSpecification}
+                isSubmitting={materialMutation.isPending}
+                onCancel={() => setActionPanel(null)}
+                onSubmit={submitMaterial}
+              />
+            ) : null}
+          </div>
+
+          {jobCase.status !== 'SUBMITTED' ? (
+            <div className="lg:col-start-2 lg:row-start-2">
+              <JobCaseActionBar
+                jobCase={jobCase}
+                user={session.user}
+                completing={completeMutation.isPending}
+                creatingQuotation={createQuotationMutation.isPending}
+                quotationId={currentQuotation?.id ?? null}
+                quotationLookupReady={quotationLookupReady}
+                onRequestInformation={() => setActionPanel('information')}
+                onDefineMaterial={() => setActionPanel('material')}
+                onComplete={() => setCompleteDialogOpen(true)}
+                onCreateQuotation={() => void createQuotation()}
+                onOpenQuotation={() => {
+                  if (currentQuotation) {
+                    navigate(`/quotations/${currentQuotation.id}`)
+                  }
+                }}
+              />
+            </div>
+          ) : null}
         </div>
-
-        {actionPanel === 'information' ? (
-          <InformationRequestForm
-            isSubmitting={infoMutation.isPending}
-            onCancel={() => setActionPanel(null)}
-            onSubmit={submitInformation}
-          />
-        ) : null}
-
-        {actionPanel === 'material' ? (
-          <MaterialSpecificationForm
-            current={jobCase.materialSpecification}
-            isSubmitting={materialMutation.isPending}
-            onCancel={() => setActionPanel(null)}
-            onSubmit={submitMaterial}
-          />
-        ) : null}
-
-        {jobCase.status !== 'SUBMITTED' ? (
-          <JobCaseActionBar
-            jobCase={jobCase}
-            user={session.user}
-            completing={completeMutation.isPending}
-            creatingQuotation={createQuotationMutation.isPending}
-            quotationId={currentQuotation?.id ?? null}
-            quotationLookupReady={quotationLookupReady}
-            onRequestInformation={() => setActionPanel('information')}
-            onDefineMaterial={() => setActionPanel('material')}
-            onComplete={() => setCompleteDialogOpen(true)}
-            onCreateQuotation={() => void createQuotation()}
-            onOpenQuotation={() => {
-              if (currentQuotation) {
-                navigate(`/quotations/${currentQuotation.id}`)
-              }
-            }}
-          />
-        ) : null}
 
         {recentActivityQuery.isPending ? (
           <LoadingState label="Cargando actividad reciente…" />
