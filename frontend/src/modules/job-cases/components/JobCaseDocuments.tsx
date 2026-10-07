@@ -39,10 +39,7 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
         <div className="flex min-w-0 flex-col gap-3 border-b border-blue-100/70 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-              <SidebarNavIcon
-                name="documents"
-                className="h-[17px] w-[17px]"
-              />
+              <SidebarNavIcon name="documents" className="h-[17px] w-[17px]" />
             </div>
             <div className="min-w-0">
               <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
@@ -117,8 +114,8 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                       {formatJobCaseFileSize(version.fileSize)}
                     </p>
                     <p className="mt-0.5 break-words text-[7px] text-slate-400">
-                      Actualizado {formatJobCaseDateTime(version.uploadedAt)} por{' '}
-                      {version.uploadedByName ?? 'usuario no disponible'}
+                      Actualizado {formatJobCaseDateTime(version.uploadedAt)}{' '}
+                      por {version.uploadedByName ?? 'usuario no disponible'}
                     </p>
                   </div>
 
@@ -126,9 +123,7 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                     <ActionIconButton
                       icon="view"
                       label={
-                        opening
-                          ? 'Abriendo documento…'
-                          : `Ver ${document.name}`
+                        opening ? 'Abriendo documento…' : `Ver ${document.name}`
                       }
                       tone="primary"
                       busy={opening}

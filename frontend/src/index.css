@@ -256,8 +256,11 @@ button:disabled {
     overflow: visible !important;
   }
 
-  body.printing-job-case #root
-    *:not(:has(.job-case-print-area)):not(.job-case-print-area):not(.job-case-print-area *) {
+  body.printing-job-case
+    #root
+    *:not(:has(.job-case-print-area)):not(.job-case-print-area):not(
+      .job-case-print-area *
+    ) {
     display: none !important;
   }
 
@@ -320,7 +323,10 @@ button:disabled {
   }
 
   body.printing-job-case .job-case-sheet-print-documents > div:last-child > div,
-  body.printing-job-case .job-case-sheet-print-clarifications > div:last-child > div {
+  body.printing-job-case
+    .job-case-sheet-print-clarifications
+    > div:last-child
+    > div {
     break-inside: avoid;
   }
 

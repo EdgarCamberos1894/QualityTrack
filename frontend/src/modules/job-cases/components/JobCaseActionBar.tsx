@@ -186,10 +186,7 @@ export function JobCaseActionBar({
     capabilities.canCreateQuotation &&
     quotationLookupReady &&
     quotationId === null
-  const context = getReviewContext(
-    jobCase,
-    capabilities.completeBlockReason,
-  )
+  const context = getReviewContext(jobCase, capabilities.completeBlockReason)
   const clarificationSummary = getJobCaseClarificationSummary(
     jobCase.informationRequests,
   )
@@ -339,9 +336,7 @@ export function JobCaseActionBar({
                 jobCase.documents.length > 0
                   ? `${jobCase.documents.length} archivo${
                       jobCase.documents.length === 1 ? '' : 's'
-                    } disponible${
-                      jobCase.documents.length === 1 ? '' : 's'
-                    }`
+                    } disponible${jobCase.documents.length === 1 ? '' : 's'}`
                   : 'Sin archivos adjuntos'
               }
               tone={jobCase.documents.length > 0 ? 'success' : 'neutral'}
@@ -365,13 +360,17 @@ export function JobCaseActionBar({
           </p>
           <dl className="mt-2 min-w-0 divide-y divide-slate-100">
             <div className="flex min-w-0 items-center justify-between gap-3 py-2.5">
-              <dt className="shrink-0 text-[8px] text-slate-500">Responsable</dt>
+              <dt className="shrink-0 text-[8px] text-slate-500">
+                Responsable
+              </dt>
               <dd className="min-w-0 max-w-[62%] break-words text-right text-[9px] font-semibold text-slate-900">
                 {jobCase.assignedToName ?? 'Sin asignar'}
               </dd>
             </div>
             <div className="flex min-w-0 items-center justify-between gap-3 py-2.5">
-              <dt className="text-[8px] text-slate-500">Tomado para revisión</dt>
+              <dt className="text-[8px] text-slate-500">
+                Tomado para revisión
+              </dt>
               <dd className="shrink-0 text-right text-[8px] font-medium text-slate-700">
                 {formatJobCaseDate(jobCase.assignedAt)}
               </dd>

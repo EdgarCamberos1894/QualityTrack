@@ -19,7 +19,10 @@ export function JobCaseMaterial({
   if (!specification) {
     if (request.materialRequirementType === 'SPECIFIED') {
       return (
-        <Card id="material-specification" className="job-case-material min-w-0 scroll-mt-24 overflow-hidden border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+        <Card
+          id="material-specification"
+          className="job-case-material min-w-0 scroll-mt-24 overflow-hidden border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]"
+        >
           <div className="flex min-w-0 items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
               <SidebarNavIcon name="cases" className="h-[17px] w-[17px]" />
@@ -53,7 +56,10 @@ export function JobCaseMaterial({
     }
 
     return (
-      <Card id="material-specification" className="job-case-material min-w-0 scroll-mt-24 overflow-hidden border-amber-100 bg-gradient-to-br from-white via-white to-amber-50/30 p-4">
+      <Card
+        id="material-specification"
+        className="job-case-material min-w-0 scroll-mt-24 overflow-hidden border-amber-100 bg-gradient-to-br from-white via-white to-amber-50/30 p-4"
+      >
         <EmptyState
           title="Definición técnica pendiente"
           description="El cliente solicitó asistencia para definir el material. Ingeniería debe completar esta definición antes de cerrar la revisión."
@@ -63,7 +69,10 @@ export function JobCaseMaterial({
   }
 
   return (
-    <Card id="material-specification" className="job-case-material min-w-0 scroll-mt-24 overflow-hidden border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+    <Card
+      id="material-specification"
+      className="job-case-material min-w-0 scroll-mt-24 overflow-hidden border-blue-100/70 bg-gradient-to-br from-white via-white to-blue-50/20 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]"
+    >
       <div className="flex min-w-0 items-start gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
           <SidebarNavIcon name="cases" className="h-[17px] w-[17px]" />

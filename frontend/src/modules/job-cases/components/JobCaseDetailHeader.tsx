@@ -35,8 +35,8 @@ export function JobCaseDetailHeader({ jobCase }: JobCaseDetailHeaderProps) {
           </div>
 
           <p className="mt-0.5 truncate text-[10px] text-slate-500">
-            {jobCase.request.title} · {jobCase.request.customerName} · historial y
-            contexto del caso
+            {jobCase.request.title} · {jobCase.request.customerName} · historial
+            y contexto del caso
           </p>
         </div>
       </div>

@@ -71,11 +71,7 @@ export function JobCaseActivityList({
           : actions
         const fallbackAction =
           primaryAction === undefined
-            ? getFallbackJobCaseTraceabilityAction(
-                event,
-                caseId,
-                workOrderId,
-              )
+            ? getFallbackJobCaseTraceabilityAction(event, caseId, workOrderId)
             : null
 
         return (
@@ -96,7 +92,8 @@ export function JobCaseActivityList({
 
                 {event.fromStatus || event.toStatus ? (
                   <p className="mt-1.5 break-words text-[8px] font-medium text-slate-500">
-                    {formatStatus(event.fromStatus)} → {formatStatus(event.toStatus)}
+                    {formatStatus(event.fromStatus)} →{' '}
+                    {formatStatus(event.toStatus)}
                   </p>
                 ) : null}
 
@@ -123,7 +120,9 @@ export function JobCaseActivityList({
                         to={fallbackAction.href}
                         className="inline-flex min-h-7 max-w-full items-center justify-center rounded-lg bg-blue-600 px-2.5 py-1.5 text-center text-[8px] font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
                       >
-                        <span className="break-words">{fallbackAction.label}</span>
+                        <span className="break-words">
+                          {fallbackAction.label}
+                        </span>
                         <span aria-hidden="true" className="ml-1 shrink-0">
                           →
                         </span>

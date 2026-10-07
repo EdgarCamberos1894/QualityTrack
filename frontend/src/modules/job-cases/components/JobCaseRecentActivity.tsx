@@ -29,7 +29,8 @@ export function JobCaseRecentActivity({
             Trazabilidad reciente
           </h2>
           <p className="mt-0.5 break-words text-[8px] text-slate-500">
-            Cada movimiento conserva el contexto y enlaza al recurso relacionado cuando sigue disponible.
+            Cada movimiento conserva el contexto y enlaza al recurso relacionado
+            cuando sigue disponible.
           </p>
         </div>
 
