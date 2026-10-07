@@ -24,7 +24,7 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
 
   if (documents.length === 0) {
     return (
-      <section className="job-case-documents min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-4">
+      <section className="job-case-documents w-full min-w-0 max-w-full overflow-hidden rounded-xl border border-slate-200 bg-white p-4">
         <EmptyState
           title="Sin documentos"
           description="La solicitud todavía no tiene documentos disponibles para revisión."
@@ -35,17 +35,17 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
 
   return (
     <>
-      <Card className="job-case-documents min-w-0 overflow-hidden border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/25 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
-        <div className="flex min-w-0 flex-col gap-3 border-b border-blue-100/70 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex min-w-0 items-start gap-3">
+      <Card className="job-case-documents w-full min-w-0 max-w-full overflow-hidden border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/25 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+        <div className="flex w-full min-w-0 max-w-full flex-col gap-3 overflow-hidden border-b border-blue-100/70 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 flex-1 items-start gap-3 overflow-hidden">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
               <SidebarNavIcon name="documents" className="h-[17px] w-[17px]" />
             </div>
-            <div className="min-w-0">
-              <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <p className="truncate text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
                 Archivos del trabajo
               </p>
-              <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
+              <h2 className="mt-0.5 truncate text-sm font-semibold text-slate-950">
                 Documentos
               </h2>
               <p className="mt-0.5 break-words text-[9px] leading-4 text-slate-500">
@@ -69,7 +69,7 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
           </p>
         ) : null}
 
-        <div className="min-w-0 divide-y divide-slate-100">
+        <div className="w-full min-w-0 max-w-full divide-y divide-slate-100 overflow-hidden">
           {documents.map((document) => {
             const version = document.currentVersion
             const opening =
@@ -83,12 +83,12 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
               <article
                 id={`document-${document.id}`}
                 key={document.id}
-                className="min-w-0 scroll-mt-24 overflow-hidden px-4 py-3.5 target:bg-blue-50/40"
+                className="w-full min-w-0 max-w-full scroll-mt-24 overflow-hidden px-4 py-3.5 target:bg-blue-50/40"
               >
-                <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="min-w-0 flex-1 overflow-hidden">
-                    <div className="flex min-w-0 flex-wrap items-center gap-2">
-                      <p className="max-w-full truncate text-[8px] font-bold uppercase tracking-wide text-blue-600">
+                <div className="flex w-full min-w-0 max-w-full flex-col gap-3 overflow-hidden lg:flex-row lg:items-center lg:justify-between">
+                  <div className="w-full min-w-0 max-w-full flex-1 overflow-hidden">
+                    <div className="flex w-full min-w-0 max-w-full flex-wrap items-center gap-2 overflow-hidden">
+                      <p className="min-w-0 max-w-full truncate text-[8px] font-bold uppercase tracking-wide text-blue-600">
                         {document.documentType}
                       </p>
                       <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[7px] font-medium text-slate-500">
@@ -96,7 +96,10 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                       </span>
                     </div>
 
-                    <h3 className="mt-1 max-w-full truncate text-[11px] font-semibold text-slate-950">
+                    <h3
+                      className="mt-1 block w-full min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-[11px] font-semibold text-slate-950"
+                      title={document.name}
+                    >
                       {document.name}
                     </h3>
 
@@ -107,13 +110,13 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                     ) : null}
 
                     <p
-                      className="mt-1.5 max-w-full truncate text-[8px] text-slate-500"
+                      className="mt-1.5 block w-full min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-[8px] text-slate-500"
                       title={version.fileName}
                     >
                       {version.fileName} ·{' '}
                       {formatJobCaseFileSize(version.fileSize)}
                     </p>
-                    <p className="mt-0.5 break-words text-[7px] text-slate-400">
+                    <p className="mt-0.5 max-w-full break-words text-[7px] text-slate-400">
                       Actualizado {formatJobCaseDateTime(version.uploadedAt)}{' '}
                       por {version.uploadedByName ?? 'usuario no disponible'}
                     </p>
