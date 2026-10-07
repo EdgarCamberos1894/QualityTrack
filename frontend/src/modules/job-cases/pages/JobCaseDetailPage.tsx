@@ -201,7 +201,7 @@ export function JobCaseDetailPage() {
             </div>
 
             {jobCase.status !== 'SUBMITTED' ? (
-              <div className="order-3 lg:order-none">
+              <div className="order-5 lg:order-none">
                 <JobCaseActionBar
                   jobCase={jobCase}
                   user={session.user}
@@ -223,11 +223,15 @@ export function JobCaseDetailPage() {
             ) : null}
           </div>
 
-          <div className="order-2 space-y-4 lg:col-start-1 lg:row-start-1 lg:order-none">
+          <div className="order-2 lg:col-start-1 lg:row-start-1 lg:order-none">
             <JobCaseSummary jobCase={jobCase} />
+          </div>
 
+          <div className="order-3 lg:col-span-2 lg:row-start-2 lg:order-none">
             <JobCaseDocuments documents={jobCase.documents} />
+          </div>
 
+          <div className="order-4 lg:col-span-2 lg:row-start-3 lg:order-none">
             <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
               <JobCaseMaterial
                 specification={jobCase.materialSpecification}
@@ -236,24 +240,28 @@ export function JobCaseDetailPage() {
 
               <JobCaseClarifications requests={jobCase.informationRequests} />
             </div>
+          </div>
 
-            {actionPanel === 'information' ? (
+          {actionPanel === 'information' ? (
+            <div className="order-6 lg:col-span-2 lg:order-none">
               <InformationRequestForm
                 isSubmitting={infoMutation.isPending}
                 onCancel={() => setActionPanel(null)}
                 onSubmit={submitInformation}
               />
-            ) : null}
+            </div>
+          ) : null}
 
-            {actionPanel === 'material' ? (
+          {actionPanel === 'material' ? (
+            <div className="order-6 lg:col-span-2 lg:order-none">
               <MaterialSpecificationForm
                 current={jobCase.materialSpecification}
                 isSubmitting={materialMutation.isPending}
                 onCancel={() => setActionPanel(null)}
                 onSubmit={submitMaterial}
               />
-            ) : null}
-          </div>
+            </div>
+          ) : null}
         </div>
 
         {recentActivityQuery.isPending ? (
