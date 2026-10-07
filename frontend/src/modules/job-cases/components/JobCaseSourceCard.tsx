@@ -29,17 +29,16 @@ export function JobCaseSourceCard({ jobCase }: JobCaseSourceCardProps) {
       ? 'Recolección en planta'
       : destination.mode === 'DEFINE_LATER'
         ? 'Destino por definir'
-        : [
-            destination.label,
-            destination.city,
-            destination.state,
-          ]
+        : [destination.label, destination.city, destination.state]
             .filter(Boolean)
             .join(' · ') || 'Destino acordado'
 
   return (
-    <section id="request-source" className="scroll-mt-24 rounded-xl border border-blue-100/80 bg-gradient-to-r from-white via-white to-blue-50/30 px-4 py-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.22)]">
-      <div className="flex items-center gap-3">
+    <section
+      id="request-source"
+      className="min-w-0 scroll-mt-24 overflow-hidden rounded-xl border border-blue-100/80 bg-gradient-to-r from-white via-white to-blue-50/30 px-4 py-3 shadow-[0_10px_28px_-24px_rgba(15,23,42,0.22)]"
+    >
+      <div className="flex min-w-0 items-center gap-3">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
           <SidebarNavIcon name="requests" className="h-4 w-4" />
         </span>
@@ -47,13 +46,13 @@ export function JobCaseSourceCard({ jobCase }: JobCaseSourceCardProps) {
           <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-blue-600">
             Solicitud de origen
           </p>
-          <p className="mt-0.5 text-[9px] font-medium text-slate-500">
+          <p className="mt-0.5 truncate text-[9px] font-medium text-slate-500">
             {jobCase.request.requestNumber} · {jobCase.request.customerName}
           </p>
         </div>
       </div>
 
-      <dl className="mt-3 grid gap-x-4 gap-y-2.5 border-t border-blue-100/70 pt-3 sm:grid-cols-2 xl:grid-cols-5">
+      <dl className="mt-3 grid min-w-0 gap-x-4 gap-y-2.5 border-t border-blue-100/70 pt-3 sm:grid-cols-2 xl:grid-cols-5">
         <Item label="Trabajo" value={jobCase.request.title} />
         <Item
           label="Cantidad"
