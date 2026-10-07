@@ -83,7 +83,7 @@ export function CustomerRequestDetailsStep({
       </Card>
 
       <div className="flex min-h-0 flex-col gap-2.5 lg:h-full">
-        <Card className="min-h-0 flex-1 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)] lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
+        <Card className="hidden min-h-0 flex-1 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)] lg:block lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
           <div className="flex items-center gap-2.5">
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
               <SidebarNavIcon name="cases" className="h-4 w-4" />
@@ -117,7 +117,7 @@ export function CustomerRequestDetailsStep({
           </ol>
         </Card>
 
-        <Card className="shrink-0 border-emerald-200 bg-gradient-to-r from-emerald-50/90 via-white to-emerald-50/65 p-3.5 shadow-none">
+        <Card className="hidden shrink-0 border-emerald-200 bg-gradient-to-r from-emerald-50/90 via-white to-emerald-50/65 p-3.5 shadow-none lg:block">
           <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-emerald-700">
             No te preocupes por el proceso
           </p>

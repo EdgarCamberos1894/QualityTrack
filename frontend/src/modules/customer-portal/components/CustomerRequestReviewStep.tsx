@@ -129,14 +129,14 @@ export function CustomerRequestReviewStep({
 }: CustomerRequestReviewStepProps) {
   const selectedAddress =
     values.deliveryMode === 'SAVED_ADDRESS'
-      ? addresses.find(
+      ? (addresses.find(
           (address) => String(address.id) === values.customerAddressId,
-        ) ?? null
+        ) ?? null)
       : null
 
   const deliveryLabel =
     values.deliveryMode === 'SAVED_ADDRESS'
-      ? selectedAddress?.label ?? 'Dirección de la empresa'
+      ? (selectedAddress?.label ?? 'Dirección de la empresa')
       : values.deliveryMode === 'CUSTOM_ADDRESS'
         ? values.deliveryLabel || 'Otro destino'
         : values.deliveryMode === 'CUSTOMER_PICKUP'
@@ -187,14 +187,14 @@ export function CustomerRequestReviewStep({
   ]
 
   return (
-    <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
-      <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
+    <div className="grid min-w-0 max-w-full gap-4 overflow-x-hidden lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
+      <Card className="min-w-0 max-w-full overflow-hidden p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-start gap-3">
+          <div className="flex min-w-0 items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
               <SidebarNavIcon name="requests" className="h-[17px] w-[17px]" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-blue-600">
                 Confirmación
               </p>
@@ -215,25 +215,25 @@ export function CustomerRequestReviewStep({
           </button>
         </div>
 
-        <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50/55 px-3.5 py-3">
-          <p className="text-[13px] font-semibold text-slate-950">
+        <div className="mt-3 min-w-0 rounded-xl border border-slate-200 bg-slate-50/55 px-3.5 py-3">
+          <p className="break-words text-[13px] font-semibold text-slate-950 [overflow-wrap:anywhere]">
             {values.title}
           </p>
-          <p className="mt-1 whitespace-pre-wrap text-[9px] leading-4 text-slate-600">
+          <p className="mt-1 whitespace-pre-wrap break-words text-[9px] leading-4 text-slate-600 [overflow-wrap:anywhere]">
             {values.description}
           </p>
         </div>
 
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+        <div className="mt-3 grid min-w-0 gap-2 sm:grid-cols-3">
           {metrics.map((metric) => (
             <div
               key={metric.label}
-              className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+              className="flex min-w-0 items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
             >
               <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                 <MetricIcon type={metric.type} />
               </span>
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-[8px] font-medium text-slate-500">
                   {metric.label}
                 </p>
@@ -245,9 +245,9 @@ export function CustomerRequestReviewStep({
           ))}
         </div>
 
-        <div className="mt-3 border-t border-slate-200 pt-3">
+        <div className="mt-3 min-w-0 border-t border-slate-200 pt-3">
           <div className="flex items-center justify-between gap-4">
-            <div>
+            <div className="min-w-0">
               <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-slate-400">
                 Definición técnica
               </p>
@@ -267,35 +267,35 @@ export function CustomerRequestReviewStep({
             </button>
           </div>
 
-          <div className="mt-2.5 grid gap-2 sm:grid-cols-2">
-            <div className="rounded-lg bg-slate-50/75 px-3 py-2.5">
+          <div className="mt-2.5 grid min-w-0 gap-2 sm:grid-cols-2">
+            <div className="min-w-0 rounded-lg bg-slate-50/75 px-3 py-2.5">
               <p className="text-[8px] font-medium text-slate-500">
                 Definición
               </p>
-              <p className="mt-0.5 text-[10px] font-semibold text-slate-800">
+              <p className="mt-0.5 break-words text-[10px] font-semibold text-slate-800 [overflow-wrap:anywhere]">
                 {values.materialRequirementType === 'SPECIFIED'
                   ? 'Material especificado'
                   : 'Asesoría técnica requerida'}
               </p>
             </div>
-            <div className="rounded-lg bg-slate-50/75 px-3 py-2.5">
+            <div className="min-w-0 rounded-lg bg-slate-50/75 px-3 py-2.5">
               <p className="text-[8px] font-medium text-slate-500">
                 Requisitos
               </p>
-              <p className="mt-0.5 whitespace-pre-wrap text-[9px] leading-4 text-slate-700">
+              <p className="mt-0.5 whitespace-pre-wrap break-words text-[9px] leading-4 text-slate-700 [overflow-wrap:anywhere]">
                 {values.materialRequirement}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="mt-3 border-t border-slate-200 pt-3">
+        <div className="mt-3 min-w-0 border-t border-slate-200 pt-3">
           <div className="flex items-center justify-between gap-4">
-            <div>
+            <div className="min-w-0">
               <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-slate-400">
                 Entrega acordada
               </p>
-              <h3 className="mt-0.5 text-[11px] font-semibold text-slate-950">
+              <h3 className="mt-0.5 break-words text-[11px] font-semibold text-slate-950 [overflow-wrap:anywhere]">
                 {deliveryLabel}
               </h3>
             </div>
@@ -311,12 +311,12 @@ export function CustomerRequestReviewStep({
             </button>
           </div>
 
-          <div className="mt-2.5 rounded-xl border border-slate-200 bg-slate-50/55 px-3 py-2.5">
-            <p className="text-[9px] font-medium leading-4 text-slate-700">
+          <div className="mt-2.5 min-w-0 rounded-xl border border-slate-200 bg-slate-50/55 px-3 py-2.5">
+            <p className="break-words text-[9px] font-medium leading-4 text-slate-700 [overflow-wrap:anywhere]">
               {deliveryAddress}
             </p>
             {values.deliveryContactName ? (
-              <p className="mt-1 text-[8px] text-slate-500">
+              <p className="mt-1 break-words text-[8px] text-slate-500 [overflow-wrap:anywhere]">
                 Contacto: {values.deliveryContactName}
                 {values.deliveryContactPhone
                   ? ' · ' + values.deliveryContactPhone
@@ -324,14 +324,14 @@ export function CustomerRequestReviewStep({
               </p>
             ) : null}
             {values.deliveryInstructions ? (
-              <p className="mt-1 text-[8px] leading-4 text-slate-500">
+              <p className="mt-1 break-words text-[8px] leading-4 text-slate-500 [overflow-wrap:anywhere]">
                 {values.deliveryInstructions}
               </p>
             ) : null}
           </div>
         </div>
 
-        <div className="mt-3">
+        <div className="mt-3 min-w-0">
           <div className="flex items-center justify-between">
             <p className="text-[11px] font-semibold text-slate-950">
               Documentos
@@ -341,18 +341,18 @@ export function CustomerRequestReviewStep({
             </span>
           </div>
 
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2 grid min-w-0 gap-2 sm:grid-cols-2">
             {documents.length > 0 ? (
               documents.map((document, index) => (
                 <div
                   key={`${document.file.name}-review-${index}`}
-                  className="flex items-center gap-2.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+                  className="flex min-w-0 max-w-full items-center gap-2.5 overflow-hidden rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
                 >
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                     <FileIcon />
                   </span>
-                  <div className="min-w-0">
-                    <p className="truncate text-[9px] font-semibold text-slate-800">
+                  <div className="min-w-0 flex-1">
+                    <p className="max-w-full truncate text-[9px] font-semibold text-slate-800">
                       {document.name?.trim() || document.file.name}
                     </p>
                     <p className="mt-0.5 text-[8px] text-slate-500">
@@ -360,7 +360,7 @@ export function CustomerRequestReviewStep({
                       {getFileExtension(document.file.name)}
                     </p>
                     {document.description ? (
-                      <p className="mt-1 truncate text-[8px] text-slate-400">
+                      <p className="mt-1 max-w-full truncate text-[8px] text-slate-400">
                         {document.description}
                       </p>
                     ) : null}
@@ -380,98 +380,98 @@ export function CustomerRequestReviewStep({
         </p>
       </Card>
 
-      <div className="flex min-h-0 flex-col gap-2.5 lg:h-full">
-        <div className="min-h-0 flex-1 space-y-2.5 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
+      <div className="flex min-w-0 min-h-0 max-w-full flex-col gap-2.5 lg:h-full">
+        <div className="hidden min-h-0 flex-1 space-y-2.5 lg:block lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
           <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-              <SidebarNavIcon name="quality" className="h-4 w-4" />
-            </span>
-            <div>
-              <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-emerald-700">
-                Validación final
-              </p>
-              <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
-                Antes de enviar
-              </h2>
-            </div>
-          </div>
-
-          <div className="mt-2.5 space-y-2.5">
-            {[
-              {
-                title: 'La solicitud quedará registrada',
-                detail: 'Podrás seguir su estado desde Solicitudes.',
-              },
-              {
-                title: 'Puede haber preguntas',
-                detail: 'Comercial puede pedir información adicional.',
-              },
-              {
-                title: 'Aún no es una cotización',
-                detail: 'Precio y condiciones se definen después.',
-              },
-            ].map((item) => (
-              <div key={item.title} className="flex gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-                  <svg
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                    className="h-3.5 w-3.5"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="m7 12 3 3 7-7" />
-                  </svg>
-                </span>
-                <div>
-                  <p className="text-[9px] font-semibold text-slate-900">
-                    {item.title}
-                  </p>
-                  <p className="mt-0.5 text-[8px] leading-4 text-slate-500">
-                    {item.detail}
-                  </p>
-                </div>
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                <SidebarNavIcon name="quality" className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-emerald-700">
+                  Validación final
+                </p>
+                <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
+                  Antes de enviar
+                </h2>
               </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card className="border-amber-300 bg-gradient-to-r from-amber-50/90 via-white to-amber-50/65 p-3.5 shadow-none">
-          <div className="flex items-start gap-2.5">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">
-              <svg
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                className="h-3.5 w-3.5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.9"
-                strokeLinecap="round"
-              >
-                <path d="M12 8v5" />
-                <path d="M12 17h.01" />
-                <circle cx="12" cy="12" r="9" />
-              </svg>
-            </span>
-            <div>
-              <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-amber-700">
-                Si necesitas corregir algo
-              </p>
-              <p className="mt-1.5 text-[9px] leading-4 text-slate-700">
-                Mientras la solicitud siga en revisión podrás modificarla. Los
-                cambios quedarán en la actividad y, si afectan el análisis, la
-                revisión puede reiniciarse.
-              </p>
             </div>
-          </div>
-        </Card>
+
+            <div className="mt-2.5 space-y-2.5">
+              {[
+                {
+                  title: 'La solicitud quedará registrada',
+                  detail: 'Podrás seguir su estado desde Solicitudes.',
+                },
+                {
+                  title: 'Puede haber preguntas',
+                  detail: 'Comercial puede pedir información adicional.',
+                },
+                {
+                  title: 'Aún no es una cotización',
+                  detail: 'Precio y condiciones se definen después.',
+                },
+              ].map((item) => (
+                <div key={item.title} className="flex gap-3">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+                    <svg
+                      viewBox="0 0 24 24"
+                      aria-hidden="true"
+                      className="h-3.5 w-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m7 12 3 3 7-7" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p className="text-[9px] font-semibold text-slate-900">
+                      {item.title}
+                    </p>
+                    <p className="mt-0.5 text-[8px] leading-4 text-slate-500">
+                      {item.detail}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="border-amber-300 bg-gradient-to-r from-amber-50/90 via-white to-amber-50/65 p-3.5 shadow-none">
+            <div className="flex items-start gap-2.5">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-700">
+                <svg
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  className="h-3.5 w-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.9"
+                  strokeLinecap="round"
+                >
+                  <path d="M12 8v5" />
+                  <path d="M12 17h.01" />
+                  <circle cx="12" cy="12" r="9" />
+                </svg>
+              </span>
+              <div>
+                <p className="text-[8px] font-bold uppercase tracking-[0.08em] text-amber-700">
+                  Si necesitas corregir algo
+                </p>
+                <p className="mt-1.5 text-[9px] leading-4 text-slate-700">
+                  Mientras la solicitud siga en revisión podrás modificarla. Los
+                  cambios quedarán en la actividad y, si afectan el análisis, la
+                  revisión puede reiniciarse.
+                </p>
+              </div>
+            </div>
+          </Card>
         </div>
 
-        <div className="shrink-0">{actions}</div>
+        <div className="min-w-0 max-w-full shrink-0">{actions}</div>
       </div>
     </div>
   )

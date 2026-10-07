@@ -56,8 +56,8 @@ export function CustomerRequestDeliveryStep({
   actions,
 }: CustomerRequestDeliveryStepProps) {
   return (
-    <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
-      <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
+    <div className="grid min-w-0 gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
+      <Card className="min-w-0 p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
         <div className="flex items-start gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
             <SidebarNavIcon name="deliveries" className="h-[17px] w-[17px]" />
@@ -284,8 +284,8 @@ export function CustomerRequestDeliveryStep({
         ) : null}
       </Card>
 
-      <div className="flex min-h-0 flex-col gap-2.5 lg:h-full">
-        <Card className="min-h-0 flex-1 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)]">
+      <div className="flex min-w-0 min-h-0 flex-col gap-2.5 lg:h-full">
+        <Card className="hidden min-h-0 flex-1 p-4 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.28)] lg:block">
           <p className="text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">
             Cómo se usará
           </p>
@@ -315,10 +315,9 @@ export function CustomerRequestDeliveryStep({
               del despacho.
             </p>
           ) : null}
-
         </Card>
 
-        <div className="shrink-0">{actions}</div>
+        <div className="min-w-0 shrink-0">{actions}</div>
       </div>
     </div>
   )
