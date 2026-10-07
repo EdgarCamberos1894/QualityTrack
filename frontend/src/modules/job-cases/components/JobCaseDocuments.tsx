@@ -24,7 +24,7 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
 
   if (documents.length === 0) {
     return (
-      <section className="rounded-xl border border-slate-200 bg-white p-4">
+      <section className="job-case-documents min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white p-4">
         <EmptyState
           title="Sin documentos"
           description="La solicitud todavía no tiene documentos disponibles para revisión."
@@ -35,20 +35,20 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
 
   return (
     <>
-      <Card className="overflow-hidden border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/25 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
-        <div className="flex flex-col gap-3 border-b border-blue-100/70 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-start gap-3">
+      <Card className="job-case-documents min-w-0 overflow-hidden border-blue-100/80 bg-gradient-to-br from-white via-white to-blue-50/25 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.24)]">
+        <div className="flex min-w-0 flex-col gap-3 border-b border-blue-100/70 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
               <SidebarNavIcon name="documents" className="h-[17px] w-[17px]" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
                 Archivos del trabajo
               </p>
               <h2 className="mt-0.5 text-sm font-semibold text-slate-950">
                 Documentos
               </h2>
-              <p className="mt-0.5 text-[9px] leading-4 text-slate-500">
+              <p className="mt-0.5 break-words text-[9px] leading-4 text-slate-500">
                 Abre los archivos que sustentan la revisión y consulta sus
                 versiones.
               </p>
@@ -69,7 +69,7 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
           </p>
         ) : null}
 
-        <div className="divide-y divide-slate-100">
+        <div className="min-w-0 divide-y divide-slate-100">
           {documents.map((document) => {
             const version = document.currentVersion
             const opening =
@@ -83,49 +83,46 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
               <article
                 id={`document-${document.id}`}
                 key={document.id}
-                className="scroll-mt-24 px-4 py-3.5 target:bg-blue-50/40"
+                className="min-w-0 scroll-mt-24 overflow-hidden px-4 py-3.5 target:bg-blue-50/40"
               >
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-[8px] font-bold uppercase tracking-wide text-blue-600">
+                <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <p className="max-w-full truncate text-[8px] font-bold uppercase tracking-wide text-blue-600">
                         {document.documentType}
                       </p>
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[7px] font-medium text-slate-500">
+                      <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[7px] font-medium text-slate-500">
                         v{version.version}
                       </span>
                     </div>
 
-                    <h3 className="mt-1 truncate text-[11px] font-semibold text-slate-950">
+                    <h3 className="mt-1 max-w-full truncate text-[11px] font-semibold text-slate-950">
                       {document.name}
                     </h3>
 
                     {document.description ? (
-                      <p className="mt-1 max-w-3xl whitespace-pre-wrap text-[9px] leading-4 text-slate-600">
+                      <p className="mt-1 max-w-3xl whitespace-pre-wrap break-words text-[9px] leading-4 text-slate-600">
                         {document.description}
                       </p>
                     ) : null}
 
-                    <p className="mt-1.5 text-[8px] text-slate-500">
-                      {version.fileName} ·{' '}
-                      {formatJobCaseFileSize(version.fileSize)}
+                    <p className="mt-1.5 max-w-full truncate text-[8px] text-slate-500" title={version.fileName}>
+                      {version.fileName} · {formatJobCaseFileSize(version.fileSize)}
                     </p>
-                    <p className="mt-0.5 text-[7px] text-slate-400">
-                      Actualizado {formatJobCaseDateTime(version.uploadedAt)}{' '}
-                      por {version.uploadedByName ?? 'usuario no disponible'}
+                    <p className="mt-0.5 break-words text-[7px] text-slate-400">
+                      Actualizado {formatJobCaseDateTime(version.uploadedAt)} por{' '}
+                      {version.uploadedByName ?? 'usuario no disponible'}
                     </p>
                   </div>
 
-                  <div className="flex shrink-0 flex-wrap gap-1.5">
+                  <div className="flex min-w-0 shrink-0 flex-wrap gap-1.5">
                     <ActionIconButton
                       icon="view"
                       label={opening ? 'Abriendo documento…' : `Ver ${document.name}`}
                       tone="primary"
                       busy={opening}
                       disabled={files.busy !== null && !opening}
-                      onClick={() =>
-                        void files.openVersion(document.id, version)
-                      }
+                      onClick={() => void files.openVersion(document.id, version)}
                     />
                     <ActionIconButton
                       icon="download"
@@ -136,9 +133,7 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                       }
                       busy={downloading}
                       disabled={files.busy !== null && !downloading}
-                      onClick={() =>
-                        void files.downloadVersion(document.id, version)
-                      }
+                      onClick={() => void files.downloadVersion(document.id, version)}
                     />
                     <ActionIconButton
                       icon="history"
