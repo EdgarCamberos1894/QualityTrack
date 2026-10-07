@@ -21,7 +21,7 @@ export function JobCaseSourceCard({ jobCase }: JobCaseSourceCardProps) {
   const material =
     jobCase.request.materialRequirementType === 'ASSISTANCE_REQUIRED'
       ? 'Asesoría técnica requerida'
-      : jobCase.request.materialRequirement ?? 'Sin especificar'
+      : (jobCase.request.materialRequirement ?? 'Sin especificar')
 
   const destination = jobCase.request.deliveryDestination
   const delivery =
