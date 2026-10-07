@@ -19,16 +19,16 @@ export function JobCaseRecentActivity({
   onOpenHistory,
 }: JobCaseRecentActivityProps) {
   return (
-    <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-30px_rgba(15,23,42,0.3)]">
-      <div className="flex flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/45 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+    <section className="job-case-activity min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_12px_35px_-30px_rgba(15,23,42,0.3)]">
+      <div className="flex min-w-0 flex-col gap-2 border-b border-blue-100 bg-gradient-to-r from-white via-white to-blue-50/45 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
             Trazabilidad
           </p>
-          <h2 className="mt-0.5 text-[12px] font-semibold text-slate-950">
+          <h2 className="mt-0.5 break-words text-[12px] font-semibold text-slate-950">
             Trazabilidad reciente
           </h2>
-          <p className="mt-0.5 text-[8px] text-slate-500">
+          <p className="mt-0.5 break-words text-[8px] text-slate-500">
             Cada movimiento conserva el contexto y enlaza al recurso relacionado cuando sigue disponible.
           </p>
         </div>
@@ -37,7 +37,7 @@ export function JobCaseRecentActivity({
           <Button
             size="sm"
             variant="secondary"
-            className="!h-7 !px-2.5 !text-[8px]"
+            className="!h-7 !w-full !justify-center !px-2.5 !text-[8px] sm:!w-auto"
             onClick={onOpenHistory}
           >
             Ver historial completo
@@ -45,7 +45,7 @@ export function JobCaseRecentActivity({
         ) : null}
       </div>
 
-      <div className="px-4 py-3.5">
+      <div className="min-w-0 px-4 py-3.5">
         {events.length === 0 ? (
           <EmptyState
             title="Sin actividad"
@@ -54,10 +54,10 @@ export function JobCaseRecentActivity({
         ) : (
           <>
             <JobCaseActivityList
-            events={events}
-            caseId={caseId}
-            workOrderId={workOrderId}
-          />
+              events={events}
+              caseId={caseId}
+              workOrderId={workOrderId}
+            />
             {hasMore ? (
               <p className="mt-3 text-[8px] text-slate-400">
                 Se muestran únicamente los movimientos más recientes.
