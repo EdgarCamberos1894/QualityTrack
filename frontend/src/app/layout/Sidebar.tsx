@@ -68,11 +68,11 @@ export function Sidebar({ open, user, onNavigate }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed inset-y-0 left-0 z-40 flex h-screen max-h-screen w-[248px] flex-col overflow-y-auto border-r border-slate-800 bg-slate-950 px-5 py-6 text-slate-200 transition-transform lg:sticky lg:top-0 lg:self-start lg:overflow-hidden lg:translate-x-0',
+        'fixed inset-y-0 left-0 z-40 flex h-[100dvh] max-h-[100dvh] w-[248px] flex-col overflow-hidden border-r border-slate-800 bg-slate-950 px-5 py-6 text-slate-200 transition-transform lg:sticky lg:top-0 lg:h-screen lg:max-h-screen lg:self-start lg:translate-x-0',
         open ? 'translate-x-0' : '-translate-x-full',
       )}
     >
-      <div className="flex items-center gap-3 px-1">
+      <div className="flex shrink-0 items-center gap-3 px-1">
         <img
           src="/brand/qualitytrack-mark-inverse.svg"
           alt=""
@@ -86,7 +86,7 @@ export function Sidebar({ open, user, onNavigate }: SidebarProps) {
         </div>
       </div>
 
-      <div className="mt-6 flex items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/80 px-3.5 py-3.5">
+      <div className="mt-6 flex shrink-0 items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/80 px-3.5 py-3.5">
         <div className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[10px] bg-blue-500/15 text-blue-300 ring-1 ring-blue-400/15">
           <SidebarNavIcon name="users" className="h-[18px] w-[18px]" />
         </div>
@@ -102,7 +102,7 @@ export function Sidebar({ open, user, onNavigate }: SidebarProps) {
       </div>
 
       <nav
-        className="mt-7 space-y-6 pb-5 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-contain lg:pr-1 [scrollbar-width:thin] [scrollbar-color:#334155_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb:hover]:bg-slate-600"
+        className="mt-7 min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain pb-[max(1.25rem,env(safe-area-inset-bottom))] pr-1 [scrollbar-width:thin] [scrollbar-color:#334155_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb:hover]:bg-slate-600"
         aria-label="Navegación principal"
       >
         {visibleGroups.map((group) => (
