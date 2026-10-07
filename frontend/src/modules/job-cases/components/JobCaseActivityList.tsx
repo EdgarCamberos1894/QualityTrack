@@ -32,7 +32,7 @@ export function JobCaseActivityList({
   workOrderId = null,
 }: JobCaseActivityListProps) {
   return (
-    <div className="relative space-y-2.5 pl-5 before:absolute before:bottom-3 before:left-[5px] before:top-3 before:w-px before:bg-slate-200">
+    <div className="relative min-w-0 space-y-2.5 pl-5 before:absolute before:bottom-3 before:left-[5px] before:top-3 before:w-px before:bg-slate-200">
       {events.map((event) => {
         const primaryHref = getPrimaryJobCaseTraceabilityHref(
           event,
@@ -81,49 +81,50 @@ export function JobCaseActivityList({
         return (
           <article
             key={event.id}
-            className="relative rounded-lg border border-slate-200 bg-white px-3 py-2.5 transition hover:border-slate-300"
+            className="relative min-w-0 overflow-hidden rounded-lg border border-slate-200 bg-white px-3 py-2.5 transition hover:border-slate-300"
           >
             <span className="absolute -left-[19px] top-3.5 h-2.5 w-2.5 rounded-full bg-blue-500 ring-4 ring-white" />
 
-            <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex min-w-0 flex-col gap-1.5 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
-                <h3 className="text-[10px] font-semibold text-slate-950">
+                <h3 className="break-words text-[10px] font-semibold text-slate-950">
                   {getJobCaseTimelineEventLabel(event.eventType)}
                 </h3>
-                <p className="mt-0.5 text-[8px] text-slate-400">
+                <p className="mt-0.5 break-words text-[8px] text-slate-400">
                   {event.performedByName ?? 'Sistema'}
                 </p>
 
                 {event.fromStatus || event.toStatus ? (
-                  <p className="mt-1.5 text-[8px] font-medium text-slate-500">
-                    {formatStatus(event.fromStatus)} →{' '}
-                    {formatStatus(event.toStatus)}
+                  <p className="mt-1.5 break-words text-[8px] font-medium text-slate-500">
+                    {formatStatus(event.fromStatus)} → {formatStatus(event.toStatus)}
                   </p>
                 ) : null}
 
                 {primaryAction || fallbackAction ? (
-                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
+                  <div className="mt-2 flex min-w-0 flex-wrap items-center gap-1.5">
                     {primaryAction ? (
                       <Link
                         to={primaryAction.href}
-                        className="inline-flex h-7 items-center justify-center rounded-lg bg-blue-600 px-2.5 text-[8px] font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                        className="inline-flex min-h-7 max-w-full items-center justify-center rounded-lg bg-blue-600 px-2.5 py-1.5 text-center text-[8px] font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
                       >
-                        {getJobCaseTraceabilityActionLabel(
-                          primaryAction.action,
-                          event,
-                          caseId,
-                        )}
-                        <span aria-hidden="true" className="ml-1">
+                        <span className="break-words">
+                          {getJobCaseTraceabilityActionLabel(
+                            primaryAction.action,
+                            event,
+                            caseId,
+                          )}
+                        </span>
+                        <span aria-hidden="true" className="ml-1 shrink-0">
                           →
                         </span>
                       </Link>
                     ) : fallbackAction ? (
                       <Link
                         to={fallbackAction.href}
-                        className="inline-flex h-7 items-center justify-center rounded-lg bg-blue-600 px-2.5 text-[8px] font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                        className="inline-flex min-h-7 max-w-full items-center justify-center rounded-lg bg-blue-600 px-2.5 py-1.5 text-center text-[8px] font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
                       >
-                        {fallbackAction.label}
-                        <span aria-hidden="true" className="ml-1">
+                        <span className="break-words">{fallbackAction.label}</span>
+                        <span aria-hidden="true" className="ml-1 shrink-0">
                           →
                         </span>
                       </Link>
@@ -133,13 +134,15 @@ export function JobCaseActivityList({
                       <Link
                         key={`${action.type}-${action.resourceId}`}
                         to={href}
-                        className="inline-flex h-7 items-center justify-center rounded-lg border border-slate-200 bg-white px-2.5 text-[8px] font-semibold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                        className="inline-flex min-h-7 max-w-full items-center justify-center rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-center text-[8px] font-semibold text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
                       >
-                        {getJobCaseTraceabilityActionLabel(
-                          action,
-                          event,
-                          caseId,
-                        )}
+                        <span className="break-words">
+                          {getJobCaseTraceabilityActionLabel(
+                            action,
+                            event,
+                            caseId,
+                          )}
+                        </span>
                       </Link>
                     ))}
                   </div>
