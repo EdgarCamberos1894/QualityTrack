@@ -216,15 +216,15 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
   }
 
   return (
-    <div className="space-y-3">
+    <div className="min-w-0 max-w-full space-y-3 overflow-x-hidden">
       {!session ? (
         <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[9px] leading-4 text-red-700">
           {getErrorMessage(new Error('No hay una sesión interna disponible.'))}
         </p>
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(280px,0.75fr)] lg:items-stretch">
-        <section className="space-y-3 rounded-xl border border-slate-200 bg-white p-3.5 shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
+      <div className="grid w-full min-w-0 max-w-full gap-4 lg:grid-cols-[minmax(0,1.65fr)_minmax(280px,0.75fr)] lg:items-stretch">
+        <section className="min-w-0 max-w-full space-y-3 overflow-hidden rounded-xl border border-slate-200 bg-white p-3.5 shadow-[0_12px_32px_-30px_rgba(15,23,42,0.3)]">
           <div>
             <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
               Planificación operativa
@@ -261,12 +261,12 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid min-w-0 max-w-full gap-3 sm:grid-cols-2">
             <section
               className={
                 detailPanel === 'documents'
-                  ? 'rounded-xl border border-blue-200 bg-blue-50/25 px-3.5 py-3 sm:col-span-2'
-                  : 'rounded-xl border border-slate-200 bg-slate-50/45 px-3.5 py-3'
+                  ? 'min-w-0 max-w-full overflow-hidden rounded-xl border border-blue-200 bg-blue-50/25 px-3.5 py-3 sm:col-span-2'
+                  : 'min-w-0 max-w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50/45 px-3.5 py-3'
               }
             >
               <p
@@ -280,7 +280,7 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
                   ? 'Documento de fabricación'
                   : 'Documentación pendiente'}
               </p>
-              <p className="mt-1.5 text-[9px] font-semibold text-slate-900">
+              <p className="mt-1.5 max-w-full whitespace-normal break-all [overflow-wrap:anywhere] text-[9px] font-semibold leading-4 text-slate-900 sm:truncate sm:break-normal">
                 {documentSummary}
               </p>
               <p className="mt-1 text-[7px] leading-3.5 text-slate-400">
@@ -306,7 +306,7 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
               {detailPanel === 'documents' ? (
                 <div
                   ref={documentPanelRef}
-                  className="mt-3 scroll-mt-20 border-t border-blue-100 pt-3"
+                  className="mt-3 min-w-0 max-w-full scroll-mt-20 overflow-hidden border-t border-blue-100 pt-3"
                 >
                   <WorkOrderPinnedDocuments
                     documents={caseDocuments}
@@ -320,7 +320,7 @@ export function WorkOrderPreparation({ data }: WorkOrderPreparationProps) {
               ) : null}
             </section>
 
-            <section className="rounded-xl border border-slate-200 bg-slate-50/45 px-3.5 py-3">
+            <section className="min-w-0 max-w-full rounded-xl border border-slate-200 bg-slate-50/45 px-3.5 py-3">
               <p className="text-[7px] font-bold uppercase tracking-[0.1em] text-slate-400">
                 Hoja de ruta
               </p>

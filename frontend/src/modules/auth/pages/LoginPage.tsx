@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LoginForm } from '../components/LoginForm'
 import { PublicAuthLayout } from '../components/PublicAuthLayout'
+import type { AccountType } from '../types/auth.types'
 
 interface LoginLocationState {
   from?: {
@@ -9,12 +10,40 @@ interface LoginLocationState {
   }
 }
 
-function getDestination(state: unknown): string {
+const PUBLIC_DESTINATIONS = new Set([
+  '/',
+  '/login',
+  '/register',
+  '/resend-verification',
+  '/forgot-password',
+  '/verify-email',
+  '/reset-password',
+])
+
+function getAccountHome(accountType: AccountType): string {
+  return accountType === 'CUSTOMER' ? '/portal' : '/dashboard'
+}
+
+function getDestination(state: unknown, accountType: AccountType): string {
   const candidate = state as LoginLocationState | null
   const pathname = candidate?.from?.pathname
+  const accountHome = getAccountHome(accountType)
 
-  if (!pathname || !pathname.startsWith('/') || pathname.startsWith('//')) {
-    return '/account'
+  if (
+    !pathname ||
+    !pathname.startsWith('/') ||
+    pathname.startsWith('//') ||
+    PUBLIC_DESTINATIONS.has(pathname)
+  ) {
+    return accountHome
+  }
+
+  if (accountType === 'CUSTOMER') {
+    if (pathname !== '/account' && !pathname.startsWith('/portal')) {
+      return accountHome
+    }
+  } else if (pathname.startsWith('/portal')) {
+    return accountHome
   }
 
   return `${pathname}${candidate?.from?.search ?? ''}`
@@ -23,7 +52,6 @@ function getDestination(state: unknown): string {
 export function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
-  const destination = getDestination(location.state)
 
   return (
     <PublicAuthLayout
@@ -45,7 +73,11 @@ export function LoginPage() {
       lockViewport
     >
       <LoginForm
-        onAuthenticated={() => navigate(destination, { replace: true })}
+        onAuthenticated={(accountType) =>
+          navigate(getDestination(location.state, accountType), {
+            replace: true,
+          })
+        }
       />
     </PublicAuthLayout>
   )
