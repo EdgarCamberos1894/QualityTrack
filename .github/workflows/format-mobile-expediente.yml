@@ -1,0 +1,58 @@
+name: Format mobile expediente
+
+on:
+  push:
+    branches:
+      - fix/mobile-demo-polish
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --include=optional --legacy-peer-deps
+
+      - name: Format expediente mobile files
+        run: >-
+          npx prettier --write
+          src/index.css
+          src/modules/job-cases/components/JobCaseDetailHeader.tsx
+          src/modules/job-cases/components/JobCaseActionBar.tsx
+          src/modules/job-cases/components/JobCaseDocuments.tsx
+          src/modules/job-cases/components/JobCaseMaterial.tsx
+          src/modules/job-cases/components/JobCaseClarifications.tsx
+          src/modules/job-cases/components/JobCaseRecentActivity.tsx
+          src/modules/job-cases/components/JobCaseActivityList.tsx
+
+      - name: Commit formatted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/index.css src/modules/job-cases/components
+          if git diff --cached --quiet; then
+            echo "No formatting changes required."
+            exit 0
+          fi
+          git commit -m "style: format mobile expediente [skip ci]"
+          git push
