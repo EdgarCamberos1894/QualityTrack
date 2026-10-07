@@ -39,7 +39,10 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
         <div className="flex min-w-0 flex-col gap-3 border-b border-blue-100/70 px-4 py-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-              <SidebarNavIcon name="documents" className="h-[17px] w-[17px]" />
+              <SidebarNavIcon
+                name="documents"
+                className="h-[17px] w-[17px]"
+              />
             </div>
             <div className="min-w-0">
               <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
@@ -106,8 +109,12 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                       </p>
                     ) : null}
 
-                    <p className="mt-1.5 max-w-full truncate text-[8px] text-slate-500" title={version.fileName}>
-                      {version.fileName} · {formatJobCaseFileSize(version.fileSize)}
+                    <p
+                      className="mt-1.5 max-w-full truncate text-[8px] text-slate-500"
+                      title={version.fileName}
+                    >
+                      {version.fileName} ·{' '}
+                      {formatJobCaseFileSize(version.fileSize)}
                     </p>
                     <p className="mt-0.5 break-words text-[7px] text-slate-400">
                       Actualizado {formatJobCaseDateTime(version.uploadedAt)} por{' '}
@@ -118,11 +125,17 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                   <div className="flex min-w-0 shrink-0 flex-wrap gap-1.5">
                     <ActionIconButton
                       icon="view"
-                      label={opening ? 'Abriendo documento…' : `Ver ${document.name}`}
+                      label={
+                        opening
+                          ? 'Abriendo documento…'
+                          : `Ver ${document.name}`
+                      }
                       tone="primary"
                       busy={opening}
                       disabled={files.busy !== null && !opening}
-                      onClick={() => void files.openVersion(document.id, version)}
+                      onClick={() =>
+                        void files.openVersion(document.id, version)
+                      }
                     />
                     <ActionIconButton
                       icon="download"
@@ -133,7 +146,9 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                       }
                       busy={downloading}
                       disabled={files.busy !== null && !downloading}
-                      onClick={() => void files.downloadVersion(document.id, version)}
+                      onClick={() =>
+                        void files.downloadVersion(document.id, version)
+                      }
                     />
                     <ActionIconButton
                       icon="history"
