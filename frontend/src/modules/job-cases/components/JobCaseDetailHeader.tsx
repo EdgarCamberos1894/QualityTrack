@@ -14,7 +14,7 @@ export function JobCaseDetailHeader({ jobCase }: JobCaseDetailHeaderProps) {
   const status = getJobCaseStatusPresentation(jobCase.status)
 
   return (
-    <header className="mb-3 flex items-center justify-between gap-4">
+    <header className="job-case-detail-header mb-3 flex min-w-0 items-center justify-between gap-4">
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200/70">
           <SidebarNavIcon name="cases" className="h-4 w-4" />
@@ -26,7 +26,7 @@ export function JobCaseDetailHeader({ jobCase }: JobCaseDetailHeaderProps) {
           </p>
 
           <div className="mt-0.5 flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
-            <h1 className="truncate text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
+            <h1 className="min-w-0 truncate text-xl font-bold tracking-tight text-slate-950 lg:text-[22px]">
               {jobCase.caseNumber}
             </h1>
             <Badge tone={status.tone} className="px-2 py-0.5 text-[8px]">
