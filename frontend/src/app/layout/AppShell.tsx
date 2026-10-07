@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
 import {
   clearCurrentSession,
@@ -15,6 +15,24 @@ export function AppShell() {
   const session = useSessionStore((state) => state.session)
 
   useSessionExpiry()
+
+  useEffect(() => {
+    if (!sidebarOpen) return
+
+    const previousBodyOverflow = document.body.style.overflow
+    const previousBodyOverscroll = document.body.style.overscrollBehavior
+    const previousHtmlOverflow = document.documentElement.style.overflow
+
+    document.body.style.overflow = 'hidden'
+    document.body.style.overscrollBehavior = 'none'
+    document.documentElement.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow
+      document.body.style.overscrollBehavior = previousBodyOverscroll
+      document.documentElement.style.overflow = previousHtmlOverflow
+    }
+  }, [sidebarOpen])
 
   if (!session) return null
 
