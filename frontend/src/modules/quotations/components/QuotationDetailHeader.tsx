@@ -35,8 +35,8 @@ export function QuotationDetailHeader({
 
   return (
     <section className="mb-4 rounded-2xl border border-slate-200 bg-gradient-to-r from-white via-white to-blue-50/55 px-5 py-4 shadow-[0_16px_44px_-36px_rgba(15,23,42,0.34)] sm:px-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex min-w-0 items-start gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="order-2 flex min-w-0 items-start gap-3 sm:order-1">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200/70">
             <SidebarNavIcon name="quotations" className="h-4 w-4" />
           </span>
@@ -70,7 +70,7 @@ export function QuotationDetailHeader({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="order-1 flex w-full items-center justify-between gap-2 sm:order-2 sm:w-auto sm:shrink-0 sm:justify-end">
           <CompactBackButton
             label="Volver a cotizaciones"
             onClick={() => navigate('/quotations')}
