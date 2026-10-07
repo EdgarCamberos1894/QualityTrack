@@ -97,7 +97,7 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                     </div>
 
                     <h3
-                      className="mt-1 block w-full min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-[11px] font-semibold text-slate-950"
+                      className="mt-1 block w-full min-w-0 max-w-full whitespace-normal break-all [overflow-wrap:anywhere] text-[11px] font-semibold leading-4 text-slate-950 sm:truncate sm:break-normal"
                       title={document.name}
                     >
                       {document.name}
@@ -110,7 +110,7 @@ export function JobCaseDocuments({ documents }: JobCaseDocumentsProps) {
                     ) : null}
 
                     <p
-                      className="mt-1.5 block w-full min-w-0 max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-[8px] text-slate-500"
+                      className="mt-1.5 block w-full min-w-0 max-w-full whitespace-normal break-all [overflow-wrap:anywhere] text-[8px] leading-4 text-slate-500 sm:truncate sm:break-normal"
                       title={version.fileName}
                     >
                       {version.fileName} ·{' '}
