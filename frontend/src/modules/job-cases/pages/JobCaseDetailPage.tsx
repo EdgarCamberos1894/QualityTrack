@@ -190,16 +190,40 @@ export function JobCaseDetailPage() {
         ) : null}
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)] lg:items-start">
-          <div className="lg:col-start-2 lg:row-start-1">
-            <JobCaseAssignmentCard
-              jobCase={jobCase}
-              user={session.user}
-              taking={takeMutation.isPending}
-              onTake={() => takeMutation.mutate()}
-            />
+          <div className="contents lg:col-start-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-4">
+            <div className="order-1 lg:order-none">
+              <JobCaseAssignmentCard
+                jobCase={jobCase}
+                user={session.user}
+                taking={takeMutation.isPending}
+                onTake={() => takeMutation.mutate()}
+              />
+            </div>
+
+            {jobCase.status !== 'SUBMITTED' ? (
+              <div className="order-3 lg:order-none">
+                <JobCaseActionBar
+                  jobCase={jobCase}
+                  user={session.user}
+                  completing={completeMutation.isPending}
+                  creatingQuotation={createQuotationMutation.isPending}
+                  quotationId={currentQuotation?.id ?? null}
+                  quotationLookupReady={quotationLookupReady}
+                  onRequestInformation={() => setActionPanel('information')}
+                  onDefineMaterial={() => setActionPanel('material')}
+                  onComplete={() => setCompleteDialogOpen(true)}
+                  onCreateQuotation={() => void createQuotation()}
+                  onOpenQuotation={() => {
+                    if (currentQuotation) {
+                      navigate(`/quotations/${currentQuotation.id}`)
+                    }
+                  }}
+                />
+              </div>
+            ) : null}
           </div>
 
-          <div className="space-y-4 lg:col-start-1 lg:row-span-2 lg:row-start-1">
+          <div className="order-2 space-y-4 lg:col-start-1 lg:row-start-1 lg:order-none">
             <JobCaseSummary jobCase={jobCase} />
 
             <JobCaseDocuments documents={jobCase.documents} />
@@ -230,28 +254,6 @@ export function JobCaseDetailPage() {
               />
             ) : null}
           </div>
-
-          {jobCase.status !== 'SUBMITTED' ? (
-            <div className="lg:col-start-2 lg:row-start-2">
-              <JobCaseActionBar
-                jobCase={jobCase}
-                user={session.user}
-                completing={completeMutation.isPending}
-                creatingQuotation={createQuotationMutation.isPending}
-                quotationId={currentQuotation?.id ?? null}
-                quotationLookupReady={quotationLookupReady}
-                onRequestInformation={() => setActionPanel('information')}
-                onDefineMaterial={() => setActionPanel('material')}
-                onComplete={() => setCompleteDialogOpen(true)}
-                onCreateQuotation={() => void createQuotation()}
-                onOpenQuotation={() => {
-                  if (currentQuotation) {
-                    navigate(`/quotations/${currentQuotation.id}`)
-                  }
-                }}
-              />
-            </div>
-          ) : null}
         </div>
 
         {recentActivityQuery.isPending ? (
