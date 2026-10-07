@@ -51,7 +51,7 @@ export function CustomerRequestRequirementsStep({
   const [draftDescription, setDraftDescription] = useState('')
 
   const editingDocument =
-    editingIndex === null ? null : documents[editingIndex] ?? null
+    editingIndex === null ? null : (documents[editingIndex] ?? null)
 
   const openEditor = (index: number) => {
     const document = documents[index]
@@ -83,13 +83,13 @@ export function CustomerRequestRequirementsStep({
 
   return (
     <>
-      <div className="grid gap-4 lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
-        <Card className="p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
+      <div className="grid min-w-0 max-w-full gap-4 overflow-x-hidden lg:h-full lg:min-h-0 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
+        <Card className="min-w-0 max-w-full overflow-hidden p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.32)] lg:h-full lg:min-h-0 lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
           <div className="flex items-start gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
               <SidebarNavIcon name="materials" className="h-[17px] w-[17px]" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-indigo-600">
                 Definición técnica
               </p>
@@ -102,7 +102,7 @@ export function CustomerRequestRequirementsStep({
             </div>
           </div>
 
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <div className="mt-3 grid min-w-0 gap-2 sm:grid-cols-2">
             {[
               {
                 value: 'SPECIFIED' as const,
@@ -129,8 +129,8 @@ export function CustomerRequestRequirementsStep({
                   }
                   className={
                     selected
-                      ? 'flex items-start gap-3 rounded-xl border border-blue-500 bg-blue-50/70 p-3.5 text-left shadow-sm'
-                      : 'flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 text-left transition hover:border-slate-300 hover:bg-white'
+                      ? 'flex min-w-0 items-start gap-3 rounded-xl border border-blue-500 bg-blue-50/70 p-3.5 text-left shadow-sm'
+                      : 'flex min-w-0 items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 text-left transition hover:border-slate-300 hover:bg-white'
                   }
                 >
                   <span
@@ -142,11 +142,11 @@ export function CustomerRequestRequirementsStep({
                   >
                     {selected ? '✓' : ''}
                   </span>
-                  <span className="min-w-0">
-                    <span className="block text-[11px] font-semibold text-slate-950">
+                  <span className="min-w-0 flex-1">
+                    <span className="block break-words text-[11px] font-semibold text-slate-950 [overflow-wrap:anywhere]">
                       {option.title}
                     </span>
-                    <span className="mt-1 block text-[9px] leading-4 text-slate-500">
+                    <span className="mt-1 block break-words text-[9px] leading-4 text-slate-500 [overflow-wrap:anywhere]">
                       {option.detail}
                     </span>
                   </span>
@@ -155,7 +155,7 @@ export function CustomerRequestRequirementsStep({
             })}
           </div>
 
-          <div className="mt-3 [&_label]:mb-1.5 [&_label]:text-[11px] [&_p]:mt-1 [&_p]:text-[9px]">
+          <div className="mt-3 min-w-0 [&_label]:mb-1.5 [&_label]:text-[11px] [&_p]:mt-1 [&_p]:text-[9px]">
             <TextareaField
               label={
                 materialRequirementType === 'SPECIFIED'
@@ -170,50 +170,53 @@ export function CustomerRequestRequirementsStep({
             />
           </div>
 
-          <div className="mt-3 rounded-xl border border-blue-200 bg-blue-50/65 px-3 py-2.5">
-            <p className="text-[9px] leading-4 text-slate-700">
+          <div className="mt-3 min-w-0 overflow-hidden rounded-xl border border-blue-200 bg-blue-50/65 px-3 py-2.5">
+            <p className="break-words text-[9px] leading-4 text-slate-700 [overflow-wrap:anywhere]">
               No necesitas elegir el proceso de fabricación. Comercial e
               Ingeniería lo determinan durante la revisión.
             </p>
           </div>
         </Card>
 
-        <div className="flex min-h-0 flex-col gap-3 lg:h-full">
-          <Card className="min-h-0 flex-1 p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.3)] lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex min-w-0 items-start gap-3">
+        <div className="flex min-h-0 min-w-0 max-w-full flex-col gap-3 lg:h-full">
+          <Card className="min-h-0 min-w-0 max-w-full flex-1 overflow-hidden p-3.5 shadow-[0_12px_35px_-26px_rgba(15,23,42,0.3)] lg:overflow-y-auto lg:[scrollbar-gutter:stable]">
+            <div className="flex min-w-0 items-start justify-between gap-3">
+              <div className="flex min-w-0 flex-1 items-start gap-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                  <SidebarNavIcon name="documents" className="h-[17px] w-[17px]" />
+                  <SidebarNavIcon
+                    name="documents"
+                    className="h-[17px] w-[17px]"
+                  />
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-[8px] font-bold uppercase tracking-[0.12em] text-blue-600">
                     Archivos del trabajo
                   </p>
                   <h2 className="mt-0.5 text-base font-semibold text-slate-950">
                     Documentos
                   </h2>
-                  <p className="mt-0.5 text-[10px] leading-4 text-slate-500">
+                  <p className="mt-0.5 break-words text-[10px] leading-4 text-slate-500 [overflow-wrap:anywhere]">
                     Planos, fotos, especificaciones u otra referencia útil.
                   </p>
                 </div>
               </div>
 
               {documents.length > 0 ? (
-                <span className="rounded-full bg-slate-100 px-2 py-1 text-[8px] font-semibold text-slate-600">
+                <span className="shrink-0 rounded-full bg-slate-100 px-2 py-1 text-[8px] font-semibold text-slate-600">
                   {documents.length} / 5
                 </span>
               ) : null}
             </div>
 
-            <label className="group mt-3 flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-blue-300 bg-gradient-to-r from-blue-50/55 via-white to-slate-50/70 px-3.5 py-3 transition hover:border-blue-400 hover:from-blue-50/80 hover:to-blue-50/45">
+            <label className="group mt-3 flex min-w-0 max-w-full cursor-pointer items-center gap-3 overflow-hidden rounded-xl border border-dashed border-blue-300 bg-gradient-to-r from-blue-50/55 via-white to-slate-50/70 px-3.5 py-3 transition hover:border-blue-400 hover:from-blue-50/80 hover:to-blue-50/45">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white text-lg font-light text-blue-600 shadow-sm ring-1 ring-blue-100 transition group-hover:ring-blue-200">
                 +
               </span>
-              <span className="min-w-0">
+              <span className="min-w-0 flex-1">
                 <span className="block text-[10px] font-semibold text-blue-700">
                   Agregar archivos
                 </span>
-                <span className="mt-0.5 block text-[8px] leading-4 text-slate-500">
+                <span className="mt-0.5 block break-words text-[8px] leading-4 text-slate-500 [overflow-wrap:anywhere]">
                   Selecciona hasta 5 archivos de máximo 25 MB.
                 </span>
               </span>
@@ -229,16 +232,16 @@ export function CustomerRequestRequirementsStep({
             </label>
 
             {documentError ? (
-              <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[10px] text-red-700">
+              <p className="mt-2 break-words rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[10px] text-red-700 [overflow-wrap:anywhere]">
                 {documentError}
               </p>
             ) : null}
 
-            <div className="mt-3 space-y-2">
+            <div className="mt-3 min-w-0 max-w-full space-y-2">
               {documents.map((document, index) => (
                 <div
                   key={`${document.file.name}-${index}`}
-                  className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+                  className="group flex min-w-0 max-w-full items-center gap-3 overflow-hidden rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
                 >
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
                     <svg
@@ -257,19 +260,21 @@ export function CustomerRequestRequirementsStep({
                     </svg>
                   </div>
 
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[10px] font-semibold text-slate-800">
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    <p className="max-w-full truncate text-[10px] font-semibold text-slate-800">
                       {document.name?.trim() || document.file.name}
                     </p>
-                    <div className="mt-0.5 flex items-center gap-2 text-[8px] text-slate-500">
-                      <span>
+                    <div className="mt-0.5 flex min-w-0 items-center gap-2 text-[8px] text-slate-500">
+                      <span className="shrink-0">
                         {(document.file.size / (1024 * 1024)).toFixed(1)} MB
                       </span>
-                      <span className="h-1 w-1 rounded-full bg-slate-300" />
-                      <span>{getFileExtension(document.file.name)}</span>
+                      <span className="h-1 w-1 shrink-0 rounded-full bg-slate-300" />
+                      <span className="truncate">
+                        {getFileExtension(document.file.name)}
+                      </span>
                     </div>
                     {document.description ? (
-                      <p className="mt-1 truncate text-[8px] text-slate-400">
+                      <p className="mt-1 max-w-full truncate text-[8px] text-slate-400">
                         {document.description}
                       </p>
                     ) : null}
@@ -329,10 +334,9 @@ export function CustomerRequestRequirementsStep({
                 </p>
               ) : null}
             </div>
-
           </Card>
 
-          {actions}
+          <div className="min-w-0 max-w-full">{actions}</div>
         </div>
       </div>
 
@@ -348,17 +352,20 @@ export function CustomerRequestRequirementsStep({
             role="dialog"
             aria-modal="true"
             aria-labelledby="document-editor-title"
-            className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl"
+            className="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl"
           >
-            <div className="flex items-start justify-between gap-4">
-              <div>
+            <div className="flex min-w-0 items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
                 <h3
                   id="document-editor-title"
                   className="text-sm font-semibold text-slate-950"
                 >
                   Editar detalles
                 </h3>
-                <p className="mt-1 text-[9px] text-slate-500">
+                <p
+                  className="mt-1 truncate text-[9px] text-slate-500"
+                  title={editingDocument.file.name}
+                >
                   Archivo original · {editingDocument.file.name}
                 </p>
               </div>
@@ -367,7 +374,7 @@ export function CustomerRequestRequirementsStep({
                 type="button"
                 onClick={closeEditor}
                 aria-label="Cerrar"
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
               >
                 <svg
                   viewBox="0 0 24 24"
@@ -383,8 +390,8 @@ export function CustomerRequestRequirementsStep({
               </button>
             </div>
 
-            <div className="mt-4 space-y-3">
-              <label className="block">
+            <div className="mt-4 min-w-0 space-y-3">
+              <label className="block min-w-0">
                 <span className="mb-1.5 block text-[9px] font-semibold text-slate-700">
                   Nombre del documento
                 </span>
@@ -393,11 +400,11 @@ export function CustomerRequestRequirementsStep({
                   value={draftName}
                   maxLength={180}
                   onChange={(event) => setDraftName(event.target.value)}
-                  className="h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-[10px] text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  className="h-9 w-full min-w-0 rounded-lg border border-slate-300 bg-white px-3 text-[10px] text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                 />
               </label>
 
-              <label className="block">
+              <label className="block min-w-0">
                 <span className="mb-1.5 block text-[9px] font-semibold text-slate-700">
                   Descripción
                   <span className="ml-1 font-normal text-slate-400">
@@ -408,13 +415,13 @@ export function CustomerRequestRequirementsStep({
                   value={draftDescription}
                   maxLength={500}
                   onChange={(event) => setDraftDescription(event.target.value)}
-                  className="min-h-20 w-full resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 text-[10px] leading-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+                  className="min-h-20 w-full min-w-0 resize-none rounded-lg border border-slate-300 bg-white px-3 py-2 text-[10px] leading-4 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                   placeholder="Añade contexto útil sobre este documento."
                 />
               </label>
             </div>
 
-            <div className="mt-3 flex items-start gap-2 rounded-lg bg-slate-50 px-3 py-2">
+            <div className="mt-3 flex min-w-0 items-start gap-2 rounded-lg bg-slate-50 px-3 py-2">
               <svg
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -426,9 +433,9 @@ export function CustomerRequestRequirementsStep({
                 <circle cx="12" cy="12" r="9" />
                 <path d="M12 11v5M12 8h.01" />
               </svg>
-              <p className="text-[8px] leading-4 text-slate-500">
-                El nombre y la descripción son metadatos. El archivo original
-                no se modifica.
+              <p className="min-w-0 break-words text-[8px] leading-4 text-slate-500 [overflow-wrap:anywhere]">
+                El nombre y la descripción son metadatos. El archivo original no
+                se modifica.
               </p>
             </div>
 
